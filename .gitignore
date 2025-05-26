@@ -1,0 +1,9 @@
+*.o
+*.a
+*.out
+*.so
+*.gcno
+*.gcda
+*.gcov
+coding-style-cpp-reports.log
+coding-style-reports.log
