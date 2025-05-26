@@ -1,0 +1,110 @@
+##
+## EPITECH PROJECT, 2023
+## painauchocolat
+## File description:
+## Bonus
+##
+
+name: painauchocolat
+
+
+on:
+  push:
+    branches-ignore:
+      - "ga-ignore-*"
+  pull_request:
+    branches-ignore:
+      - "ga-ignore-*"
+
+
+env:
+  EXECUTABLES: "zappy_server;zappy_gui;zappy_ai"
+
+jobs:
+  draw_doofenschmirtz:
+    name: Secret Job ;)
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout@v4
+        uses: actions/checkout@v4
+
+      - name: CLICK HERE TO SEE "DOOF DOOF"
+        run: |
+          echo "::notice title=DOOFENSCHMIRTZ::CLICK HERE"
+          echo "/\_/\
+                (o.o)
+                 >^<"
+
+
+  check_program_compilation:
+    name: Check Program Compilation
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker:latest
+    steps:
+      - name: checkout@v4
+        uses: actions/checkout@v4
+
+      - name: Compilation
+        run: make
+        timeout-minutes: 5
+
+      - name: Clean
+        run: make clean
+
+      - name: Server
+        run: make zappy_server
+
+      - name: GUI
+        run: make zappy_gui
+
+      - name: AI
+        run: make zappy_ai
+
+  coding_style:
+    name: Check Coding Style
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker:latest
+    steps:
+      - name: checkout@v4
+        uses: actions/checkout@v4
+
+      - name: Dependencies
+        run: |
+          apt update && apt install -y python3-pip
+          pip install --break-system-packages cpplint
+          chmod +x styleChecker.sh
+
+      - name: Check Coding Style
+        run: |
+          ./styleChecker.sh
+
+      - name: Verify Coding Style
+        run: |
+          if [ -s coding-style-cpp-reports.log ]; then
+            echo "Coding style errors found. See coding-style-cpp-reports.log for details."
+            cat coding-style-cpp-reports.log
+            exit 1
+          else
+            echo "No coding style errors found."
+          fi
+
+
+  run_tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker:latest
+    steps:
+      - name: checkout@v4
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libsfml-dev libsfml-graphics2.5 libsfml-window2.5 libsfml-system2.5
+
+      - name: Run Unit Tests
+        run: make tests_run
+        timeout-minutes: 5
