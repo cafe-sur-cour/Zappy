@@ -1,0 +1,11 @@
+{
+    "tests": [
+        {
+            "name": "GUI: Not implemented",
+            "description": "Not implemented",
+            "input": ["./zappy_gui"],
+            "expected_output": "ANYTHING",
+            "expected_return": 0
+        }
+    ]
+}

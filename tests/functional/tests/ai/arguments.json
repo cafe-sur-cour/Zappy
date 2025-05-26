@@ -1,0 +1,11 @@
+{
+    "tests": [
+        {
+            "name": "AI: Not implemented",
+            "description": "Not implemented",
+            "input": ["./zappy_ai"],
+            "expected_output": "ANYTHING",
+            "expected_return": 0
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+{
+    "tests": [
+        {
+            "name": "Server: Not implemented",
+            "description": "Not implemented",
+            "input": ["./zappy_server"],
+            "expected_output": "ANYTHING",
+            "expected_return": 0
+        }
+    ]
+}
