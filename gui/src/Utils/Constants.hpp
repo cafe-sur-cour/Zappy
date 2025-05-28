@@ -12,8 +12,19 @@ namespace zappy::constants {
 
     const char *USAGE_STRING = "USAGE: ./zappy_gui -p port -h machine\n"
                                "option\t\tdescription\n"
-                               "port\t\tport number\n"
-                               "machine\t\thostname of the server";
+                               "-p port\t\tport number\n"
+                               "-h machine\t\thostname of the server";
+
+    const int FAILURE_EXIT_CODE = 84;
+    const int SUCCESS_EXIT_CODE = 0;
+};
+
+namespace zappy::constants::structs {
+
+    struct Config {
+        int port;
+        std::string hostname;
+    };
 }
 
 #endif /* !CONSTANTS_HPP_ */
