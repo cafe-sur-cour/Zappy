@@ -35,7 +35,7 @@ namespace colors {
 
 };
 
-namespace zappy::constants::structs {
+namespace zappy::structs {
 
     struct Config {
         int port;

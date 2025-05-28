@@ -16,7 +16,7 @@ class Client {
         ~Client();
 
     private:
-        zappy::constants::structs::Config _config;
+        zappy::structs::Config _config;
         void initialize(int ac, char **av);
 };
 

@@ -15,7 +15,7 @@ class CLI {
         CLI(int ac, char **av);
         ~CLI();
 
-        zappy::constants::structs::Config parseArguments(int ac, char **av) const;
+        zappy::structs::Config parseArguments(int ac, char **av) const;
 
     private:
         int _ac;

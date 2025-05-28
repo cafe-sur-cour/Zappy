@@ -20,12 +20,12 @@ CLI::~CLI()
 {
 }
 
-zappy::constants::structs::Config CLI::parseArguments(int ac, char **av) const
+zappy::structs::Config CLI::parseArguments(int ac, char **av) const
 {
     if (!hasCorrectNumberOfArguments(ac))
         throw Exceptions::CLIInvalidArgumentException("Expected 5 arguments.");
 
-    zappy::constants::structs::Config config;
+    zappy::structs::Config config;
     bool portFound = false;
     bool hostFound = false;
 
