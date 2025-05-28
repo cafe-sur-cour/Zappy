@@ -10,13 +10,16 @@
 
 #include <exception>
 #include <string>
+#include "../Utils/Constants.hpp"
 
 namespace Exceptions {
 
     class CLIParsingException : public std::exception {
         public:
             explicit CLIParsingException(const std::string &message)
-                : _message("CLI Parsing Error: " + message) {}
+                : _message(std::string(colors::RED) +
+                          "CLI Parsing Error: " + message +
+                          colors::RESET) {}
 
             virtual const char *what() const noexcept override {
                 return _message.c_str();
@@ -26,6 +29,37 @@ namespace Exceptions {
             std::string _message;
     };
 
+    class CLIPortException : public CLIParsingException {
+        public:
+            explicit CLIPortException(const std::string &message)
+                : CLIParsingException(std::string(colors::CYAN) +
+                                     "Port Error: " + message +
+                                     colors::RESET) {}
+    };
+
+    class CLIHostException : public CLIParsingException {
+        public:
+            explicit CLIHostException(const std::string &message)
+                : CLIParsingException(std::string(colors::CYAN) +
+                                     "Hostname Error: " + message +
+                                     colors::RESET) {}
+    };
+
+    class CLIMissingArgumentException : public CLIParsingException {
+        public:
+            explicit CLIMissingArgumentException(const std::string &message)
+                : CLIParsingException(std::string(colors::CYAN) +
+                                     "Missing Argument: " + message +
+                                     colors::RESET) {}
+    };
+
+    class CLIInvalidArgumentException : public CLIParsingException {
+        public:
+            explicit CLIInvalidArgumentException(const std::string &message)
+                : CLIParsingException(std::string(colors::CYAN) +
+                                     "Invalid Argument: " + message +
+                                     colors::RESET) {}
+    };
 }
 
 #endif /* !EXCEPTIONS_HPP_ */
