@@ -6,14 +6,22 @@
 */
 
 #include <iostream>
+
 #include "Client.hpp"
+#include "../CLI/CLI.hpp"
 
 Client::Client(int ac, char **av)
 {
-    (void)ac;
-    (void)av;
+    initialize(ac, av);
 }
 
 Client::~Client()
 {
+}
+
+void Client::initialize(int ac, char **av)
+{
+    CLI cli(ac, av);
+
+    _config = cli.parseArguments(ac, av);
 }

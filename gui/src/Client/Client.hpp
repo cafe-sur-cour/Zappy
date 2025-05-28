@@ -8,10 +8,16 @@
 #ifndef CLIENT_HPP_
 #define CLIENT_HPP_
 
+#include "../Utils/Constants.hpp"
+
 class Client {
     public:
         Client(int ac, char **av);
         ~Client();
+
+    private:
+        zappy::constants::structs::Config _config;
+        void initialize(int ac, char **av);
 };
 
 #endif /* !CLIENT_HPP_ */
