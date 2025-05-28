@@ -16,7 +16,7 @@ MAIN = src/main.cpp
 
 MAIN_OBJ = $(MAIN:.cpp=.o)
 
-SRC =
+SRC =	src/Client/Client.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
