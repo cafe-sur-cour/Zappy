@@ -8,15 +8,17 @@
 #ifndef CONSTANTS_HPP_
 #define CONSTANTS_HPP_
 
+#include <string>
+
 namespace zappy::constants {
 
-    const char *USAGE_STRING = "USAGE: ./zappy_gui -p port -h machine\n"
+    inline const char *USAGE_STRING = "USAGE: ./zappy_gui -p port -h machine\n"
                                "option\t\tdescription\n"
                                "-p port\t\tport number\n"
                                "-h machine\t\thostname of the server";
 
-    const int FAILURE_EXIT_CODE = 84;
-    const int SUCCESS_EXIT_CODE = 0;
+    inline const int FAILURE_EXIT_CODE = 84;
+    inline const int SUCCESS_EXIT_CODE = 0;
 };
 
 namespace zappy::constants::structs {
@@ -25,6 +27,6 @@ namespace zappy::constants::structs {
         int port;
         std::string hostname;
     };
-}
+};
 
 #endif /* !CONSTANTS_HPP_ */
