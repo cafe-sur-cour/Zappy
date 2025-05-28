@@ -54,6 +54,10 @@ clean:
 
 fclean: clean
 	@rm -rf $(NAME)
+	@rm -rf $(UNIT_TESTS)
+	@rm -rf coverage_report/
+	@rm -rf *.gcda
+	@rm -rf *.gcno
 
 re: fclean all
 
