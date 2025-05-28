@@ -6,11 +6,12 @@
 */
 
 #include <iostream>
+#include "Utils/Constants.hpp"
 
 int main(int ac, char **av)
 {
     (void)ac;
     (void)av;
-    std::cout << "Zappy GUI is running!" << std::endl;
+    std::cout << zappy::constants::USAGE_STRING << std::endl;
     return 0;
 }
