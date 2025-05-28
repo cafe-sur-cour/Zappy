@@ -5,11 +5,12 @@
 ** CLI
 */
 
-#include "CLI.hpp"
-#include "../Exceptions/Exceptions.hpp"
 #include <string>
 #include <iostream>
 #include <sstream>
+
+#include "CLI.hpp"
+#include "../Exceptions/Exceptions.hpp"
 
 CLI::CLI(int ac, char **av) : _ac(ac), _av(av)
 {
@@ -40,7 +41,8 @@ zappy::constants::structs::Config CLI::parseArguments(int ac, char **av) const
             i++;
         } else if (arg == "-h") {
             if (i + 1 >= ac)
-                throw Exceptions::CLIMissingArgumentException("Missing hostname value after -h");
+                throw Exceptions::CLIMissingArgumentException(
+                    "Missing hostname value after -h");
 
             config.hostname = parseHostname(av[i + 1]);
             hostFound = true;
@@ -71,10 +73,8 @@ int CLI::parsePort(const char *portStr) const
             throw Exceptions::CLIPortException("Port must be less than or equal to 65535");
 
         return port;
-
     } catch (const std::invalid_argument &) {
         throw Exceptions::CLIPortException("Port must be a valid number");
-
     } catch (const std::out_of_range &) {
         throw Exceptions::CLIPortException("Port is out of range");
     }
@@ -100,10 +100,11 @@ std::string CLI::parseHostname(const char *hostnameStr) const
             int value = std::stoi(segment);
 
             if (value < 0 || value > 255)
-                throw Exceptions::CLIHostException("IP address segments must be between 0 and 255");
-
+                throw Exceptions::CLIHostException(
+                    "IP address segments must be between 0 and 255");
         } catch (const std::exception &) {
-            throw Exceptions::CLIHostException("IP address must contain valid numeric segments");
+            throw Exceptions::CLIHostException(
+                "IP address must contain valid numeric segments");
         }
     }
 

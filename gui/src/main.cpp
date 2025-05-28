@@ -6,6 +6,7 @@
 */
 
 #include <iostream>
+#include <string>
 
 #include "Utils/Constants.hpp"
 #include "Client/Client.hpp"
@@ -21,14 +22,12 @@ int main(int ac, char **av)
 
     try {
         Client client(ac, av);
-
     } catch (const Exceptions::CLIParsingException &e) {
         std::cerr << colors::RED << e.what()
                   << colors::RESET << std::endl;
         std::cerr << colors::YELLOW << zappy::constants::USAGE_STRING
                   << colors::RESET << std::endl;
         return zappy::constants::FAILURE_EXIT_CODE;
-
     } catch (const std::exception &e) {
         std::cerr << colors::RED << "An unexpected error occurred: "
                   << e.what() << colors::RESET << std::endl;
