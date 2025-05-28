@@ -46,4 +46,9 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re $(SERVER_NAME) $(GUI_NAME) $(AI_NAME)
+functional_tests: $(GUI_NAME) $(SERVER_NAME) $(AI_NAME)
+	@echo -e "$(BLUE)ᒥ🧪ᒧ Running functional tests...$(NC)"
+	@python3 ./tests/functional/Tester.py
+
+.PHONY: all clean fclean re functional_tests \
+		 $(SERVER_NAME) $(GUI_NAME) $(AI_NAME)
