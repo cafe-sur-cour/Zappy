@@ -14,18 +14,24 @@
 int main(int ac, char **av)
 {
     if (ac == 2 && std::string(av[1]) == "-help") {
-        std::cout << zappy::constants::USAGE_STRING << std::endl;
+        std::cout << colors::CYAN << zappy::constants::USAGE_STRING
+                  << colors::RESET << std::endl;
         return zappy::constants::SUCCESS_EXIT_CODE;
     }
 
     try {
         Client client(ac, av);
+
     } catch (const Exceptions::CLIParsingException &e) {
-        std::cerr << e.what() << std::endl;
-        std::cerr << zappy::constants::USAGE_STRING << std::endl;
+        std::cerr << colors::RED << e.what()
+                  << colors::RESET << std::endl;
+        std::cerr << colors::YELLOW << zappy::constants::USAGE_STRING
+                  << colors::RESET << std::endl;
         return zappy::constants::FAILURE_EXIT_CODE;
+
     } catch (const std::exception &e) {
-        std::cerr << "An unexpected error occurred: " << e.what() << std::endl;
+        std::cerr << colors::RED << "An unexpected error occurred: "
+                  << e.what() << colors::RESET << std::endl;
         return zappy::constants::FAILURE_EXIT_CODE;
     }
     return zappy::constants::SUCCESS_EXIT_CODE;
