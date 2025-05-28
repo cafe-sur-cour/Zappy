@@ -20,6 +20,8 @@ class CLI {
     private:
         int _ac;
         char **_av;
+
+        bool hasCorrectNumberOfArguments(int ac) const;
 };
 
 #endif /* !CLI_HPP_ */
