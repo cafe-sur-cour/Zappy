@@ -13,6 +13,11 @@
 Client::Client(int ac, char **av)
 {
     initialize(ac, av);
+
+    std::cout << colors::GREEN << "Client initialized with configuration: "
+              << "Port: " << _config.port
+              << ", Hostname: " << _config.hostname
+              << colors::RESET << std::endl;
 }
 
 Client::~Client()
