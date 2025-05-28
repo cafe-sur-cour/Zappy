@@ -90,6 +90,23 @@ jobs:
             echo "No coding style errors found."
           fi
 
+  run_functionnal_tests:
+    name: Run Functional Tests
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker
+
+    steps:
+      - name: checkout@v4
+        uses: actions/checkout@v4
+
+      - name: Run functional tests
+        run: |
+          make functional_tests
+          if [ $? -ne 0 ]; then
+            echo "Functional tests failed"
+            exit 1
+          fi
 
   run_tests:
     name: Run Unit Tests
@@ -100,10 +117,15 @@ jobs:
       - name: checkout@v4
         uses: actions/checkout@v4
 
-      - name: Install Dependencies
+      - name: Install Google Test
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libsfml-dev libsfml-graphics2.5 libsfml-window2.5 libsfml-system2.5
+          apt-get update
+          apt-get install -y libgtest-dev cmake
+          cd /usr/src/gtest
+          cmake CMakeLists.txt
+          make
+          cp lib/*.a /usr/lib
+          cd -
 
       - name: Run Unit Tests
         run: make tests_run
