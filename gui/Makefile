@@ -22,6 +22,9 @@ SRC =	src/Client/Client.cpp \
 OBJ = $(SRC:.cpp=.o)
 
 TEST_SRC = tests/unit/main_test.cpp \
+		   tests/unit/CLI/CLI_test.cpp \
+		   tests/unit/Exceptions/Exceptions_test.cpp \
+		   tests/unit/Client/Client_test.cpp \
 
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
