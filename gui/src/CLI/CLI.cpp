@@ -33,17 +33,10 @@ zappy::constants::structs::Config CLI::parseArguments(int ac, char **av) const
         std::string arg(av[i]);
 
         if (arg == "-p") {
-            if (i + 1 >= ac)
-                throw Exceptions::CLIMissingArgumentException("Missing port value after -p");
-
             config.port = parsePort(av[i + 1]);
             portFound = true;
             i++;
         } else if (arg == "-h") {
-            if (i + 1 >= ac)
-                throw Exceptions::CLIMissingArgumentException(
-                    "Missing hostname value after -h");
-
             config.hostname = parseHostname(av[i + 1]);
             hostFound = true;
             i++;
