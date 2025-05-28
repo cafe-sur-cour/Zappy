@@ -22,6 +22,9 @@ class CLI {
         char **_av;
 
         bool hasCorrectNumberOfArguments(int ac) const;
+        int parsePort(const char *portStr) const;
+        std::string parseHostname(const char *hostnameStr) const;
+        void validateConfig(bool portFound, bool hostFound) const;
 };
 
 #endif /* !CLI_HPP_ */
