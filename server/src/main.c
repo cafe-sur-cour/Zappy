@@ -1,13 +1,21 @@
 /*
 ** EPITECH PROJECT, 2025
-** B-YEP-400-NAN-4-1-zappy-albane.merian
+** Server
 ** File description:
-** main
+** Server :: Main
 */
 
-int main(int ac, char **av)
+#include <string.h>
+
+#include "zappy.h"
+
+int main(int argc, char **argv)
 {
-    (void)ac;
-    (void)av;
+    if (argc == 2 && (strcmp(argv[1], "-h") == 0 ||
+        strcmp(argv[1], "-help") == 0)) {
+        return helper();
+    }
+    if (check_args(argc, argv) == 84)
+        return 84;
     return 0;
 }

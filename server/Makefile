@@ -5,30 +5,31 @@
 ## Makefile
 ##
 
-# ANSI Colors
 GREEN=\033[1;32m
 BLUE=\033[1;34m
 RED=\033[1;31m
 YELLOW=\033[1;33m
 NC=\033[0m
 
-MAIN = src/main.c
+MAIN 		= 	src/main.c
 
-MAIN_OBJ = $(MAIN:.c=.o)
+MAIN_OBJ 	= 	$(MAIN:.c=.o)
 
-SRC =
+SRC 		=	src/params.c					\
+				src/errors.c					\
+				src/checkers.c
 
-OBJ = $(SRC:.c=.o)
+OBJ 		= 	$(SRC:.c=.o)
 
-INCLUDES = -I./include
+INCLUDES 	= 	-I./include
 
-CFLAGS =	-Wall -Wextra -Werror
+CFLAGS 		=	-Wall -Wextra -Werror
 
-LIBS =
+LIBS 		=
 
-NAME = zappy_server
+NAME 		= 	zappy_server
 
-CC = gcc
+CC 			= 	gcc
 
 all: $(NAME)
 
