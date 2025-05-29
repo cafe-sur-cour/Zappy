@@ -12,14 +12,14 @@
 
 class CLI {
     public:
-        CLI(int ac, char **av);
+        CLI(int ac, const char *const *av);
         ~CLI();
 
-        zappy::structs::Config parseArguments(int ac, char **av) const;
+        zappy::structs::Config parseArguments(int ac, const char *const *av) const;
 
     private:
         int _ac;
-        char **_av;
+        const char *const *_av;
 
         bool hasCorrectNumberOfArguments(int ac) const;
         int parsePort(const char *portStr) const;

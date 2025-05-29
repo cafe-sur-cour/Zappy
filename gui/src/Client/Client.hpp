@@ -12,12 +12,12 @@
 
 class Client {
     public:
-        Client(int ac, char **av);
+        Client(int ac, const char *const *av);
         ~Client();
 
     private:
         zappy::structs::Config _config;
-        void initialize(int ac, char **av);
+        void initialize(int ac, const char * const *av);
 };
 
 #endif /* !CLIENT_HPP_ */

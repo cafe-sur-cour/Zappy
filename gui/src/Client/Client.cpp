@@ -10,7 +10,7 @@
 #include "Client.hpp"
 #include "../CLI/CLI.hpp"
 
-Client::Client(int ac, char **av)
+Client::Client(int ac, const char *const *av)
 {
     initialize(ac, av);
 
@@ -24,7 +24,7 @@ Client::~Client()
 {
 }
 
-void Client::initialize(int ac, char **av)
+void Client::initialize(int ac, const char *const *av)
 {
     CLI cli(ac, av);
 

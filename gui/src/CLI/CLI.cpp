@@ -12,7 +12,7 @@
 #include "CLI.hpp"
 #include "../Exceptions/Exceptions.hpp"
 
-CLI::CLI(int ac, char **av) : _ac(ac), _av(av)
+CLI::CLI(int ac, const char *const *av) : _ac(ac), _av(av)
 {
 }
 
@@ -20,7 +20,7 @@ CLI::~CLI()
 {
 }
 
-zappy::structs::Config CLI::parseArguments(int ac, char **av) const
+zappy::structs::Config CLI::parseArguments(int ac, const char *const *av) const
 {
     if (!hasCorrectNumberOfArguments(ac))
         throw Exceptions::CLIInvalidArgumentException("Expected 5 arguments.");
