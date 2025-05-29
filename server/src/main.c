@@ -5,15 +5,9 @@
 ** Server :: Main
 */
 
-#include <stdio.h>
 #include <string.h>
 
-int helper(void)
-{
-    printf("USAGE: ./zappy_server -p port -x width -y height ");
-    printf("-n name1 name2 ... -c clientsNb -f freq\n");
-    return 84;
-}
+#include "zappy.h"
 
 int main(int argc, char **argv)
 {
@@ -21,7 +15,7 @@ int main(int argc, char **argv)
         strcmp(argv[1], "-help") == 0)) {
         return helper();
     }
-    printf("\033[1;34m[SERVER]\033[0m ");
-    printf("Welcome to the Tranttorian world!\n");
+    if (check_args(argc, argv) == 84)
+        return 84;
     return 0;
 }

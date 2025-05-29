@@ -5,13 +5,14 @@
 ## Makefile
 ##
 
-NAME = zappy_server
+NAME 	= 	zappy_server
 
-SRC = src/main.c
+SRC 	= 	src/main.c						\
+	  		src/parsing.c
 
-OBJ = $(SRC:.c=.o)
+OBJ 	= 	$(SRC:.c=.o)
 
-CFLAGS = -Wall -Wextra
+CFLAGS 	= 	-Wall -Wextra -Werror -I include
 
 all: $(NAME)
 
@@ -19,10 +20,10 @@ $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJ)
 
 clean:
-	rm -f $(OBJ)
+	@rm -f $(OBJ)
 
 fclean: clean
-	rm -f $(NAME)
+	@rm -f $(NAME)
 
 re: fclean all
 
