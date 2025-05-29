@@ -78,7 +78,7 @@ static int check_name(char const *flag, char const * const *value, int nb)
 static int check_client(char const *flag, char const *value)
 {
     if (!flag || strcmp(flag, "-c") != 0 || !value) {
-        error_message("Invalid name flag.");
+        error_message("Invalid client flag.");
         return -1;
     }
     int clients_nb = atoi(value);
