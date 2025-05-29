@@ -5,26 +5,48 @@
 ## Makefile
 ##
 
-NAME 	= 	zappy_server
+GREEN=\033[1;32m
+BLUE=\033[1;34m
+RED=\033[1;31m
+YELLOW=\033[1;33m
+NC=\033[0m
 
-SRC 	= 	src/main.c						\
-	  		src/params.c					\
-			src/errors.c
+MAIN = src/main.c
 
-OBJ 	= 	$(SRC:.c=.o)
+MAIN_OBJ = $(MAIN:.c=.o)
 
-CFLAGS 	= 	-Wall -Wextra -Werror -I include
+SRC 		= 	src/main.c						\
+	  			src/params.c					\
+				src/errors.c
+
+OBJ 		= 	$(SRC:.c=.o)
+
+INCLUDES 	= 	-I./include
+
+CFLAGS 		=	-Wall -Wextra -Werror
+
+LIBS 		=
+
+NAME 		= 	zappy_server
+
+CC 			= 	gcc
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJ)
+$(NAME): $(OBJ) $(MAIN_OBJ)
+	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
+	$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
+	@echo -e "$(GREEN)ᒥ✅ᒧ Compilation completed successfully!$(NC)"
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
-	@rm -f $(OBJ)
+	@rm -rf $(OBJ)
+	@rm -rf $(MAIN_OBJ)
 
 fclean: clean
-	@rm -f $(NAME)
+	@rm -rf $(NAME)
 
 re: fclean all
 

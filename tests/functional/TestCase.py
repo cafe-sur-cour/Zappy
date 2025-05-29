@@ -132,7 +132,7 @@ class TestCase:
 
     def check(self):
         if self.output.startswith("CONTAINS - "):
-            search_text = self.output[10:]
+            search_text = self.output[11:]
             if search_text not in self.real_output and self.output != "ANYTHING":
                 return False
         elif self.real_output != self.output and self.output != "ANYTHING":
