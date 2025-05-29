@@ -13,7 +13,7 @@ SERVER_DIR = server
 GUI_DIR = gui
 AI_DIR = ai
 
-all: $(SERVER_NAME)
+all: $(SERVER_NAME) $(GUI_NAME) $(AI_NAME)
 
 $(SERVER_NAME):
 	@echo "Compiling $(SERVER_NAME)..."
