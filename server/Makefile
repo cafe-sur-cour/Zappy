@@ -8,7 +8,8 @@
 NAME 	= 	zappy_server
 
 SRC 	= 	src/main.c						\
-	  		src/parsing.c
+	  		src/params.c					\
+			src/errors.c
 
 OBJ 	= 	$(SRC:.c=.o)
 
