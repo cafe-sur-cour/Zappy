@@ -25,7 +25,7 @@
             "name": "Server: Invalid flag port",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-z", "8080", "-x", "100", "-y", "100", "-n", "team1", "team2", "-c", "6", "-f", "10"],
-            "expected_output": "[SERVER] Invalid port flag.",
+            "expected_output": "[SERVER] Missing or invalid -p flag.",
             "expected_return": 84
         },
         {
@@ -46,7 +46,7 @@
             "name": "Server: Invalid flag width",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "8080", "-z", "100", "-y", "100", "-n", "team1", "team2", "-c", "6", "-f", "10"],
-            "expected_output": "[SERVER] Invalid width flag.",
+            "expected_output": "[SERVER] Missing or invalid -x flag.",
             "expected_return": 84
         },
         {
@@ -67,7 +67,7 @@
             "name": "Server: Invalid flag height",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "8080", "-x", "100", "-z", "100", "-n", "team1", "team2", "-c", "6", "-f", "10"],
-            "expected_output": "[SERVER] Invalid height flag.",
+            "expected_output": "[SERVER] Missing or invalid -y flag.",
             "expected_return": 84
         },
         {
@@ -88,7 +88,7 @@
             "name": "Server: Invalid flag client_nb",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "8080", "-x", "100", "-y", "100", "-n", "team1", "team2", "-z", "6", "-f", "10"],
-            "expected_output": "[SERVER] Invalid client flag.",
+            "expected_output": "[SERVER] Missing or invalid -c flag.",
             "expected_return": 84
         },
         {
@@ -109,7 +109,7 @@
             "name": "Server: Invalid flag frequency",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "8080", "-x", "100", "-y", "100", "-n", "team1", "team2", "-c", "6", "-z", "10"],
-            "expected_output": "[SERVER] Invalid frequency flag.",
+            "expected_output": "[SERVER] Missing or invalid -f flag.",
             "expected_return": 84
         },
         {

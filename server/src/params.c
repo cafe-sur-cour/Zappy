@@ -107,20 +107,71 @@ static int check_freq(char const *flag, char const *value)
     return 0;
 }
 
+static int find_flag(int argc, char **argv, const char *flag)
+{
+    for (int i = 1; i < argc; i++) {
+        if (argv[i] && strcmp(argv[i], flag) == 0)
+            return i;
+    }
+    return -1;
+}
+
+static int count_names(int argc, char **argv, int start_pos)
+{
+    int count = 0;
+
+    for (int i = start_pos; i < argc; i++) {
+        if (argv[i][0] == '-')
+            break;
+        count++;
+    }
+    return count;
+}
+
+static bool check_simple_flag(int argc, char **argv, const char *flag,
+    int (*checker)(const char *, const char *))
+{
+    int pos = find_flag(argc, argv, flag);
+
+    if (pos == -1 || pos + 1 >= argc) {
+        char error_msg[256];
+        snprintf(error_msg, sizeof(error_msg),
+            "Missing or invalid %s flag.", flag);
+        error_message(error_msg);
+        return false;
+    }
+    return checker(argv[pos], argv[pos + 1]) == 0;
+}
+
+static bool check_names_flag(int argc, char **argv)
+{
+    int pos = find_flag(argc, argv, "-n");
+    int names_count;
+
+    if (pos == -1 || pos + 1 >= argc) {
+        error_message("Missing or invalid name flag.");
+        return false;
+    }
+    names_count = count_names(argc, argv, pos + 1);
+    if (names_count == 0) {
+        error_message("No team names provided after -n flag.");
+        return false;
+    }
+    return check_name(argv[pos],
+        (const char **) &argv[pos + 1], names_count) == 0;
+}
+
 int check_args(int argc, char **argv)
 {
     bool is_ok = true;
 
     if (argc < 14)
         return helper();
-    check_port(argv[1], argv[2]) == -1 ? is_ok = false : 0;
-    check_width(argv[3], argv[4]) == -1 ? is_ok = false : 0;
-    check_height(argv[5], argv[6]) == -1 ? is_ok = false : 0;
-    check_name(argv[7],
-        (const char **) &argv[8], argc - 12) == -1 ? is_ok = false : 0;
-    check_client(argv[10 + (argc - 14)],
-        argv[11 + (argc - 14)]) == -1 ? is_ok = false : 0;
-    check_freq(argv[12 + (argc - 14)],
-        argv[13 + (argc - 14)]) == -1 ? is_ok = false : 0;
+    check_simple_flag(argc, argv, "-p", check_port) ? 0 : (is_ok = false);
+    check_simple_flag(argc, argv, "-x", check_width) ? 0 : (is_ok = false);
+    check_simple_flag(argc, argv, "-y", check_height) ? 0 : (is_ok = false);
+    check_names_flag(argc, argv) ? 0 : (is_ok = false);
+    check_simple_flag(argc, argv, "-c", check_client) ? 0 : (is_ok = false);
+    check_simple_flag(argc, argv, "-f", check_freq) ? 0 : (is_ok = false);
     return is_ok ? 0 : 84;
 }
