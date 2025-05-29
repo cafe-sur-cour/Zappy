@@ -16,7 +16,8 @@ MAIN 		= 	src/main.c
 MAIN_OBJ 	= 	$(MAIN:.c=.o)
 
 SRC 		=	src/params.c					\
-				src/errors.c
+				src/errors.c					\
+				src/checkers.c
 
 OBJ 		= 	$(SRC:.c=.o)
 

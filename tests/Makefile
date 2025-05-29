@@ -12,7 +12,8 @@ UNIT 	= 	unit_tests
 TESTS 	= 	unit/tests_params_server.c
 
 SRC 	= 	../server/src/params.c			\
-			../server/src/errors.c
+			../server/src/errors.c			\
+			../server/src/checkers.c		\
 
 CFLAGS 	= 	-Wall -Wextra -Werror -I ../server/include
 
