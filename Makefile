@@ -32,12 +32,16 @@ $(AI_NAME):
 clean:
 	@echo "Cleaning server..."
 	@make -C $(SERVER_DIR) clean
+	@make -C $(GUI_DIR) clean
 	@make -C tests/ clean
 
 fclean: clean
 	@echo "Full clean server..."
 	@make -C $(SERVER_DIR) fclean
+	@make -C $(GUI_DIR) fclean
 	@rm -f $(SERVER_NAME)
+	@rm -f $(GUI_NAME)
+	@rm -f $(AI_NAME)
 
 re: fclean all
 
