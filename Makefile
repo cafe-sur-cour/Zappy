@@ -32,11 +32,24 @@ $(AI_NAME):
 clean:
 	@echo "Cleaning server..."
 	@make -C $(SERVER_DIR) clean
+	@make -C tests/ clean
 
 fclean: clean
 	@echo "Full clean server..."
 	@make -C $(SERVER_DIR) fclean
 	@rm -f $(SERVER_NAME)
+
+unit_test:
+	@echo "Compiling unit tests..."
+	@make -C tests unit_test
+
+tests_run:
+	@echo "Running unit tests..."
+	@make -C tests tests_run
+
+coverage:
+	@echo "Generating coverage report..."
+	@make -C tests coverage
 
 re: fclean all
 
