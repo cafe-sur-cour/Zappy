@@ -75,16 +75,48 @@ static int check_name(char const *flag, char const * const *value, int nb)
     return 0;
 }
 
+static int check_client(char const *flag, char const *value)
+{
+    if (!flag || strcmp(flag, "-c") != 0 || !value) {
+        error_message("Invalid name flag.");
+        return -1;
+    }
+    int clients_nb = atoi(value);
+    if (clients_nb <= 0) {
+        error_message("Number of clients must be a positive integer.");
+        return -1;
+    }
+    return 0;
+}
+
+static int check_freq(char const *flag, char const *value)
+{
+    if (!flag || strcmp(flag, "-f") != 0 || !value) {
+        error_message("Invalid frequency flag.");
+        return -1;
+    }
+    int freq = atoi(value);
+    if (freq <= 0  || freq > 200) {
+        error_message("Frequency must be 1 and 200 (included).");
+        return -1;
+    }
+    return 0;
+}
+
 int check_args(int argc, char **argv)
 {
     bool is_ok = true;
 
-    if (argc < 7)
+    if (argc < 14)
         return helper();
     check_port(argv[1], argv[2]) == -1 ? is_ok = false : 0;
     check_width(argv[3], argv[4]) == -1 ? is_ok = false : 0;
     check_height(argv[5], argv[6]) == -1 ? is_ok = false : 0;
     check_name(argv[7],
         (const char **) &argv[8], argc - 12) == -1 ? is_ok = false : 0;
+    check_client(argv[10 + (argc - 14)],
+        argv[11 + (argc - 14)]) == -1 ? is_ok = false : 0;
+    check_freq(argv[12 + (argc - 14)],
+        argv[13 + (argc - 14)]) == -1 ? is_ok = false : 0;
     return is_ok ? 0 : 84;
 }
