@@ -77,11 +77,13 @@ static int check_name(char const *flag, char const * const *value, int nb)
 
 static int check_client(char const *flag, char const *value)
 {
+    int clients_nb = 0;
+
     if (!flag || strcmp(flag, "-c") != 0 || !value) {
         error_message("Invalid client flag.");
         return -1;
     }
-    int clients_nb = atoi(value);
+    clients_nb = atoi(value);
     if (clients_nb <= 0) {
         error_message("Number of clients must be a positive integer.");
         return -1;
@@ -91,11 +93,13 @@ static int check_client(char const *flag, char const *value)
 
 static int check_freq(char const *flag, char const *value)
 {
+    int freq = 0;
+
     if (!flag || strcmp(flag, "-f") != 0 || !value) {
         error_message("Invalid frequency flag.");
         return -1;
     }
-    int freq = atoi(value);
+    freq = atoi(value);
     if (freq <= 0  || freq > 200) {
         error_message("Frequency must be 1 and 200 (included).");
         return -1;
