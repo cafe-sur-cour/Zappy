@@ -215,14 +215,14 @@ Test(check_args, check_name_invalid_flag, .init = redirect_all_std) {
     cr_assert_eq(check_args(argc, argv), 84, "Expected invalid name check to pass.");
 }
 
-Test(check_args, check_name_many_team) {
+Test(check_args, check_name_many_team, .init = redirect_all_std) {
     char *argv[] = {"./server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "team3", "team4", "-c", "5", "-f", "50"};
     int argc = 16;
 
     cr_assert_eq(check_args(argc, argv), 0, "Expected valid multiple team names check to pass.");
 }
 
-Test(check_args, check_name_one_team) {
+Test(check_args, check_name_one_team, .init = redirect_all_std) {
     char *argv[] = {"./server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "-c", "5", "-f", "50"};
     int argc = 13;
 

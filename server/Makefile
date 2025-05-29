@@ -11,12 +11,11 @@ RED=\033[1;31m
 YELLOW=\033[1;33m
 NC=\033[0m
 
-MAIN = src/main.c
+MAIN 		= 	src/main.c
 
-MAIN_OBJ = $(MAIN:.c=.o)
+MAIN_OBJ 	= 	$(MAIN:.c=.o)
 
-SRC 		= 	src/main.c						\
-	  			src/params.c					\
+SRC 		=	src/params.c					\
 				src/errors.c
 
 OBJ 		= 	$(SRC:.c=.o)

@@ -39,18 +39,6 @@ fclean: clean
 	@make -C $(SERVER_DIR) fclean
 	@rm -f $(SERVER_NAME)
 
-unit_test:
-	@echo "Compiling unit tests..."
-	@make -C tests unit_test
-
-tests_run:
-	@echo "Running unit tests..."
-	@make -C tests tests_run
-
-coverage:
-	@echo "Generating coverage report..."
-	@make -C tests coverage
-
 re: fclean all
 
 functional_tests: $(GUI_NAME) $(SERVER_NAME) $(AI_NAME)
