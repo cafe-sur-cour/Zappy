@@ -13,7 +13,7 @@ SERVER_DIR = server
 GUI_DIR = gui
 AI_DIR = ai
 
-all: $(SERVER_NAME) $(GUI_NAME) $(AI_NAME)
+all: $(SERVER_NAME)
 
 $(SERVER_NAME):
 	@echo "Compiling $(SERVER_NAME)..."
@@ -32,17 +32,11 @@ $(AI_NAME):
 clean:
 	@echo "Cleaning server..."
 	@make -C $(SERVER_DIR) clean
-	@echo "Cleaning gui..."
-	@make -C $(GUI_DIR) clean
 
 fclean: clean
 	@echo "Full clean server..."
 	@make -C $(SERVER_DIR) fclean
-	@echo "Full clean gui..."
-	@make -C $(GUI_DIR) fclean
-	@rm -f $(AI_NAME)
 	@rm -f $(SERVER_NAME)
-	@rm -f $(GUI_NAME)
 
 re: fclean all
 
