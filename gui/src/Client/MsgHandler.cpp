@@ -7,11 +7,16 @@
 
 #include <iostream>
 #include <sstream>
+#include <memory>
+#include <string>
 
 #include "MsgHandler.hpp"
 
-MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<Communication> communication)
-    : _running(false), _gameInfos(gameInfos), _communication(communication)
+MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos,
+    std::shared_ptr<Communication> communication)
+    : _running(false),
+    _gameInfos(gameInfos),
+    _communication(communication)
 {
     _messageHandlers = {
         {"WELCOME", std::bind(&MsgHandler::handleWelcomeMessage, this, std::placeholders::_1)},
@@ -53,7 +58,6 @@ void MsgHandler::stop()
 void MsgHandler::messageLoop()
 {
     while (_running) {
-
         if (_communication->hasMessages()) {
             handleMessage(_communication->popMessage());
 

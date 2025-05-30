@@ -5,6 +5,8 @@
 ** GameInfos
 */
 
+#include <utility>
+
 #include "GameInfos.hpp"
 
 GameInfos::GameInfos() :
