@@ -14,7 +14,8 @@
 
 GameInfos::GameInfos() :
     _mapWidth(0),
-    _mapHeight(0)
+    _mapHeight(0),
+    _gameOver(false)
 {
 }
 
@@ -144,6 +145,29 @@ void GameInfos::updatePlayerExpulsion(int playerNumber)
     _playersExpulsing.emplace_back(playerNumber, true);
 }
 
+void GameInfos::updatePlayerDeath(int playerNumber)
+{
+    if (playerNumber < 0)
+        return;
+
+    _players.erase(std::remove_if(_players.begin(), _players.end(),
+        [playerNumber](const zappy::structs::Player &player) {
+            return player.number == playerNumber;
+        }), _players.end());
+}
+
+void GameInfos::updatePlayerResourceAction(int playerNumber, int resourceId, bool isCollecting)
+{
+    (void)isCollecting;
+    if (playerNumber < 0 || resourceId < 0 || resourceId > 6)
+        return;
+}
+
+void GameInfos::updatePlayerFork(int playerNumber)
+{
+    (void)playerNumber;
+}
+
 std::vector<zappy::structs::Player> GameInfos::getPlayers() const
 {
     return _players;
@@ -178,4 +202,51 @@ void GameInfos::removeIncantation(int x, int y, int result)
         _incantations.erase(it, _incantations.end());
 
     (void)result;
+}
+
+void GameInfos::addEgg(zappy::structs::Egg egg)
+{
+    auto it = std::find_if(_eggs.begin(), _eggs.end(),
+                           [&egg](const zappy::structs::Egg &e) {
+                               return e.eggNumber == egg.eggNumber;
+                           });
+
+    if (it != _eggs.end())
+        *it = egg;
+    else
+        _eggs.push_back(egg);
+}
+
+void GameInfos::updateEggHatched(int eggNumber)
+{
+    for (auto &egg : _eggs) {
+        if (egg.eggNumber == eggNumber) {
+            egg.hatched = true;
+            return;
+        }
+    }
+}
+
+void GameInfos::updateEggDeath(int eggNumber)
+{
+    _eggs.erase(std::remove_if(_eggs.begin(), _eggs.end(),
+        [eggNumber](const zappy::structs::Egg &egg) {
+            return egg.eggNumber == eggNumber;
+        }), _eggs.end());
+}
+
+std::vector<zappy::structs::Egg> GameInfos::getEggs() const
+{
+    return _eggs;
+}
+
+void GameInfos::setGameOver(const std::string &winningTeam)
+{
+    _gameOver = true;
+    _winningTeam = winningTeam;
+}
+
+std::pair<bool, std::string> GameInfos::isGameOver() const
+{
+    return std::make_pair(_gameOver, _winningTeam);
 }

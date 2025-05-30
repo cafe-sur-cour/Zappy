@@ -36,6 +36,9 @@ class GameInfos {
         void updatePlayerLevel(int playerNumber, int level);
         void updatePlayerInventory(int playerNumber, zappy::structs::Inventory inventory);
         void updatePlayerExpulsion(int playerNumber);
+        void updatePlayerDeath(int playerNumber);
+        void updatePlayerResourceAction(int playerNumber, int resourceId, bool isCollecting);
+        void updatePlayerFork(int playerNumber);
         std::vector<zappy::structs::Player> getPlayers() const;
 
         void addPlayerBroadcast(int playerNumber, const std::string &message);
@@ -43,6 +46,14 @@ class GameInfos {
 
         void addIncantation(zappy::structs::Incantation incantation);
         void removeIncantation(int x, int y, int result);
+
+        void addEgg(zappy::structs::Egg egg);
+        void updateEggHatched(int eggNumber);
+        void updateEggDeath(int eggNumber);
+        std::vector<zappy::structs::Egg> getEggs() const;
+
+        void setGameOver(const std::string &winningTeam);
+        std::pair<bool, std::string> isGameOver() const;
 
     private:
         int _mapWidth;
@@ -55,6 +66,10 @@ class GameInfos {
         std::vector<std::pair<int, bool>> _playersExpulsing;
         std::vector<std::pair<int, std::string>> _playersBroadcasting;
         std::vector<zappy::structs::Incantation> _incantations;
+        std::vector<zappy::structs::Egg> _eggs;
+
+        bool _gameOver;
+        std::string _winningTeam;
 };
 
 #endif /* !GAMEINFOS_HPP_ */

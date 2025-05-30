@@ -46,19 +46,19 @@ class MsgHandler {
         bool handlePbcMessage(const std::string& message);
         bool handlePicMessage(const std::string& message);
         bool handlePieMessage(const std::string& message);
-        // pfk
-        // pdr
-        // pgt
-        // pdi
-        // enw
-        // ebo
-        // edi
+        bool handlePfkMessage(const std::string& message);
+        bool handlePdrMessage(const std::string& message);
+        bool handlePgtMessage(const std::string& message);
+        bool handlePdiMessage(const std::string& message);
+        bool handleEnwMessage(const std::string& message);
+        bool handleEboMessage(const std::string& message);
+        bool handleEdiMessage(const std::string& message);
         bool handleSgtMessage(const std::string& message);
-        // sst
-        // seg
-        // smg
-        // suc
-        // sbp
+        bool handleSstMessage(const std::string& message);
+        bool handleSegMessage(const std::string& message);
+        bool handleSmgMessage(const std::string& message);
+        bool handleSucMessage(const std::string& message);
+        bool handleSbpMessage(const std::string& message);
 
     private:
         std::thread _thread;
