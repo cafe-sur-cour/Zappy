@@ -25,8 +25,8 @@ MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos,
         {"tna", std::bind(&MsgHandler::handleTnaMessage, this, std::placeholders::_1)},
         {"pnw", std::bind(&MsgHandler::handlePnwMessage, this, std::placeholders::_1)},
         {"ppo", std::bind(&MsgHandler::handlePpoMessage, this, std::placeholders::_1)},
-        // plv
-        // pin
+        {"plv", std::bind(&MsgHandler::handlePlvMessage, this, std::placeholders::_1)},
+        {"pin", std::bind(&MsgHandler::handlePinMessage, this, std::placeholders::_1)},
         // pex
         // pbc
         // pic
@@ -298,6 +298,72 @@ bool MsgHandler::handlePpoMessage(const std::string& message)
 
     std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
               << " position updated to (" << x << ", " << y << ")"
+              << colors::RESET << std::endl;
+    return true;
+}
+
+bool MsgHandler::handlePlvMessage(const std::string& message)
+{
+    if (message.empty())
+        return false;
+
+    std::istringstream iss(message);
+    std::string prefix;
+    int playerNumber, level;
+
+    iss >> prefix >> playerNumber >> level;
+
+    if (iss.fail() || prefix != "plv" || playerNumber < 0 || level < 1) {
+        std::cerr << colors::RED << "[WARNING] Invalid player level format received: "
+                  << message << colors::RESET << std::endl;
+        return false;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        _gameInfos->updatePlayerLevel(playerNumber, level);
+    }
+
+    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+              << " level updated to " << level
+              << colors::RESET << std::endl;
+    return true;
+}
+
+bool MsgHandler::handlePinMessage(const std::string& message)
+{
+    if (message.empty())
+        return false;
+
+    std::istringstream iss(message);
+    std::string prefix;
+    int playerNumber, x, y, food, linemate, deraumere, sibur, mendiane, phiras, thystame;
+
+    iss >> prefix >> playerNumber >> x >> y >> food >> linemate
+        >> deraumere >> sibur >> mendiane >> phiras >> thystame;
+    if (iss.fail() || prefix != "pin" || playerNumber < 0 || x < 0 || y < 0 ||
+        food < 0 || linemate < 0 || deraumere < 0 ||
+        sibur < 0 || mendiane < 0 || phiras < 0 || thystame < 0) {
+        std::cerr << colors::RED << "[WARNING] Invalid player inventory format received: "
+                  << message << colors::RESET << std::endl;
+        return false;
+    }
+
+    zappy::structs::Inventory inventory(food, linemate, deraumere,
+                                        sibur, mendiane, phiras, thystame);
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        _gameInfos->updatePlayerInventory(playerNumber, inventory);
+    }
+
+    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+              << " inventory updated: Food: " << food
+              << ", Linemate: " << linemate
+              << ", Deraumere: " << deraumere
+              << ", Sibur: " << sibur
+              << ", Mendiane: " << mendiane
+              << ", Phiras: " << phiras
+              << ", Thystame: " << thystame
               << colors::RESET << std::endl;
     return true;
 }

@@ -40,8 +40,8 @@ class MsgHandler {
         bool handleTnaMessage(const std::string& message);
         bool handlePnwMessage(const std::string& message);
         bool handlePpoMessage(const std::string& message);
-        // plv
-        // pin
+        bool handlePlvMessage(const std::string& message);
+        bool handlePinMessage(const std::string& message);
         // pex
         // pbc
         // pic
