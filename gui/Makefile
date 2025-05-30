@@ -17,8 +17,10 @@ MAIN = src/main.cpp
 MAIN_OBJ = $(MAIN:.cpp=.o)
 
 SRC =	src/Client/Client.cpp \
+		src/Client/MsgHandler.cpp \
 		src/CLI/CLI.cpp \
 		src/Communication/Communication.cpp \
+		src/Game/GameInfos.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
