@@ -21,6 +21,7 @@ typedef struct params_s {
 } params_t;
 
 typedef struct server_s {
+    int sockfd;
     params_t *params;
 } server_t;
 
