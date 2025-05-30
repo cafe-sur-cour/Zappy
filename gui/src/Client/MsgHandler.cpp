@@ -16,6 +16,7 @@ MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<Com
     _messageHandlers = {
         {"WELCOME", std::bind(&MsgHandler::handleWelcomeMessage, this, std::placeholders::_1)},
         {"msz", std::bind(&MsgHandler::handleMszMessage, this, std::placeholders::_1)},
+        {"sgt", std::bind(&MsgHandler::handleSgtMessage, this, std::placeholders::_1)}
     };
 
     start();
@@ -115,6 +116,33 @@ bool MsgHandler::handleMszMessage(const std::string& message)
     }
 
     std::cout << colors::YELLOW << "[INFO] Map size set to: " << width << "x" << height
+              << colors::RESET << std::endl;
+    return true;
+}
+
+bool MsgHandler::handleSgtMessage(const std::string& message)
+{
+    if (message.empty())
+        return false;
+
+    std::istringstream iss(message);
+    std::string prefix;
+    int timeUnit;
+
+    iss >> prefix >> timeUnit;
+
+    if (iss.fail() || timeUnit <= 0 || prefix != "sgt") {
+        std::cerr << colors::RED << "[WARNING] Invalid time unit format received: " << message
+                  << colors::RESET << std::endl;
+        return false;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        _gameInfos->setTimeUnit(timeUnit);
+    }
+
+    std::cout << colors::YELLOW << "[INFO] Time unit set to: " << timeUnit
               << colors::RESET << std::endl;
     return true;
 }
