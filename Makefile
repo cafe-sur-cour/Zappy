@@ -33,7 +33,6 @@ clean:
 	@echo "Cleaning server..."
 	@make -C $(SERVER_DIR) clean
 	@make -C $(GUI_DIR) clean
-	@make -C tests/ clean
 
 fclean: clean
 	@echo "Full clean server..."
@@ -50,9 +49,11 @@ functional_tests: $(GUI_NAME) $(SERVER_NAME) $(AI_NAME)
 	@python3 ./tests/functional/Tester.py
 
 tests_run: $(GUI_NAME)
+	@make -C $(SERVER_DIR) tests_run
 	@make -C $(GUI_DIR) tests_run
 
 coverage: $(GUI_NAME)
+	@make -C $(SERVER_DIR) coverage
 	@make -C $(GUI_DIR) coverage
 
 .PHONY: all clean fclean re functional_tests tests_run coverage\

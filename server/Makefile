@@ -11,6 +11,13 @@ RED=\033[1;31m
 YELLOW=\033[1;33m
 NC=\033[0m
 
+UNIT 	    = 	unit_tests
+
+TESTS 	    =   tests/tests_params.c			\
+				tests/tests_errors.c			\
+				tests/tests_checkers.c			\
+				tests/tests_server.c			\
+
 MAIN 		= 	src/main.c
 
 MAIN_OBJ 	= 	$(MAIN:.c=.o)
@@ -32,6 +39,8 @@ NAME 		= 	zappy_server
 
 CC 			= 	gcc
 
+CRIT 		= 	-lcriterion --coverage
+
 all: $(NAME)
 
 $(NAME): $(OBJ) $(MAIN_OBJ)
@@ -45,9 +54,23 @@ $(NAME): $(OBJ) $(MAIN_OBJ)
 clean:
 	@rm -rf $(OBJ)
 	@rm -rf $(MAIN_OBJ)
+	@rm -rf *.gc*
 
 fclean: clean
 	@rm -rf $(NAME)
+	@rm -rf $(UNIT)
+
+unit_test: fclean
+	@echo -e "$(YELLOW)ᒥ🧪ᒧ Compiling unit tests...$(NC)"
+	@$(CC) -o $(UNIT) $(TESTS) $(SRC) $(CFLAGS) $(INCLUDES) $(CRIT)
+
+tests_run: unit_test
+	@echo -e "$(YELLOW)ᒥ🧪ᒧ Running unit tests...$(NC)"
+	@./$(UNIT)
+
+coverage: tests_run
+	@echo -e "$(BLUE)ᒥ📊ᒧ Generating coverage report...$(NC)"
+	@gcovr --exclude /tests
 
 re: fclean all
 

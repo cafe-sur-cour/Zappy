@@ -15,6 +15,10 @@ bool check_port(char const *flag, char const *value, params_t *params)
 {
     int port = 0;
 
+    if (!params) {
+        error_message("Params structure is NULL.");
+        return false;
+    }
     if (!flag || strcmp(flag, "-p") != 0 || !value) {
         error_message("Invalid port flag.");
         return false;
@@ -32,6 +36,10 @@ bool check_width(char const *flag, char const *value, params_t *params)
 {
     int width = 0;
 
+    if (!params) {
+        error_message("Params structure is NULL.");
+        return false;
+    }
     if (!flag || strcmp(flag, "-x") != 0 || !value) {
         error_message("Invalid width flag.");
         return false;
@@ -49,6 +57,10 @@ bool check_height(char const *flag, char const *value, params_t *params)
 {
     int height = 0;
 
+    if (!params) {
+        error_message("Params structure is NULL.");
+        return false;
+    }
     if (!flag || strcmp(flag, "-y") != 0 || !value) {
         error_message("Invalid height flag.");
         return false;
@@ -66,6 +78,10 @@ bool check_client(char const *flag, char const *value, params_t *params)
 {
     int clients_nb = 0;
 
+    if (!params) {
+        error_message("Params structure is NULL.");
+        return false;
+    }
     if (!flag || strcmp(flag, "-c") != 0 || !value) {
         error_message("Invalid client flag.");
         return false;
@@ -83,6 +99,10 @@ bool check_freq(char const *flag, char const *value, params_t *params)
 {
     int freq = 0;
 
+    if (!params) {
+        error_message("Params structure is NULL.");
+        return false;
+    }
     if (!flag || strcmp(flag, "-f") != 0 || !value) {
         error_message("Invalid frequency flag.");
         return false;

@@ -24,7 +24,7 @@ const command_pf_t CHECKERS[] = {
 static bool check_name(char const *flag, char const * const *value,
     int nb, params_t *params)
 {
-    if (!flag || strcmp(flag, "-n") != 0 || !value) {
+    if (!flag || strcmp(flag, "-n") != 0 || !value || !params) {
         error_message("Invalid name flag.");
         return true;
     }
@@ -32,7 +32,7 @@ static bool check_name(char const *flag, char const * const *value,
     params->teams = calloc(nb + 1, sizeof(char *));
     if (!params->teams) {
         error_message("Memory allocation failed for team names.");
-        return true;
+        return false;
     }
     for (int i = 0; i < nb; i++) {
         if (value[i] == NULL || strlen(value[i]) == 0) {
