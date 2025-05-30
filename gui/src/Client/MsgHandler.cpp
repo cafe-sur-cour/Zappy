@@ -21,7 +21,8 @@ MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos,
     _messageHandlers = {
         {"WELCOME", std::bind(&MsgHandler::handleWelcomeMessage, this, std::placeholders::_1)},
         {"msz", std::bind(&MsgHandler::handleMszMessage, this, std::placeholders::_1)},
-        {"sgt", std::bind(&MsgHandler::handleSgtMessage, this, std::placeholders::_1)}
+        {"sgt", std::bind(&MsgHandler::handleSgtMessage, this, std::placeholders::_1)},
+        {"bct", std::bind(&MsgHandler::handleBctMessage, this, std::placeholders::_1)}
     };
 
     start();
@@ -37,8 +38,6 @@ void MsgHandler::start()
     if (!_running) {
         _running = true;
         _thread = std::thread(&MsgHandler::messageLoop, this);
-        std::cout << colors::GREEN << "[INFO] Message handler thread started"
-                  << colors::RESET << std::endl;
     }
 }
 
@@ -47,11 +46,9 @@ void MsgHandler::stop()
     if (_running) {
         _running = false;
         _condition.notify_one();
-        if (_thread.joinable()) {
+
+        if (_thread.joinable())
             _thread.join();
-        }
-        std::cout << colors::GREEN << "[INFO] Message handler thread stopped"
-                  << colors::RESET << std::endl;
     }
 }
 
@@ -147,6 +144,52 @@ bool MsgHandler::handleSgtMessage(const std::string& message)
     }
 
     std::cout << colors::YELLOW << "[INFO] Time unit set to: " << timeUnit
+              << colors::RESET << std::endl;
+    return true;
+}
+
+bool MsgHandler::handleBctMessage(const std::string& message)
+{
+    if (message.empty())
+        return false;
+
+    std::istringstream iss(message);
+    std::string prefix;
+    int x, y, food, linemate, deraumere, sibur, mendiane, phiras, thystame;
+    int width, height;
+
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        auto mapSize = _gameInfos->getMapSize();
+
+        width = mapSize.first;
+        height = mapSize.second;
+    }
+
+    iss >> prefix >> x >> y >> food >> linemate >> deraumere
+        >> sibur >> mendiane >> phiras >> thystame;
+
+    if (iss.fail() || prefix != "bct" || x < 0 || y < 0 || x >= width || y >= height ||
+        food < 0 || linemate < 0 || deraumere < 0 ||
+        sibur < 0 || mendiane < 0 || phiras < 0 || thystame < 0) {
+        std::cerr << colors::RED << "[WARNING] Invalid tile data format received: " << message
+                  << colors::RESET << std::endl;
+        return false;
+    }
+
+    zappy::structs::Tile tile(x, y, food, linemate, deraumere,
+                              sibur, mendiane, phiras, thystame);
+
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        _gameInfos->updateTile(tile);
+    }
+
+    std::cout << colors::YELLOW << "[INFO] Tile updated: (" << x << ", " << y << ") "
+              << "Food: " << food << ", Linemate: " << linemate
+              << ", Deraumere: " << deraumere << ", Sibur: " << sibur
+              << ", Mendiane: " << mendiane << ", Phiras: " << phiras
+              << ", Thystame: " << thystame
               << colors::RESET << std::endl;
     return true;
 }
