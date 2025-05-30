@@ -35,6 +35,7 @@ class MsgHandler {
 
         void handleMessage(const std::string& message);
         bool handleWelcomeMessage(const std::string& message);
+        bool handleMszMessage(const std::string& message);
 
     private:
         std::thread _thread;
