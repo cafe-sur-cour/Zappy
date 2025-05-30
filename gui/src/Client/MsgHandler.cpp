@@ -9,6 +9,7 @@
 #include <sstream>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "MsgHandler.hpp"
 
@@ -29,8 +30,8 @@ MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos,
         {"pin", std::bind(&MsgHandler::handlePinMessage, this, std::placeholders::_1)},
         {"pex", std::bind(&MsgHandler::handlePexMessage, this, std::placeholders::_1)},
         {"pbc", std::bind(&MsgHandler::handlePbcMessage, this, std::placeholders::_1)},
-        // pic
-        // pie
+        {"pic", std::bind(&MsgHandler::handlePicMessage, this, std::placeholders::_1)},
+        {"pie", std::bind(&MsgHandler::handlePieMessage, this, std::placeholders::_1)},
         // pfk
         // pdr
         // pgt
@@ -421,6 +422,75 @@ bool MsgHandler::handlePbcMessage(const std::string& message)
 
     std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
               << " broadcasted: " << broadcastMessage
+              << colors::RESET << std::endl;
+    return true;
+}
+
+bool MsgHandler::handlePicMessage(const std::string& message)
+{
+    if (message.empty())
+        return false;
+
+    std::istringstream iss(message);
+    std::string prefix;
+    int x, y, level;
+    std::vector<int> players;
+
+    iss >> prefix >> x >> y >> level;
+    if (iss.fail() || prefix != "pic" || x < 0 || y < 0 || level < 1) {
+        std::cerr << colors::RED << "[WARNING] Invalid incantation format received: "
+                  << message << colors::RESET << std::endl;
+        return false;
+    }
+
+    int playerNumber;
+    while (iss >> playerNumber) {
+        if (playerNumber < 0) {
+            std::cerr << colors::RED << "[WARNING] Invalid player number in incantation: "
+                      << playerNumber << colors::RESET << std::endl;
+            return false;
+        }
+        players.push_back(playerNumber);
+    }
+
+    zappy::structs::Incantation incantation(x, y, level, players);
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        _gameInfos->addIncantation(incantation);
+    }
+
+    std::cout << colors::YELLOW << "[INFO] Incantation at (" << x << ", " << y
+              << ") for level " << level << " with players: ";
+    for (const auto &player : players) {
+        std::cout << player << " ";
+    }
+    std::cout << colors::RESET << std::endl;
+    return true;
+}
+
+bool MsgHandler::handlePieMessage(const std::string& message)
+{
+    if (message.empty())
+        return false;
+
+    std::istringstream iss(message);
+    std::string prefix;
+    int x, y, result;
+
+    iss >> prefix >> x >> y >> result;
+    if (iss.fail() || prefix != "pie" || x < 0 || y < 0 || (result != 0 && result != 1)) {
+        std::cerr << colors::RED << "[WARNING] Invalid incantation result format received: "
+                  << message << colors::RESET << std::endl;
+        return false;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        _gameInfos->removeIncantation(x, y, result);
+    }
+
+    std::cout << colors::YELLOW << "[INFO] Incantation at (" << x << ", " << y
+              << ") result: " << (result == 1 ? "Success" : "Failure")
               << colors::RESET << std::endl;
     return true;
 }
