@@ -7,5 +7,6 @@
 
 from src.Utils.Utils import USAGE_STRING
 
+
 def main():
     print(USAGE_STRING)
