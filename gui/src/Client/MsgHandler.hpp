@@ -43,7 +43,7 @@ class MsgHandler {
         bool handlePlvMessage(const std::string& message);
         bool handlePinMessage(const std::string& message);
         bool handlePexMessage(const std::string& message);
-        // pbc
+        bool handlePbcMessage(const std::string& message);
         // pic
         // pie
         // pfk

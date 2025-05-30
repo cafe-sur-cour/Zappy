@@ -28,7 +28,7 @@ MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos,
         {"plv", std::bind(&MsgHandler::handlePlvMessage, this, std::placeholders::_1)},
         {"pin", std::bind(&MsgHandler::handlePinMessage, this, std::placeholders::_1)},
         {"pex", std::bind(&MsgHandler::handlePexMessage, this, std::placeholders::_1)},
-        // pbc
+        {"pbc", std::bind(&MsgHandler::handlePbcMessage, this, std::placeholders::_1)},
         // pic
         // pie
         // pfk
@@ -392,6 +392,35 @@ bool MsgHandler::handlePexMessage(const std::string& message)
 
     std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
               << " has been expelled."
+              << colors::RESET << std::endl;
+    return true;
+}
+
+bool MsgHandler::handlePbcMessage(const std::string& message)
+{
+    if (message.empty())
+        return false;
+
+    std::istringstream iss(message);
+    std::string prefix, broadcastMessage;
+    int playerNumber;
+
+    iss >> prefix >> playerNumber;
+    std::getline(iss, broadcastMessage);
+
+    if (iss.fail() || prefix != "pbc" || playerNumber < 0 || broadcastMessage.empty()) {
+        std::cerr << colors::RED << "[WARNING] Invalid player broadcast format received: "
+                  << message << colors::RESET << std::endl;
+        return false;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        _gameInfos->addPlayerBroadcast(playerNumber, broadcastMessage);
+    }
+
+    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+              << " broadcasted: " << broadcastMessage
               << colors::RESET << std::endl;
     return true;
 }
