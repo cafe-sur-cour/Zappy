@@ -26,7 +26,7 @@ static bool check_name(char const *flag, char const * const *value,
 {
     if (!flag || strcmp(flag, "-n") != 0 || !value || !params) {
         error_message("Invalid name flag.");
-        return true;
+        return false;
     }
     params->nb_team = nb;
     params->teams = calloc(nb + 1, sizeof(char *));
