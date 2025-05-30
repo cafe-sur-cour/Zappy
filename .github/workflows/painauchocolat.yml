@@ -160,6 +160,12 @@ jobs:
           cp lib/*.a /usr/lib
           cd -
 
+      - name: Install pytest and dependencies
+        run: |
+          apt-get update
+          apt-get install -y python3-pip
+          pip install --break-system-packages pytest pytest-cov
+
       - name: Run Unit Tests
         run: make tests_run
         timeout-minutes: 5
