@@ -18,6 +18,7 @@ MAIN_OBJ = $(MAIN:.cpp=.o)
 
 SRC =	src/Client/Client.cpp \
 		src/CLI/CLI.cpp \
+		src/Communication/Communication.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
@@ -25,6 +26,7 @@ TEST_SRC = tests/unit/main_test.cpp \
 		   tests/unit/CLI/CLI_test.cpp \
 		   tests/unit/Exceptions/Exceptions_test.cpp \
 		   tests/unit/Client/Client_test.cpp \
+		   tests/unit/Communication/Communication_test.cpp \
 
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
@@ -61,6 +63,7 @@ fclean: clean
 	@rm -rf coverage_report/
 	@rm -rf *.gcda
 	@rm -rf *.gcno
+	@rm -rf *.gcov
 
 re: fclean all
 
@@ -68,6 +71,7 @@ coverage: tests_run
 	@echo -e "$(BLUE)ᒥ📊ᒧ Generating coverage report...$(NC)"
 	@mkdir -p coverage_report
 	@gcovr --root . --exclude tests/ --exclude-unreachable-branches \
+	--merge-mode-functions=merge-use-line-min \
 	--html --html-details -o coverage_report/index.html
 	@echo -e "$(GREEN)ᒥ✅ᒧ Report generated in coverage_report/index.html$(NC)"
 	@firefox coverage_report/index.html &> /dev/null || xdg-open \
