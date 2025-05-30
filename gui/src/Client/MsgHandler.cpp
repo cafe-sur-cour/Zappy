@@ -23,7 +23,7 @@ MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos,
         {"msz", std::bind(&MsgHandler::handleMszMessage, this, std::placeholders::_1)},
         {"bct", std::bind(&MsgHandler::handleBctMessage, this, std::placeholders::_1)},
         {"tna", std::bind(&MsgHandler::handleTnaMessage, this, std::placeholders::_1)},
-        // pnw
+        {"pnw", std::bind(&MsgHandler::handlePnwMessage, this, std::placeholders::_1)},
         // ppo
         // plv
         // pin
@@ -237,6 +237,58 @@ bool MsgHandler::handleTnaMessage(const std::string& message)
     }
 
     std::cout << colors::YELLOW << "[INFO] Team name added: " << teamName
+              << colors::RESET << std::endl;
+    return true;
+}
+
+bool MsgHandler::handlePnwMessage(const std::string& message)
+{
+    if (message.empty())
+        return false;
+
+    std::istringstream iss(message);
+    std::string prefix, teamName;
+    int playerNumber, x, y, orientation, level;
+    int width, height;
+
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        auto mapSize = _gameInfos->getMapSize();
+
+        width = mapSize.first;
+        height = mapSize.second;
+    }
+
+    iss >> prefix >> playerNumber >> x >> y >> orientation >> level >> teamName;
+
+    if (iss.fail() || prefix != "pnw" || playerNumber < 0 || x < 0 || y < 0 ||
+        x >= width || y >= height ||
+        orientation < 0 || orientation > 3 || level < 1 || teamName.empty()) {
+        std::cerr << colors::RED << "[WARNING] Invalid player data format received: "
+                  << message << colors::RESET << std::endl;
+        return false;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        auto teams = _gameInfos->getTeamNames();
+        if (std::find(teams.begin(), teams.end(), teamName) == teams.end()) {
+            std::cerr << colors::RED << "[WARNING] Team name not found: " << teamName
+                      << colors::RESET << std::endl;
+            return false;
+        }
+    }
+
+    zappy::structs::Player player(playerNumber, x, y, orientation, level, teamName);
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        _gameInfos->addPlayer(player);
+    }
+
+    std::cout << colors::YELLOW << "[INFO] Player added: " << playerNumber
+              << " at (" << x << ", " << y << ") with orientation "
+              << orientation << " and level " << level
+              << " from team " << teamName
               << colors::RESET << std::endl;
     return true;
 }

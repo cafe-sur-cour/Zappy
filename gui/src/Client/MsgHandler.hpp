@@ -38,7 +38,7 @@ class MsgHandler {
         bool handleMszMessage(const std::string& message);
         bool handleBctMessage(const std::string& message);
         bool handleTnaMessage(const std::string& message);
-        // pnw
+        bool handlePnwMessage(const std::string& message);
         // ppo
         // plv
         // pin
