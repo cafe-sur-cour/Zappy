@@ -11,11 +11,14 @@
 
 int main(int argc, char **argv)
 {
+    server_t *server = NULL;
+
     if (argc == 2 && (strcmp(argv[1], "-h") == 0 ||
         strcmp(argv[1], "-help") == 0)) {
         return helper();
     }
-    if (check_args(argc, argv) == 84)
+    server = init_server(argc, argv);
+    if (server == NULL)
         return 84;
     return 0;
 }
