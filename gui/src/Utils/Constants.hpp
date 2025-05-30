@@ -41,6 +41,25 @@ namespace zappy::structs {
         int port;
         std::string hostname;
     };
+
+    struct Tile {
+        int x;
+        int y;
+        int food;
+        int linemate;
+        int deraumere;
+        int sibur;
+        int mendiane;
+        int phiras;
+        int thystame;
+
+        Tile(int x = 0, int y = 0, int food = 0, int linemate = 0,
+             int deraumere = 0, int sibur = 0, int mendiane = 0,
+             int phiras = 0, int thystame = 0)
+            : x(x), y(y), food(food), linemate(linemate),
+              deraumere(deraumere), sibur(sibur),
+              mendiane(mendiane), phiras(phiras), thystame(thystame) {}
+    };
 };
 
 #endif /* !CONSTANTS_HPP_ */
