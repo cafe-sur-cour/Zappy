@@ -24,7 +24,7 @@ MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos,
         {"bct", std::bind(&MsgHandler::handleBctMessage, this, std::placeholders::_1)},
         {"tna", std::bind(&MsgHandler::handleTnaMessage, this, std::placeholders::_1)},
         {"pnw", std::bind(&MsgHandler::handlePnwMessage, this, std::placeholders::_1)},
-        // ppo
+        {"ppo", std::bind(&MsgHandler::handlePpoMessage, this, std::placeholders::_1)},
         // plv
         // pin
         // pex
@@ -177,20 +177,11 @@ bool MsgHandler::handleBctMessage(const std::string& message)
     std::istringstream iss(message);
     std::string prefix;
     int x, y, food, linemate, deraumere, sibur, mendiane, phiras, thystame;
-    int width, height;
-
-    {
-        std::lock_guard<std::mutex> lock(_gameInfosMutex);
-        auto mapSize = _gameInfos->getMapSize();
-
-        width = mapSize.first;
-        height = mapSize.second;
-    }
 
     iss >> prefix >> x >> y >> food >> linemate >> deraumere
         >> sibur >> mendiane >> phiras >> thystame;
 
-    if (iss.fail() || prefix != "bct" || x < 0 || y < 0 || x >= width || y >= height ||
+    if (iss.fail() || prefix != "bct" || x < 0 || y < 0 ||
         food < 0 || linemate < 0 || deraumere < 0 ||
         sibur < 0 || mendiane < 0 || phiras < 0 || thystame < 0) {
         std::cerr << colors::RED << "[WARNING] Invalid tile data format received: " << message
@@ -249,20 +240,10 @@ bool MsgHandler::handlePnwMessage(const std::string& message)
     std::istringstream iss(message);
     std::string prefix, teamName;
     int playerNumber, x, y, orientation, level;
-    int width, height;
-
-    {
-        std::lock_guard<std::mutex> lock(_gameInfosMutex);
-        auto mapSize = _gameInfos->getMapSize();
-
-        width = mapSize.first;
-        height = mapSize.second;
-    }
 
     iss >> prefix >> playerNumber >> x >> y >> orientation >> level >> teamName;
 
     if (iss.fail() || prefix != "pnw" || playerNumber < 0 || x < 0 || y < 0 ||
-        x >= width || y >= height ||
         orientation < 0 || orientation > 3 || level < 1 || teamName.empty()) {
         std::cerr << colors::RED << "[WARNING] Invalid player data format received: "
                   << message << colors::RESET << std::endl;
@@ -289,6 +270,34 @@ bool MsgHandler::handlePnwMessage(const std::string& message)
               << " at (" << x << ", " << y << ") with orientation "
               << orientation << " and level " << level
               << " from team " << teamName
+              << colors::RESET << std::endl;
+    return true;
+}
+
+bool MsgHandler::handlePpoMessage(const std::string& message)
+{
+    if (message.empty())
+        return false;
+
+    std::istringstream iss(message);
+    std::string prefix;
+    int playerNumber, x, y;
+
+    iss >> prefix >> playerNumber >> x >> y;
+
+    if (iss.fail() || prefix != "ppo" || playerNumber < 0 || x < 0 || y < 0) {
+        std::cerr << colors::RED << "[WARNING] Invalid player position format received: "
+                  << message << colors::RESET << std::endl;
+        return false;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        _gameInfos->updatePlayerPosition(playerNumber, x, y);
+    }
+
+    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+              << " position updated to (" << x << ", " << y << ")"
               << colors::RESET << std::endl;
     return true;
 }
