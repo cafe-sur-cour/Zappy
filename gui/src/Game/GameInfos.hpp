@@ -31,6 +31,9 @@ class GameInfos {
         void updateTeamName(const std::string &teamName);
         const std::vector<std::string> getTeamNames() const;
 
+        void addPlayer(zappy::structs::Player player);
+        std::vector<zappy::structs::Player> getPlayers() const;
+
     private:
         int _mapWidth;
         int _mapHeight;
@@ -38,6 +41,7 @@ class GameInfos {
 
         std::vector<zappy::structs::Tile> _tiles;
         std::vector<std::string> _teamNames;
+        std::vector<zappy::structs::Player> _players;
 };
 
 #endif /* !GAMEINFOS_HPP_ */

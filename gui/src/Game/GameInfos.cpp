@@ -82,3 +82,21 @@ const std::vector<std::string> GameInfos::getTeamNames() const
 {
     return _teamNames;
 }
+
+void GameInfos::addPlayer(zappy::structs::Player player)
+{
+    auto it = std::find_if(_players.begin(), _players.end(),
+                           [&player](const zappy::structs::Player &p) {
+                               return p.number == player.number;
+                           });
+
+    if (it != _players.end())
+        *it = player;
+    else
+        _players.push_back(player);
+}
+
+std::vector<zappy::structs::Player> GameInfos::getPlayers() const
+{
+    return _players;
+}
