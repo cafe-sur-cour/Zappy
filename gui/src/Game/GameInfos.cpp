@@ -27,3 +27,13 @@ std::pair<int, int> GameInfos::getMapSize() const
 {
     return std::make_pair(_mapWidth, _mapHeight);
 }
+
+void GameInfos::setTimeUnit(int timeUnit)
+{
+    _timeUnit = timeUnit;
+}
+
+int GameInfos::getTimeUnit() const
+{
+    return _timeUnit;
+}
