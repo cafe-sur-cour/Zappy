@@ -18,9 +18,13 @@ class GameInfos {
         void setMapSize(int width, int height);
         std::pair<int, int> getMapSize() const;
 
+        void setTimeUnit(int timeUnit);
+        int getTimeUnit() const;
+
     private:
         int _mapWidth;
         int _mapHeight;
+        int _timeUnit;
 };
 
 #endif /* !GAMEINFOS_HPP_ */
