@@ -6,6 +6,7 @@
 */
 
 #include <utility>
+#include <vector>
 
 #include "GameInfos.hpp"
 
@@ -38,4 +39,33 @@ void GameInfos::setTimeUnit(int timeUnit)
 int GameInfos::getTimeUnit() const
 {
     return _timeUnit;
+}
+
+void GameInfos::updateTile(zappy::structs::Tile tile)
+{
+    if (tile.x < 0 || tile.y < 0 || tile.x >= _mapWidth || tile.y >= _mapHeight)
+        return;
+
+    for (auto &existingTile : _tiles) {
+        if (existingTile.x == tile.x && existingTile.y == tile.y) {
+            existingTile = tile;
+            return;
+        }
+    }
+    _tiles.push_back(tile);
+}
+
+const std::vector<zappy::structs::Tile> GameInfos::getTiles() const
+{
+    return _tiles;
+}
+
+const zappy::structs::Tile GameInfos::getTile(int x, int y) const
+{
+    for (const auto &tile : _tiles) {
+        if (tile.x == x && tile.y == y)
+            return tile;
+    }
+
+    return zappy::structs::Tile(x, y);
 }

@@ -9,6 +9,9 @@
 #define GAMEINFOS_HPP_
 
 #include <utility>
+#include <vector>
+
+#include "../Utils/Constants.hpp"
 
 class GameInfos {
     public:
@@ -21,10 +24,15 @@ class GameInfos {
         void setTimeUnit(int timeUnit);
         int getTimeUnit() const;
 
+        void updateTile(zappy::structs::Tile tile);
+        const std::vector<zappy::structs::Tile> getTiles() const;
+        const zappy::structs::Tile getTile(int x, int y) const;
+
     private:
         int _mapWidth;
         int _mapHeight;
         int _timeUnit;
+        std::vector<zappy::structs::Tile> _tiles;
 };
 
 #endif /* !GAMEINFOS_HPP_ */
