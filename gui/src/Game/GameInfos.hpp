@@ -28,11 +28,16 @@ class GameInfos {
         const std::vector<zappy::structs::Tile> getTiles() const;
         const zappy::structs::Tile getTile(int x, int y) const;
 
+        void updateTeamName(const std::string &teamName);
+        const std::vector<std::string> getTeamNames() const;
+
     private:
         int _mapWidth;
         int _mapHeight;
         int _timeUnit;
+
         std::vector<zappy::structs::Tile> _tiles;
+        std::vector<std::string> _teamNames;
 };
 
 #endif /* !GAMEINFOS_HPP_ */

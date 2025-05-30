@@ -7,6 +7,8 @@
 
 #include <utility>
 #include <vector>
+#include <algorithm>
+#include <string>
 
 #include "GameInfos.hpp"
 
@@ -68,4 +70,15 @@ const zappy::structs::Tile GameInfos::getTile(int x, int y) const
     }
 
     return zappy::structs::Tile(x, y);
+}
+
+void GameInfos::updateTeamName(const std::string &teamName)
+{
+    if (std::find(_teamNames.begin(), _teamNames.end(), teamName) == _teamNames.end())
+        _teamNames.push_back(teamName);
+}
+
+const std::vector<std::string> GameInfos::getTeamNames() const
+{
+    return _teamNames;
 }
