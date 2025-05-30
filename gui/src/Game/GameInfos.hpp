@@ -38,6 +38,9 @@ class GameInfos {
         void updatePlayerExpulsion(int playerNumber);
         std::vector<zappy::structs::Player> getPlayers() const;
 
+        void addPlayerBroadcast(int playerNumber, const std::string &message);
+        std::vector<std::pair<int, std::string>> getPlayersBroadcasting() const;
+
     private:
         int _mapWidth;
         int _mapHeight;
@@ -47,6 +50,7 @@ class GameInfos {
         std::vector<std::string> _teamNames;
         std::vector<zappy::structs::Player> _players;
         std::vector<std::pair<int, bool>> _playersExpulsing;
+        std::vector<std::pair<int, std::string>> _playersBroadcasting;
 };
 
 #endif /* !GAMEINFOS_HPP_ */

@@ -148,3 +148,11 @@ std::vector<zappy::structs::Player> GameInfos::getPlayers() const
 {
     return _players;
 }
+
+void GameInfos::addPlayerBroadcast(int playerNumber, const std::string &message)
+{
+    if (playerNumber < 0 || message.empty())
+        return;
+
+    _playersBroadcasting.emplace_back(playerNumber, message);
+}
