@@ -96,6 +96,20 @@ void GameInfos::addPlayer(zappy::structs::Player player)
         _players.push_back(player);
 }
 
+void GameInfos::updatePlayerPosition(int playerNumber, int x, int y)
+{
+    if (x < 0 || y < 0 || x >= _mapWidth || y >= _mapHeight)
+        return;
+
+    for (auto &player : _players) {
+        if (player.number == playerNumber) {
+            player.x = x;
+            player.y = y;
+            return;
+        }
+    }
+}
+
 std::vector<zappy::structs::Player> GameInfos::getPlayers() const
 {
     return _players;
