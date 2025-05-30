@@ -21,9 +21,29 @@ MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos,
     _messageHandlers = {
         {"WELCOME", std::bind(&MsgHandler::handleWelcomeMessage, this, std::placeholders::_1)},
         {"msz", std::bind(&MsgHandler::handleMszMessage, this, std::placeholders::_1)},
-        {"sgt", std::bind(&MsgHandler::handleSgtMessage, this, std::placeholders::_1)},
         {"bct", std::bind(&MsgHandler::handleBctMessage, this, std::placeholders::_1)},
-        {"tna", std::bind(&MsgHandler::handleTnaMessage, this, std::placeholders::_1)}
+        {"tna", std::bind(&MsgHandler::handleTnaMessage, this, std::placeholders::_1)},
+        // pnw
+        // ppo
+        // plv
+        // pin
+        // pex
+        // pbc
+        // pic
+        // pie
+        // pfk
+        // pdr
+        // pgt
+        // pdi
+        // enw
+        // ebo
+        // edi
+        {"sgt", std::bind(&MsgHandler::handleSgtMessage, this, std::placeholders::_1)},
+        // sst
+        // seg
+        // smg
+        // suc
+        // sbp
     };
 
     start();
