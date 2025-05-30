@@ -156,3 +156,26 @@ void GameInfos::addPlayerBroadcast(int playerNumber, const std::string &message)
 
     _playersBroadcasting.emplace_back(playerNumber, message);
 }
+
+std::vector<std::pair<int, std::string>> GameInfos::getPlayersBroadcasting() const
+{
+    return _playersBroadcasting;
+}
+
+void GameInfos::addIncantation(zappy::structs::Incantation incantation)
+{
+    _incantations.push_back(incantation);
+}
+
+void GameInfos::removeIncantation(int x, int y, int result)
+{
+    auto it = std::remove_if(_incantations.begin(), _incantations.end(),
+                             [x, y](const zappy::structs::Incantation &inc) {
+                                 return inc.x == x && inc.y == y;
+                             });
+
+    if (it != _incantations.end())
+        _incantations.erase(it, _incantations.end());
+
+    (void)result;
+}

@@ -41,6 +41,9 @@ class GameInfos {
         void addPlayerBroadcast(int playerNumber, const std::string &message);
         std::vector<std::pair<int, std::string>> getPlayersBroadcasting() const;
 
+        void addIncantation(zappy::structs::Incantation incantation);
+        void removeIncantation(int x, int y, int result);
+
     private:
         int _mapWidth;
         int _mapHeight;
@@ -51,6 +54,7 @@ class GameInfos {
         std::vector<zappy::structs::Player> _players;
         std::vector<std::pair<int, bool>> _playersExpulsing;
         std::vector<std::pair<int, std::string>> _playersBroadcasting;
+        std::vector<zappy::structs::Incantation> _incantations;
 };
 
 #endif /* !GAMEINFOS_HPP_ */
