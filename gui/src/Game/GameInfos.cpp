@@ -130,6 +130,20 @@ void GameInfos::updatePlayerInventory(int playerNumber, zappy::structs::Inventor
     }
 }
 
+void GameInfos::updatePlayerExpulsion(int playerNumber)
+{
+    if (playerNumber < 0)
+        return;
+
+    for (auto &expulsions : _playersExpulsing) {
+        if (expulsions.first == playerNumber) {
+            _playersExpulsing.erase(std::remove(_playersExpulsing.begin(),
+                _playersExpulsing.end(), expulsions), _playersExpulsing.end());
+        }
+    }
+    _playersExpulsing.emplace_back(playerNumber, true);
+}
+
 std::vector<zappy::structs::Player> GameInfos::getPlayers() const
 {
     return _players;

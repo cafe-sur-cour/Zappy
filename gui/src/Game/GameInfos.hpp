@@ -35,6 +35,7 @@ class GameInfos {
         void updatePlayerPosition(int playerNumber, int x, int y);
         void updatePlayerLevel(int playerNumber, int level);
         void updatePlayerInventory(int playerNumber, zappy::structs::Inventory inventory);
+        void updatePlayerExpulsion(int playerNumber);
         std::vector<zappy::structs::Player> getPlayers() const;
 
     private:
@@ -45,6 +46,7 @@ class GameInfos {
         std::vector<zappy::structs::Tile> _tiles;
         std::vector<std::string> _teamNames;
         std::vector<zappy::structs::Player> _players;
+        std::vector<std::pair<int, bool>> _playersExpulsing;
 };
 
 #endif /* !GAMEINFOS_HPP_ */
