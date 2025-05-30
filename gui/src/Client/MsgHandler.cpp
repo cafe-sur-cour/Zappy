@@ -27,7 +27,7 @@ MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos,
         {"ppo", std::bind(&MsgHandler::handlePpoMessage, this, std::placeholders::_1)},
         {"plv", std::bind(&MsgHandler::handlePlvMessage, this, std::placeholders::_1)},
         {"pin", std::bind(&MsgHandler::handlePinMessage, this, std::placeholders::_1)},
-        // pex
+        {"pex", std::bind(&MsgHandler::handlePexMessage, this, std::placeholders::_1)},
         // pbc
         // pic
         // pie
@@ -364,6 +364,34 @@ bool MsgHandler::handlePinMessage(const std::string& message)
               << ", Mendiane: " << mendiane
               << ", Phiras: " << phiras
               << ", Thystame: " << thystame
+              << colors::RESET << std::endl;
+    return true;
+}
+
+bool MsgHandler::handlePexMessage(const std::string& message)
+{
+    if (message.empty())
+        return false;
+
+    std::istringstream iss(message);
+    std::string prefix;
+    int playerNumber;
+
+    iss >> prefix >> playerNumber;
+
+    if (iss.fail() || prefix != "pex" || playerNumber < 0) {
+        std::cerr << colors::RED << "[WARNING] Invalid player expulsion format received: "
+                  << message << colors::RESET << std::endl;
+        return false;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        _gameInfos->updatePlayerExpulsion(playerNumber);
+    }
+
+    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+              << " has been expelled."
               << colors::RESET << std::endl;
     return true;
 }
