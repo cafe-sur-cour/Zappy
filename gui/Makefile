@@ -29,6 +29,7 @@ TEST_SRC = tests/unit/main_test.cpp \
 		   tests/unit/Exceptions/Exceptions_test.cpp \
 		   tests/unit/Client/Client_test.cpp \
 		   tests/unit/Communication/Communication_test.cpp \
+		   tests/unit/Game/GameInfos_test.cpp \
 
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
