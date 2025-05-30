@@ -14,7 +14,8 @@ fi
 find ./ai -type f -name "*.py" ! -path "*/tests/*" ! -path "*/bonus/*" ! -path "*/__pycache__/*" | while read -r file; do
     echo "Checking $file..."
     # Using --ignore=E266 to ignore the Epitech header style (multiple # characters at start of comments)
-    pycodestyle --ignore=E266 "$file" >> "$LOG_FILE" 2>&1
+    # Setting max-line-length to 95 characters
+    pycodestyle --ignore=E266 --max-line-length=95 "$file" >> "$LOG_FILE" 2>&1
 done
 
 # Count the number of errors
