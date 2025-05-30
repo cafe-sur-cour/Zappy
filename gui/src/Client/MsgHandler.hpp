@@ -38,6 +38,7 @@ class MsgHandler {
         bool handleMszMessage(const std::string& message);
         bool handleSgtMessage(const std::string& message);
         bool handleBctMessage(const std::string& message);
+        bool handleTnaMessage(const std::string& message);
 
     private:
         std::thread _thread;

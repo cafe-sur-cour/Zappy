@@ -22,7 +22,8 @@ MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos,
         {"WELCOME", std::bind(&MsgHandler::handleWelcomeMessage, this, std::placeholders::_1)},
         {"msz", std::bind(&MsgHandler::handleMszMessage, this, std::placeholders::_1)},
         {"sgt", std::bind(&MsgHandler::handleSgtMessage, this, std::placeholders::_1)},
-        {"bct", std::bind(&MsgHandler::handleBctMessage, this, std::placeholders::_1)}
+        {"bct", std::bind(&MsgHandler::handleBctMessage, this, std::placeholders::_1)},
+        {"tna", std::bind(&MsgHandler::handleTnaMessage, this, std::placeholders::_1)}
     };
 
     start();
@@ -190,6 +191,32 @@ bool MsgHandler::handleBctMessage(const std::string& message)
               << ", Deraumere: " << deraumere << ", Sibur: " << sibur
               << ", Mendiane: " << mendiane << ", Phiras: " << phiras
               << ", Thystame: " << thystame
+              << colors::RESET << std::endl;
+    return true;
+}
+
+bool MsgHandler::handleTnaMessage(const std::string& message)
+{
+    if (message.empty())
+        return false;
+
+    std::istringstream iss(message);
+    std::string prefix, teamName;
+
+    iss >> prefix >> teamName;
+
+    if (iss.fail() || prefix != "tna" || teamName.empty()) {
+        std::cerr << colors::RED << "[WARNING] Invalid team name format received: " << message
+                  << colors::RESET << std::endl;
+        return false;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        _gameInfos->updateTeamName(teamName);
+    }
+
+    std::cout << colors::YELLOW << "[INFO] Team name added: " << teamName
               << colors::RESET << std::endl;
     return true;
 }
