@@ -60,6 +60,38 @@ namespace zappy::structs {
               deraumere(deraumere), sibur(sibur),
               mendiane(mendiane), phiras(phiras), thystame(thystame) {}
     };
+
+    struct Inventory {
+        int food;
+        int linemate;
+        int deraumere;
+        int sibur;
+        int mendiane;
+        int phiras;
+        int thystame;
+
+        Inventory(int food = 0, int linemate = 0, int deraumere = 0,
+                  int sibur = 0, int mendiane = 0, int phiras = 0,
+                  int thystame = 0)
+            : food(food), linemate(linemate), deraumere(deraumere),
+              sibur(sibur), mendiane(mendiane), phiras(phiras),
+              thystame(thystame) {}
+    };
+    struct Player {
+        int number;
+        int x;
+        int y;
+        int orientation;
+        int level;
+        std::string teamName;
+        struct Inventory inventory;
+
+        Player(int number = 0, int x = 0, int y = 0, int orientation = 0,
+               int level = 1, const std::string &teamName = "",
+               struct Inventory inventory = Inventory())
+            : number(number), x(x), y(y), orientation(orientation),
+              level(level), teamName(teamName), inventory(inventory) {}
+    };
 };
 
 #endif /* !CONSTANTS_HPP_ */
