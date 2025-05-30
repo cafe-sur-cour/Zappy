@@ -11,7 +11,7 @@
 
 #include "zappy.h"
 
-bool check_port(char const *flag, char const *value)
+bool check_port(char const *flag, char const *value, params_t *params)
 {
     int port = 0;
 
@@ -24,10 +24,11 @@ bool check_port(char const *flag, char const *value)
         error_message("Port must be between 1024 and 65535 (included).");
         return false;
     }
+    params->port = port;
     return true;
 }
 
-bool check_width(char const *flag, char const *value)
+bool check_width(char const *flag, char const *value, params_t *params)
 {
     int width = 0;
 
@@ -40,10 +41,11 @@ bool check_width(char const *flag, char const *value)
         error_message("Width must be a positive integer.");
         return false;
     }
+    params->x = width;
     return true;
 }
 
-bool check_height(char const *flag, char const *value)
+bool check_height(char const *flag, char const *value, params_t *params)
 {
     int height = 0;
 
@@ -56,10 +58,11 @@ bool check_height(char const *flag, char const *value)
         error_message("Height must be a positive integer.");
         return false;
     }
+    params->y = height;
     return true;
 }
 
-bool check_client(char const *flag, char const *value)
+bool check_client(char const *flag, char const *value, params_t *params)
 {
     int clients_nb = 0;
 
@@ -72,10 +75,11 @@ bool check_client(char const *flag, char const *value)
         error_message("Number of clients must be a positive integer.");
         return false;
     }
+    params->nb_client = clients_nb;
     return true;
 }
 
-bool check_freq(char const *flag, char const *value)
+bool check_freq(char const *flag, char const *value, params_t *params)
 {
     int freq = 0;
 
@@ -88,5 +92,6 @@ bool check_freq(char const *flag, char const *value)
         error_message("Frequency must be 1 and 200 (included).");
         return false;
     }
+    params->freq = freq;
     return true;
 }
