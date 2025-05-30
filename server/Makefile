@@ -25,7 +25,9 @@ MAIN_OBJ 	= 	$(MAIN:.c=.o)
 SRC 		=	src/params.c					\
 				src/errors.c					\
 				src/checkers.c					\
-				src/server.c
+				src/server.c					\
+				src/protocol.c					\
+				src/client.c
 
 OBJ 		= 	$(SRC:.c=.o)
 
@@ -45,7 +47,7 @@ all: $(NAME)
 
 $(NAME): $(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
-	$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
+	@$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ Compilation completed successfully!$(NC)"
 
 %.o: %.c
