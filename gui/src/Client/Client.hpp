@@ -9,6 +9,8 @@
 #define CLIENT_HPP_
 
 #include "../Utils/Constants.hpp"
+#include "../Communication/Communication.hpp"
+#include <memory>
 
 class Client {
     public:
@@ -17,6 +19,7 @@ class Client {
 
     private:
         zappy::structs::Config _config;
+        std::unique_ptr<Communication> _communication;
         void initialize(int ac, const char * const *av);
 };
 

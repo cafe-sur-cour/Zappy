@@ -117,11 +117,15 @@ jobs:
       - name: checkout@v4
         uses: actions/checkout@v4
 
-      - name: Install Google Test
+      - name: Install Google Test and Google Mock
         run: |
           apt-get update
-          apt-get install -y libgtest-dev cmake
+          apt-get install -y libgtest-dev libgmock-dev cmake
           cd /usr/src/gtest
+          cmake CMakeLists.txt
+          make
+          cp lib/*.a /usr/lib
+          cd /usr/src/googletest/googlemock
           cmake CMakeLists.txt
           make
           cp lib/*.a /usr/lib

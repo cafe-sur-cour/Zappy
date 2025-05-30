@@ -94,3 +94,96 @@ TEST_F(ExceptionsTest, CLIInvalidArgumentExceptionTest) {
     EXPECT_STREQ(exception.what(), expectedMessage.c_str());
     EXPECT_TRUE(dynamic_cast<const Exceptions::CLIParsingException*>(&exception) != nullptr);
 }
+
+// Test the base NetworkException
+TEST_F(ExceptionsTest, NetworkExceptionTest) {
+    std::string errorMessage = "General network error";
+    Exceptions::NetworkException exception(errorMessage);
+
+    std::string expectedMessage = std::string(colors::RED) +
+                                "Network Error: " + errorMessage +
+                                colors::RESET;
+
+    EXPECT_STREQ(exception.what(), expectedMessage.c_str());
+    EXPECT_TRUE(dynamic_cast<const std::exception*>(&exception) != nullptr);
+}
+
+// Test the ConnectionFailedException
+TEST_F(ExceptionsTest, ConnectionFailedExceptionTest) {
+    std::string errorMessage = "Could not connect to host";
+    Exceptions::ConnectionFailedException exception(errorMessage);
+
+    std::string expectedMessage = std::string(colors::RED) +
+                                "Network Error: " +
+                                std::string(colors::CYAN) +
+                                "Connection Failed: " + errorMessage +
+                                colors::RESET +
+                                colors::RESET;
+
+    EXPECT_STREQ(exception.what(), expectedMessage.c_str());
+    EXPECT_TRUE(dynamic_cast<const Exceptions::NetworkException*>(&exception) != nullptr);
+}
+
+// Test the SocketCreationException
+TEST_F(ExceptionsTest, SocketCreationExceptionTest) {
+    std::string errorMessage = "Failed to create socket";
+    Exceptions::SocketCreationException exception(errorMessage);
+
+    std::string expectedMessage = std::string(colors::RED) +
+                                "Network Error: " +
+                                std::string(colors::CYAN) +
+                                "Socket Creation Failed: " + errorMessage +
+                                colors::RESET +
+                                colors::RESET;
+
+    EXPECT_STREQ(exception.what(), expectedMessage.c_str());
+    EXPECT_TRUE(dynamic_cast<const Exceptions::NetworkException*>(&exception) != nullptr);
+}
+
+// Test the ConnectionTimeoutException
+TEST_F(ExceptionsTest, ConnectionTimeoutExceptionTest) {
+    std::string errorMessage = "Connection attempt timed out";
+    Exceptions::ConnectionTimeoutException exception(errorMessage);
+
+    std::string expectedMessage = std::string(colors::RED) +
+                                "Network Error: " +
+                                std::string(colors::CYAN) +
+                                "Connection Timeout: " + errorMessage +
+                                colors::RESET +
+                                colors::RESET;
+
+    EXPECT_STREQ(exception.what(), expectedMessage.c_str());
+    EXPECT_TRUE(dynamic_cast<const Exceptions::NetworkException*>(&exception) != nullptr);
+}
+
+// Test the SendException
+TEST_F(ExceptionsTest, SendExceptionTest) {
+    std::string errorMessage = "Failed to send data";
+    Exceptions::SendException exception(errorMessage);
+
+    std::string expectedMessage = std::string(colors::RED) +
+                                "Network Error: " +
+                                std::string(colors::CYAN) +
+                                "Send Error: " + errorMessage +
+                                colors::RESET +
+                                colors::RESET;
+
+    EXPECT_STREQ(exception.what(), expectedMessage.c_str());
+    EXPECT_TRUE(dynamic_cast<const Exceptions::NetworkException*>(&exception) != nullptr);
+}
+
+// Test the ReceiveException
+TEST_F(ExceptionsTest, ReceiveExceptionTest) {
+    std::string errorMessage = "Failed to receive data";
+    Exceptions::ReceiveException exception(errorMessage);
+
+    std::string expectedMessage = std::string(colors::RED) +
+                                "Network Error: " +
+                                std::string(colors::CYAN) +
+                                "Receive Error: " + errorMessage +
+                                colors::RESET +
+                                colors::RESET;
+
+    EXPECT_STREQ(exception.what(), expectedMessage.c_str());
+    EXPECT_TRUE(dynamic_cast<const Exceptions::NetworkException*>(&exception) != nullptr);
+}

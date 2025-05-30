@@ -6,6 +6,7 @@
 */
 
 #include <iostream>
+#include <memory>
 
 #include "Client.hpp"
 #include "../CLI/CLI.hpp"
@@ -18,6 +19,12 @@ Client::Client(int ac, const char *const *av)
               << "Port: " << _config.port
               << ", Hostname: " << _config.hostname
               << colors::RESET << std::endl;
+
+    _communication = std::make_unique<Communication>(_config);
+    while (true) {
+        if (!_communication->isConnected())
+            break;
+    }
 }
 
 Client::~Client()

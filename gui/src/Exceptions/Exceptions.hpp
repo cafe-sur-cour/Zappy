@@ -14,6 +14,7 @@
 
 namespace Exceptions {
 
+    // CLI Exceptions
     class CLIParsingException : public std::exception {
         public:
             explicit CLIParsingException(const std::string &message)
@@ -59,6 +60,61 @@ namespace Exceptions {
                 : CLIParsingException(std::string(colors::CYAN) +
                                      "Invalid Argument: " + message +
                                      colors::RESET) {}
+    };
+
+    class NetworkException : public std::exception {
+        public:
+            explicit NetworkException(const std::string &message)
+                : _message(std::string(colors::RED) +
+                          "Network Error: " + message +
+                          colors::RESET) {}
+
+            virtual const char *what() const noexcept override {
+                return _message.c_str();
+            }
+
+        private:
+            std::string _message;
+    };
+
+    class ConnectionFailedException : public NetworkException {
+        public:
+            explicit ConnectionFailedException(const std::string &message)
+                : NetworkException(std::string(colors::CYAN) +
+                                  "Connection Failed: " + message +
+                                  colors::RESET) {}
+    };
+
+    class SocketCreationException : public NetworkException {
+        public:
+            explicit SocketCreationException(const std::string &message)
+                : NetworkException(std::string(colors::CYAN) +
+                                  "Socket Creation Failed: " + message +
+                                  colors::RESET) {}
+    };
+
+    class ConnectionTimeoutException : public NetworkException {
+        public:
+            explicit ConnectionTimeoutException(const std::string &message)
+                : NetworkException(std::string(colors::CYAN) +
+                                  "Connection Timeout: " + message +
+                                  colors::RESET) {}
+    };
+
+    class SendException : public NetworkException {
+        public:
+            explicit SendException(const std::string &message)
+                : NetworkException(std::string(colors::CYAN) +
+                                  "Send Error: " + message +
+                                  colors::RESET) {}
+    };
+
+    class ReceiveException : public NetworkException {
+        public:
+            explicit ReceiveException(const std::string &message)
+                : NetworkException(std::string(colors::CYAN) +
+                                  "Receive Error: " + message +
+                                  colors::RESET) {}
     };
 }
 
