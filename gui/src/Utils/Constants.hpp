@@ -104,6 +104,20 @@ namespace zappy::structs {
                     const std::vector<int> &players = {})
             : x(x), y(y), level(level), players(players) {}
     };
+
+    struct Egg {
+        int eggNumber;
+        int playerNumber;
+        int x;
+        int y;
+        bool hatched;
+        std::string teamName;
+
+        Egg(int eggNumber = 0, int playerNumber = 0, int x = 0, int y = 0,
+            bool hatched = false, const std::string &teamName = "")
+            : eggNumber(eggNumber), playerNumber(playerNumber), x(x), y(y),
+              hatched(hatched), teamName(teamName) {}
+    };
 };
 
 #endif /* !CONSTANTS_HPP_ */
