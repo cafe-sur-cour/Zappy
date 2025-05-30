@@ -5,12 +5,14 @@
 ** Communication
 */
 
-#include "Communication.hpp"
-#include <iostream>
 #include <netdb.h>
+#include <iostream>
 #include <cstring>
 #include <cerrno>
 #include <sstream>
+#include <string>
+
+#include "Communication.hpp"
 
 Communication::Communication(zappy::structs::Config config)
     : _config(config),

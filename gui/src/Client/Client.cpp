@@ -6,6 +6,7 @@
 */
 
 #include <iostream>
+#include <memory>
 
 #include "Client.hpp"
 #include "../CLI/CLI.hpp"
