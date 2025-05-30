@@ -110,6 +110,26 @@ void GameInfos::updatePlayerPosition(int playerNumber, int x, int y)
     }
 }
 
+void GameInfos::updatePlayerLevel(int playerNumber, int level)
+{
+    for (auto &player : _players) {
+        if (player.number == playerNumber) {
+            player.level = level;
+            return;
+        }
+    }
+}
+
+void GameInfos::updatePlayerInventory(int playerNumber, zappy::structs::Inventory inventory)
+{
+    for (auto &player : _players) {
+        if (player.number == playerNumber) {
+            player.inventory = inventory;
+            return;
+        }
+    }
+}
+
 std::vector<zappy::structs::Player> GameInfos::getPlayers() const
 {
     return _players;

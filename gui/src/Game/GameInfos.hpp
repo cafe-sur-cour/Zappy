@@ -33,6 +33,8 @@ class GameInfos {
 
         void addPlayer(zappy::structs::Player player);
         void updatePlayerPosition(int playerNumber, int x, int y);
+        void updatePlayerLevel(int playerNumber, int level);
+        void updatePlayerInventory(int playerNumber, zappy::structs::Inventory inventory);
         std::vector<zappy::structs::Player> getPlayers() const;
 
     private:
