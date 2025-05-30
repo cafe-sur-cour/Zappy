@@ -15,6 +15,7 @@ MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<Com
 {
     _messageHandlers = {
         {"WELCOME", std::bind(&MsgHandler::handleWelcomeMessage, this, std::placeholders::_1)},
+        {"msz", std::bind(&MsgHandler::handleMszMessage, this, std::placeholders::_1)},
     };
 
     start();
@@ -87,6 +88,33 @@ bool MsgHandler::handleWelcomeMessage(const std::string& message)
               << colors::RESET << std::endl;
     _communication->sendMessage("GRAPHIC\n");
     std::cout << colors::YELLOW << "[INFO] Sent GRAPHIC command to server."
+              << colors::RESET << std::endl;
+    return true;
+}
+
+bool MsgHandler::handleMszMessage(const std::string& message)
+{
+    if (message.empty())
+        return false;
+
+    std::istringstream iss(message);
+    std::string prefix;
+    int width, height;
+
+    iss >> prefix >> width >> height;
+
+    if (iss.fail() || width <= 0 || height <= 0 || prefix != "msz") {
+        std::cerr << colors::RED << "[WARNING] Invalid map size format received: " << message
+                  << colors::RESET << std::endl;
+        return false;
+    }
+
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        _gameInfos->setMapSize(width, height);
+    }
+
+    std::cout << colors::YELLOW << "[INFO] Map size set to: " << width << "x" << height
               << colors::RESET << std::endl;
     return true;
 }
