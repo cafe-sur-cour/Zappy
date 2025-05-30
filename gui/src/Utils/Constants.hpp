@@ -9,6 +9,7 @@
 #define CONSTANTS_HPP_
 
 #include <string>
+#include <vector>
 
 namespace zappy::constants {
 
@@ -91,6 +92,17 @@ namespace zappy::structs {
                struct Inventory inventory = Inventory())
             : number(number), x(x), y(y), orientation(orientation),
               level(level), teamName(teamName), inventory(inventory) {}
+    };
+
+    struct Incantation {
+        int x;
+        int y;
+        int level;
+        std::vector<int> players;
+
+        Incantation(int x = 0, int y = 0, int level = 1,
+                    const std::vector<int> &players = {})
+            : x(x), y(y), level(level), players(players) {}
     };
 };
 
