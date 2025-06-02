@@ -9,7 +9,7 @@
 #define CLIENT_HPP_
 
 #include "../Utils/Constants.hpp"
-#include "../Communication/Communication.hpp"
+#include "../Communication/ICommunication.hpp"
 #include "../Game/GameInfos.hpp"
 #include "MsgHandler.hpp"
 
@@ -26,7 +26,7 @@ class Client {
         zappy::structs::Config _config;
         void initialize(int ac, const char * const *av);
 
-        std::shared_ptr<Communication> _communication;
+        std::shared_ptr<ICommunication> _communication;
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<MsgHandler> _msgHandler;
 };
