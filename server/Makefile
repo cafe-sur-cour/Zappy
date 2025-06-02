@@ -13,10 +13,10 @@ NC=\033[0m
 
 UNIT 	    = 	unit_tests
 
-TESTS 	    =   tests/tests_params.c			\
-				tests/tests_messages.c			\
-				tests/tests_checkers.c			\
-				tests/tests_server.c			\
+TESTS 	    =   tests/ctest_params.c			\
+				tests/ctest_messages.c			\
+				tests/ctest_checkers.c			\
+				tests/ctest_server.c
 
 MAIN 		= 	src/main.c
 
@@ -61,9 +61,11 @@ clean:
 fclean: clean
 	@rm -rf $(NAME)
 	@rm -rf $(UNIT)
+	@rm -f tests/*.c
 
 unit_test: fclean
 	@echo -e "$(YELLOW)ᒥ🧪ᒧ Compiling unit tests...$(NC)"
+	@cp -f ../tests/unit/ctest_*.c tests/
 	@$(CC) -o $(UNIT) $(TESTS) $(SRC) $(CFLAGS) $(INCLUDES) $(CRIT)
 
 tests_run: unit_test
