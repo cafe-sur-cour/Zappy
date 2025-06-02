@@ -22,9 +22,13 @@ The winning team is the first one where at least 6 players reach the maximum ele
     The basic documentation fo the project is generated using the
     doxygen, to run the doxygen executable, please make sure you
     installed the pdf-latex librairie.
-    To generate the PDF :
+    To generate the PDF you need move the my-zappy-doc, folder out of the repositorie
+    because the Unicode emojis used make the generation fails, then execute this :
+
     ./generateDoc.sh
 
+    After that you can move back the folder in the documentation
+    folder.
 
 ## Commit norm :
 
