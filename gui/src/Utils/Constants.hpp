@@ -9,6 +9,7 @@
 #define CONSTANTS_HPP_
 
 #include <string>
+#include <vector>
 
 namespace zappy::constants {
 
@@ -40,6 +41,82 @@ namespace zappy::structs {
     struct Config {
         int port;
         std::string hostname;
+    };
+
+    struct Tile {
+        int x;
+        int y;
+        int food;
+        int linemate;
+        int deraumere;
+        int sibur;
+        int mendiane;
+        int phiras;
+        int thystame;
+
+        Tile(int x = 0, int y = 0, int food = 0, int linemate = 0,
+             int deraumere = 0, int sibur = 0, int mendiane = 0,
+             int phiras = 0, int thystame = 0)
+            : x(x), y(y), food(food), linemate(linemate),
+              deraumere(deraumere), sibur(sibur),
+              mendiane(mendiane), phiras(phiras), thystame(thystame) {}
+    };
+
+    struct Inventory {
+        int food;
+        int linemate;
+        int deraumere;
+        int sibur;
+        int mendiane;
+        int phiras;
+        int thystame;
+
+        Inventory(int food = 0, int linemate = 0, int deraumere = 0,
+                  int sibur = 0, int mendiane = 0, int phiras = 0,
+                  int thystame = 0)
+            : food(food), linemate(linemate), deraumere(deraumere),
+              sibur(sibur), mendiane(mendiane), phiras(phiras),
+              thystame(thystame) {}
+    };
+    struct Player {
+        int number;
+        int x;
+        int y;
+        int orientation;
+        int level;
+        std::string teamName;
+        struct Inventory inventory;
+
+        Player(int number = 0, int x = 0, int y = 0, int orientation = 0,
+               int level = 1, const std::string &teamName = "",
+               struct Inventory inventory = Inventory())
+            : number(number), x(x), y(y), orientation(orientation),
+              level(level), teamName(teamName), inventory(inventory) {}
+    };
+
+    struct Incantation {
+        int x;
+        int y;
+        int level;
+        std::vector<int> players;
+
+        Incantation(int x = 0, int y = 0, int level = 1,
+                    const std::vector<int> &players = {})
+            : x(x), y(y), level(level), players(players) {}
+    };
+
+    struct Egg {
+        int eggNumber;
+        int playerNumber;
+        int x;
+        int y;
+        bool hatched;
+        std::string teamName;
+
+        Egg(int eggNumber = 0, int playerNumber = 0, int x = 0, int y = 0,
+            bool hatched = false, const std::string &teamName = "")
+            : eggNumber(eggNumber), playerNumber(playerNumber), x(x), y(y),
+              hatched(hatched), teamName(teamName) {}
     };
 };
 
