@@ -61,8 +61,6 @@ void *free_server(server_t *server)
         return NULL;
     if (server->params)
         free_params(server->params);
-    if (server->clients)
-        free_clients(server->clients);
     if (server->sockfd != -1)
         close(server->sockfd);
     free(server);
@@ -80,7 +78,6 @@ server_t *init_server(int argc, char **argv)
     server->params = check_args(argc, argv);
     if (!server->params)
         return free_server(server);
-    server->clients = NULL;
     if (set_socket(server) == -1)
         return free_server(server);
     if (bind_socket(server) == -1)

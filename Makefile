@@ -42,7 +42,7 @@ fclean: clean
 	@rm -f $(GUI_NAME)
 	@rm -f $(AI_NAME)
 	@rm -rf $(AI_DIR)/coverage_report
-	-rm -rf *.log
+	@rm -rf *.log
 	@make -C tests/unit/gui/ fclean
 	@make -C tests/unit/server/ fclean
 

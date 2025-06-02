@@ -32,7 +32,6 @@ typedef struct client_s {
 
 typedef struct server_s {
     int sockfd;
-    client_t *clients;
     params_t *params;
     map_t *map;
 } server_t;
