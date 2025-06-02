@@ -41,7 +41,7 @@ class Socket:
         if '\n' in self._buffer:
             message, self._buffer = self._buffer.split('\n', 1)
             return message + '\n'
-        return ""
+        raise SocketException("No complete message received from the socket")
 
     def close(self):
         self._socket.close()
