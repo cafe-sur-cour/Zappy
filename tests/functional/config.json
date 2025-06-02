@@ -2,7 +2,6 @@
     "output_folder": "tests/functional/outputs/",
     "tests_folder": "tests/functional/tests/",
     "files": [
-        "server/arguments",
         "ai/arguments",
         "gui/arguments"
     ]
