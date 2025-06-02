@@ -16,19 +16,19 @@ MAIN = src/main.cpp
 
 MAIN_OBJ = $(MAIN:.cpp=.o)
 
-SRC =	src/Client/Client.cpp \
-		src/Client/MsgHandler.cpp \
-		src/CLI/CLI.cpp \
-		src/Game/GameInfos.cpp \
+SRC =	../../../gui/src/Client/Client.cpp \
+		../../../gui/src/Client/MsgHandler.cpp \
+		../../../gui/src/CLI/CLI.cpp \
+		../../../gui/src/Communication/Communication.cpp \
+		../../../gui/src/Game/GameInfos.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
-TEST_SRC = ../tests/unit/gui/main_test.cpp \
-		   ../tests/unit/gui/CLI/CLI_test.cpp \
-		   ../tests/unit/gui/Exceptions/Exceptions_test.cpp \
-		   ../tests/unit/gui/Client/Client_test.cpp \
-		   ../tests/unit/gui/Communication/Communication_test.cpp \
-		   ../tests/unit/gui/Game/GameInfos_test.cpp \
+TEST_SRC = main_test.cpp \
+		   CLI/CLI_test.cpp \
+		   Exceptions/Exceptions_test.cpp \
+		   Client/Client_test.cpp \
+		   Communication/Communication_test.cpp \
 
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
@@ -37,9 +37,7 @@ INCLUDES = -I./include
 CFLAGS =	-std=c++20 -Wall -Wextra -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
-LIBS = -L./src/Communication -lcommunication
-
-COMM_LIB = src/Communication/libcommunication.a
+LIBS =
 
 NAME = zappy_gui
 
@@ -49,14 +47,10 @@ CC = g++
 
 all: $(NAME)
 
-$(NAME): communication_lib $(OBJ) $(MAIN_OBJ)
+$(NAME): $(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
 	$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ Compilation completed successfully!$(NC)"
-
-communication_lib:
-	@echo -e "$(BLUE)ᒥ🔧ᒧ Building Communication library...$(NC)"
-	@make -C src/Communication
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
@@ -64,7 +58,6 @@ communication_lib:
 clean:
 	@rm -rf $(OBJ)
 	@rm -rf $(MAIN_OBJ)
-	@make -C src/Communication clean
 
 fclean: clean
 	@rm -rf $(NAME)
@@ -73,7 +66,6 @@ fclean: clean
 	@rm -rf *.gcda
 	@rm -rf *.gcno
 	@rm -rf *.gcov
-	@make -C src/Communication fclean
 
 re: fclean all
 
@@ -88,12 +80,12 @@ coverage: tests_run
 		coverage_report/index.html &> /dev/null || echo "Please open \
 		coverage_report/index.html in your browser"
 
-tests_run: communication_lib $(SRC) $(TEST_SRC)
+tests_run: $(SRC) $(TEST_SRC)
 	@echo -e "$(BLUE)ᒥ🧪ᒧ Compiling Google Test unit tests...$(NC)"
-	$(CC) -o $(UNIT_TESTS) $(SRC) $(TEST_SRC) $(CFLAGS_COVERAGE) $(INCLUDES) $(LIBS) \
+	$(CC) -o $(UNIT_TESTS) $(SRC) $(TEST_SRC) $(CFLAGS_COVERAGE) $(INCLUDES) \
 		-lgtest -lgtest_main
 	@echo -e "$(GREEN)ᒥ✅ᒧ Unit tests compiled! Running...$(NC)"
 	./$(UNIT_TESTS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ All tests completed!$(NC)"
 
-.PHONY: all clean fclean re communication_lib coverage tests_run
+.PHONY: all clean fclean re

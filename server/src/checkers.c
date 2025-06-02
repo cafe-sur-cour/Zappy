@@ -108,7 +108,7 @@ bool check_freq(char const *flag, char const *value, params_t *params)
         return false;
     }
     freq = atoi(value);
-    if (freq <= 0  || freq > 200) {
+    if (freq <= 0 || freq > 200) {
         error_message("Frequency must be 1 and 200 (included).");
         return false;
     }
