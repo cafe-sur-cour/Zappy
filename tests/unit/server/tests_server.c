@@ -19,7 +19,7 @@ static void redirect_all_std(void)
 /* Server :: Server :: Init server */
 
 Test(init_server, init_server_valid, .init = redirect_all_std) {
-    char *argv[] = {"./server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "-c", "5", "-f", "50"};
+    char *argv[] = {"./zappy_server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "-c", "5", "-f", "50"};
     int argc = 14;
 
     server_t *server = init_server(argc, argv);
@@ -28,7 +28,7 @@ Test(init_server, init_server_valid, .init = redirect_all_std) {
 }
 
 Test(init_server, init_server_invalid, .init = redirect_all_std) {
-    char *argv[] = {"./server"};
+    char *argv[] = {"./zappy_server"};
     int argc = 1;
 
     cr_assert_null(init_server(argc, argv), "Expected server initialization to fail with insufficient arguments.");
@@ -41,7 +41,7 @@ Test(free_server, free_server_null, .init = redirect_all_std) {
 }
 
 Test(free_server, free_server_valid, .init = redirect_all_std) {
-    char *argv[] = {"./server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "-c", "5", "-f", "50"};
+    char *argv[] = {"./zappy_server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "-c", "5", "-f", "50"};
     int argc = 14;
 
     server_t *server = init_server(argc, argv);
