@@ -9,6 +9,7 @@ import socket
 
 BUFFER_SIZE = 4096
 
+
 class Socket:
     def __init__(self, host: str, port: int):
         self._host = host
