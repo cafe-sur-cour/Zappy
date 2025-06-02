@@ -225,17 +225,17 @@ class Communication:
                 f"Invalid response from Take: {response[:-1]}"
             )
 
-    def sendSetObject(self):
-        self._socket.send("Set object\n")
+    def sendSetObject(self, object_name: str):
+        self._socket.send(f"Set {object_name}\n")
         response = self._socket.receive()
 
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
-                f"Response from Set object is not terminated with a newline"
+                f"Response from Set is not terminated with a newline"
             )
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
-                f"Invalid response from Set object: {response[:-1]}"
+                f"Invalid response from Set: {response[:-1]}"
             )
 
     def sendIncantation(self):
