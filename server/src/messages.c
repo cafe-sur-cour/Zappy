@@ -14,7 +14,12 @@ int helper(void)
     return 84;
 }
 
-void error_message(const char *message)
+void error_message(char const *message)
 {
     printf("\033[1;31m[SERVER]\033[0m \033[0;31m%s\033[0m\n", message);
+}
+
+void printfd(char const *message, int fd)
+{
+    dprintf(fd, "%s\n", message);
 }

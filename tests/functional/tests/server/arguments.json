@@ -3,7 +3,10 @@
         {
             "name": "Server: Valid arguments",
             "description": "Testing with correct values in each fields",
-            "input": ["./zappy_server", "-p", "4242", "-x", "100", "-y", "100", "-n", "team1", "team2", "-c", "6", "-f", "10"],
+            "input": {
+                "program": ["./zappy_server", "-p", "4242", "-x", "100", "-y", "100", "-n", "team1", "team2", "-c", "6", "-f", "10"],
+                "succeed_after": 1
+            },
             "expected_output": "ANYTHING",
             "expected_return": 0
         },
@@ -122,7 +125,10 @@
         {
             "name": "Server: 4 teams",
             "description": "Testing with correct values in each fields",
-            "input": ["./zappy_server", "-p", "4242", "-x", "100", "-y", "100", "-n", "team1", "team2", "team3", "team4", "-c", "6", "-f", "10"],
+            "input": {
+                "program": ["./zappy_server", "-p", "4242", "-x", "100", "-y", "100", "-n", "team1", "team2", "team3", "team4", "-c", "6", "-f", "10"],
+                "succeed_after": 1
+            },
             "expected_output": "ANYTHING",
             "expected_return": 0
         }

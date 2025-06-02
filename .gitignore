@@ -15,3 +15,4 @@ zappy_gui
 zappy_server
 .vscode
 unit_tests
+server/tests/ctest*.c

@@ -21,7 +21,7 @@ const command_pf_t CHECKERS[] = {
     {NULL, NULL}
 };
 
-static bool check_name(char const *flag, char const * const *value,
+static bool check_name(char const *flag, char const *const *value,
     int nb, params_t *params)
 {
     if (!flag || strcmp(flag, "-n") != 0 || !value || !params) {
@@ -68,10 +68,10 @@ static int count_names(int argc, char **argv, int start_pos)
 static bool check_simple_flag(int argc, char **argv,
     const char *flag, params_t *params)
 {
+    char error_msg[28];
     int pos = find_flag(argc, argv, flag);
 
     if (pos == -1 || pos + 1 >= argc) {
-        char error_msg[28];
         snprintf(error_msg, sizeof(error_msg),
             "Missing or invalid %s flag.", flag);
         error_message(error_msg);
@@ -127,12 +127,12 @@ params_t *check_args(int argc, char **argv)
         helper();
         return NULL;
     }
-    check_simple_flag(argc, argv, "-p", params) ? is_ok = false : 0;
-    check_simple_flag(argc, argv, "-x", params) ? is_ok = false : 0;
-    check_simple_flag(argc, argv, "-y", params) ? is_ok = false : 0;
-    check_names_flag(argc, argv, params) ? is_ok = false : 0;
-    check_simple_flag(argc, argv, "-c", params) ? is_ok = false : 0;
-    check_simple_flag(argc, argv, "-f", params) ? is_ok = false : 0;
+    is_ok ^= check_simple_flag(argc, argv, "-p", params);
+    is_ok ^= check_simple_flag(argc, argv, "-x", params);
+    is_ok ^= check_simple_flag(argc, argv, "-y", params);
+    is_ok ^= check_names_flag(argc, argv, params);
+    is_ok ^= check_simple_flag(argc, argv, "-c", params);
+    is_ok ^= check_simple_flag(argc, argv, "-f", params);
     if (!is_ok)
         return free_params(params);
     return params;
