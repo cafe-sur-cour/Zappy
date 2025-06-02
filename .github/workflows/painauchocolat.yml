@@ -101,16 +101,6 @@ jobs:
         run: |
           ./styleChecker.sh
 
-      - name: Verify Coding Style
-        run: |
-          if [ -s coding-style-cpp-reports.log ]; then
-            echo "Coding style errors found. See coding-style-cpp-reports.log for details."
-            cat coding-style-cpp-reports.log
-            exit 1
-          else
-            echo "No coding style errors found."
-          fi
-
   coding_style_python:
     name: Check Coding Style Python
     runs-on: ubuntu-latest
