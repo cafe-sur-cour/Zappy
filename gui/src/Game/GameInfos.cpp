@@ -51,11 +51,15 @@ void GameInfos::updateTile(zappy::structs::Tile tile)
 
     for (auto &existingTile : _tiles) {
         if (existingTile.x == tile.x && existingTile.y == tile.y) {
-            existingTile = tile;
+            existingTile = zappy::structs::Tile(
+                tile.x, tile.y, tile.food, tile.linemate, tile.deraumere,
+                tile.sibur, tile.mendiane, tile.phiras, tile.thystame);
             return;
         }
     }
-    _tiles.push_back(tile);
+    _tiles.push_back(zappy::structs::Tile(
+        tile.x, tile.y, tile.food, tile.linemate, tile.deraumere,
+        tile.sibur, tile.mendiane, tile.phiras, tile.thystame));
 }
 
 const std::vector<zappy::structs::Tile> GameInfos::getTiles() const
@@ -84,7 +88,7 @@ const std::vector<std::string> GameInfos::getTeamNames() const
     return _teamNames;
 }
 
-void GameInfos::addPlayer(zappy::structs::Player player)
+void GameInfos::addPlayer(const zappy::structs::Player player)
 {
     auto it = std::find_if(_players.begin(), _players.end(),
                            [&player](const zappy::structs::Player &p) {
@@ -93,8 +97,11 @@ void GameInfos::addPlayer(zappy::structs::Player player)
 
     if (it != _players.end())
         *it = player;
-    else
-        _players.push_back(player);
+    else {
+        _players.push_back(zappy::structs::Player(
+            player.number, player.x, player.y, player.orientation,
+            player.level, player.teamName, player.inventory));
+    }
 }
 
 void GameInfos::updatePlayerPosition(int playerNumber, int x, int y)
@@ -125,7 +132,10 @@ void GameInfos::updatePlayerInventory(int playerNumber, zappy::structs::Inventor
 {
     for (auto &player : _players) {
         if (player.number == playerNumber) {
-            player.inventory = inventory;
+            player.inventory = zappy::structs::Inventory(
+                inventory.food, inventory.linemate, inventory.deraumere,
+                inventory.sibur, inventory.mendiane, inventory.phiras,
+                inventory.thystame);
             return;
         }
     }
@@ -168,7 +178,7 @@ void GameInfos::updatePlayerFork(int playerNumber)
     (void)playerNumber;
 }
 
-std::vector<zappy::structs::Player> GameInfos::getPlayers() const
+const std::vector<zappy::structs::Player> GameInfos::getPlayers() const
 {
     return _players;
 }
@@ -186,9 +196,10 @@ std::vector<std::pair<int, std::string>> GameInfos::getPlayersBroadcasting() con
     return _playersBroadcasting;
 }
 
-void GameInfos::addIncantation(zappy::structs::Incantation incantation)
+void GameInfos::addIncantation(const zappy::structs::Incantation incantation)
 {
-    _incantations.push_back(incantation);
+    _incantations.push_back(zappy::structs::Incantation(
+        incantation.x, incantation.y, incantation.level, incantation.players));
 }
 
 void GameInfos::removeIncantation(int x, int y, int result)
@@ -204,7 +215,7 @@ void GameInfos::removeIncantation(int x, int y, int result)
     (void)result;
 }
 
-void GameInfos::addEgg(zappy::structs::Egg egg)
+void GameInfos::addEgg(const zappy::structs::Egg egg)
 {
     auto it = std::find_if(_eggs.begin(), _eggs.end(),
                            [&egg](const zappy::structs::Egg &e) {
@@ -213,8 +224,10 @@ void GameInfos::addEgg(zappy::structs::Egg egg)
 
     if (it != _eggs.end())
         *it = egg;
-    else
-        _eggs.push_back(egg);
+    else {
+        _eggs.push_back(zappy::structs::Egg(
+            egg.eggNumber, egg.playerNumber, egg.x, egg.y, egg.hatched, egg.teamName));
+    }
 }
 
 void GameInfos::updateEggHatched(int eggNumber)
@@ -235,7 +248,7 @@ void GameInfos::updateEggDeath(int eggNumber)
         }), _eggs.end());
 }
 
-std::vector<zappy::structs::Egg> GameInfos::getEggs() const
+const std::vector<zappy::structs::Egg> GameInfos::getEggs() const
 {
     return _eggs;
 }

@@ -10,6 +10,7 @@
 
 #include <utility>
 #include <vector>
+#include <memory>
 
 #include "../Utils/Constants.hpp"
 
@@ -24,33 +25,33 @@ class GameInfos {
         void setTimeUnit(int timeUnit);
         int getTimeUnit() const;
 
-        void updateTile(zappy::structs::Tile tile);
+        void updateTile(const zappy::structs::Tile tile);
         const std::vector<zappy::structs::Tile> getTiles() const;
         const zappy::structs::Tile getTile(int x, int y) const;
 
         void updateTeamName(const std::string &teamName);
         const std::vector<std::string> getTeamNames() const;
 
-        void addPlayer(zappy::structs::Player player);
+        void addPlayer(const zappy::structs::Player player);
         void updatePlayerPosition(int playerNumber, int x, int y);
         void updatePlayerLevel(int playerNumber, int level);
-        void updatePlayerInventory(int playerNumber, zappy::structs::Inventory inventory);
+        void updatePlayerInventory(int playerNumber, const zappy::structs::Inventory inventory);
         void updatePlayerExpulsion(int playerNumber);
         void updatePlayerDeath(int playerNumber);
         void updatePlayerResourceAction(int playerNumber, int resourceId, bool isCollecting);
         void updatePlayerFork(int playerNumber);
-        std::vector<zappy::structs::Player> getPlayers() const;
+        const std::vector<zappy::structs::Player> getPlayers() const;
 
         void addPlayerBroadcast(int playerNumber, const std::string &message);
         std::vector<std::pair<int, std::string>> getPlayersBroadcasting() const;
 
-        void addIncantation(zappy::structs::Incantation incantation);
+        void addIncantation(const zappy::structs::Incantation incantation);
         void removeIncantation(int x, int y, int result);
 
-        void addEgg(zappy::structs::Egg egg);
+        void addEgg(const zappy::structs::Egg egg);
         void updateEggHatched(int eggNumber);
         void updateEggDeath(int eggNumber);
-        std::vector<zappy::structs::Egg> getEggs() const;
+        const std::vector<zappy::structs::Egg> getEggs() const;
 
         void setGameOver(const std::string &winningTeam);
         std::pair<bool, std::string> isGameOver() const;
