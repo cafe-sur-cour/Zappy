@@ -61,8 +61,8 @@ jobs:
       - name: AI
         run: make zappy_ai
 
-  coding_style:
-    name: Check Coding Style
+  coding_style_cpp:
+    name: Check Coding Style CPP
     runs-on: ubuntu-latest
     container:
       image: epitechcontent/epitest-docker:latest
@@ -88,6 +88,35 @@ jobs:
             exit 1
           else
             echo "No coding style errors found."
+          fi
+
+  coding_style_python:
+    name: Check Coding Style Python
+    runs-on: ubuntu-latest
+    container:
+      image: epitechcontent/epitest-docker:latest
+    steps:
+      - name: checkout@v4
+        uses: actions/checkout@v4
+
+      - name: Dependencies
+        run: |
+          apt update && apt install -y python3-pip
+          pip install --break-system-packages pycodestyle
+          chmod +x pythonStyleChecker.sh
+
+      - name: Check Python Coding Style
+        run: |
+          ./pythonStyleChecker.sh
+
+      - name: Verify Python Coding Style
+        run: |
+          if [ -s coding-style-python-reports.log ]; then
+            echo "Python coding style errors found. See coding-style-python-reports.log for details."
+            cat coding-style-python-reports.log
+            exit 1
+          else
+            echo "No Python coding style errors found."
           fi
 
   run_functionnal_tests:
@@ -130,6 +159,12 @@ jobs:
           make
           cp lib/*.a /usr/lib
           cd -
+
+      - name: Install pytest and dependencies
+        run: |
+          apt-get update
+          apt-get install -y python3-pip
+          pip install --break-system-packages pytest pytest-cov
 
       - name: Run Unit Tests
         run: make tests_run
