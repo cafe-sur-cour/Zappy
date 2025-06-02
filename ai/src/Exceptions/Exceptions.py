@@ -40,3 +40,21 @@ class CLIInvalidArgumentException(CLIParsingException):
 
     def __init__(self, message: str):
         super().__init__(f"Invalid Argument: {message}")
+
+
+class SocketException(Exception):
+
+    def __init__(self, message: str):
+        super().__init__(f"Socket Error: {message}")
+
+
+class CommunicationException(Exception):
+
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
+class CommunicationInvalidResponseException(CommunicationException):
+
+    def __init__(self, message: str):
+        super().__init__(f"Invalid response from server: {message}")
