@@ -12,9 +12,6 @@ import time
 import pty
 import os
 import signal
-import threading
-import sys
-
 class TestCase:
     def __init__(self, name, desc, input, output, value, output_folder):
         self.name = name
