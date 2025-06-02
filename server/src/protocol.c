@@ -45,10 +45,11 @@ static int accept_client(server_t *server)
 {
     int new_sockfd = accept(server->sockfd, NULL, NULL);
 
-    if (new_sockfd < 0) {
+    if (new_sockfd == -1) {
         printf("\033[0;31mFailed to accept new client connection.\033[0m");
         return -1;
     }
+    printfd("WELCOME", new_sockfd);
     printf("New client connected.\n");
     return 0;
 }

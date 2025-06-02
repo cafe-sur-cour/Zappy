@@ -14,7 +14,7 @@ NC=\033[0m
 UNIT 	    = 	unit_tests
 
 TESTS 	    =   tests/tests_params.c			\
-				tests/tests_errors.c			\
+				tests/tests_messages.c			\
 				tests/tests_checkers.c			\
 				tests/tests_server.c			\
 
@@ -23,7 +23,7 @@ MAIN 		= 	src/main.c
 MAIN_OBJ 	= 	$(MAIN:.c=.o)
 
 SRC 		=	src/params.c					\
-				src/errors.c					\
+				src/messages.c					\
 				src/checkers.c					\
 				src/server.c					\
 				src/protocol.c					\

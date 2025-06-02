@@ -39,9 +39,10 @@ typedef struct command_pf_s {
     bool (*checker)(const char *, const char *, params_t *);
 } command_pf_t;
 
-/* errors.c */
+/* messages.c */
 int helper(void);
 void error_message(const char *message);
+void printfd(char const *message, int fd);
 
 /* checkers.c */
 bool check_port(char const *flag, char const *value, params_t *params);
