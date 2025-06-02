@@ -2,7 +2,7 @@
 ## EPITECH PROJECT, 2025
 ## zappy
 ## File description:
-## ComWithServer
+## Communication
 ##
 
 from Socket import Socket
@@ -10,7 +10,7 @@ from src.Exceptions.Exceptions import (
     CommunicationInvalidResponseException
 )
 
-class ComWithServer:
+class Communication:
     def __init__(self, host: str, port: int):
         self._host = host
         self._port = port
