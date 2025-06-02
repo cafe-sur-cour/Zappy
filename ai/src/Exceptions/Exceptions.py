@@ -54,6 +54,12 @@ class CommunicationException(Exception):
         super().__init__(message)
 
 
+class CommunicationHandshakeException(CommunicationException):
+
+    def __init__(self, message: str):
+        super().__init__(f"Handshake Error: {message}")
+
+
 class CommunicationInvalidResponseException(CommunicationException):
 
     def __init__(self, message: str):
