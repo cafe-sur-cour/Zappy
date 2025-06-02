@@ -134,9 +134,9 @@ static void print_elem(params_t *params, int argc, char **argv)
 {
     for (int i = 0; i < argc; i++) {
         if (strcmp(argv[i], "-d") == 0)
-            params->isDebug = true;
+            params->is_debug = true;
     }
-    if (params->isDebug == false)
+    if (params->is_debug == false)
         return;
     printf("Port: %d\n", params->port);
     printf("Width: %d\n", params->x);
@@ -146,7 +146,7 @@ static void print_elem(params_t *params, int argc, char **argv)
         printf("Team Names %d: %s\n", i + 1, params->teams[i]);
     printf("Number of clients: %d\n", params->nb_client);
     printf("Frequency: %d\n", params->freq);
-    printf("Debug mode: %s\n", params->isDebug ? "Enabled" : "Disabled");
+    printf("Debug mode: %s\n", params->is_debug ? "Enabled" : "Disabled");
 }
 
 params_t *check_args(int argc, char **argv)

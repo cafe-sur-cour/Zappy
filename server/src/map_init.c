@@ -88,7 +88,7 @@ static void init_tiles(server_t *server)
             malloc_ressource(server, j, i, tiles);
         }
     }
-    if (server->params->isDebug == true)
+    if (server->params->is_debug == true)
         print_map(server);
 }
 

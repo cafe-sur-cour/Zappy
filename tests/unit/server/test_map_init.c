@@ -26,7 +26,7 @@ static server_t *create_test_server(int width, int height, bool debug)
     server->params = malloc(sizeof(params_t));
     server->params->x = width;
     server->params->y = height;
-    server->params->isDebug = debug;
+    server->params->is_debug = debug;
     server->map = NULL;
     return server;
 }
