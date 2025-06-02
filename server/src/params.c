@@ -130,17 +130,20 @@ static bool check_all_params(int argc, char **argv, bool is_ok,
     return is_ok;
 }
 
-static void print_elem(params_t *params)
+static void print_elem(params_t *params, int argc, char **argv)
 {
+    for (int i = 0; i < argc; i++) {
+        if (strcmp(argv[i], "-d") == 0)
+            params->isDebug = true;
+    }
     if (params->isDebug == false)
         return;
     printf("Port: %d\n", params->port);
     printf("Width: %d\n", params->x);
     printf("Height: %d\n", params->y);
     printf("Number of teams: %d\n", params->nb_team);
-    for (int i = 0; i < params->nb_team; i++) {
+    for (int i = 0; i < params->nb_team; i++)
         printf("Team Names %d: %s\n", i + 1, params->teams[i]);
-    }
     printf("Number of clients: %d\n", params->nb_client);
     printf("Frequency: %d\n", params->freq);
     printf("Debug mode: %s\n", params->isDebug ? "Enabled" : "Disabled");
@@ -161,6 +164,6 @@ params_t *check_args(int argc, char **argv)
     }
     if (!check_all_params(argc, argv, is_ok, params))
         return free_params(params);
-    print_elem(params);
+    print_elem(params, argc, argv);
     return params;
 }

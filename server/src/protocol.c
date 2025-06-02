@@ -5,6 +5,7 @@
 ** Server :: Protocol
 */
 
+    #define _POSIX_C_SOURCE 200809L
 #include <stdbool.h>
 #include <stdlib.h>
 #include <poll.h>
