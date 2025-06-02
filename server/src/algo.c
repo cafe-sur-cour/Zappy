@@ -29,7 +29,3 @@ tiles_t *shuffle_fisher(int width, int heigth)
     }
     return tiles;
 }
-
-
-// ./zappy_server help
-// USAGE: ./zappy_server -p port -x width -y height -n name1 name2 ... -c clientsNb -f freq

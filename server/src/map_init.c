@@ -34,6 +34,7 @@ static int nb_total(server_t *server)
     int total = ((mapValue * density[0]) + (mapValue * density[1]) + (mapValue
         * density[2]) + (mapValue * density[3]) + (mapValue * density[4]) +
         (mapValue * density[5]) + (mapValue * density[6]));
+
     return total;
 }
 
