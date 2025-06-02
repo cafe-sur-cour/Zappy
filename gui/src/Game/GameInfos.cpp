@@ -44,7 +44,7 @@ int GameInfos::getTimeUnit() const
     return _timeUnit;
 }
 
-void GameInfos::updateTile(zappy::structs::Tile tile)
+void GameInfos::updateTile(const zappy::structs::Tile tile)
 {
     if (tile.x < 0 || tile.y < 0 || tile.x >= _mapWidth || tile.y >= _mapHeight)
         return;
@@ -128,7 +128,8 @@ void GameInfos::updatePlayerLevel(int playerNumber, int level)
     }
 }
 
-void GameInfos::updatePlayerInventory(int playerNumber, zappy::structs::Inventory inventory)
+void GameInfos::updatePlayerInventory(int playerNumber,
+    const zappy::structs::Inventory inventory)
 {
     for (auto &player : _players) {
         if (player.number == playerNumber) {
