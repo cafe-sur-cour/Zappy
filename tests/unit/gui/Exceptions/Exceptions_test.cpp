@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 #include <string>
-#include "../../../src/Exceptions/Exceptions.hpp"
+#include "../../../../gui/src/Exceptions/Exceptions.hpp"
 
 class ExceptionsTest : public ::testing::Test {
 protected:

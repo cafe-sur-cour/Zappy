@@ -42,6 +42,9 @@ fclean: clean
 	@rm -f $(GUI_NAME)
 	@rm -f $(AI_NAME)
 	@rm -rf $(AI_DIR)/coverage_report
+	@make -C tests/unit/gui/ fclean
+	@make -C tests/unit/server/ fclean
+
 
 re: fclean all
 
@@ -58,10 +61,10 @@ tests_run_ai: $(AI_NAME)
 	@cd $(AI_DIR) && python3 -m pytest tests/unit/CLI/test_cli.py -v
 
 tests_run_gui:
-	@make -C $(GUI_DIR) tests_run
+	@make -C tests/unit/gui/ tests_run
 
 tests_run_server:
-	@make -C $(SERVER_DIR) tests_run
+	@make -C tests/unit/server/ tests_run
 
 coverage: $(GUI_NAME)
 	@make coverage_server
@@ -75,10 +78,10 @@ coverage_ai: $(AI_NAME)
 	@firefox ai/coverage_report/index.html &> /dev/null
 
 coverage_gui:
-	@make -C $(GUI_DIR) coverage
+	@make -C tests/unit/gui/ coverage
 
 coverage_server:
-	@make -C $(SERVER_DIR) coverage
+	@make -C tests/unit/server/ coverage
 
 .PHONY: all clean fclean re functional_tests tests_run coverage \
 		tests_run_ai tests_run_gui tests_run_server \
