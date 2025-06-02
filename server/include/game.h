@@ -85,4 +85,3 @@ typedef struct map_s {
 } map_t;
 
 #endif /* !GAME_H_ */
-
