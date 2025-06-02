@@ -331,9 +331,9 @@ class TestCommunication:
         mock_socket.receive.return_value = "ok\n"
 
         comm = Communication("team1", "localhost", 4242)
-        comm.sendSetObject()
+        comm.sendSetObject("food")
 
-        mock_socket.send.assert_called_once_with("Set object\n")
+        mock_socket.send.assert_called_once_with("Set food\n")
 
     @patch('src.Communication.Communication.Socket')
     def test_send_incantation_elevation_underway(self, mock_socket_class):
@@ -421,7 +421,7 @@ class TestCommunication:
             ("sendFork", lambda comm: comm.sendFork()),
             ("sendEject", lambda comm: comm.sendEject()),
             ("sendTakeObject", lambda comm: comm.sendTakeObject("food")),
-            ("sendSetObject", lambda comm: comm.sendSetObject()),
+            ("sendSetObject", lambda comm: comm.sendSetObject("food")),
             ("sendIncantation", lambda comm: comm.sendIncantation())
         ]
 
