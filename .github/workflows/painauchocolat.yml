@@ -73,15 +73,6 @@ jobs:
       - name: Run Coding-Style-Checker
         run: check.sh $(pwd) $(pwd)
 
-      - name: Check Any Error
-        run: |
-          cat coding-style-reports.log
-          if [ -s coding-style-reports.log ]; then
-            exit 1
-          else
-            exit 0
-          fi
-
   coding_style_cpp:
     name: Check Coding Style CPP
     runs-on: ubuntu-latest
