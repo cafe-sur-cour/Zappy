@@ -22,19 +22,21 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <netdb.h>
+
 #include "../Utils/Constants.hpp"
 #include "../Exceptions/Exceptions.hpp"
+#include "ICommunication.hpp"
 
-class Communication {
+class Communication : public ICommunication {
     public:
         Communication(zappy::structs::Config config);
         ~Communication();
 
-        void sendMessage(const std::string &message);
-        bool hasMessages() const;
-        std::string popMessage();
-        bool isConnected() const;
-        void disconnect();
+        void sendMessage(const std::string &message) override;
+        bool hasMessages() const override;
+        std::string popMessage() override;
+        bool isConnected() const override;
+        void disconnect() override;
 
     private:
         void setupConnection();
