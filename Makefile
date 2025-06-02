@@ -42,6 +42,7 @@ fclean: clean
 	@rm -f $(GUI_NAME)
 	@rm -f $(AI_NAME)
 	@rm -rf $(AI_DIR)/coverage_report
+	-rm -rf *.log
 	@make -C tests/unit/gui/ fclean
 	@make -C tests/unit/server/ fclean
 
@@ -58,7 +59,7 @@ tests_run: $(GUI_NAME)
 	@make tests_run_ai
 
 tests_run_ai: $(AI_NAME)
-	@cd $(AI_DIR) && python3 -m pytest tests/unit/CLI/test_cli.py -v
+	@cd tests/unit/ && python3 -m pytest ai/CLI/test_cli.py -v
 
 tests_run_gui:
 	@make -C tests/unit/gui/ tests_run

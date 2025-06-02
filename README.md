@@ -58,7 +58,7 @@ Gitmojies:
         - :memo: (📝) : Add or update documentation
 
 ### Pull Request
-    - :tada: (🎉): This Gitmoji must be used for each PR created!
+    - :tada: (m): This Gitmoji must be used for each PR created!
     - :lipstick: (💄): This Gitmoji must be used for each PR merged!
     - :rewind: (⏪️): This Gitmoji must be used for each revert done!
 
