@@ -63,6 +63,7 @@ void *free_server(server_t *server);
 int start_protocol(server_t *server);
 
 /* client.c */
+void free_clients(client_t *clients);
 int get_nb_clients(client_t *clients);
 
 #endif /* !ZAPPY_H_ */

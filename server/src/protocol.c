@@ -9,9 +9,12 @@
 #include <stdlib.h>
 #include <poll.h>
 #include <stdio.h>
+#include <signal.h>
 #include <arpa/inet.h>
 
 #include "zappy.h"
+
+static int running = 1;
 
 static void diplay_help(int port)
 {
@@ -54,14 +57,31 @@ static int accept_client(server_t *server)
     return 0;
 }
 
+static void handle_sigint(int sig)
+{
+    (void)sig;
+    running = 0;
+}
+
+static void setup_signal()
+{
+    struct sigaction sa;
+
+    sa.sa_handler = handle_sigint;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sigaction(SIGINT, &sa, NULL);
+}
+
 int start_protocol(server_t *server)
 {
     struct pollfd *pollfds;
 
+    setup_signal();
     diplay_help(server->params->port);
-    while (1) {
+    while (running) {
         pollfds = init_pollfds(server);
-        if (poll(pollfds, get_nb_clients(server->clients) + 1, 0) == -1) {
+        if (poll(pollfds, get_nb_clients(server->clients) + 1, 0) == -1 && running) {
             error_message("Poll failed.");
             free(pollfds);
             return -1;

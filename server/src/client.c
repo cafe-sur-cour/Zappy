@@ -5,7 +5,23 @@
 ** Server :: Client
 */
 
+#include <stdlib.h>
+#include <unistd.h>
+
 #include "zappy.h"
+
+void free_clients(client_t *clients)
+{
+    client_t *current = clients;
+    client_t *next;
+
+    while (current) {
+        next = current->next;
+        close(current->sockfd);
+        free(current);
+        current = next;
+    }
+}
 
 int get_nb_clients(client_t *clients)
 {

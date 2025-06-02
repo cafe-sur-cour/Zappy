@@ -54,6 +54,8 @@ void *free_server(server_t *server)
         return NULL;
     if (server->params)
         free_params(server->params);
+    if (server->clients)
+        free_clients(server->clients);
     if (server->sockfd > 0)
         close(server->sockfd);
     free(server);
