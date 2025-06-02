@@ -70,23 +70,4 @@ fclean: clean
 
 re: fclean all
 
-coverage: tests_run
-	@echo -e "$(BLUE)ᒥ📊ᒧ Generating coverage report...$(NC)"
-	@mkdir -p coverage_report
-	@gcovr --root . --exclude tests/ --exclude-unreachable-branches \
-	--merge-mode-functions=merge-use-line-min \
-	--html --html-details -o coverage_report/index.html
-	@echo -e "$(GREEN)ᒥ✅ᒧ Report generated in coverage_report/index.html$(NC)"
-	@firefox coverage_report/index.html &> /dev/null || xdg-open \
-		coverage_report/index.html &> /dev/null || echo "Please open \
-		coverage_report/index.html in your browser"
-
-tests_run: $(SRC) $(TEST_SRC)
-	@echo -e "$(BLUE)ᒥ🧪ᒧ Compiling Google Test unit tests...$(NC)"
-	$(CC) -o $(UNIT_TESTS) $(SRC) $(TEST_SRC) $(CFLAGS_COVERAGE) $(INCLUDES) \
-		-lgtest -lgtest_main
-	@echo -e "$(GREEN)ᒥ✅ᒧ Unit tests compiled! Running...$(NC)"
-	./$(UNIT_TESTS)
-	@echo -e "$(GREEN)ᒥ✅ᒧ All tests completed!$(NC)"
-
 .PHONY: all clean fclean re

@@ -114,6 +114,22 @@ void *free_params(params_t *params)
     return NULL;
 }
 
+static bool check_all_params(int argc, char **argv, bool is_ok,
+    params_t *params)
+{
+    bool port_error = check_simple_flag(argc, argv, "-p", params);
+    bool width_error = check_simple_flag(argc, argv, "-x", params);
+    bool height_error = check_simple_flag(argc, argv, "-y", params);
+    bool names_error = check_names_flag(argc, argv, params);
+    bool client_error = check_simple_flag(argc, argv, "-c", params);
+    bool freq_error = check_simple_flag(argc, argv, "-f", params);
+
+    if (port_error || width_error || height_error ||
+        names_error || client_error || freq_error)
+        is_ok = false;
+    return is_ok;
+}
+
 params_t *check_args(int argc, char **argv)
 {
     bool is_ok = true;
@@ -127,12 +143,7 @@ params_t *check_args(int argc, char **argv)
         helper();
         return NULL;
     }
-    is_ok ^= check_simple_flag(argc, argv, "-p", params);
-    is_ok ^= check_simple_flag(argc, argv, "-x", params);
-    is_ok ^= check_simple_flag(argc, argv, "-y", params);
-    is_ok ^= check_names_flag(argc, argv, params);
-    is_ok ^= check_simple_flag(argc, argv, "-c", params);
-    is_ok ^= check_simple_flag(argc, argv, "-f", params);
+    is_ok = check_all_params(argc, argv, is_ok, params);
     if (!is_ok)
         return free_params(params);
     return params;

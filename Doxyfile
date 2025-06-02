@@ -1,0 +1,31 @@
+PROJECT_NAME           = "Arcade architecture"
+OUTPUT_DIRECTORY       = doc
+INPUT                  = ./
+RECURSIVE              = YES
+GENERATE_HTML          = YES
+GENERATE_LATEX         = YES
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = NO
+MARKDOWN_SUPPORT       = YES
+EXTRACT_PRIVATE        = YES
+SHOW_FILES             = YES
+SHOW_NAMESPACES        = YES
+PROJECT_LOGO           = styleDoc/logo-arcade.svg
+
+
+HTML_EXTRA_STYLESHEET  = styleDoc/doxygen-awesome.css \
+                        styleDoc/doxygen-awesome-sidebar-only.css \
+                        styleDoc/doxygen-awesome-sidebar-only-darkmode-toggle.css
+
+HTML_EXTRA_FILES       = styleDoc/doxygen-awesome-darkmode-toggle.js \
+                        styleDoc/doxygen-awesome-fragment-copy-button.js \
+                        styleDoc/doxygen-awesome-interactive-toc.js \
+                        styleDoc/doxygen-awesome-paragraph-link.js \
+                        styleDoc/doxygen-awesome-tabs.js \
+                        styleDoc/header.html    \
+                        styleDoc/logo-arcade.svg
+
+HTML_HEADER            = styleDoc/header.html
+
+HTML_COLORSTYLE        = LIGHT
