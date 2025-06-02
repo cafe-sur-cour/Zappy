@@ -14,9 +14,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-#include "../../../src/Communication/Communication.hpp"
-#include "../../../src/Exceptions/Exceptions.hpp"
-#include "../../../src/Utils/Constants.hpp"
+#include "../../../../gui/src/Communication/Communication.hpp"
+#include "../../../../gui/src/Exceptions/Exceptions.hpp"
+#include "../../../../gui/src/Utils/Constants.hpp"
 
 // Mock server for testing
 class MockServer {

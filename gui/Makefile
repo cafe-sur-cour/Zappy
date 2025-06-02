@@ -17,16 +17,19 @@ MAIN = src/main.cpp
 MAIN_OBJ = $(MAIN:.cpp=.o)
 
 SRC =	src/Client/Client.cpp \
+		src/Client/MsgHandler.cpp \
 		src/CLI/CLI.cpp \
 		src/Communication/Communication.cpp \
+		src/Game/GameInfos.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
-TEST_SRC = tests/unit/main_test.cpp \
-		   tests/unit/CLI/CLI_test.cpp \
-		   tests/unit/Exceptions/Exceptions_test.cpp \
-		   tests/unit/Client/Client_test.cpp \
-		   tests/unit/Communication/Communication_test.cpp \
+TEST_SRC = ../tests/unit/gui/main_test.cpp \
+		   ../tests/unit/gui/CLI/CLI_test.cpp \
+		   ../tests/unit/gui/Exceptions/Exceptions_test.cpp \
+		   ../tests/unit/gui/Client/Client_test.cpp \
+		   ../tests/unit/gui/Communication/Communication_test.cpp \
+		   ../tests/unit/gui/Game/GameInfos_test.cpp \
 
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 

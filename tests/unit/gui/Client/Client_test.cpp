@@ -9,8 +9,8 @@
 #include <stdexcept>
 #include <string>
 #include <sstream>
-#include "../../../src/Client/Client.hpp"
-#include "../../../src/Exceptions/Exceptions.hpp"
+#include "../../../../gui/src/Client/Client.hpp"
+#include "../../../../gui/src/Exceptions/Exceptions.hpp"
 
 class ClientTest : public ::testing::Test {
 protected:
