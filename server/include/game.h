@@ -11,22 +11,22 @@
     #define GAME_H_
 
 /* Definition of the directions */
-enum direction_e {
+typedef enum direction_e {
     NORTH,
     SOUTH,
     EAST,
     WEST
-};
+} direction_e;
 
 /* definintion od the different element on the map */
-enum crystal_e {
+typedef enum crystal_e {
     LINEMATE,
     DERAUMERE,
     SIBUR,
     MENDIANE,
     PHIRAS,
     THYSTAME
-};
+} crystal_e;
 
 /* Struct that "counts" the current stat of the player */
 typedef struct lives_s {
@@ -56,7 +56,7 @@ typedef struct player_s {
     direction_e direction;
     inventory_t *inventory;
     lives_t *lives;
-    player_t *next;
+    struct player_s *next;
 } player_t;
 
 /* Team Strcut */
@@ -65,7 +65,7 @@ typedef struct team_s {
     int nbPlayers;
     int nbPlayerAlive;
     player_t *players;
-    team_t *next;
+    struct team_s *next;
 } team_t;
 
 /* Ressources, and there pos on the map */
@@ -73,7 +73,7 @@ typedef struct ressources_s {
     crystal_e type;
     int posX;
     int posY;
-    ressources_t *next;
+    struct ressources_s *next;
 } ressources_t;
 
 /* Map struct */
