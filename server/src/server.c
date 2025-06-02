@@ -14,6 +14,7 @@
 
 static int set_socket(server_t *server)
 {
+    int y = 1;
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
     if (sockfd < 0) {
@@ -21,6 +22,12 @@ static int set_socket(server_t *server)
         return -1;
     }
     server->sockfd = sockfd;
+    if (setsockopt(server->sockfd, SOL_SOCKET, SO_REUSEADDR, &y,
+        sizeof(y)) < 0) {
+        error_message("Failed to set socket options.");
+        close(server->sockfd);
+        return -1;
+    }
     return 0;
 }
 
@@ -56,7 +63,7 @@ void *free_server(server_t *server)
         free_params(server->params);
     if (server->clients)
         free_clients(server->clients);
-    if (server->sockfd > 0)
+    if (server->sockfd != -1)
         close(server->sockfd);
     free(server);
     return NULL;
