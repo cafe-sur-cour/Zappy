@@ -23,9 +23,12 @@ MAIN 		= 	../../../server/src/main.c
 MAIN_OBJ 	= 	$(MAIN:.c=.o)
 
 SRC 		=	../../../server/src/params.c					\
-				../../../server/src/errors.c					\
+				../../../server/src/messages.c					\
 				../../../server/src/checkers.c					\
-				../../../server/src/server.c
+				../../../server/src/server.c					\
+				../../../server/src/protocol.c					\
+				../../../server/src/client.c
+
 
 OBJ 		= 	$(SRC:.c=.o)
 

@@ -68,8 +68,8 @@ static int count_names(int argc, char **argv, int start_pos)
 static bool check_simple_flag(int argc, char **argv,
     const char *flag, params_t *params)
 {
-    int pos = find_flag(argc, argv, flag);
     char error_msg[28];
+    int pos = find_flag(argc, argv, flag);
 
     if (pos == -1 || pos + 1 >= argc) {
         snprintf(error_msg, sizeof(error_msg),
