@@ -14,7 +14,12 @@
 
 #include "zappy.h"
 
-static int running = 1;
+static int *get_running_state(void)
+{
+    static int running = 1;
+
+    return &running;
+}
 
 static void diplay_help(int port)
 {
@@ -60,10 +65,10 @@ static int accept_client(server_t *server)
 static void handle_sigint(int sig)
 {
     (void)sig;
-    running = 0;
+    *get_running_state() = 0;
 }
 
-static void setup_signal()
+static void setup_signal(void)
 {
     struct sigaction sa;
 
@@ -79,9 +84,10 @@ int start_protocol(server_t *server)
 
     setup_signal();
     diplay_help(server->params->port);
-    while (running) {
+    while (*get_running_state()) {
         pollfds = init_pollfds(server);
-        if (poll(pollfds, get_nb_clients(server->clients) + 1, 0) == -1 && running) {
+        if (poll(pollfds, get_nb_clients(server->clients) + 1, 0) == -1
+            && *get_running_state()) {
             error_message("Poll failed.");
             free(pollfds);
             return -1;
