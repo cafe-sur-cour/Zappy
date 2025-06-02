@@ -5,7 +5,7 @@
 ## Communication
 ##
 
-from Socket import Socket
+from .Socket import Socket
 from src.Exceptions.Exceptions import (
     CommunicationHandshakeException,
     CommunicationInvalidResponseException
@@ -27,7 +27,7 @@ class Communication:
             raise CommunicationInvalidResponseException(
                 f"Response from server handshake is not terminated with a newline"
             )
-        if (response[:-1] != "Welcome"):
+        if (response[:-1] != "WELCOME"):
             raise CommunicationInvalidResponseException(
                 f"Invalid response from server handshake: {response[:-1]}"
             )
@@ -54,7 +54,8 @@ class Communication:
                 f"Response from server after slots is not terminated with a newline"
             )
 
-        x, y = 0
+        x = 0
+        y = 0
         try:
             x, y = map(int, response[:-1].split(" "))
         except ValueError:
@@ -121,7 +122,7 @@ class Communication:
                 f"Invalid response from Look: {response[:-1]}"
             )
 
-        return response[:-1][1:-1].split(", ")
+        return [d.strip() for d in response[:-1][1:-1].split(",")]
 
     def getInventory(self) -> list[tuple[str, int]]:
         self._socket.send("Inventory\n")
@@ -136,13 +137,19 @@ class Communication:
                 f"Invalid response from Inventory: {response[:-1]}"
             )
 
-        items = response[:-1][1:-1].split(", ")
+        items = response[:-1][1:-1].split(",")
         inventory = []
         for item in items:
             if not item:
                 continue
             try:
-                name, quantity = item.split(" ")
+                data = item.strip().split(" ")
+                data = [d.strip() for d in data if d and d.strip()]
+                if len(data) != 2:
+                    raise ValueError("Invalid item format")
+                name, quantity = data
+                if not name or not quantity:
+                    raise ValueError("Invalid item format")
                 inventory.append((name, int(quantity)))
             except ValueError:
                 raise CommunicationInvalidResponseException(
