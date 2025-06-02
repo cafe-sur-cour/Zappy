@@ -10,6 +10,7 @@ from src.Exceptions.Exceptions import (
     CommunicationInvalidResponseException
 )
 
+
 class Communication:
     def __init__(self, host: str, port: int):
         self._host = host
@@ -26,12 +27,12 @@ class Communication:
 
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
-                    f"Response from Forward is not terminated with a newline"
-                )
+                f"Response from Forward is not terminated with a newline"
+            )
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
-                    f"Invalid response from Forward: {response[:-1]}"
-                )
+                f"Invalid response from Forward: {response[:-1]}"
+            )
 
     def sendRight(self):
         self._socket.send("Right\n")
@@ -39,12 +40,12 @@ class Communication:
 
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
-                    f"Response from Right is not terminated with a newline"
-                )
+                f"Response from Right is not terminated with a newline"
+            )
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
-                    f"Invalid response from Right: {response[:-1]}"
-                )
+                f"Invalid response from Right: {response[:-1]}"
+            )
 
     def sendLeft(self):
         self._socket.send("Left\n")
@@ -52,12 +53,12 @@ class Communication:
 
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
-                    f"Response from Left is not terminated with a newline"
-                )
+                f"Response from Left is not terminated with a newline"
+            )
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
-                    f"Invalid response from Left: {response[:-1]}"
-                )
+                f"Invalid response from Left: {response[:-1]}"
+            )
 
     def getLook(self) -> list[str]:
         self._socket.send("Look\n")
@@ -65,12 +66,12 @@ class Communication:
 
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
-                    f"Response from Look is not terminated with a newline"
-                )
+                f"Response from Look is not terminated with a newline"
+            )
         if (not response[:-1].startswith("[") or not response[:-1].endswith("]")):
             raise CommunicationInvalidResponseException(
-                    f"Invalid response from Look: {response[:-1]}"
-                )
+                f"Invalid response from Look: {response[:-1]}"
+            )
 
         return response[:-1][1:-1].split(", ")
 
@@ -80,12 +81,12 @@ class Communication:
 
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
-                    f"Response from Inventory is not terminated with a newline"
-                )
+                f"Response from Inventory is not terminated with a newline"
+            )
         if (not response[:-1].startswith("[") or not response[:-1].endswith("]")):
             raise CommunicationInvalidResponseException(
-                    f"Invalid response from Inventory: {response[:-1]}"
-                )
+                f"Invalid response from Inventory: {response[:-1]}"
+            )
 
         items = response[:-1][1:-1].split(", ")
         inventory = []
@@ -97,8 +98,8 @@ class Communication:
                 inventory.append((name, int(quantity)))
             except ValueError:
                 raise CommunicationInvalidResponseException(
-                        f"Invalid item format in Inventory: {item}"
-                    )
+                    f"Invalid item format in Inventory: {item}"
+                )
 
         return inventory
 
@@ -108,12 +109,12 @@ class Communication:
 
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
-                    f"Response from Broadcast is not terminated with a newline"
-                )
+                f"Response from Broadcast is not terminated with a newline"
+            )
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
-                    f"Invalid response from Broadcast: {response[:-1]}"
-                )
+                f"Invalid response from Broadcast: {response[:-1]}"
+            )
 
     def getCetConnectNbr(self) -> int:
         self._socket.send("Connect_nbr\n")
@@ -121,12 +122,12 @@ class Communication:
 
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
-                    f"Response from Connect_nbr is not terminated with a newline"
-                )
+                f"Response from Connect_nbr is not terminated with a newline"
+            )
         if (not response[:-1].isdecimal()):
             raise CommunicationInvalidResponseException(
-                    f"Invalid number: Got {response[:-1]} from command Connect_nbr"
-                )
+                f"Invalid number: Got {response[:-1]} from command Connect_nbr"
+            )
 
         return int(response[:-1])
 
@@ -136,25 +137,25 @@ class Communication:
 
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
-                    f"Response from Fork is not terminated with a newline"
-                )
+                f"Response from Fork is not terminated with a newline"
+            )
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
-                    f"Invalid response from Fork: {response[:-1]}"
-                )
-    
+                f"Invalid response from Fork: {response[:-1]}"
+            )
+
     def sendEject(self):
         self._socket.send("Eject\n")
         response = self._socket.receive()
 
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
-                    f"Response from Eject is not terminated with a newline"
-                )
+                f"Response from Eject is not terminated with a newline"
+            )
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
-                    f"Invalid response from Eject: {response[:-1]}"
-                )
+                f"Invalid response from Eject: {response[:-1]}"
+            )
 
     def sendTakeObject(self, object_name: str):
         self._socket.send(f"Take {object_name}\n")
@@ -162,12 +163,12 @@ class Communication:
 
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
-                    f"Response from Take is not terminated with a newline"
-                )
+                f"Response from Take is not terminated with a newline"
+            )
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
-                    f"Invalid response from Take: {response[:-1]}"
-                )
+                f"Invalid response from Take: {response[:-1]}"
+            )
 
     def sendSetObject(self):
         self._socket.send("Set object\n")
@@ -175,12 +176,12 @@ class Communication:
 
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
-                    f"Response from Set object is not terminated with a newline"
-                )
+                f"Response from Set object is not terminated with a newline"
+            )
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
-                    f"Invalid response from Set object: {response[:-1]}"
-                )
+                f"Invalid response from Set object: {response[:-1]}"
+            )
 
     def sendIncantation(self):
         self._socket.send("Incantation\n")
@@ -188,12 +189,12 @@ class Communication:
 
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
-                    f"Response from Incantation is not terminated with a newline"
-                )
+                f"Response from Incantation is not terminated with a newline"
+            )
         if (response[:-1] == "ko"):
             raise CommunicationInvalidResponseException(
-                    f"Invalid response from Incantation: {response[:-1]}"
-                )
+                f"Invalid response from Incantation: {response[:-1]}"
+            )
 
         if (response[:-1] == "Elevation underway"):
             return (response[:-1], 0)
@@ -204,8 +205,8 @@ class Communication:
                 return (response[:-1], level)
             except ValueError:
                 raise CommunicationInvalidResponseException(
-                        f"Invalid level in Incantation response: {response[:-1]}"
-                    )
+                    f"Invalid level in Incantation response: {response[:-1]}"
+                )
         raise CommunicationInvalidResponseException(
-                f"Unexpected response from Incantation: {response[:-1]}"
-            )
+            f"Unexpected response from Incantation: {response[:-1]}"
+        )
