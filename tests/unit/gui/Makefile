@@ -19,6 +19,7 @@ MAIN_OBJ = $(MAIN:.cpp=.o)
 SRC =	../../../gui/src/Client/Client.cpp \
 		../../../gui/src/CLI/CLI.cpp \
 		../../../gui/src/Communication/Communication.cpp \
+		../../../gui/src/Game/GameInfos.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
