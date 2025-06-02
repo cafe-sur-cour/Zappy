@@ -41,6 +41,7 @@ fclean: clean
 	@rm -f $(SERVER_NAME)
 	@rm -f $(GUI_NAME)
 	@rm -f $(AI_NAME)
+	@rm -rf $(AI_DIR)/coverage_report
 
 re: fclean all
 
@@ -49,12 +50,37 @@ functional_tests: $(GUI_NAME) $(SERVER_NAME) $(AI_NAME)
 	@python3 ./tests/functional/Tester.py
 
 tests_run: $(GUI_NAME)
-	@make -C $(SERVER_DIR) tests_run
+	@make tests_run_server
+	@make tests_run_gui
+	@make tests_run_ai
+
+tests_run_ai: $(AI_NAME)
+	@cd $(AI_DIR) && python3 -m pytest tests/unit/CLI/test_cli.py -v
+
+tests_run_gui:
 	@make -C $(GUI_DIR) tests_run
 
+tests_run_server:
+	@make -C $(SERVER_DIR) tests_run
+
 coverage: $(GUI_NAME)
-	@make -C $(SERVER_DIR) coverage
+	@make coverage_server
+	@make coverage_gui
+	@make coverage_ai
+
+coverage_ai: $(AI_NAME)
+	@echo "Compiling $(AI_NAME)..."
+	@cd $(AI_DIR) && python3 -m pytest tests/unit/CLI/test_cli.py \
+	 -v --cov=src --cov-report=term --cov-report=html:coverage_report
+	@firefox ai/coverage_report/index.html &> /dev/null
+
+coverage_gui:
 	@make -C $(GUI_DIR) coverage
 
-.PHONY: all clean fclean re functional_tests tests_run coverage\
+coverage_server:
+	@make -C $(SERVER_DIR) coverage
+
+.PHONY: all clean fclean re functional_tests tests_run coverage \
+		tests_run_ai tests_run_gui tests_run_server \
+		coverage_ai coverage_gui coverage_server \
 		 $(SERVER_NAME) $(GUI_NAME) $(AI_NAME)

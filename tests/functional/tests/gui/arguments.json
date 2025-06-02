@@ -3,14 +3,20 @@
         {
             "name": "GUI: Valid arguments",
             "description": "Testing with valid port and hostname",
-            "input": ["./zappy_gui", "-p", "4242", "-h", "127.0.0.1"],
+            "input": {
+                "program": ["./zappy_gui", "-p", "8080", "-h", "127.0.0.1"],
+                "succeed_after": 1
+            },
             "expected_output": "ANYTHING",
             "expected_return": 0
         },
         {
             "name": "GUI: Valid arguments with localhost",
             "description": "Testing with valid port and localhost",
-            "input": ["./zappy_gui", "-p", "8080", "-h", "localhost"],
+            "input": {
+                "program": ["./zappy_gui", "-p", "8080", "-h", "localhost"],
+                "succeed_after": 1
+            },
             "expected_output": "ANYTHING",
             "expected_return": 0
         },
