@@ -75,15 +75,7 @@ jobs:
 
       - name: Check Any Error
         run: |
-          cat coding-style-reports.log | while read line; do
-            TYPE=$(echo $line | cut -d ':' -f 3 | cut -c 2-)
-            temp=$(echo $line | cut -d ':' -f 1)
-            NAME=$(echo $temp | cut -d '/' -f 2)
-            LINE=$(echo $line | cut -d ':' -f 2)
-            NBR=$(echo $line | cut -d ':' -f 4)
-            ERROR=$(printf "%s coding style error" "$TYPE")
-            echo "::error file=$NAME,line=$LINE,title=$ERROR::$NBR"
-          done
+          cat coding-style-reports.log
           if [ -s coding-style-reports.log ]; then
             exit 1
           else
