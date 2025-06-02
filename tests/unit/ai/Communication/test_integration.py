@@ -131,9 +131,9 @@ class TestIntegration:
             assert "Invalid response from Take" in str(e)
 
         try:
-            comm.sendSetObject()
+            comm.sendSetObject("food")
         except CommunicationInvalidResponseException as e:
-            assert "Invalid response from Set object" in str(e)
+            assert "Invalid response from Set" in str(e)
 
     def test_communication_real_incantation(self, server_process):
         """Test incantation command with real server"""
