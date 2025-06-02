@@ -10,11 +10,12 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "MsgHandler.hpp"
 
 MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos,
-    std::shared_ptr<Communication> communication)
+    std::shared_ptr<ICommunication> communication)
     : _running(false),
     _gameInfos(gameInfos),
     _communication(communication)

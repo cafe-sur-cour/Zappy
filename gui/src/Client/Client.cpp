@@ -11,6 +11,7 @@
 #include <chrono>
 
 #include "Client.hpp"
+#include "../Communication/Communication.hpp"
 #include "../CLI/CLI.hpp"
 
 Client::Client(int ac, const char *const *av) :

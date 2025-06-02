@@ -11,13 +11,24 @@ The winning team is the first one where at least 6 players reach the maximum ele
     cd documentation/my-website
     npx docusaurus start
 
+    Si erreur dans le lancement comme ici :
+
+    `npm error could not determine executable to run`
+
+    executer ça : `npm install --save-dev @docusaurus/types`
+
+
 ### Doxygen :
     The basic documentation fo the project is generated using the
     doxygen, to run the doxygen executable, please make sure you
     installed the pdf-latex librairie.
-    To generate the PDF :
+    To generate the PDF you need move the my-zappy-doc, folder out of the repositorie
+    because the Unicode emojis used make the generation fails, then execute this :
+
     ./generateDoc.sh
 
+    After that you can move back the folder in the documentation
+    folder.
 
 ## Commit norm :
 
@@ -28,7 +39,7 @@ Gitmoji = The emoji approriate for the current modification.
 [MESSAGE] = A detail message of what you did.
 
 Gitmojies:
- 
+
     Code feature :
         - :sparkles: (✨): Introduce new features
         - :recycle: (♻️): Refactor / update code
@@ -36,10 +47,10 @@ Gitmojies:
         - :poop: (💩) : Remove Coding style or temporary fix
         - :rotating_light: (🚨) : Fix Compiling Warning
         - :fire: (🔥): Remove code or files
- 
+
     Test feature :
         - :white_check_mark: (✅): Add, update, or pass tests
- 
+
     Architecture :
         - :see_no_evil: (🙈): Add or update .gitignore files
         - :construction_worker: (👷): Add or update CI build system
