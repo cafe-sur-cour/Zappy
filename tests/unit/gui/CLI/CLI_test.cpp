@@ -8,8 +8,8 @@
 #include <gtest/gtest.h>
 #include <stdexcept>
 #include <string>
-#include "../../../src/CLI/CLI.hpp"
-#include "../../../src/Exceptions/Exceptions.hpp"
+#include "../../../../gui/src/CLI/CLI.hpp"
+#include "../../../../gui/src/Exceptions/Exceptions.hpp"
 
 class CLITest : public ::testing::Test {
 protected:

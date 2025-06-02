@@ -6,7 +6,7 @@
 */
 
 #include <gtest/gtest.h>
-#include "../../../src/Game/GameInfos.hpp"
+#include "../../../../gui/src/Game/GameInfos.hpp"
 
 class GameInfosTest : public ::testing::Test {
 protected:
