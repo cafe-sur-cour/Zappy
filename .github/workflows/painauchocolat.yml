@@ -61,6 +61,35 @@ jobs:
       - name: AI
         run: make zappy_ai
 
+  server_style:
+    name: Check Any Coding Style Errors in C Files
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/epitech/coding-style-checker:latest
+    steps:
+      - name: checkout@v4
+        uses: actions/checkout@v4
+
+      - name: Run Coding-Style-Checker
+        run: check.sh $(pwd) $(pwd)
+
+      - name: Check Any Error
+        run: |
+          cat coding-style-reports.log | while read line; do
+            TYPE=$(echo $line | cut -d ':' -f 3 | cut -c 2-)
+            temp=$(echo $line | cut -d ':' -f 1)
+            NAME=$(echo $temp | cut -d '/' -f 2)
+            LINE=$(echo $line | cut -d ':' -f 2)
+            NBR=$(echo $line | cut -d ':' -f 4)
+            ERROR=$(printf "%s coding style error" "$TYPE")
+            echo "::error file=$NAME,line=$LINE,title=$ERROR::$NBR"
+          done
+          if [ -s coding-style-reports.log ]; then
+            exit 1
+          else
+            exit 0
+          fi
+
   coding_style:
     name: Check Coding Style
     runs-on: ubuntu-latest
