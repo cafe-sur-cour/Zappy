@@ -16,17 +16,18 @@ typedef enum direction_e {
     SOUTH,
     EAST,
     WEST
-} direction_e;
+} direction_t;
 
 /* definintion od the different element on the map */
 typedef enum crystal_e {
+    FOOD,
     LINEMATE,
     DERAUMERE,
     SIBUR,
     MENDIANE,
     PHIRAS,
     THYSTAME
-} crystal_e;
+} crystal_t;
 
 /* Struct that "counts" the current stat of the player */
 typedef struct lives_s {
@@ -53,7 +54,7 @@ typedef struct player_s {
     int posX;
     int posY;
     bool isAlive;
-    direction_e direction;
+    direction_t direction;
     inventory_t *inventory;
     lives_t *lives;
     struct player_s *next;
@@ -70,7 +71,7 @@ typedef struct team_s {
 
 /* Ressources, and there pos on the map */
 typedef struct ressources_s {
-    crystal_e type;
+    crystal_t type;
     int posX;
     int posY;
     struct ressources_s *next;
