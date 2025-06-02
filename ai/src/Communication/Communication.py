@@ -7,19 +7,67 @@
 
 from Socket import Socket
 from src.Exceptions.Exceptions import (
+    CommunicationHandshakeException,
     CommunicationInvalidResponseException
 )
 
 
 class Communication:
-    def __init__(self, host: str, port: int):
+    def __init__(self, name: str, host: str, port: int):
+        self._name = name
         self._host = host
         self._port = port
         self._socket = Socket(host, port)
 
     def connectToServer(self):
         self._socket.connect()
-        # TODO: Handle server handshake
+        response = self._socket.receive()
+
+        if (response[-1] != '\n'):
+            raise CommunicationInvalidResponseException(
+                f"Response from server handshake is not terminated with a newline"
+            )
+        if (response[:-1] != "Welcome"):
+            raise CommunicationInvalidResponseException(
+                f"Invalid response from server handshake: {response[:-1]}"
+            )
+
+        self._socket.send(f"{self._name}\n")
+        response = self._socket.receive()
+
+        if (response[-1] != '\n'):
+            raise CommunicationInvalidResponseException(
+                f"Response from server after sending name is not terminated with a newline"
+            )
+
+        slots = 0
+        try:
+            slots = int(response[:-1])
+        except ValueError:
+            raise CommunicationInvalidResponseException(
+                f"Invalid number of slots: {response[:-1]}"
+            )
+
+        response = self._socket.receive()
+        if (response[-1] != '\n'):
+            raise CommunicationInvalidResponseException(
+                f"Response from server after slots is not terminated with a newline"
+            )
+
+        x, y = 0
+        try:
+            x, y = map(int, response[:-1].split(" "))
+        except ValueError:
+            raise CommunicationInvalidResponseException(
+                f"Invalid coordinates from server: {response[:-1]}"
+            )
+
+        if slots < 1 or x < 1 or y < 1:
+            raise CommunicationHandshakeException(
+                f"Invalid handshake values: slots={slots}, x={x}, y={y}"
+            )
+
+        return (slots, x, y)
 
     def sendForward(self):
         self._socket.send("Forward\n")
