@@ -92,7 +92,7 @@ static void init_tiles(server_t *server)
         print_map(server);
 }
 
-void inti_map(server_t *server)
+void init_map(server_t *server)
 {
     server->map = create_map(server);
     init_tiles(server);

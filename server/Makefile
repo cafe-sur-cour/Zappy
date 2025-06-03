@@ -16,24 +16,27 @@ MAIN 		= 	src/main.c
 
 MAIN_OBJ 	= 	$(MAIN:.c=.o)
 
-SRC 		=	src/params.c	\
-				src/messages.c	\
-				src/checkers.c	\
-				src/server.c	\
-				src/protocol.c	\
-				src/client.c	\
-				src/map_init.c	\
-				src/algo.c		\
-				src/buffer.c	\
-				src/free.c
+SRC 		=	src/params.c					\
+				src/messages.c					\
+				src/checkers.c					\
+				src/server.c					\
+				src/protocol.c					\
+				src/client.c					\
+				src/map_init.c					\
+				src/buffer.c					\
+				src/free.c						\
+				src/algo.c						\
+				src/accept.c					\
+				src/guiMessage/gui_send_map_data.c	\
+				src/guiMessage/gui_send_team_name.c
 
 OBJ 		= 	$(SRC:.c=.o)
 
 INCLUDES 	= 	-I./include
 
-CFLAGS 		=	-Wall -Wextra -Werror
+CFLAGS 		=	-Wall -Wextra -Werror -Wshadow
 
-LIBS 		=
+LIBS 		= -L./ -lmy
 
 NAME 		= 	zappy_server
 
@@ -41,7 +44,11 @@ CC 			= 	gcc
 
 CRIT 		= 	-lcriterion --coverage
 
-all: $(NAME)
+all: libmy $(NAME)
+
+
+libmy:
+	$(MAKE) -C lib/my
 
 $(NAME): $(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
@@ -55,6 +62,7 @@ clean:
 	@rm -rf $(OBJ)
 	@rm -rf $(MAIN_OBJ)
 	@rm -rf *.gc*
+	-rm libmy.a
 
 fclean: clean
 	@rm -rf $(NAME)
