@@ -22,7 +22,7 @@ SRC 		=	src/params.c					\
 				src/server.c					\
 				src/protocol.c					\
 				src/client.c					\
-				src/map_init.c					\
+				src/game.c						\
 				src/buffer.c					\
 				src/free.c						\
 				src/algo.c						\
@@ -46,7 +46,7 @@ all: $(NAME)
 
 $(NAME): $(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
-	@$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
+	@$(CC) -g -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ Compilation completed successfully!$(NC)"
 
 %.o: %.c

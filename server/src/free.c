@@ -73,24 +73,21 @@ static void free_teams(team_t *teams)
     }
 }
 
-static void free_map(map_t *map)
+static void free_game(game_t *game)
 {
-    if (!map)
+    if (!game)
         return;
-    if (map->teams)
-        free_teams(map->teams);
-    if (map->ressources)
-        free_ressources(map->ressources);
-    free(map);
+    if (game->teams)
+        free_teams(game->teams);
+    if (game->ressources)
+        free_ressources(game->ressources);
+    free(game);
 }
 
 static void free_graph(graph_t *graph)
 {
     if (!graph)
         return;
-    if (graph->pollfd) {
-        free(graph->pollfd);
-    }
     free(graph);
 }
 
@@ -102,10 +99,22 @@ void *free_server(server_t *server)
         free_params(server->params);
     if (server->sockfd != -1)
         close(server->sockfd);
-    if (server->map)
-        free_map(server->map);
+    if (server->game)
+        free_game(server->game);
     if (server->graph)
         free_graph(server->graph);
     free(server);
+    return NULL;
+}
+
+void *free_player(player_t *player)
+{
+    if (!player)
+        return NULL;
+    if (player->inventory)
+        free(player->inventory);
+    if (player->lives)
+        free(player->lives);
+    free(player);
     return NULL;
 }

@@ -59,7 +59,7 @@ static int listen_socket(server_t *server)
 static void fill_elements(server_t *server)
 {
     server->graph = NULL;
-    server->map = NULL;
+    server->game = NULL;
     server->params = NULL;
 }
 
