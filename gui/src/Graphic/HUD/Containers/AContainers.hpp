@@ -8,7 +8,7 @@
 #pragma once
 
 #include "IContainers.hpp"
-#include "Graphic/RayLib/RayLib.hpp"
+#include "../../RayLib/RayLib.hpp"
 #include <string>
 #include <memory>
 #include <vector>
