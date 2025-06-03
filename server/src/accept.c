@@ -47,6 +47,11 @@ int accept_client(server_t *server)
         close(new_sockfd);
         return -1;
     }
+    if (add_client_to_team(message, new_sockfd, server) == -1) {
+        close(new_sockfd);
+        free(message);
+        return -1;
+    }
     free(message);
     return 0;
 }

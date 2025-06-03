@@ -13,6 +13,7 @@
 #include <time.h>
 
 #include "zappy.h"
+#include "algo.h"
 
 static bool valid_team_name(const char *team_name, server_t *server)
 {
@@ -84,7 +85,7 @@ static lives_t *init_lives(int freq)
     return lives;
 }
 
-static player_t *init_player(int fd, int freq)
+static player_t *init_player(int fd, int freq, tiles_t tile)
 {
     player_t *player = malloc(sizeof(player_t));
 
@@ -94,8 +95,8 @@ static player_t *init_player(int fd, int freq)
     }
     player->id = fd;
     player->level = 1;
-    player->posX = 0;
-    player->posY = 0;
+    player->posX = tile.x;
+    player->posY = tile.y;
     player->isAlive = true;
     player->direction = rand() % 4;
     player->inventory = init_inventory();
@@ -107,15 +108,9 @@ static player_t *init_player(int fd, int freq)
     return player;
 }
 
-int add_client_to_team(const char *team_name, int fd, server_t *server)
+static int check_team_capacity(server_t *server, const char *team_name,
+    player_t *new_player)
 {
-    player_t *new_player = init_player(fd, server->params->freq);
-    team_t *save = server->game->teams;
-
-    if (!new_player) {
-        close(fd);
-        return -1;
-    }
     while (server->game->teams) {
         if (strcmp(server->game->teams->name, team_name) == 0 &&
             server->game->teams->nbPlayers < server->params->nb_client) {
@@ -128,7 +123,25 @@ int add_client_to_team(const char *team_name, int fd, server_t *server)
         }
         server->game->teams = server->game->teams->next;
     }
-    printf("Team %s is full or does not exist.\n", team_name);
+    return -1;
+}
+
+int add_client_to_team(const char *team_name, int fd, server_t *server)
+{
+    tiles_t *tiles = shuffle_fisher(server->game->width, server->game->heigt);
+    player_t *new_player = init_player(fd, server->params->freq, tiles[0]);
+    team_t *save = server->game->teams;
+
+    free(tiles);
+    if (!new_player) {
+        close(fd);
+        return -1;
+    }
+    if (check_team_capacity(server, team_name, new_player) == -1) {
+        error_message("Requested team is full.");
+        server->game->teams = save;
+        return -1;
+    }
     server->game->teams = save;
     return 0;
 }

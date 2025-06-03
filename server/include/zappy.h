@@ -68,6 +68,7 @@ int start_protocol(server_t *server);
 
 /* client.c */
 bool process_new_client(const char *team_name, int fd, server_t *server);
+int add_client_to_team(const char *team_name, int fd, server_t *server);
 
 /* init_map.c */
 void init_game(server_t *server);
