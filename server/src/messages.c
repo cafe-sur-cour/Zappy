@@ -54,18 +54,51 @@ static char *resize_buffer(char *buffer, size_t len, char c)
     return buffer;
 }
 
+static int handle_poll(struct pollfd *pollfd, size_t len, char *buffer)
+{
+    int poll_result = poll(pollfd, 1, 100);
+
+    if (poll_result == -1) {
+        error_message("Failed to poll from client socket.");
+        free(buffer);
+        return -1;
+    }
+    if (!(pollfd->revents & POLLIN)) {
+        if (len == 0) {
+            free(buffer);
+            return -1;
+        }
+        return 1;
+    }
+    return 0;
+}
+
+static int read_character(int fd, char *c, char *buffer)
+{
+    if (read(fd, c, 1) <= 0) {
+        free(buffer);
+        return -1;
+    }
+    return 0;
+}
+
 char *get_message(int fd)
 {
     char c = 0;
     char *buffer = allocate_buffer();
+    struct pollfd pollfd = {.fd = fd, .events = POLLIN};
+    int poll_status;
 
     if (!buffer)
         return NULL;
     for (size_t len = 0; c != '\n'; len++) {
-        if (read(fd, &c, 1) <= 0) {
-            free(buffer);
+        poll_status = handle_poll(&pollfd, len, buffer);
+        if (poll_status == -1)
             return NULL;
-        }
+        if (poll_status == 1)
+            break;
+        if (read_character(fd, &c, buffer) == -1)
+            return NULL;
         if (c == '\n') {
             buffer[len] = '\0';
             return buffer;
