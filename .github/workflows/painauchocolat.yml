@@ -105,7 +105,7 @@ jobs:
         run: |
           apt update && apt install -y python3-pip
           pip install --break-system-packages cpplint
-          chmod +x styleChecker.sh
+          chmod +x cppStyleChecker.sh
 
       - name: Check Coding Style
         run: |
@@ -151,13 +151,7 @@ jobs:
 
         - name: Run Coding-Style-Checker
           run: |
-            check.sh $(pwd) $(pwd) || { echo "check.sh failed"; exit 1; }
-            if [ ! -s coding-style-reports.log ]; then
-              echo "coding-style-reports.log is empty or missing."
-              exit 0
-            fi
-            grep -v "./documentation" coding-style-reports.log > new-coding.log || true
-            rm -f coding-style-reports.log
+            ./cStyleChecker.sh
 
         - name: Check Any Error
           run: |
