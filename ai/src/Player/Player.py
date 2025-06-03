@@ -1,18 +1,32 @@
+#
+# EPITECH PROJECT, 2025
+# zappy
+# File description:
+# player.py
+#
+
 from time import sleep
 from src.Hash.Hash import Hash
 
+
 class Player:
     def __init__(self, name):
-        self.teamName : str = name
-        self.level : int = 1
-        self.hash : Hash = Hash(name)
-        self.inventory : dict[str, int] = {"food": 10, "linemate": 0, "deraumere": 0, "sibur": 0,
-                          "mendiane": 0, "phiras": 0, "thystame": 0}
-        self.alive : bool = True
-        self.in_incantation : bool = False
+        self.teamName: str = name
+        self.level: int = 1
+        self.hash: Hash = Hash(name)
+        self.inventory: dict[str, int] = {
+            "food": 10, "linemate": 0, "deraumere": 0, "sibur": 0,
+            "mendiane": 0, "phiras": 0, "thystame": 0
+        }
+        self.alive: bool = True
+        self.in_incantation: bool = False
 
     def __str__(self):
-        return f"Player team: {self.teamName} - Level: {self.level}, Inventory: {self.inventory}, Alive: {self.alive}, In Incantation: {self.in_incantation}"
+        return (f"Player team: {self.teamName}, "
+                f"Level: {self.level}, "
+                f"Inventory: {self.inventory}, "
+                f"Alive: {self.alive}, "
+                f"In Incantation: {self.in_incantation}")
 
     def beginIncantation(self) -> None:
         print(f"Player team: {self.teamName} has started an incentive!")
@@ -27,6 +41,7 @@ class Player:
 
     def loop(self) -> None:
         while self.alive:
-            self.hash.hashMessage("Hello, World!")
-            print(self)
+            msg = self.hash.hashMessage("J'ai tous les objets pour incanter !")
+            print(f"Crypted message: {msg}")
+            print(f"Uncrypted message: {self.hash.unHashMessage(msg)}")
             sleep(1)
