@@ -37,7 +37,7 @@ class Containers : public AContainers {
          * @param height Container height
          * @param backgroundColor Background color (default: semi-transparent dark gray)
          */
-        Containers(RayLib& raylib, float x, float y, float width, float height, Color backgroundColor = {40, 40, 40, 200});
+        Containers(std::shared_ptr<RayLib> raylib, float x, float y, float width, float height, Color backgroundColor = {40, 40, 40, 200});
 
         /**
          * @brief Destroy the Container
@@ -191,7 +191,7 @@ class Containers : public AContainers {
         void handleResize(int oldWidth, int oldHeight, int newWidth, int newHeight);
 
     private:
-        RayLib& _raylib;
+        std::shared_ptr<RayLib> _raylib;
         Texture2D _backgroundTexture;
         bool _hasBackgroundTexture;
         std::unordered_map<std::string, std::shared_ptr<IUIElement>> _elements;
