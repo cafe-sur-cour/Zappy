@@ -260,11 +260,11 @@ void RayLib::updateCameraCustom()
             Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
             float rotAngle = -mouseDelta.y * rotationSpeed;
 
-            Vector3 right = Vector3CrossProduct(viewDir, _camera.up);
-            right = Vector3Normalize(right);
-            viewDir = Vector3RotateByAxisAngle(viewDir, right, rotAngle);
+            Vector3 rightVec = Vector3CrossProduct(viewDir, _camera.up);
+            rightVec = Vector3Normalize(rightVec);
+            viewDir = Vector3RotateByAxisAngle(viewDir, rightVec, rotAngle);
 
-            Vector3 newUp = Vector3CrossProduct(right, viewDir);
+            Vector3 newUp = Vector3CrossProduct(rightVec, viewDir);
             if (newUp.y > 0.0f)
                 _camera.target = Vector3Add(_camera.position, viewDir);
         }
