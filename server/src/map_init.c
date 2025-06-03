@@ -38,6 +38,16 @@ static int nb_total(server_t *server)
     return total;
 }
 
+static const char *get_type(crystal_t type)
+{
+    const char *crystal_names[] = {"food", "linemate", "deraumere", "sibur",
+        "mendiane", "phiras", "thystame" };
+
+    if (type >= 0 && type < 7)
+        return crystal_names[type];
+    return "unknown";
+}
+
 static void print_map(server_t *server)
 {
     int total = nb_total(server);
@@ -46,8 +56,8 @@ static void print_map(server_t *server)
     printf("Map size: %d x %d\n", server->params->x, server->params->y);
     printf("Total resources: %d\n", total);
     while (current) {
-        printf("Resource type: %d at position (%d, %d)\n",
-            current->type, current->posX, current->posY);
+        printf("Resource type: %s at position (%d, %d)\n",
+            get_type(current->type), current->posX, current->posY);
         current = current->next;
     }
 }
@@ -78,7 +88,7 @@ static void init_tiles(server_t *server)
             malloc_ressource(server, j, i, tiles);
         }
     }
-    if (server->params->isDebug == true)
+    if (server->params->is_debug == true)
         print_map(server);
 }
 

@@ -20,7 +20,7 @@ typedef struct params_s {
     char **teams;
     int nb_client;
     int freq;
-    bool isDebug;
+    bool is_debug;
 } params_t;
 
 typedef struct server_s {
