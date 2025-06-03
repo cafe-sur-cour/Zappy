@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <poll.h>
 
 #include "zappy.h"
 #include "buffer.h"
@@ -37,32 +38,14 @@ static void print_received_message(char c, server_t *server)
     }
 }
 
-static char *get_current_char(buffer_t *cb)
-{
-    char *line = malloc(BUFFER_SIZE);
-
-    if (cb_getline(cb, line, BUFFER_SIZE) > 0) {
-        if (strchr(line, '\n')) {
-            line[strcspn(line, "\n")] = '\0';
-            return line;
-        }
-    }
-    return NULL;
-}
-
 char *get_message(int fd, server_t *server)
 {
     static buffer_t cb = {0};
     char c = 0;
-    char *line = malloc(BUFFER_SIZE);
+    char *line = NULL;
     int bytes_read;
 
-    if (!line)
-        return NULL;
     while (1) {
-        line = get_current_char(&cb);
-        if (line != NULL)
-            return line;
         bytes_read = read(fd, &c, 1);
         if (bytes_read <= 0) {
             free(line);
@@ -70,5 +53,30 @@ char *get_message(int fd, server_t *server)
         }
         cb_write(&cb, c);
         print_received_message(c, server);
+        if (c == '\n')
+            break;
     }
+    return cb.data;
+}
+
+int write_message(int fd, const char *message)
+{
+    struct pollfd pollfd = {.fd = fd, .events = POLLOUT};
+
+    if (poll(&pollfd, 1, 10) == -1) {
+        error_message("Client socket not ready for writing.");
+        close(fd);
+        return -1;
+    }
+    if (pollfd.revents & POLLOUT) {
+        if (write(fd, message, strlen(message)) == -1) {
+            error_message("Failed to write message to client.");
+            close(fd);
+            return -1;
+        }
+        return 0;
+    }
+    error_message("Client socket not ready for writing.");
+    close(fd);
+    return -1;
 }

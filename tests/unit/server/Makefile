@@ -21,45 +21,32 @@ TESTS 	    =   tests_params.c			\
 				tests_buffer.c			\
 				tests_free.c
 
-MAIN 		= 	../../../server/src/main.c
-
-MAIN_OBJ 	= 	$(MAIN:.c=.o)
-
 SRC 		=	../../../server/src/params.c					\
 				../../../server/src/messages.c					\
 				../../../server/src/checkers.c					\
 				../../../server/src/server.c					\
 				../../../server/src/protocol.c					\
 				../../../server/src/client.c					\
+				../../../server/src/accept.c					\
 				../../../server/src/map_init.c					\
 				../../../server/src/algo.c						\
 				../../../server/src/buffer.c					\
-				../../../server/src/free.c
+				../../../server/src/free.c						\
+				../../../server/src/guiMessage/gui_send_map_data.c	\
+				../../../server/src/guiMessage/gui_send_team_name.c
 
 
-OBJ 		= 	$(SRC:.c=.o)
 
 INCLUDES 	= 	-I./../../../server/include
 
 CFLAGS 		=	-Wall -Wextra -Werror
 
-LIBS 		=
-
-NAME 		= 	zappy_server
+LIBS 		=	-L./ -lmy
 
 CC 			= 	gcc
 
 CRIT 		= 	-lcriterion --coverage
 
-all: $(NAME)
-
-$(NAME): $(OBJ) $(MAIN_OBJ)
-	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
-	$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
-	@echo -e "$(GREEN)ᒥ✅ᒧ Compilation completed successfully!$(NC)"
-
-%.o: %.c
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
 	@rm -rf $(OBJ)
@@ -72,7 +59,7 @@ fclean: clean
 
 unit_test: fclean
 	@echo -e "$(YELLOW)ᒥ🧪ᒧ Compiling unit tests...$(NC)"
-	@$(CC) -o $(UNIT) $(TESTS) $(SRC) $(CFLAGS) $(INCLUDES) $(CRIT)
+	@$(CC) -o $(UNIT) $(SRC)  $(TESTS)  $(CFLAGS) $(INCLUDES) $(CRIT) $(LIBS)
 
 tests_run: unit_test
 	@echo -e "$(YELLOW)ᒥ🧪ᒧ Running unit tests...$(NC)"

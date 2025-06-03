@@ -20,7 +20,7 @@ int main(int argc, char **argv)
     server = init_server(argc, argv);
     if (server == NULL)
         return 84;
-    inti_map(server);
+    init_map(server);
     start_protocol(server);
     free_server(server);
     return 0;
