@@ -6,17 +6,10 @@ labels: task
 assignees: ''
 ---
 
-## 🎯 Goal
+## 🎯 Goal & Description
 
 <!-- What needs to be done? Brief and clear description of the task. -->
 <!-- Example: Implement the thread pool in the Kitchen module -->
-
-## 📋 Description
-
-<!-- Detailed explanation of the task -->
-- What component/class/function is involved?
-- What is the expected behavior?
-- Any constraints, edge cases, or specific logic to consider?
 
 ## 🔗 Related Milestone
 
