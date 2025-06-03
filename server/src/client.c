@@ -42,7 +42,6 @@ bool process_new_client(const char *team_name, int fd, server_t *server)
             return false;
         }
         server->graph->fd = fd;
-        printfd("GRAPHIC client connected.\n", fd);
         return true;
     }
     return valid_team_name(team_name, server);
