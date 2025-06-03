@@ -61,15 +61,15 @@ void send_map_tile(ressources_t *ressource, server_t *server,
 
     if (elem == NULL)
         return;
-    xLength = int_str_len(ressource->posX) +
-        int_str_len(ressource->posY) +
+    xLength = int_str_len(posX) +
+        int_str_len(posY) +
         int_str_len(elem[0]) + int_str_len(elem[1]) +
         int_str_len(elem[2]) + int_str_len(elem[3]) +
         int_str_len(elem[4]) + int_str_len(elem[5]) +
         int_str_len(elem[6]) + 14;
     message = malloc(sizeof(char) * xLength);
     snprintf(message, xLength, "bct %d %d %d %d %d %d %d %d %d\n",
-        ressource->posX, ressource->posY,
+        posX, posY,
         elem[0], elem[1], elem[2], elem[3],
         elem[4], elem[5], elem[6]);
     write_message(server->graph->fd, message);
@@ -79,11 +79,10 @@ void send_map_tile(ressources_t *ressource, server_t *server,
 
 void send_entrie_map(server_t *server)
 {
-    ressources_t *current = server->map->ressources;
-
-    while (current != NULL) {
-        send_map_tile(current, server, current->posX, current->posY);
-        current = current->next;
+    for (int x = 0; x < server->map->width; x++) {
+        for (int y = 0; y < server->map->heigt; y++) {
+            send_map_tile(server->map->ressources, server, x, y);
+        }
     }
 }
 
