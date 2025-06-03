@@ -97,7 +97,7 @@ jobs:
 
       - name: Check Coding Style
         run: |
-          ./styleChecker.sh
+          ./cppStyleChecker.sh
 
   coding_style_python:
     name: Check Coding Style Python
