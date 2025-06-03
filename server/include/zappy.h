@@ -7,6 +7,7 @@
 
 #include <stdbool.h>
 #include <poll.h>
+#include "game.h"
 
 #ifndef ZAPPY_H_
     #define ZAPPY_H_
@@ -19,6 +20,7 @@ typedef struct params_s {
     char **teams;
     int nb_client;
     int freq;
+    bool is_debug;
 } params_t;
 
 typedef struct client_s {
@@ -32,6 +34,7 @@ typedef struct server_s {
     int sockfd;
     client_t *clients;
     params_t *params;
+    map_t *map;
 } server_t;
 
 typedef struct command_pf_s {
@@ -66,4 +69,7 @@ int start_protocol(server_t *server);
 void free_clients(client_t *clients);
 int get_nb_clients(client_t *clients);
 
+
+/* init_map.c */
+void inti_map(server_t *server);
 #endif /* !ZAPPY_H_ */

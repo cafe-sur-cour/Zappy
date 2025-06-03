@@ -1,0 +1,2 @@
+tests/unit/ai/Hash/test_hash.py
+tests/unit/ai/CLI/test_cli.py

@@ -48,7 +48,7 @@ static int bind_socket(server_t *server)
 
 static int listen_socket(server_t *server)
 {
-    if (listen(server->sockfd, 12) < 0) {
+    if (listen(server->sockfd, 10) < 0) {
         error_message("Failed to listen on socket.");
         return -1;
     }

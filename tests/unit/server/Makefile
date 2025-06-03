@@ -17,6 +17,7 @@ TESTS 	    =   tests_params.c			\
 				tests_errors.c			\
 				tests_checkers.c		\
 				tests_server.c			\
+				test_map_init.c
 
 MAIN 		= 	../../../server/src/main.c
 
@@ -27,7 +28,9 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/checkers.c					\
 				../../../server/src/server.c					\
 				../../../server/src/protocol.c					\
-				../../../server/src/client.c
+				../../../server/src/client.c					\
+				../../../server/src/map_init.c					\
+				../../../server/src/algo.c
 
 
 OBJ 		= 	$(SRC:.c=.o)
