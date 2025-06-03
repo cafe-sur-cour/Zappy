@@ -13,7 +13,7 @@
 tiles_t *shuffle_fisher(int width, int heigth)
 {
     int total = width * heigth;
-    tiles_t *tiles = malloc(sizeof(tiles_t) * total);
+    tiles_t *tiles = calloc(total, sizeof(tiles_t));
     tiles_t tmp = {0, 0};
     int j = 0;
 
