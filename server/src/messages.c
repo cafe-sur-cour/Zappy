@@ -31,7 +31,6 @@ void printfd(char const *message, int fd)
     dprintf(fd, "%s\n", message);
 }
 
-
 static char *allocate_buffer(void)
 {
     char *buffer = calloc(1, sizeof(char));
