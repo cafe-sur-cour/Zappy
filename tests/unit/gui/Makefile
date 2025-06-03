@@ -44,7 +44,7 @@ TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
 INCLUDES = -I./include
 
-CFLAGS =	-std=c++20 -Wall -Wextra -Werror
+CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
