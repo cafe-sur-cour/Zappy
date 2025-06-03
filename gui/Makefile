@@ -20,6 +20,8 @@ SRC =	src/Client/Client.cpp \
 		src/Client/MsgHandler.cpp \
 		src/CLI/CLI.cpp \
 		src/Game/GameInfos.cpp \
+		src/Graphic/RayLib/RayLib.cpp \
+		src/Graphic/GUI.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
@@ -37,11 +39,10 @@ INCLUDES = -I./include -I./src
 CFLAGS =	-std=c++20 -Wall -Wextra -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
-LIBS = -L./src/Communication -lcommunication -L./build/graphic \
-		-lzappy_graphic -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+LIBS = -L./src/Communication -lcommunication -lraylib -lGL -lm -lpthread \
+		-ldl -lrt -lX11
 
 COMM_LIB = src/Communication/libcommunication.a
-GRAPHIC_LIB = build/graphic/libzappy_graphic.a
 
 NAME = zappy_gui
 
@@ -51,7 +52,7 @@ CC = g++
 
 all: $(NAME)
 
-$(NAME): communication_lib graphic_lib $(OBJ) $(MAIN_OBJ)
+$(NAME): communication_lib $(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
 	$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ Compilation completed successfully!$(NC)"
@@ -60,11 +61,6 @@ communication_lib:
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Building Communication library...$(NC)"
 	@make -C src/Communication
 
-graphic_lib:
-	@echo -e "$(BLUE)ᒥ🔧ᒧ Building Graphic library...$(NC)"
-	@mkdir -p build/graphic
-	@make -C src/Graphic
-
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -72,7 +68,6 @@ clean:
 	@rm -rf $(OBJ)
 	@rm -rf $(MAIN_OBJ)
 	@make -C src/Communication clean
-	@make -C src/Graphic clean
 
 fclean: clean
 	@rm -rf $(NAME)
@@ -82,7 +77,6 @@ fclean: clean
 	@rm -rf *.gcno
 	@rm -rf *.gcov
 	@make -C src/Communication fclean
-	@make -C src/Graphic fclean
 
 re: fclean all
 
@@ -105,4 +99,4 @@ tests_run: communication_lib $(SRC) $(TEST_SRC)
 	./$(UNIT_TESTS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ All tests completed!$(NC)"
 
-.PHONY: all clean fclean re communication_lib graphic_lib coverage tests_run
+.PHONY: all clean fclean re communication_lib coverage tests_run

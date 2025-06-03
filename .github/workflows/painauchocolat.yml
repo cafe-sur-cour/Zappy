@@ -47,6 +47,11 @@ jobs:
       - name: checkout@v4
         uses: actions/checkout@v4
 
+      - name: Install Raylib
+        run: |
+          apt-get update
+          apt-get install -y raylib-devel
+
       - name: Compilation
         run: make
         timeout-minutes: 5
@@ -170,6 +175,11 @@ jobs:
       - name: checkout@v4
         uses: actions/checkout@v4
 
+      - name: Install Raylib
+        run: |
+          apt-get update
+          apt-get install -y raylib-devel
+
       - name: Run functional tests
         run: |
           make functional_tests
@@ -206,6 +216,11 @@ jobs:
           apt-get update
           apt-get install -y python3-pip
           pip install --break-system-packages pytest pytest-cov
+
+      - name: Install Raylib
+        run: |
+          apt-get update
+          apt-get install -y raylib-devel
 
       - name: Run Unit Tests
         run: make tests_run

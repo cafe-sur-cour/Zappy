@@ -26,8 +26,11 @@ Client::Client(int ac, const char *const *av) :
 
     _communication = std::make_shared<Communication>(_config);
     _msgHandler = std::make_unique<MsgHandler>(_gameInfos, _communication);
-    _gui = std::make_unique<GUI>();
 
+    if (!_communication->isConnected())
+        return;
+
+    _gui = std::make_unique<GUI>();
     _gui->run();
 }
 
