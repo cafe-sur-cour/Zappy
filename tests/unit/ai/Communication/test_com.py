@@ -116,7 +116,7 @@ class TestCommunication:
         with pytest.raises(CommunicationHandshakeException) as excinfo:
             comm.connectToServer()
 
-        assert "Invalid handshake values: slots=0, x=10, y=15" in str(excinfo.value)
+        assert "Invalid handshake values: slots=-1, x=10, y=15" in str(excinfo.value)
 
     @patch('src.Communication.Communication.Socket')
     def test_send_forward_success(self, mock_socket_class):
