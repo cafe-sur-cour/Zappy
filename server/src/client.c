@@ -26,17 +26,17 @@ static bool valid_team_name(const char *team_name, server_t *server)
     return false;
 }
 
-static graph_t *init_graph(void)
-{
-    graph_t *graph = malloc(sizeof(graph_t));
+// static graph_t *init_graph(void)
+// {
+//     graph_t *graph = malloc(sizeof(graph_t));
 
-    if (!graph) {
-        error_message("Failed to allocate memory for graph.");
-        exit(84);
-    }
-    graph->fd = -1;
-    return graph;
-}
+//     if (!graph) {
+//         error_message("Failed to allocate memory for graph.");
+//         exit(84);
+//     }
+//     graph->fd = -1;
+//     return graph;
+// }
 
 bool process_new_client(const char *team_name, int fd, server_t *server)
 {

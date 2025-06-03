@@ -79,7 +79,7 @@ void send_map_tile(ressources_t *ressource, server_t *server,
 
 void send_entrie_map(server_t *server)
 {
-    ressources_t *current = server->map->ressources;
+    ressources_t *current = server->game->ressources;
 
     while (current != NULL) {
         send_map_tile(current, server, current->posX, current->posY);
@@ -90,11 +90,11 @@ void send_entrie_map(server_t *server)
 /* Send  the msz message to the gui */
 void send_map_size(server_t *server)
 {
-    int xLenthth = int_str_len(server->map->width) +
-        int_str_len(server->map->heigt) + 7;
+    int xLenthth = int_str_len(server->game->width) +
+        int_str_len(server->game->heigt) + 7;
     char *message = malloc(sizeof(char) * xLenthth);
-    char *x = my_itoa(server->map->width);
-    char *y = my_itoa(server->map->heigt);
+    char *x = my_itoa(server->game->width);
+    char *y = my_itoa(server->game->heigt);
 
     snprintf(message, xLenthth, "msz %s %s\n", x, y);
     write_message(server->graph->fd, message);

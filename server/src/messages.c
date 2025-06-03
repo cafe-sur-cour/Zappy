@@ -31,25 +31,83 @@ void printfd(char const *message, int fd)
     dprintf(fd, "%s\n", message);
 }
 
-char *get_message(int fd, server_t *server)
+static char *allocate_buffer(void)
 {
-    static buffer_t cb = {0};
-    char c = 0;
-    char *line = NULL;
-    int bytes_read;
+    char *buffer = calloc(1, sizeof(char));
 
-    while (1) {
-        bytes_read = read(fd, &c, 1);
-        if (bytes_read <= 0) {
-            free(line);
-            return NULL;
-        }
-        cb_write(&cb, c);
-        print_received_message(c, server);
-        if (c == '\n')
-            break;
+    if (!buffer) {
+        error_message("Failed to allocate memory for message buffer.");
+        return NULL;
     }
-    return cb.data;
+    return buffer;
+}
+
+static char *resize_buffer(char *buffer, size_t len, char c)
+{
+    buffer = realloc(buffer, len + 2);
+    if (!buffer) {
+        error_message("Failed to reallocate memory for message buffer.");
+        return NULL;
+    }
+    buffer[len] = c;
+    return buffer;
+}
+
+static int handle_poll(struct pollfd *pollfd, size_t len, char *buffer)
+{
+    int poll_result = poll(pollfd, 1, 100);
+
+    if (buffer == NULL) {
+        error_message("Buffer to read is NULL.");
+        return -1;
+    }
+    if (poll_result == -1) {
+        error_message("Failed to poll from client socket.");
+        free(buffer);
+        return -1;
+    }
+    if (!(pollfd->revents & POLLIN)) {
+        if (len == 0) {
+            free(buffer);
+            return -1;
+        }
+        return 1;
+    }
+    return 0;
+}
+
+static int read_character(int fd, char *c, char *buffer)
+{
+    if (read(fd, c, 1) <= 0) {
+        error_message("Failed to read character from client socket.");
+        free(buffer);
+        return -1;
+    }
+    return 0;
+}
+
+char *get_message(int fd)
+{
+    char c = 0;
+    char *buffer = allocate_buffer();
+    struct pollfd pollfd = {.fd = fd, .events = POLLIN};
+    int poll_status = 0;
+
+    if (!buffer)
+        return NULL;
+    for (size_t len = 0; c != '\n'; len++) {
+        poll_status = handle_poll(&pollfd, len, buffer);
+        if (poll_status != 0)
+            return (poll_status == -1 ? NULL : buffer);
+        if (read_character(fd, &c, buffer) == -1)
+            return NULL;
+        if (c == '\n') {
+            buffer[len] = '\0';
+            return buffer;
+        }
+        buffer = resize_buffer(buffer, len, c);
+    }
+    return buffer;
 }
 
 int write_message(int fd, const char *message)
