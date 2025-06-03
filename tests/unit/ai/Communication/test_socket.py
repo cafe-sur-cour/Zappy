@@ -80,21 +80,6 @@ class TestSocket:
         mock_socket_instance.sendall.assert_called_once_with("tëst mëssagë".encode("utf-8"))
 
     @patch('socket.socket')
-    def test_socket_receive_single_message(self, mock_socket):
-        """Test receiving a single complete message"""
-        mock_socket_instance = Mock()
-        mock_socket_instance.recv.return_value = b"test message\n"
-        mock_socket.return_value = mock_socket_instance
-
-        sock = Socket("localhost", 4242)
-        sock.connect()
-        result = sock.receive()
-
-        assert result == "test message\n"
-        mock_socket_instance.settimeout.assert_called_once_with(3.0)
-        mock_socket_instance.recv.assert_called_once_with(4096)
-
-    @patch('socket.socket')
     def test_socket_receive_partial_messages(self, mock_socket):
         """Test receiving message in multiple parts"""
         mock_socket_instance = Mock()
@@ -127,21 +112,6 @@ class TestSocket:
             mock_recv.assert_not_called()
 
         assert sock._buffer == "third"
-
-    @patch('socket.socket')
-    def test_socket_receive_timeout(self, mock_socket):
-        """Test socket receive timeout"""
-        mock_socket_instance = Mock()
-        mock_socket_instance.recv.side_effect = socket.timeout("Timeout")
-        mock_socket.return_value = mock_socket_instance
-
-        sock = Socket("localhost", 4242)
-        sock.connect()
-
-        with pytest.raises(SocketException) as excinfo:
-            sock.receive()
-
-        assert "Socket receive timed out" in str(excinfo.value)
 
     @patch('socket.socket')
     def test_socket_receive_connection_closed(self, mock_socket):

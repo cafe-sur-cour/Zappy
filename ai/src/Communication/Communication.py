@@ -8,7 +8,7 @@
 from .Socket import Socket
 from src.Exceptions.Exceptions import (
     CommunicationHandshakeException,
-    CommunicationInvalidResponseException
+    CommunicationInvalidResponseException,
 )
 
 
@@ -31,6 +31,10 @@ class Communication:
         self._socket.send(f"{self._name}\n")
         response = self._socket.receive()
 
+        if response[:-1] == "ko":
+            raise CommunicationHandshakeException(
+                f"Handshake failed: server return KO after sending: '{self._name}'"
+            )
         slots = 0
         try:
             slots = int(response[:-1])

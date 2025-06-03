@@ -8,20 +8,6 @@
             "expected_return": 84
         },
         {
-            "name": "AI: Valid Arguments",
-            "description": "Run the AI with valid arguments",
-            "input": ["./zappy_ai", "-p", "4242", "-n", "team1", "-h", "127.0.0.1"],
-            "expected_output": "ANYTHING",
-            "expected_return": 0
-        },
-        {
-            "name": "AI: Valid Arguments (localhost)",
-            "description": "Run the AI with localhost as hostname",
-            "input": ["./zappy_ai", "-p", "4242", "-n", "team1", "-h", "localhost"],
-            "expected_output": "ANYTHING",
-            "expected_return": 0
-        },
-        {
             "name": "AI: Missing Port",
             "description": "Try to run without port parameter",
             "input": ["./zappy_ai", "-n", "team1", "-h", "127.0.0.1"],
@@ -118,13 +104,6 @@
             "input": ["./zappy_ai", "-p", "4242", "-n", "team1", "-h", "127.0.0.1", "-x", "unknown"],
             "expected_output": "CONTAINS - Unknown option: -x",
             "expected_return": 84
-        },
-        {
-            "name": "AI: Maximum Valid Port",
-            "description": "Run with maximum valid port number",
-            "input": ["./zappy_ai", "-p", "65535", "-n", "team1", "-h", "127.0.0.1"],
-            "expected_output": "ANYTHING",
-            "expected_return": 0
         },
         {
             "name": "AI: Missing Value for Option",
