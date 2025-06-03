@@ -12,7 +12,7 @@ from src.Communication.Communication import Communication
 
 
 class Player:
-    def __init__(self, name: str, ip : str, port: int = 4242) -> None:
+    def __init__(self, name: str, ip: str, port: int = 4242) -> None:
         self.communication: Communication = Communication(name, ip, port)
         self.teamName: str = name
         self.ip: str = ip
