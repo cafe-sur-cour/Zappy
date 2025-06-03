@@ -65,6 +65,7 @@ class CommunicationInvalidResponseException(CommunicationException):
     def __init__(self, message: str):
         super().__init__(f"Invalid response from server: {message}")
 
+
 class PlayerDead(CommunicationException):
 
     def __init__(self):

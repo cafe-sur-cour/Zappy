@@ -12,6 +12,7 @@ from src.Player.Player import Player
 from sys import argv
 from src.Communication.Communication import Communication
 
+
 def main():
     if len(argv) == 2 and argv[1] == "-help":
         print(Colors.CYAN + USAGE_STRING + Colors.RESET)

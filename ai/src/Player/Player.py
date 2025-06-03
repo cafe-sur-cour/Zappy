@@ -10,8 +10,9 @@ from src.Hash.Hash import Hash
 from src.Exceptions.Exceptions import PlayerDead
 from src.Communication.Communication import Communication
 
+
 class Player:
-    def __init__(self, name : str, com : Communication):
+    def __init__(self, name: str, com: Communication):
         self.communication: Communication = com
         self.teamName: str = name
         self.level: int = 1
@@ -47,7 +48,7 @@ class Player:
     def loop(self) -> None:
         # This is a default loop for the player to simulate actions it's not definitive
         while self.alive:
-            try :
+            try:
                 self.communication.sendForward()
                 print("Player go forward")
                 self.inventory = self.communication.getInventory()
