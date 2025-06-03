@@ -47,7 +47,7 @@ int helper(void);
 void error_message(const char *message);
 void printfd(char const *message, int fd);
 int write_message(int fd, const char *message);
-char *get_message(int fd);
+char *get_message(int fd, server_t *server);
 
 /* checkers.c */
 bool check_port(char const *flag, char const *value, params_t *params);

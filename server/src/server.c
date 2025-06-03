@@ -56,9 +56,21 @@ static int listen_socket(server_t *server)
     return 0;
 }
 
+static graph_t *init_graph(void)
+{
+    graph_t *graph = malloc(sizeof(graph_t));
+
+    if (!graph) {
+        error_message("Failed to allocate memory for graph.");
+        exit(84);
+    }
+    graph->fd = -1;
+    return graph;
+}
+
 static void fill_elements(server_t *server)
 {
-    server->graph = NULL;
+    server->graph = init_graph();
     server->game = NULL;
     server->params = NULL;
 }

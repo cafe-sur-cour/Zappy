@@ -26,21 +26,8 @@ static bool valid_team_name(const char *team_name, server_t *server)
     return false;
 }
 
-// static graph_t *init_graph(void)
-// {
-//     graph_t *graph = malloc(sizeof(graph_t));
-
-//     if (!graph) {
-//         error_message("Failed to allocate memory for graph.");
-//         exit(84);
-//     }
-//     graph->fd = -1;
-//     return graph;
-// }
-
 bool process_new_client(const char *team_name, int fd, server_t *server)
 {
-    printf("Processing new client with team name: '%s'\n", team_name);
     if (strcmp(team_name, "GRAPHIC\n") == 0) {
         if (server->graph->fd != -1) {
             error_message("A graphic client is already connected.");
