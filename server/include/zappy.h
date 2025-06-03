@@ -70,7 +70,7 @@ void realloc_pollfds(server_t *server, int new_fd);
 
 /* client.c */
 bool valid_team_name(const char *team_name, server_t *server);
-bool graphic(const char *team_name, int fd, server_t *server);
+bool process_new_client(const char *team_name, int fd, server_t *server);
 
 /* init_map.c */
 void init_map(server_t *server);

@@ -13,7 +13,7 @@
 
 #include "zappy.h"
 
-bool valid_team_name(const char *team_name, params_t *params)
+bool valid_team_name(const char *team_name, server_t *server)
 {
     printf("Validating team name: '%s'\n", team_name);
     if (team_name == NULL) {
@@ -46,7 +46,7 @@ static graph_t *init_graph(void)
     return graph;
 }
 
-bool graphic(const char *team_name, int fd, server_t *server)
+bool process_new_client(const char *team_name, int fd, server_t *server)
 {
     if (strcmp(team_name, "GRAPHIC") == 0) {
         server->graph = init_graph();

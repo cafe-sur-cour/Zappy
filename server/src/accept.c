@@ -19,13 +19,13 @@ static int check_team_name(server_t *server, int new_sockfd)
 
     if (write_message(new_sockfd, "WELCOME\n") == -1)
         return -1;
-    message = get_message(new_sockfd);
+    message = get_message(new_sockfd, server);
     if (!message) {
         error_message("Failed to read team name message from client.");
         close(new_sockfd);
         return -1;
     }
-    if (!valid_team_name(message, server)) {
+    if (!graphic(message, new_sockfd, server)) {
         free(message);
         close(new_sockfd);
         return -1;
