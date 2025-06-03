@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400-NAN-4-1-zappy-albane.merian
 ** File description:
-** test_map_init
+** test_game_init
 */
 
 #include <criterion/criterion.h>
@@ -27,21 +27,21 @@ static server_t *create_test_server(int width, int height, bool debug)
     server->params->x = width;
     server->params->y = height;
     server->params->is_debug = debug;
-    server->map = NULL;
+    server->game = NULL;
     return server;
 }
 
 // Helper function to free test server
 static void free_test_server(server_t *server)
 {
-    if (server->map) {
-        ressources_t *current = server->map->ressources;
+    if (server->game) {
+        ressources_t *current = server->game->ressources;
         while (current) {
             ressources_t *next = current->next;
             free(current);
             current = next;
         }
-        free(server->map);
+        free(server->game);
     }
     free(server->params);
     free(server);
@@ -86,29 +86,29 @@ Test(algo, shuffle_fisher_coverage, .init = redirect_all_std)
     free(tiles);
 }
 
-Test(map_init, init_map_basic, .init = redirect_all_std)
+Test(game_init, init_game_basic, .init = redirect_all_std)
 {
     server_t *server = create_test_server(5, 5, false);
     
-    init_map(server);
+    init_game(server);
     
-    cr_assert_not_null(server->map, "Map should be initialized");
-    cr_assert_eq(server->map->width, 5, "Map width should be set correctly");
-    cr_assert_eq(server->map->heigt, 5, "Map height should be set correctly");
-    cr_assert_null(server->map->teams, "Teams should be null initially");
+    cr_assert_not_null(server->game, "game should be initialized");
+    cr_assert_eq(server->game->width, 5, "game width should be set correctly");
+    cr_assert_eq(server->game->heigt, 5, "game height should be set correctly");
+    cr_assert_null(server->game->teams, "Teams should be null initially");
     
     free_test_server(server);
 }
 
-Test(map_init, resource_distribution, .init = redirect_all_std)
+Test(game_init, resource_distribution, .init = redirect_all_std)
 {
     server_t *server = create_test_server(10, 10, false);
     
-    init_map(server);
+    init_game(server);
     
     // Count resources by type
     int resource_count[7] = {0};
-    ressources_t *current = server->map->ressources;
+    ressources_t *current = server->game->ressources;
     
     while (current) {
         cr_assert_geq(current->type, 0, "Resource type should be >= 0");
@@ -123,11 +123,11 @@ Test(map_init, resource_distribution, .init = redirect_all_std)
     }
     
     // Verify resource distribution (approximate due to float to int conversion)
-    int mapValue = 100;
+    int gameValue = 100;
     float density[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
     
     for (int i = 0; i < 7; i++) {
-        int expected = (int)(mapValue * density[i]);
+        int expected = (int)(gameValue * density[i]);
         cr_assert_eq(resource_count[i], expected, 
             "Resource type %d count should match expected density", i);
     }
@@ -135,52 +135,52 @@ Test(map_init, resource_distribution, .init = redirect_all_std)
     free_test_server(server);
 }
 
-Test(map_init, debug_output, .init = redirect_all_std)
+Test(game_init, debug_output, .init = redirect_all_std)
 {
     server_t *server = create_test_server(3, 3, true);
     
-    init_map(server);
+    init_game(server);
     
     // Debug mode should produce output
     fflush(stdout);
     free_test_server(server);
 }
 
-Test(map_init, empty_map, .init = redirect_all_std)
+Test(game_init, empty_game, .init = redirect_all_std)
 {
     server_t *server = create_test_server(1, 1, false);
     
-    init_map(server);
+    init_game(server);
     
-    cr_assert_not_null(server->map, "Even 1x1 map should be initialized");
-    cr_assert_eq(server->map->width, 1, "1x1 map width should be 1");
-    cr_assert_eq(server->map->heigt, 1, "1x1 map height should be 1");
+    cr_assert_not_null(server->game, "Even 1x1 game should be initialized");
+    cr_assert_eq(server->game->width, 1, "1x1 game width should be 1");
+    cr_assert_eq(server->game->heigt, 1, "1x1 game height should be 1");
     
     // Should have at least some resources
-    cr_assert_null(server->map->ressources, "1x1 map should have resources");
+    cr_assert_null(server->game->ressources, "1x1 game should have resources");
     
     free_test_server(server);
 }
 
-Test(map_init, large_map, .init = redirect_all_std)
+Test(game_init, large_game, .init = redirect_all_std)
 {
     server_t *server = create_test_server(50, 50, false);
     
-    init_map(server);
+    init_game(server);
     
-    cr_assert_not_null(server->map, "Large map should be initialized");
-    cr_assert_eq(server->map->width, 50, "Large map width should be correct");
-    cr_assert_eq(server->map->heigt, 50, "Large map height should be correct");
+    cr_assert_not_null(server->game, "Large game should be initialized");
+    cr_assert_eq(server->game->width, 50, "Large game width should be correct");
+    cr_assert_eq(server->game->heigt, 50, "Large game height should be correct");
     
     // Count total resources
     int total_resources = 0;
-    ressources_t *current = server->map->ressources;
+    ressources_t *current = server->game->ressources;
     while (current) {
         total_resources++;
         current = current->next;
     }
     
-    cr_assert_gt(total_resources, 0, "Large map should have resources");
+    cr_assert_gt(total_resources, 0, "Large game should have resources");
     
     free_test_server(server);
 }
