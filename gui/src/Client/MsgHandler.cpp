@@ -12,6 +12,7 @@
 #include <vector>
 #include <algorithm>
 
+#include "../Exceptions/Exceptions.hpp"
 #include "MsgHandler.hpp"
 
 MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos,
@@ -97,8 +98,15 @@ void MsgHandler::handleMessage(const std::string& message)
         return;
 
     for (auto &handler : _messageHandlers) {
-        if (message.find(handler.first) != std::string::npos && handler.second(message))
+        try {
+            if (message.find(handler.first) != std::string::npos && handler.second(message))
+                return;
+        } catch (const Exceptions::NetworkException& e) {
+            std::cerr << colors::T_RED << "[ERROR] Network exception: " << e.what()
+                      << colors::RESET << std::endl;
+            _communication->disconnect();
             return;
+        }
     }
     std::cout << colors::T_RED << "[WARNING] Unhandled message: " << message
               << colors::RESET << std::endl;

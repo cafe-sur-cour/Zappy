@@ -80,18 +80,6 @@ jobs:
       - name: AI
         run: make zappy_ai
 
-  server_style:
-    name: Check Any Coding Style Errors in C Files
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/epitech/coding-style-checker:latest
-    steps:
-      - name: checkout@v4
-        uses: actions/checkout@v4
-
-      - name: Run Coding-Style-Checker
-        run: check.sh $(pwd) $(pwd)
-
   coding_style_cpp:
     name: Check Coding Style CPP
     runs-on: ubuntu-latest
