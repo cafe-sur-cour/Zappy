@@ -129,7 +129,7 @@ jobs:
           fi
 
   check_coding_style_c:
-      name: Check Any Coding Style Errors in C Files
+      name: Check Coding Style C
       runs-on: ubuntu-latest
       container:
         image: ghcr.io/epitech/coding-style-checker:latest
@@ -139,15 +139,20 @@ jobs:
 
         - name: Run Coding-Style-Checker
           run: |
-            ./cStyleChecker.sh
+            check.sh $(pwd) $(pwd) || { echo "check.sh failed"; exit 1; }
+            if [ ! -s coding-style-reports.log ]; then
+              echo "coding-style-reports.log is empty or missing."
+              exit 0
+            fi
+            grep -v "./documentation" coding-style-reports.log > coding-style-reports.log || true
 
         - name: Check Any Error
           run: |
-            if [ ! -s new-coding.log ]; then
+            if [ ! -s coding-style-reports.log ]; then
               echo "No coding style errors found."
               exit 0
             fi
-            cat new-coding.log | while read line; do
+            cat coding-style-reports.log | while read line; do
               TYPE=$(echo $line | cut -d ':' -f 3 | cut -c 2-)
               temp=$(echo $line | cut -d ':' -f 1)
               NAME=$(echo $temp | cut -d '/' -f 2)
