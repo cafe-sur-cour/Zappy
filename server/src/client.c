@@ -33,9 +33,10 @@ bool valid_team_name(const char *team_name, params_t *params)
     return false;
 }
 
-static graph_t *init_graph()
+static graph_t *init_graph(void)
 {
     graph_t *graph = malloc(sizeof(graph_t));
+
     graph->fd = -1;
     graph->pollfd = NULL;
     return graph;
@@ -54,7 +55,7 @@ bool graphic(const char *team_name, int fd, server_t *server)
             sizeof(struct pollfd) * (server->params->nb_client *
             server->params->nb_team + 1));
         if (!server->graph->pollfd) {
-            error_message("Failed to allocate memory for graph poll file descriptors.");
+            error_message("Failed to allocate memory for graph poll.");
             return false;
         }
         server->graph->pollfd[0].fd = fd;

@@ -34,7 +34,8 @@ int cb_getline(buffer_t *cb, char *line, int max_len)
 
     while (idx != cb->head || cb->full) {
         c = cb->data[idx];
-        line[i++] = c;
+        i++;
+        line[i] = c;
         idx = advance(idx);
         if (c == '\n' || i == max_len - 1) {
             line[i] = '\0';

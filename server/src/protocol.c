@@ -57,15 +57,13 @@ static int accept_client(server_t *server)
         return -1;
     }
     printfd("\033[1;32mWelcome to Trantor!\33[0m\n", new_sockfd);
-    send(new_sockfd, "WELCOME\n", 8, 0);
-    message = get_message(new_sockfd);
+    write(new_sockfd, "WELCOME\n", 8);
+    message = get_message(new_sockfd, server);
     if (!message) {
-        error_message("Failed to read team name message from client.");
         close(new_sockfd);
         return -1;
     }
     if (!graphic(message, new_sockfd, server)) {
-        printfd("\033[1;31mInvalid team name.\033[0m", new_sockfd);
         free(message);
         close(new_sockfd);
         return -1;

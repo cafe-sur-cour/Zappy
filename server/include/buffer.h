@@ -5,12 +5,13 @@
 ** buffer
 */
 
+#include <stddef.h>
+
 #ifndef BUFFER_H_
     #define BUFFER_H_
 
     #define BUFFER_SIZE 1024
 
-#include <stddef.h>
 
 typedef struct buffer_s {
     char data[BUFFER_SIZE];

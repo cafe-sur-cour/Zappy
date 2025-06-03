@@ -100,7 +100,6 @@ static bool check_names_flag(int argc, char **argv, params_t *params)
         (const char **) &argv[pos + 1], names_count, params) == 0;
 }
 
-
 static bool check_all_params(int argc, char **argv, bool is_ok,
     params_t *params)
 {

@@ -39,6 +39,7 @@ static void free_ressources(ressources_t *ressources)
 static void free_players(player_t *player)
 {
     player_t *next_player;
+
     while (player) {
         next_player = player->next;
         if (player->inventory) {
