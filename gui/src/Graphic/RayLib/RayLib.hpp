@@ -25,6 +25,19 @@ class RayLib {
         void clearBackground(Color color = WHITE);
         bool isWindowReady() const;
 
+        // Input methods
+        bool isMouseButtonDown(int button) const;
+        bool isMouseButtonPressed(int button) const;
+        bool isMouseButtonReleased(int button) const;
+        bool isKeyDown(int key) const;
+        Vector2 getMouseDelta() const;
+        Vector2 getMousePosition() const;
+        void setMousePosition(int x, int y);
+        void disableCursor();
+        void enableCursor();
+        int getScreenWidth() const;
+        int getScreenHeight() const;
+
         // 3D Environment methods
         void begin3DMode();
         void end3DMode();
@@ -37,6 +50,7 @@ class RayLib {
         void setCameraFovy(float fovy);
         void setCameraProjection(int projection);
         void updateCamera(int mode = CAMERA_FREE);
+        void updateCameraCustom();
         Camera3D getCamera() const;
 
         // 3D Drawing methods
@@ -51,6 +65,8 @@ class RayLib {
     private:
         bool _isInitialized;
         Camera3D _camera;
+        Vector2 _previousMousePosition;
+        bool _isCursorLocked;
 };
 
 #endif /* !RAYLIB_HPP_ */
