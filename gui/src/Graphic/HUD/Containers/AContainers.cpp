@@ -7,7 +7,7 @@
 
 #include "AContainers.hpp"
 
-AContainers::AContainers(RayLib& raylib, float x, float y, float width, float height)
+AContainers::AContainers(std::shared_ptr<RayLib> raylib, float x, float y, float width, float height)
     : _raylib(raylib), _bounds({x, y, width, height}), _backgroundColor(RAYWHITE), _visible(true), _hasBackground(true)
 {
 }
@@ -31,7 +31,7 @@ Rectangle AContainers::getBounds() const
 
 bool AContainers::contains(float x, float y) const
 {
-    return _raylib.checkCollisionPointRec({x, y}, _bounds);
+    return _raylib->checkCollisionPointRec({x, y}, _bounds);
 }
 
 void AContainers::setVisible(bool visible)

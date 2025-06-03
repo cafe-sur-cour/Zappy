@@ -8,7 +8,7 @@
 #pragma once
 
 #include "IContainers.hpp"
-#include "Graphic/RayLib/RayLib.hpp"
+#include "../../RayLib/RayLib.hpp"
 #include <string>
 #include <memory>
 #include <vector>
@@ -28,7 +28,7 @@ class AContainers : public IContainers {
          * @param width Container width
          * @param height Container height
          */
-        AContainers(RayLib& raylib, float x, float y, float width, float height);
+        AContainers(std::shared_ptr<RayLib> raylib, float x, float y, float width, float height);
 
         /**
          * @brief Destroy the AContainers object
@@ -43,7 +43,7 @@ class AContainers : public IContainers {
         bool isVisible() const override;
 
     protected:
-        RayLib& _raylib;
+        std::shared_ptr<RayLib> _raylib;
         Rectangle _bounds;
         Color _backgroundColor;
         bool _visible;

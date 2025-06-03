@@ -8,7 +8,7 @@
 #include "HUD.hpp"
 #include "../../Utils/Constants.hpp"
 
-HUD::HUD(RayLib& raylib)
+HUD::HUD(std::shared_ptr<RayLib> raylib)
     : _containers(), _raylib(raylib)
 {
 }
@@ -83,8 +83,8 @@ void HUD::clearAllContainers()
 
 void HUD::initDefaultLayout(float sideWidth, float bottomHeight)
 {
-    int screenHeight = _raylib.getScreenHeight();
-    int screenWidth = _raylib.getScreenWidth();
+    int screenHeight = _raylib->getScreenHeight();
+    int screenWidth = _raylib->getScreenWidth();
 
     addContainer(
         "side_container",

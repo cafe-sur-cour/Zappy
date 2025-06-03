@@ -8,9 +8,10 @@
 #pragma once
 
 #include "../UIElement/AUIElement.hpp"
-#include "Graphic/RayLib/RayLib.hpp"
+#include "../../RayLib/RayLib.hpp"
 #include <string>
 #include <functional>
+#include <memory>
 
 /**
  * @brief Button UI element
@@ -30,7 +31,7 @@ class Button : public AUIElement {
          * @param callback Function to call when button is clicked
          */
         Button(
-            RayLib& raylib,
+            std::shared_ptr<RayLib> raylib,
             float x, float y,
             float width, float height,
             const std::string& text,
@@ -100,5 +101,5 @@ class Button : public AUIElement {
         bool _isHovered;
         bool _isPressed;
 
-        RayLib& _raylib;
+        std::shared_ptr<RayLib> _raylib;
 };

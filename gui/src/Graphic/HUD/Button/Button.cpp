@@ -8,7 +8,7 @@
 #include "Button.hpp"
 
 Button::Button(
-    RayLib& raylib,
+    std::shared_ptr<RayLib> raylib,
     float x, float y,
     float width, float height,
     const std::string& text,
@@ -37,14 +37,14 @@ void Button::draw()
     else if (_isHovered)
         currentColor = _hoverColor;
 
-    _raylib.drawRectangleRec(_bounds, currentColor);
+    _raylib->drawRectangleRec(_bounds, currentColor);
 
     float fontSize = _bounds.height * 0.5f;
-    float textWidth = _raylib.measureText(_text, fontSize);
+    float textWidth = _raylib->measureText(_text, fontSize);
     float textX = _bounds.x + (_bounds.width - textWidth) * 0.5f;
     float textY = _bounds.y + (_bounds.height - fontSize) * 0.5f;
 
-    _raylib.drawText(_text, textX, textY, fontSize, _textColor);
+    _raylib->drawText(_text, textX, textY, fontSize, _textColor);
 }
 
 void Button::update()
@@ -52,11 +52,11 @@ void Button::update()
     if (!_visible)
         return;
 
-    Vector2 mousePoint = _raylib.getMousePosition();
+    Vector2 mousePoint = _raylib->getMousePosition();
     _isHovered = contains(mousePoint.x, mousePoint.y);
 
     bool wasPressed = _isPressed;
-    _isPressed = _isHovered && _raylib.isMouseButtonDown(MOUSE_LEFT_BUTTON);
+    _isPressed = _isHovered && _raylib->isMouseButtonDown(MOUSE_LEFT_BUTTON);
 
     if (wasPressed && !_isPressed && _isHovered && _callback)
         _callback();

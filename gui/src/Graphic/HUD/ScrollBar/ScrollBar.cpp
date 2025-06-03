@@ -9,7 +9,7 @@
 #include <algorithm>
 
 ScrollBar::ScrollBar(
-    RayLib& raylib,
+    std::shared_ptr<RayLib> raylib,
     float x, float y,
     float length, float thickness,
     ScrollBarOrientation orientation,
@@ -38,7 +38,7 @@ void ScrollBar::draw()
     if (!_visible)
         return;
 
-    _raylib.drawRectangleRec(_bounds, _backgroundColor);
+    _raylib->drawRectangleRec(_bounds, _backgroundColor);
 
     Rectangle handleBounds = getHandleBounds();
 
@@ -48,7 +48,7 @@ void ScrollBar::draw()
     else if (_isHandleHovered)
         currentHandleColor = _handleHoverColor;
 
-    _raylib.drawRectangleRec(handleBounds, currentHandleColor);
+    _raylib->drawRectangleRec(handleBounds, currentHandleColor);
 }
 
 void ScrollBar::update()
@@ -56,15 +56,15 @@ void ScrollBar::update()
     if (!_visible)
         return;
 
-    Vector2 mousePoint = _raylib.getMousePosition();
+    Vector2 mousePoint = _raylib->getMousePosition();
     Rectangle handleBounds = getHandleBounds();
 
-    _isHandleHovered = _raylib.checkCollisionPointRec(mousePoint, handleBounds);
+    _isHandleHovered = _raylib->checkCollisionPointRec(mousePoint, handleBounds);
 
-    if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && _isHandleHovered)
+    if (_raylib->isMouseButtonPressed(MOUSE_LEFT_BUTTON) && _isHandleHovered)
         _isDragging = true;
 
-    if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON))
+    if (_raylib->isMouseButtonReleased(MOUSE_LEFT_BUTTON))
         _isDragging = false;
 
     if (_isDragging) {

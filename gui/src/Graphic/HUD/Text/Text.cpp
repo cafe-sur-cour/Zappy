@@ -8,18 +8,18 @@
 #include "Text.hpp"
 
 Text::Text(
-    RayLib& raylib,
+    std::shared_ptr<RayLib> raylib,
     float x, float y,
     const std::string& text,
     float fontSize,
     Color color
-) : AUIElement(x, y, raylib.measureText(text, fontSize), fontSize),
+) : AUIElement(x, y, raylib->measureText(text, fontSize), fontSize),
     _text(text),
     _fontSize(fontSize),
     _color(color),
     _raylib(raylib)
 {
-    _bounds.width = _raylib.measureText(_text, _fontSize);
+    _bounds.width = _raylib->measureText(_text, _fontSize);
     _bounds.height = fontSize;
 }
 
@@ -28,7 +28,7 @@ void Text::draw()
     if (!_visible)
         return;
 
-    _raylib.drawText(_text, _bounds.x, _bounds.y, _fontSize, _color);
+    _raylib->drawText(_text, _bounds.x, _bounds.y, _fontSize, _color);
 }
 
 void Text::update()
@@ -40,7 +40,7 @@ void Text::setText(const std::string& text)
 {
     _text = text;
 
-    _bounds.width = _raylib.measureText(_text, _fontSize);
+    _bounds.width = _raylib->measureText(_text, _fontSize);
 }
 
 std::string Text::getText() const
@@ -52,7 +52,7 @@ void Text::setFontSize(float fontSize)
 {
     _fontSize = fontSize;
 
-    _bounds.width = _raylib.measureText(_text, _fontSize);
+    _bounds.width = _raylib->measureText(_text, _fontSize);
     _bounds.height = _fontSize;
 }
 

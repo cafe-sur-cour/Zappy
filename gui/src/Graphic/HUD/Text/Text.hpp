@@ -8,8 +8,9 @@
 #pragma once
 
 #include "../UIElement/AUIElement.hpp"
-#include "Graphic/RayLib/RayLib.hpp"
+#include "../../RayLib/RayLib.hpp"
 #include <string>
+#include <memory>
 
 /**
  * @brief Text UI element
@@ -28,7 +29,7 @@ class Text : public AUIElement {
          * @param color Text color
          */
         Text(
-            RayLib& raylib,
+            std::shared_ptr<RayLib> raylib,
             float x, float y,
             const std::string& text,
             float fontSize = 20.0f,
@@ -96,5 +97,5 @@ class Text : public AUIElement {
         std::string _text;
         float _fontSize;
         Color _color;
-        RayLib& _raylib;
+        std::shared_ptr<RayLib> _raylib;
 };
