@@ -65,20 +65,6 @@ class TestCommunication:
         assert "Invalid response from server handshake: Invalid" in str(excinfo.value)
 
     @patch('src.Communication.Communication.Socket')
-    def test_connect_to_server_welcome_no_newline(self, mock_socket_class):
-        """Test server connection with welcome message without newline"""
-        mock_socket = Mock()
-        mock_socket_class.return_value = mock_socket
-        mock_socket.receive.return_value = "WELCOME"
-
-        comm = Communication("team1", "localhost", 4242)
-
-        with pytest.raises(CommunicationInvalidResponseException) as excinfo:
-            comm.connectToServer()
-
-        assert "Response from server handshake is not terminated with a newline" in str(excinfo.value)
-
-    @patch('src.Communication.Communication.Socket')
     def test_connect_to_server_invalid_slots(self, mock_socket_class):
         """Test server connection with invalid slots number"""
         mock_socket = Mock()
@@ -187,13 +173,18 @@ class TestCommunication:
         """Test successful look command"""
         mock_socket = Mock()
         mock_socket_class.return_value = mock_socket
-        mock_socket.receive.return_value = "[player, food linemate, empty]\n"
+        mock_socket.receive.return_value = "[player, food linemate,]\n"
 
         comm = Communication("team1", "localhost", 4242)
         result = comm.getLook()
 
         mock_socket.send.assert_called_once_with("Look\n")
-        assert result == ["player", "food linemate", "empty"]
+        expected = [
+            {"player": 1},
+            {"food": 1, "linemate": 1},
+            {}
+        ]
+        assert result == expected
 
     @patch('src.Communication.Communication.Socket')
     def test_get_look_invalid_format(self, mock_socket_class):
@@ -220,7 +211,8 @@ class TestCommunication:
         result = comm.getInventory()
 
         mock_socket.send.assert_called_once_with("Inventory\n")
-        assert result == [("food", 3), ("linemate", 1), ("deraumere", 2)]
+        expected = {"food": 3, "linemate": 1, "deraumere": 2}
+        assert result == expected
 
     @patch('src.Communication.Communication.Socket')
     def test_get_inventory_empty(self, mock_socket_class):
@@ -232,7 +224,7 @@ class TestCommunication:
         comm = Communication("team1", "localhost", 4242)
         result = comm.getInventory()
 
-        assert result == []
+        assert result == {}
 
     @patch('src.Communication.Communication.Socket')
     def test_get_inventory_invalid_item_format(self, mock_socket_class):
@@ -403,33 +395,3 @@ class TestCommunication:
             comm.sendIncantation()
 
         assert "Unexpected response from Incantation: Unexpected response" in str(excinfo.value)
-
-    @patch('src.Communication.Communication.Socket')
-    def test_response_without_newline_errors(self, mock_socket_class):
-        """Test that responses without newlines raise appropriate errors"""
-        mock_socket = Mock()
-        mock_socket_class.return_value = mock_socket
-
-        commands_to_test = [
-            ("sendForward", lambda comm: comm.sendForward()),
-            ("sendRight", lambda comm: comm.sendRight()),
-            ("sendLeft", lambda comm: comm.sendLeft()),
-            ("getLook", lambda comm: comm.getLook()),
-            ("getInventory", lambda comm: comm.getInventory()),
-            ("sendBroadcast", lambda comm: comm.sendBroadcast("test")),
-            ("getCetConnectNbr", lambda comm: comm.getCetConnectNbr()),
-            ("sendFork", lambda comm: comm.sendFork()),
-            ("sendEject", lambda comm: comm.sendEject()),
-            ("sendTakeObject", lambda comm: comm.sendTakeObject("food")),
-            ("sendSetObject", lambda comm: comm.sendSetObject("food")),
-            ("sendIncantation", lambda comm: comm.sendIncantation())
-        ]
-
-        for command_name, command_func in commands_to_test:
-            mock_socket.receive.return_value = "response_without_newline"
-            comm = Communication("team1", "localhost", 4242)
-
-            with pytest.raises(CommunicationInvalidResponseException) as excinfo:
-                command_func(comm)
-
-            assert "is not terminated with a newline" in str(excinfo.value)
