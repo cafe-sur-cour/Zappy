@@ -18,7 +18,7 @@ namespace Exceptions {
     class CLIParsingException : public std::exception {
         public:
             explicit CLIParsingException(const std::string &message)
-                : _message(std::string(colors::RED) +
+                : _message(std::string(colors::T_RED) +
                           "CLI Parsing Error: " + message +
                           colors::RESET) {}
 
@@ -33,7 +33,7 @@ namespace Exceptions {
     class CLIPortException : public CLIParsingException {
         public:
             explicit CLIPortException(const std::string &message)
-                : CLIParsingException(std::string(colors::CYAN) +
+                : CLIParsingException(std::string(colors::T_CYAN) +
                                      "Port Error: " + message +
                                      colors::RESET) {}
     };
@@ -41,7 +41,7 @@ namespace Exceptions {
     class CLIHostException : public CLIParsingException {
         public:
             explicit CLIHostException(const std::string &message)
-                : CLIParsingException(std::string(colors::CYAN) +
+                : CLIParsingException(std::string(colors::T_CYAN) +
                                      "Hostname Error: " + message +
                                      colors::RESET) {}
     };
@@ -49,7 +49,7 @@ namespace Exceptions {
     class CLIMissingArgumentException : public CLIParsingException {
         public:
             explicit CLIMissingArgumentException(const std::string &message)
-                : CLIParsingException(std::string(colors::CYAN) +
+                : CLIParsingException(std::string(colors::T_CYAN) +
                                      "Missing Argument: " + message +
                                      colors::RESET) {}
     };
@@ -57,7 +57,7 @@ namespace Exceptions {
     class CLIInvalidArgumentException : public CLIParsingException {
         public:
             explicit CLIInvalidArgumentException(const std::string &message)
-                : CLIParsingException(std::string(colors::CYAN) +
+                : CLIParsingException(std::string(colors::T_CYAN) +
                                      "Invalid Argument: " + message +
                                      colors::RESET) {}
     };
@@ -65,7 +65,7 @@ namespace Exceptions {
     class NetworkException : public std::exception {
         public:
             explicit NetworkException(const std::string &message)
-                : _message(std::string(colors::RED) +
+                : _message(std::string(colors::T_RED) +
                           "Network Error: " + message +
                           colors::RESET) {}
 
@@ -80,7 +80,7 @@ namespace Exceptions {
     class ConnectionFailedException : public NetworkException {
         public:
             explicit ConnectionFailedException(const std::string &message)
-                : NetworkException(std::string(colors::CYAN) +
+                : NetworkException(std::string(colors::T_CYAN) +
                                   "Connection Failed: " + message +
                                   colors::RESET) {}
     };
@@ -88,7 +88,7 @@ namespace Exceptions {
     class SocketCreationException : public NetworkException {
         public:
             explicit SocketCreationException(const std::string &message)
-                : NetworkException(std::string(colors::CYAN) +
+                : NetworkException(std::string(colors::T_CYAN) +
                                   "Socket Creation Failed: " + message +
                                   colors::RESET) {}
     };
@@ -96,7 +96,7 @@ namespace Exceptions {
     class ConnectionTimeoutException : public NetworkException {
         public:
             explicit ConnectionTimeoutException(const std::string &message)
-                : NetworkException(std::string(colors::CYAN) +
+                : NetworkException(std::string(colors::T_CYAN) +
                                   "Connection Timeout: " + message +
                                   colors::RESET) {}
     };
@@ -104,7 +104,7 @@ namespace Exceptions {
     class SendException : public NetworkException {
         public:
             explicit SendException(const std::string &message)
-                : NetworkException(std::string(colors::CYAN) +
+                : NetworkException(std::string(colors::T_CYAN) +
                                   "Send Error: " + message +
                                   colors::RESET) {}
     };
@@ -112,7 +112,7 @@ namespace Exceptions {
     class ReceiveException : public NetworkException {
         public:
             explicit ReceiveException(const std::string &message)
-                : NetworkException(std::string(colors::CYAN) +
+                : NetworkException(std::string(colors::T_CYAN) +
                                   "Receive Error: " + message +
                                   colors::RESET) {}
     };

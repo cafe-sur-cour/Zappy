@@ -47,6 +47,23 @@ jobs:
       - name: checkout@v4
         uses: actions/checkout@v4
 
+      - name: Install Raylib
+        run: |
+          apt-get update
+          apt-get install -y software-properties-common
+          apt-get install -y build-essential git cmake
+          apt-get install -y libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev
+          apt-get install -y libxinerama-dev libxcursor-dev
+
+          git clone https://github.com/raysan5/raylib.git raylib
+          cd raylib
+          mkdir build && cd build
+          cmake -DSHARED=ON -DBUILD_EXAMPLES=OFF ..
+          make -j$(nproc)
+          make install
+          ldconfig
+          cd ../..
+
       - name: Compilation
         run: make
         timeout-minutes: 5
@@ -63,26 +80,6 @@ jobs:
       - name: AI
         run: make zappy_ai
 
-  server_style:
-    name: Check Any Coding Style Errors in C Files
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/epitech/coding-style-checker:latest
-    steps:
-      - name: checkout@v4
-        uses: actions/checkout@v4
-
-      - name: Run Coding-Style-Checker
-        run: check.sh $(pwd) $(pwd)
-
-      - name: Check Any Error
-        run: |
-          cat coding-style-reports.log
-          if [ ! -s coding-style-reports.log ]; then
-            echo "No coding style errors found."
-            exit 0
-          fi
-
   coding_style_cpp:
     name: Check Coding Style CPP
     runs-on: ubuntu-latest
@@ -96,11 +93,11 @@ jobs:
         run: |
           apt update && apt install -y python3-pip
           pip install --break-system-packages cpplint
-          chmod +x styleChecker.sh
+          chmod +x cppStyleChecker.sh
 
       - name: Check Coding Style
         run: |
-          ./styleChecker.sh
+          ./cppStyleChecker.sh
 
   coding_style_python:
     name: Check Coding Style Python
@@ -132,7 +129,7 @@ jobs:
           fi
 
   check_coding_style_c:
-      name: Check Any Coding Style Errors in C Files
+      name: Check Coding Style C
       runs-on: ubuntu-latest
       container:
         image: ghcr.io/epitech/coding-style-checker:latest
@@ -147,16 +144,15 @@ jobs:
               echo "coding-style-reports.log is empty or missing."
               exit 0
             fi
-            grep -v "./documentation" coding-style-reports.log > new-coding.log || true
-            rm -f coding-style-reports.log
+            grep -v "./documentation" coding-style-reports.log > coding-style-reports.log || true
 
         - name: Check Any Error
           run: |
-            if [ ! -s new-coding.log ]; then
+            if [ ! -s coding-style-reports.log ]; then
               echo "No coding style errors found."
               exit 0
             fi
-            cat new-coding.log | while read line; do
+            cat coding-style-reports.log | while read line; do
               TYPE=$(echo $line | cut -d ':' -f 3 | cut -c 2-)
               temp=$(echo $line | cut -d ':' -f 1)
               NAME=$(echo $temp | cut -d '/' -f 2)
@@ -177,6 +173,23 @@ jobs:
     steps:
       - name: checkout@v4
         uses: actions/checkout@v4
+
+      - name: Install Raylib
+        run: |
+          apt-get update
+          apt-get install -y software-properties-common
+          apt-get install -y build-essential git cmake
+          apt-get install -y libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev
+          apt-get install -y libxinerama-dev libxcursor-dev
+
+          git clone https://github.com/raysan5/raylib.git raylib
+          cd raylib
+          mkdir build && cd build
+          cmake -DSHARED=ON -DBUILD_EXAMPLES=OFF ..
+          make -j$(nproc)
+          make install
+          ldconfig
+          cd ../..
 
       - name: Run functional tests
         run: |
@@ -214,6 +227,23 @@ jobs:
           apt-get update
           apt-get install -y python3-pip
           pip install --break-system-packages pytest pytest-cov
+
+      - name: Install Raylib
+        run: |
+          apt-get update
+          apt-get install -y software-properties-common
+          apt-get install -y build-essential git cmake
+          apt-get install -y libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev
+          apt-get install -y libxinerama-dev libxcursor-dev
+
+          git clone https://github.com/raysan5/raylib.git raylib
+          cd raylib
+          mkdir build && cd build
+          cmake -DSHARED=ON -DBUILD_EXAMPLES=OFF ..
+          make -j$(nproc)
+          make install
+          ldconfig
+          cd ../..
 
       - name: Run Unit Tests
         run: make tests_run

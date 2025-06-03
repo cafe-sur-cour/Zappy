@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <poll.h>
 #include "game.h"
+#include "my.h"
 
 #ifndef ZAPPY_H_
     #define ZAPPY_H_
@@ -80,5 +81,12 @@ int accept_client(server_t *server);
 void *free_server(server_t *server);
 void *free_params(params_t *params);
 void *free_player(player_t *player);
+
+/* Function to send info to the gui */
+void send_map_size(server_t *server);
+void send_entrie_map(server_t *server);
+void send_map_tile(ressources_t *ressource, server_t *server,
+    int posX, int posY);
+void send_team_name(server_t *server);
 
 #endif /* !ZAPPY_H_ */

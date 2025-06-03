@@ -9,6 +9,7 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <mutex>
 
 #include "GameInfos.hpp"
 
@@ -46,6 +47,8 @@ int GameInfos::getTimeUnit() const
 
 void GameInfos::updateTile(const zappy::structs::Tile tile)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
     if (tile.x < 0 || tile.y < 0 || tile.x >= _mapWidth || tile.y >= _mapHeight)
         return;
 
@@ -64,11 +67,14 @@ void GameInfos::updateTile(const zappy::structs::Tile tile)
 
 const std::vector<zappy::structs::Tile> GameInfos::getTiles() const
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     return _tiles;
 }
 
 const zappy::structs::Tile GameInfos::getTile(int x, int y) const
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
     for (const auto &tile : _tiles) {
         if (tile.x == x && tile.y == y)
             return tile;
@@ -79,17 +85,21 @@ const zappy::structs::Tile GameInfos::getTile(int x, int y) const
 
 void GameInfos::updateTeamName(const std::string &teamName)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     if (std::find(_teamNames.begin(), _teamNames.end(), teamName) == _teamNames.end())
         _teamNames.push_back(teamName);
 }
 
 const std::vector<std::string> GameInfos::getTeamNames() const
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     return _teamNames;
 }
 
 void GameInfos::addPlayer(const zappy::structs::Player player)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
     auto it = std::find_if(_players.begin(), _players.end(),
                            [&player](const zappy::structs::Player &p) {
                                return p.number == player.number;
@@ -106,6 +116,8 @@ void GameInfos::addPlayer(const zappy::structs::Player player)
 
 void GameInfos::updatePlayerPosition(int playerNumber, int x, int y)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
     if (x < 0 || y < 0 || x >= _mapWidth || y >= _mapHeight)
         return;
 
@@ -120,6 +132,8 @@ void GameInfos::updatePlayerPosition(int playerNumber, int x, int y)
 
 void GameInfos::updatePlayerLevel(int playerNumber, int level)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
     for (auto &player : _players) {
         if (player.number == playerNumber) {
             player.level = level;
@@ -131,6 +145,8 @@ void GameInfos::updatePlayerLevel(int playerNumber, int level)
 void GameInfos::updatePlayerInventory(int playerNumber,
     const zappy::structs::Inventory inventory)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
     for (auto &player : _players) {
         if (player.number == playerNumber) {
             player.inventory = zappy::structs::Inventory(
@@ -144,6 +160,8 @@ void GameInfos::updatePlayerInventory(int playerNumber,
 
 void GameInfos::updatePlayerExpulsion(int playerNumber)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
     if (playerNumber < 0)
         return;
 
@@ -158,6 +176,8 @@ void GameInfos::updatePlayerExpulsion(int playerNumber)
 
 void GameInfos::updatePlayerDeath(int playerNumber)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
     if (playerNumber < 0)
         return;
 
@@ -169,6 +189,8 @@ void GameInfos::updatePlayerDeath(int playerNumber)
 
 void GameInfos::updatePlayerResourceAction(int playerNumber, int resourceId, bool isCollecting)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
     (void)isCollecting;
     if (playerNumber < 0 || resourceId < 0 || resourceId > 6)
         return;
@@ -176,16 +198,20 @@ void GameInfos::updatePlayerResourceAction(int playerNumber, int resourceId, boo
 
 void GameInfos::updatePlayerFork(int playerNumber)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
     (void)playerNumber;
 }
 
 const std::vector<zappy::structs::Player> GameInfos::getPlayers() const
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     return _players;
 }
 
 void GameInfos::addPlayerBroadcast(int playerNumber, const std::string &message)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     if (playerNumber < 0 || message.empty())
         return;
 
@@ -194,17 +220,20 @@ void GameInfos::addPlayerBroadcast(int playerNumber, const std::string &message)
 
 std::vector<std::pair<int, std::string>> GameInfos::getPlayersBroadcasting() const
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     return _playersBroadcasting;
 }
 
 void GameInfos::addIncantation(const zappy::structs::Incantation incantation)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     _incantations.push_back(zappy::structs::Incantation(
         incantation.x, incantation.y, incantation.level, incantation.players));
 }
 
 void GameInfos::removeIncantation(int x, int y, int result)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     auto it = std::remove_if(_incantations.begin(), _incantations.end(),
                              [x, y](const zappy::structs::Incantation &inc) {
                                  return inc.x == x && inc.y == y;
@@ -218,6 +247,7 @@ void GameInfos::removeIncantation(int x, int y, int result)
 
 void GameInfos::addEgg(const zappy::structs::Egg egg)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     auto it = std::find_if(_eggs.begin(), _eggs.end(),
                            [&egg](const zappy::structs::Egg &e) {
                                return e.eggNumber == egg.eggNumber;
@@ -233,6 +263,7 @@ void GameInfos::addEgg(const zappy::structs::Egg egg)
 
 void GameInfos::updateEggHatched(int eggNumber)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     for (auto &egg : _eggs) {
         if (egg.eggNumber == eggNumber) {
             egg.hatched = true;
@@ -243,6 +274,7 @@ void GameInfos::updateEggHatched(int eggNumber)
 
 void GameInfos::updateEggDeath(int eggNumber)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     _eggs.erase(std::remove_if(_eggs.begin(), _eggs.end(),
         [eggNumber](const zappy::structs::Egg &egg) {
             return egg.eggNumber == eggNumber;
@@ -251,16 +283,19 @@ void GameInfos::updateEggDeath(int eggNumber)
 
 const std::vector<zappy::structs::Egg> GameInfos::getEggs() const
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     return _eggs;
 }
 
 void GameInfos::setGameOver(const std::string &winningTeam)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     _gameOver = true;
     _winningTeam = winningTeam;
 }
 
 std::pair<bool, std::string> GameInfos::isGameOver() const
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     return std::make_pair(_gameOver, _winningTeam);
 }

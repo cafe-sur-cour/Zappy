@@ -20,6 +20,9 @@ SRC =	src/Client/Client.cpp \
 		src/Client/MsgHandler.cpp \
 		src/CLI/CLI.cpp \
 		src/Game/GameInfos.cpp \
+		src/Graphic/RayLib/RayLib.cpp \
+		src/Graphic/GUI.cpp \
+		src/Graphic/Map.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
@@ -32,12 +35,13 @@ TEST_SRC = ../tests/unit/gui/main_test.cpp \
 
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
-INCLUDES = -I./include
+INCLUDES = -I./include -I./src
 
 CFLAGS =	-std=c++20 -Wall -Wextra -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
-LIBS = -L./src/Communication -lcommunication
+LIBS = -L./src/Communication -lcommunication -lraylib -lGL -lm -lpthread \
+		-ldl -lrt -lX11
 
 COMM_LIB = src/Communication/libcommunication.a
 

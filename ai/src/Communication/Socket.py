@@ -7,7 +7,7 @@
 
 import socket
 from src.Exceptions.Exceptions import (
-    SocketException
+    SocketException, PlayerDead
 )
 
 BUFFER_SIZE = 4096
@@ -30,18 +30,14 @@ class Socket:
 
     def receive(self) -> str:
         while ('\n' not in self._buffer):
-            try:
-                self._socket.settimeout(3.0)
-                data = self._socket.recv(BUFFER_SIZE)
-                if not data:
-                    raise SocketException("Socket connection closed by the server")
-                self._buffer += data.decode("utf-8")
-            except socket.timeout:
-                raise SocketException("Socket receive timed out")
-        if '\n' in self._buffer:
-            message, self._buffer = self._buffer.split('\n', 1)
-            return message + '\n'
-        raise SocketException("No complete message received from the socket")
+            data = self._socket.recv(BUFFER_SIZE)
+            if not data:
+                raise SocketException("Socket connection closed by the server")
+            self._buffer += data.decode("utf-8")
+        message, self._buffer = self._buffer.split('\n', 1)
+        if message == "dead":
+            raise PlayerDead()
+        return message + '\n'
 
     def close(self):
         self._socket.close()

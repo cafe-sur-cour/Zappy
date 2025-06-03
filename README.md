@@ -1,3 +1,5 @@
+![ZAAAAAAPPPPPPPYYYYYYYYYYYYYYY](styleDoc/zappy.png)
+
 ## Description
 
 The goal of this project is to create a network game where several teams confront each other on a tile map containing resources.

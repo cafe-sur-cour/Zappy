@@ -48,6 +48,8 @@ static void diplay_help(int port)
 
 int start_protocol(server_t *server)
 {
+    bool temp = false;
+
     setup_signal();
     diplay_help(server->params->port);
     while (*get_running_state()) {
@@ -58,6 +60,7 @@ int start_protocol(server_t *server)
         }
         if (server->pollserver.revents & POLLIN)
             accept_client(server);
+        temp = send_gui_message(server, temp);
     }
     printf("\033[1;33mServer stopped.\033[0m\n");
     return 0;

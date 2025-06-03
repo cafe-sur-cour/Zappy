@@ -94,7 +94,7 @@ void Communication::setupConnection()
     _pollfd.events = POLLIN | POLLOUT;
 
     _connected = true;
-    std::cout << colors::GREEN << "Successfully connected to "
+    std::cout << colors::T_GREEN << "Successfully connected to "
               << _config.hostname << ":" << _config.port
               << colors::RESET << std::endl;
 }
