@@ -23,18 +23,16 @@ typedef struct params_s {
     bool is_debug;
 } params_t;
 
-typedef struct client_s {
-    int id;
-    int sockfd;
-    struct pollfd pollfd;
-    struct client_s *next;
-} client_t;
+typedef struct graph_s {
+    int fd;
+    struct pollfd *pollfd;
+} graph_t;
 
 typedef struct server_s {
     int sockfd;
-    client_t *clients;
     params_t *params;
     map_t *map;
+    graph_t *graph;
 } server_t;
 
 typedef struct command_pf_s {
@@ -46,6 +44,7 @@ typedef struct command_pf_s {
 int helper(void);
 void error_message(const char *message);
 void printfd(char const *message, int fd);
+char *get_message(int fd, server_t *server);
 
 /* checkers.c */
 bool check_port(char const *flag, char const *value, params_t *params);
@@ -66,10 +65,13 @@ void *free_server(server_t *server);
 int start_protocol(server_t *server);
 
 /* client.c */
-void free_clients(client_t *clients);
-int get_nb_clients(client_t *clients);
-
+bool valid_team_name(const char *team_name, params_t *params);
+bool graphic(const char *team_name, int fd, server_t *server);
 
 /* init_map.c */
 void inti_map(server_t *server);
+
+/* free server  */
+void *free_server(server_t *server);
+void *free_params(params_t *params);
 #endif /* !ZAPPY_H_ */
