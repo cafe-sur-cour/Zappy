@@ -47,16 +47,16 @@ class TestPlayer:
     @patch('builtins.print')
     def test_begin_incantation(self, mock_print, mock_sleep):
         initial_level = self.player.level
-        self.player.beginIncantation()
+        self.player.begin_incantation()
         
         assert self.player.level == initial_level + 1
         assert self.player.in_incantation is False
         
-        mock_print.assert_any_call("Player team: test_team has started an incentive!")
-        mock_print.assert_any_call("Player team: test_team has ended an incentive!")
+        mock_print.assert_any_call("Player team: test_team has started an incantation!")
+        mock_print.assert_any_call("Player team: test_team has ended an incantation!")
         mock_sleep.assert_called_once_with(10)
     
     @patch('builtins.print')
     def test_lay_a_egg(self, mock_print):
-        self.player.layAEgg()
+        self.player.lay_an_egg()
         mock_print.assert_called_once_with("Player team: test_team has laid an egg!")
