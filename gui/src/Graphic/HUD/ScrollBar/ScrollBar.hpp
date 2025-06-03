@@ -10,6 +10,7 @@
 #include "../UIElement/AUIElement.hpp"
 #include "Graphic/RayLib/RayLib.hpp"
 #include <functional>
+#include <memory>
 
 /**
  * @brief Scrollbar orientation
@@ -37,7 +38,7 @@ class ScrollBar : public AUIElement {
          * @param onValueChanged Callback when value changes
          */
         ScrollBar(
-            RayLib& raylib,
+            std::shared_ptr<RayLib> raylib,
             float x, float y,
             float length, float thickness,
             ScrollBarOrientation orientation = ScrollBarOrientation::VERTICAL,
@@ -96,7 +97,7 @@ class ScrollBar : public AUIElement {
         void setOnValueChanged(std::function<void(float)> onValueChanged);
 
     private:
-        RayLib& _raylib;
+        std::shared_ptr<RayLib> _raylib;
         float _value;
         float _handleSize;
         bool _isDragging;
