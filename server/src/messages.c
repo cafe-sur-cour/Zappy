@@ -57,10 +57,8 @@ char *get_message(int fd, server_t *server)
     char *line = malloc(BUFFER_SIZE);
     int bytes_read;
 
-    if (!line) {
-        error_message("Failed to allocate memory for message line.");
+    if (!line)
         return NULL;
-    }
     while (1) {
         line = get_current_char(&cb);
         if (line != NULL)
