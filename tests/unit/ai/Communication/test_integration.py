@@ -114,7 +114,7 @@ class TestIntegration:
         assert isinstance(look_result, list)
 
         inventory_result = comm.getInventory()
-        assert isinstance(inventory_result, list)
+        assert isinstance(inventory_result, dict)
 
         connect_nbr = comm.getCetConnectNbr()
         assert isinstance(connect_nbr, int)
