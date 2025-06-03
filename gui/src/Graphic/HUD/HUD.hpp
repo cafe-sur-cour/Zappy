@@ -9,10 +9,8 @@
 
 #include "Containers/Containers.hpp"
 #include "../RayLib/RayLib.hpp"
-#include <memory>
 #include <vector>
 #include <unordered_map>
-#include <string>
 
 /**
  * @brief Main HUD class to manage all UI elements

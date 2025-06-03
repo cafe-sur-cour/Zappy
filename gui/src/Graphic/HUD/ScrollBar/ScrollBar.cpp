@@ -7,6 +7,7 @@
 
 #include "ScrollBar.hpp"
 #include <algorithm>
+#include <memory>
 
 ScrollBar::ScrollBar(
     std::shared_ptr<RayLib> raylib,
@@ -81,7 +82,6 @@ void ScrollBar::setValue(float value)
 
     if (oldValue != _value && _onValueChanged)
         _onValueChanged(_value);
-
 }
 
 float ScrollBar::getValue() const

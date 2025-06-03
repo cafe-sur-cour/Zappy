@@ -6,6 +6,8 @@
 */
 
 #include "Text.hpp"
+#include <memory>
+#include <string>
 
 Text::Text(
     std::shared_ptr<RayLib> raylib,
@@ -25,15 +27,6 @@ Text::Text(
 
 void Text::draw()
 {
-    if (!_visible)
-        return;
-
-    _raylib->drawText(_text, _bounds.x, _bounds.y, _fontSize, _color);
-}
-
-void Text::update()
-{
-
 }
 
 void Text::setText(const std::string& text)

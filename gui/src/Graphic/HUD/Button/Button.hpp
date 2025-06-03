@@ -11,7 +11,6 @@
 #include "../../RayLib/RayLib.hpp"
 #include <string>
 #include <functional>
-#include <memory>
 
 /**
  * @brief Button UI element

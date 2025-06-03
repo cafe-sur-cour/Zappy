@@ -344,7 +344,11 @@ void RayLib::drawRectangleRec(Rectangle rec, Color color)
 
 void RayLib::drawText(const std::string& text, float x, float y, float fontSize, Color color)
 {
-    DrawText(text.c_str(), static_cast<int>(x), static_cast<int>(y), static_cast<int>(fontSize), color);
+    DrawText(text.c_str(),
+             static_cast<int>(x),
+             static_cast<int>(y),
+             static_cast<int>(fontSize),
+             color);
 }
 
 float RayLib::measureText(const std::string& text, float fontSize) const

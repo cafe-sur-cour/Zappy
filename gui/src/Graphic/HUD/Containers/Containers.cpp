@@ -6,9 +6,20 @@
 */
 
 #include "Containers.hpp"
+#include <string>
+#include <memory>
 
-Containers::Containers(std::shared_ptr<RayLib> raylib, float x, float y, float width, float height, Color backgroundColor)
-    : AContainers(raylib, x, y, width, height), _raylib(raylib), _hasBackgroundTexture(false), _elements()
+Containers::Containers(
+    std::shared_ptr<RayLib> raylib,
+    float x,
+    float y,
+    float width,
+    float height,
+    Color backgroundColor)
+    : AContainers(raylib, x, y, width, height),
+      _raylib(raylib),
+      _hasBackgroundTexture(false),
+      _elements()
 {
     _backgroundColor = backgroundColor;
 }
@@ -145,7 +156,14 @@ std::shared_ptr<ScrollBar> Containers::addScrollBar(
     std::function<void(float)> onValueChanged
 )
 {
-    auto scrollBar = std::make_shared<ScrollBar>(_raylib, x, y, length, thickness, orientation, onValueChanged);
+    auto scrollBar = std::make_shared<ScrollBar>(
+        _raylib,
+        x,
+        y,
+        length,
+        thickness,
+        orientation,
+        onValueChanged);
 
     if (addElement(id, scrollBar))
         return scrollBar;

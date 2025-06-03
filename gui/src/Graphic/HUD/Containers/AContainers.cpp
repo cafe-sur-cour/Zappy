@@ -6,9 +6,19 @@
 */
 
 #include "AContainers.hpp"
+#include <memory>
 
-AContainers::AContainers(std::shared_ptr<RayLib> raylib, float x, float y, float width, float height)
-    : _raylib(raylib), _bounds({x, y, width, height}), _backgroundColor(RAYWHITE), _visible(true), _hasBackground(true)
+AContainers::AContainers(
+    std::shared_ptr<RayLib> raylib,
+    float x,
+    float y,
+    float width,
+    float height)
+    : _raylib(raylib),
+      _bounds({x, y, width, height}),
+      _backgroundColor(RAYWHITE),
+      _visible(true),
+      _hasBackground(true)
 {
 }
 

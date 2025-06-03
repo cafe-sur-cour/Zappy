@@ -6,6 +6,8 @@
 */
 
 #include "Button.hpp"
+#include <memory>
+#include <string>
 
 Button::Button(
     std::shared_ptr<RayLib> raylib,

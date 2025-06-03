@@ -5,8 +5,10 @@
 ** HUD
 */
 
-#include "HUD.hpp"
+#include <string>
+#include <memory>
 #include "../../Utils/Constants.hpp"
+#include "HUD.hpp"
 
 HUD::HUD(std::shared_ptr<RayLib> raylib)
     : _containers(), _raylib(raylib)
@@ -42,7 +44,14 @@ std::shared_ptr<Containers> HUD::addContainer(
     if (_containers.find(id) != _containers.end())
         return nullptr;
 
-    auto container = std::make_shared<Containers>(_raylib, x, y, width, height, backgroundColor);
+    auto container = std::make_shared<Containers>(
+        _raylib,
+        x,
+        y,
+        width,
+        height,
+        backgroundColor);
+
     _containers[id] = container;
 
     return container;

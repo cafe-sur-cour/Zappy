@@ -10,7 +10,6 @@
 AUIElement::AUIElement(float x, float y, float width, float height)
     : _bounds({x, y, width, height}), _visible(true)
 {
-
 }
 
 void AUIElement::setPosition(float x, float y)

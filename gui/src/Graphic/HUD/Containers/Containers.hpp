@@ -13,9 +13,7 @@
 #include "../Text/Text.hpp"
 #include "../ScrollBar/ScrollBar.hpp"
 #include "../../RayLib/RayLib.hpp"
-#include <memory>
 #include <vector>
-#include <string>
 #include <functional>
 #include <unordered_map>
 
