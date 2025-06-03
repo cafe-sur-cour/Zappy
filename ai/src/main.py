@@ -10,7 +10,7 @@ from src.CLI.CLI import CLI
 from src.Exceptions.Exceptions import CLIParsingException
 from src.Player.Player import Player
 from sys import argv
-
+from src.Communication.Communication import Communication
 
 def main():
     if len(argv) == 2 and argv[1] == "-help":
@@ -25,7 +25,8 @@ def main():
               f"Port: {config['port']}, "
               f"Team name: {config['name']}, "
               f"Machine: {config['machine']}{Colors.RESET}")
-        player = Player(config['name'])
+        com = Communication(config['name'], config['machine'], config['port'])
+        player = Player(config['name'], com)
         player.loop()
         # TODO: Implement AI and Communication logic here
         return 0

@@ -7,10 +7,12 @@
 
 from time import sleep
 from src.Hash.Hash import Hash
-
+from src.Exceptions.Exceptions import PlayerDead
+from src.Communication.Communication import Communication
 
 class Player:
-    def __init__(self, name):
+    def __init__(self, name : str, com : Communication):
+        self.communication: Communication = com
         self.teamName: str = name
         self.level: int = 1
         self.hash: Hash = Hash(name)
@@ -20,6 +22,8 @@ class Player:
         }
         self.alive: bool = True
         self.in_incantation: bool = False
+        self.communication.connectToServer()
+        print("Ai connected to the server successfully!")
 
     def __str__(self):
         return (f"Player team: {self.teamName}, "
@@ -37,13 +41,17 @@ class Player:
         self.level = self.level + 1
 
     def lay_an_egg(self) -> None:
-        print(f"Player team: {self.teamName} has laid an egg!")
+        # TODO: Send to the server the command to lay an egg
+        print("Lay an new egg!")
 
     def loop(self) -> None:
         # This is a default loop for the player to simulate actions it's not definitive
         while self.alive:
-            msg = self.hash.hashMessage("J'ai tous les objets pour incantation !")
-            print(f"Crypted message: {msg}")
-            print(f"Decrypted message: {self.hash.unHashMessage(msg)}")
-            sleep(1)
-            self.alive = False
+            try :
+                self.communication.sendForward()
+                print("Player go forward")
+                self.inventory = self.communication.getInventory()
+                print("Current inventory:", self.inventory)
+            except PlayerDead:
+                print(f"The player is dead")
+                self.alive = False
