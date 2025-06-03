@@ -16,14 +16,16 @@ MAIN 		= 	src/main.c
 
 MAIN_OBJ 	= 	$(MAIN:.c=.o)
 
-SRC 		=	src/params.c					\
-				src/messages.c					\
-				src/checkers.c					\
-				src/server.c					\
-				src/protocol.c					\
-				src/client.c					\
-				src/map_init.c					\
-				src/algo.c
+SRC 		=	src/params.c	\
+				src/messages.c	\
+				src/checkers.c	\
+				src/server.c	\
+				src/protocol.c	\
+				src/client.c	\
+				src/map_init.c	\
+				src/algo.c		\
+				src/buffer.c	\
+				src/free.c
 
 OBJ 		= 	$(SRC:.c=.o)
 
