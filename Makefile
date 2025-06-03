@@ -69,16 +69,15 @@ tests_run_gui:
 tests_run_server:
 	@make -C tests/unit/server/ tests_run
 
-coverage: $(GUI_NAME)
+coverage: $(GUI_NAME) $(SERVER_NAME) $(AI_NAME)
 	@make coverage_server
 	@make coverage_gui
 	@make coverage_ai
 
-coverage_ai: $(AI_NAME)
-	@echo "Compiling $(AI_NAME)..."
+coverage_ai:
 	@python3 -m pytest $(AI_TEST_SRC) \
 	-v --cov=src --cov-report=term --cov-report=html:coverage_report
-	@firefox ai/coverage_report/index.html &> /dev/null
+	@firefox tests/unit/coverage_report/index.html &> /dev/null
 
 coverage_gui:
 	@make -C tests/unit/gui/ coverage
