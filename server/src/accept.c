@@ -33,6 +33,29 @@ static char *check_team_name(server_t *server, int new_sockfd)
     return message;
 }
 
+static int complete_connection(server_t *server, int fd, const char *message)
+{
+    char *buffer = calloc(12, sizeof(char));
+    team_t *team = add_client_to_team(message, fd, server);
+
+    if (!team || !buffer)
+        return -1;
+    snprintf(buffer, sizeof(buffer), "%d\n",
+        server->params->nb_client - team->nbPlayers);
+    if (write_message(fd, buffer) == -1)
+        return -1;
+    free(buffer);
+    buffer = calloc(27, sizeof(char));
+    if (!buffer)
+        return -1;
+    snprintf(buffer, sizeof(buffer), "%d %d\n", server->params->x,
+        server->params->y);
+    if (write_message(fd, buffer) == -1)
+        return -1;
+    free(buffer);
+    return 0;
+}
+
 int accept_client(server_t *server)
 {
     char *message = NULL;
@@ -47,7 +70,7 @@ int accept_client(server_t *server)
         close(new_sockfd);
         return -1;
     }
-    if (add_client_to_team(message, new_sockfd, server) == -1) {
+    if (complete_connection(server, new_sockfd, message) == -1) {
         close(new_sockfd);
         free(message);
         return -1;

@@ -119,29 +119,31 @@ static int check_team_capacity(server_t *server, const char *team_name,
             server->game->teams->nbPlayers++;
             server->game->teams->nbPlayerAlive++;
             printf("New player added to team %s.\n", team_name);
-            return 0;
+            return server->params->nb_client - server->game->teams->nbPlayers;
         }
         server->game->teams = server->game->teams->next;
     }
     return -1;
 }
 
-int add_client_to_team(const char *team_name, int fd, server_t *server)
+team_t *add_client_to_team(const char *team_name, int fd, server_t *server)
 {
     tiles_t *tiles = shuffle_fisher(server->game->width, server->game->heigt);
     player_t *new_player = init_player(fd, server->params->freq, tiles[0]);
     team_t *save = server->game->teams;
+    team_t *result = NULL;
 
     free(tiles);
     if (!new_player) {
         close(fd);
-        return -1;
+        return NULL;
     }
     if (check_team_capacity(server, team_name, new_player) == -1) {
         error_message("Requested team is full.");
         server->game->teams = save;
-        return -1;
+        return NULL;
     }
+    result = server->game->teams;
     server->game->teams = save;
-    return 0;
+    return result;
 }
