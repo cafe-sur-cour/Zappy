@@ -78,7 +78,7 @@ coverage_ai:
 	@echo "Compiling $(AI_NAME)..."
 	@python3 -m pytest $(AI_TEST_SRC) \
 	-v --cov=src --cov-report=term --cov-report=html:coverage_report
-	@firefox ai/coverage_report/index.html &> /dev/null
+	@firefox tests/unit/coverage_report/index.html &> /dev/null
 
 coverage_gui:
 	@make -C tests/unit/gui/ coverage
