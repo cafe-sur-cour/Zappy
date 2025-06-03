@@ -78,11 +78,11 @@ typedef struct ressources_s {
 } ressources_t;
 
 /* Map struct */
-typedef struct map_s {
+typedef struct game_s {
     int width;
     int heigt;
     team_t *teams;
     ressources_t *ressources;
-} map_t;
+} game_t;
 
 #endif /* !GAME_H_ */

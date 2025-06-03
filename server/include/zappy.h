@@ -25,11 +25,12 @@ typedef struct params_s {
 
 typedef struct graph_s {
     int fd;
+    struct graph_s *next;
 } graph_t;
 
 typedef struct server_s {
     int sockfd;
-    map_t *map;
+    game_t *game;
     graph_t *graph;
     params_t *params;
     struct pollfd pollserver;
@@ -66,11 +67,10 @@ void *free_server(server_t *server);
 int start_protocol(server_t *server);
 
 /* client.c */
-bool valid_team_name(const char *team_name, server_t *server);
 bool process_new_client(const char *team_name, int fd, server_t *server);
 
 /* init_map.c */
-void init_map(server_t *server);
+void init_game(server_t *server);
 
 /* accept.c */
 int accept_client(server_t *server);
@@ -78,5 +78,6 @@ int accept_client(server_t *server);
 /* free server  */
 void *free_server(server_t *server);
 void *free_params(params_t *params);
+void *free_player(player_t *player);
 
 #endif /* !ZAPPY_H_ */
