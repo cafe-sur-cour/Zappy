@@ -36,16 +36,13 @@ class Player:
                 f"In Incantation: {self.in_incantation}")
 
     def begin_incantation(self) -> None:
-        print(f"Player team: {self.teamName} has started an incantation!")
+        # TODO: Send to the server the command to start an incantation
         self.in_incantation = True
-        sleep(10)
-        print(f"Player team: {self.teamName} has ended an incantation!")
-        self.in_incantation = False
-        self.level = self.level + 1
+        print("Incantation started!")
 
     def lay_an_egg(self) -> None:
         # TODO: Send to the server the command to lay an egg
-        print("Lay an new egg!")
+        print("Lay a new egg!")
 
     def loop(self) -> None:
         # This is a default loop for the player to simulate actions it's not definitive
