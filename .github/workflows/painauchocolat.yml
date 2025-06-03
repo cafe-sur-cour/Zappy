@@ -33,9 +33,7 @@ jobs:
       - name: CLICK HERE TO SEE "DOOF DOOF"
         run: |
           echo "::notice title=DOOFENSCHMIRTZ::CLICK HERE"
-          echo "/\_/\
-                (o.o)
-                 >^<"
+          eval echo "/\_/\" ; echo "(o.o)" ; echo " >^<"
 
 
   check_program_compilation:
