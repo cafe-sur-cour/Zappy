@@ -11,6 +11,9 @@ USAGE_STRING = "Usage: ./zappy_ai -p port -n name -h machine\n" \
                "-n name\t\tname of the team\n" \
                "-h machine\tname of the machine; localhost by default"
 
+FAILURE = 84
+SUCCESS = 0
+
 
 class Colors:
     BOLD = "\033[1m"
