@@ -107,7 +107,7 @@ class TestCommunication:
         mock_socket_class.return_value = mock_socket
         mock_socket.receive.side_effect = [
             "WELCOME\n",
-            "0\n",
+            "-1\n",
             "10 15\n"
         ]
 
