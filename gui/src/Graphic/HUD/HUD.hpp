@@ -27,7 +27,7 @@ class HUD {
          *
          * @param raylib Reference to the RayLib instance
          */
-        HUD(RayLib& raylib);
+        HUD(std::shared_ptr<RayLib> raylib);
 
         /**
          * @brief Destroy the HUD object
@@ -125,5 +125,5 @@ class HUD {
 
     private:
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
-        RayLib& _raylib;
+        std::shared_ptr<RayLib> _raylib;
 };
