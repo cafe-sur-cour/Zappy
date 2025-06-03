@@ -7,7 +7,7 @@
 
 import socket
 from src.Exceptions.Exceptions import (
-    SocketException
+    SocketException, PlayerDead
 )
 
 BUFFER_SIZE = 4096
@@ -36,6 +36,8 @@ class Socket:
             self._buffer += data.decode("utf-8")
         if '\n' in self._buffer:
             message, self._buffer = self._buffer.split('\n', 1)
+            if message == "dead":
+                raise PlayerDead()
             return message + '\n'
         raise SocketException("No complete message received from the socket")
 

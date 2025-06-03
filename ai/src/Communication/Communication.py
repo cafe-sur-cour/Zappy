@@ -9,7 +9,6 @@ from .Socket import Socket
 from src.Exceptions.Exceptions import (
     CommunicationHandshakeException,
     CommunicationInvalidResponseException,
-    PlayerDead
 )
 
 
@@ -70,8 +69,6 @@ class Communication:
         self._socket.send("Forward\n")
         response = self._socket.receive()
 
-        if response[:-1] == "dead":
-            raise PlayerDead()
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
                 f"Invalid response from Forward: {response[:-1]}"
@@ -81,8 +78,6 @@ class Communication:
         self._socket.send("Right\n")
         response = self._socket.receive()
 
-        if response[:-1] == "dead":
-            raise PlayerDead()
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
                 f"Invalid response from Right: {response[:-1]}"
@@ -92,8 +87,6 @@ class Communication:
         self._socket.send("Left\n")
         response = self._socket.receive()
 
-        if response[:-1] == "dead":
-            raise PlayerDead()
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
                 f"Invalid response from Left: {response[:-1]}"
@@ -103,8 +96,6 @@ class Communication:
         self._socket.send("Look\n")
         response = self._socket.receive()
 
-        if response[:-1] == "dead":
-            raise PlayerDead()
         if (not response[:-1].startswith("[") or not response[:-1].endswith("]")):
             raise CommunicationInvalidResponseException(
                 f"Invalid response from Look: {response[:-1]}"
@@ -130,8 +121,6 @@ class Communication:
         self._socket.send("Inventory\n")
         response = self._socket.receive()
 
-        if response[:-1] == "dead":
-            raise PlayerDead()
         if (not response[:-1].startswith("[") or not response[:-1].endswith("]")):
             raise CommunicationInvalidResponseException(
                 f"Invalid response from Inventory: {response[:-1]}"
@@ -162,8 +151,6 @@ class Communication:
         self._socket.send(f"Broadcast {message}\n")
         response = self._socket.receive()
 
-        if response[:-1] == "dead":
-            raise PlayerDead()
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
                 f"Invalid response from Broadcast: {response[:-1]}"
@@ -173,8 +160,6 @@ class Communication:
         self._socket.send("Connect_nbr\n")
         response = self._socket.receive()
 
-        if response[:-1] == "dead":
-            raise PlayerDead()
         if (not response[:-1].isdecimal()):
             raise CommunicationInvalidResponseException(
                 f"Invalid number: Got {response[:-1]} from command Connect_nbr"
@@ -186,8 +171,6 @@ class Communication:
         self._socket.send("Fork\n")
         response = self._socket.receive()
 
-        if response[:-1] == "dead":
-            raise PlayerDead()
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
                 f"Invalid response from Fork: {response[:-1]}"
@@ -197,8 +180,6 @@ class Communication:
         self._socket.send("Eject\n")
         response = self._socket.receive()
 
-        if response[:-1] == "dead":
-            raise PlayerDead()
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
                 f"Invalid response from Eject: {response[:-1]}"
@@ -208,8 +189,6 @@ class Communication:
         self._socket.send(f"Take {object_name}\n")
         response = self._socket.receive()
 
-        if response[:-1] == "dead":
-            raise PlayerDead()
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
                 f"Invalid response from Take: {response[:-1]}"
@@ -219,8 +198,6 @@ class Communication:
         self._socket.send(f"Set {object_name}\n")
         response = self._socket.receive()
 
-        if response[:-1] == "dead":
-            raise PlayerDead()
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
                 f"Invalid response from Set: {response[:-1]}"
@@ -230,8 +207,6 @@ class Communication:
         self._socket.send("Incantation\n")
         response = self._socket.receive()
 
-        if response[:-1] == "dead":
-            raise PlayerDead()
         if (response[:-1] == "ko"):
             raise CommunicationInvalidResponseException(
                 f"Invalid response from Incantation: {response[:-1]}"
