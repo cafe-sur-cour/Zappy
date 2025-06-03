@@ -303,6 +303,12 @@ void RayLib::drawSphere(Vector3 position, float radius, Color color)
     DrawSphere(position, radius, color);
 }
 
+void RayLib::drawSphereWires(Vector3 position, float radius, int rings,
+    int slices, Color color)
+{
+    DrawSphereWires(position, radius, rings, slices, color);
+}
+
 void RayLib::drawCylinder(Vector3 position, float radiusTop, float radiusBottom,
     float height, int slices, Color color)
 {
