@@ -100,7 +100,7 @@ void MsgHandler::handleMessage(const std::string& message)
         if (message.find(handler.first) != std::string::npos && handler.second(message))
             return;
     }
-    std::cout << colors::RED << "[WARNING] Unhandled message: " << message
+    std::cout << colors::T_RED << "[WARNING] Unhandled message: " << message
               << colors::RESET << std::endl;
 }
 
@@ -109,10 +109,10 @@ bool MsgHandler::handleWelcomeMessage(const std::string& message)
     if (message.empty())
         return false;
 
-    std::cout << colors::YELLOW << "[INFO] Welcome message received: " << message
+    std::cout << colors::T_YELLOW << "[INFO] Welcome message received: " << message
               << colors::RESET << std::endl;
     _communication->sendMessage("GRAPHIC\n");
-    std::cout << colors::YELLOW << "[INFO] Sent GRAPHIC command to server."
+    std::cout << colors::T_YELLOW << "[INFO] Sent GRAPHIC command to server."
               << colors::RESET << std::endl;
     return true;
 }
@@ -129,7 +129,7 @@ bool MsgHandler::handleMszMessage(const std::string& message)
     iss >> prefix >> width >> height;
 
     if (iss.fail() || width <= 0 || height <= 0 || prefix != "msz") {
-        std::cerr << colors::RED << "[WARNING] Invalid map size format received: " << message
+        std::cerr << colors::T_RED << "[WARNING] Invalid map size format received: " << message
                   << colors::RESET << std::endl;
         return false;
     }
@@ -139,7 +139,7 @@ bool MsgHandler::handleMszMessage(const std::string& message)
         _gameInfos->setMapSize(width, height);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Map size set to: " << width << "x" << height
+    std::cout << colors::T_YELLOW << "[INFO] Map size set to: " << width << "x" << height
               << colors::RESET << std::endl;
     return true;
 }
@@ -156,8 +156,8 @@ bool MsgHandler::handleSgtMessage(const std::string& message)
     iss >> prefix >> timeUnit;
 
     if (iss.fail() || timeUnit <= 0 || prefix != "sgt") {
-        std::cerr << colors::RED << "[WARNING] Invalid time unit format received: " << message
-                  << colors::RESET << std::endl;
+        std::cerr << colors::T_RED << "[WARNING] Invalid time unit format received: "
+                  << message << colors::RESET << std::endl;
         return false;
     }
 
@@ -166,7 +166,7 @@ bool MsgHandler::handleSgtMessage(const std::string& message)
         _gameInfos->setTimeUnit(timeUnit);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Time unit set to: " << timeUnit
+    std::cout << colors::T_YELLOW << "[INFO] Time unit set to: " << timeUnit
               << colors::RESET << std::endl;
     return true;
 }
@@ -186,8 +186,8 @@ bool MsgHandler::handleBctMessage(const std::string& message)
     if (iss.fail() || prefix != "bct" || x < 0 || y < 0 ||
         food < 0 || linemate < 0 || deraumere < 0 ||
         sibur < 0 || mendiane < 0 || phiras < 0 || thystame < 0) {
-        std::cerr << colors::RED << "[WARNING] Invalid tile data format received: " << message
-                  << colors::RESET << std::endl;
+        std::cerr << colors::T_RED << "[WARNING] Invalid tile data format received: "
+                  << message << colors::RESET << std::endl;
         return false;
     }
 
@@ -199,7 +199,7 @@ bool MsgHandler::handleBctMessage(const std::string& message)
         _gameInfos->updateTile(tile);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Tile updated: (" << x << ", " << y << ") "
+    std::cout << colors::T_YELLOW << "[INFO] Tile updated: (" << x << ", " << y << ") "
               << "Food: " << food << ", Linemate: " << linemate
               << ", Deraumere: " << deraumere << ", Sibur: " << sibur
               << ", Mendiane: " << mendiane << ", Phiras: " << phiras
@@ -219,8 +219,8 @@ bool MsgHandler::handleTnaMessage(const std::string& message)
     iss >> prefix >> teamName;
 
     if (iss.fail() || prefix != "tna" || teamName.empty()) {
-        std::cerr << colors::RED << "[WARNING] Invalid team name format received: " << message
-                  << colors::RESET << std::endl;
+        std::cerr << colors::T_RED << "[WARNING] Invalid team name format received: "
+                  << message << colors::RESET << std::endl;
         return false;
     }
 
@@ -229,7 +229,7 @@ bool MsgHandler::handleTnaMessage(const std::string& message)
         _gameInfos->updateTeamName(teamName);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Team name added: " << teamName
+    std::cout << colors::T_YELLOW << "[INFO] Team name added: " << teamName
               << colors::RESET << std::endl;
     return true;
 }
@@ -250,19 +250,19 @@ bool MsgHandler::handlePnwMessage(const std::string& message)
         try {
             playerNumber = std::stoi(playerNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                       << playerNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                   << playerNumberStr << colors::RESET << std::endl;
         return false;
     }
 
     if (iss.fail() || prefix != "pnw" || playerNumber < 0 || x < 0 || y < 0 ||
         orientation < 0 || orientation > 3 || level < 1 || teamName.empty()) {
-        std::cerr << colors::RED << "[WARNING] Invalid player data format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player data format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -271,7 +271,7 @@ bool MsgHandler::handlePnwMessage(const std::string& message)
         std::lock_guard<std::mutex> lock(_gameInfosMutex);
         auto teams = _gameInfos->getTeamNames();
         if (std::find(teams.begin(), teams.end(), teamName) == teams.end()) {
-            std::cerr << colors::RED << "[WARNING] Team name not found: " << teamName
+            std::cerr << colors::T_RED << "[WARNING] Team name not found: " << teamName
                       << colors::RESET << std::endl;
             return false;
         }
@@ -283,7 +283,7 @@ bool MsgHandler::handlePnwMessage(const std::string& message)
         _gameInfos->addPlayer(player);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Player added: " << playerNumber
+    std::cout << colors::T_YELLOW << "[INFO] Player added: " << playerNumber
               << " at (" << x << ", " << y << ") with orientation "
               << orientation << " and level " << level
               << " from team " << teamName
@@ -307,19 +307,19 @@ bool MsgHandler::handlePpoMessage(const std::string& message)
         try {
             playerNumber = std::stoi(playerNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                       << playerNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                   << playerNumberStr << colors::RESET << std::endl;
         return false;
     }
 
     if (iss.fail() || prefix != "ppo" || playerNumber < 0 || x < 0 || y < 0 ||
         orientation < 0 || orientation > 3) {
-        std::cerr << colors::RED << "[WARNING] Invalid player position format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player position format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -329,7 +329,7 @@ bool MsgHandler::handlePpoMessage(const std::string& message)
         _gameInfos->updatePlayerPosition(playerNumber, x, y);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+    std::cout << colors::T_YELLOW << "[INFO] Player " << playerNumber
               << " position updated to (" << x << ", " << y
               << ") orientation " << orientation
               << colors::RESET << std::endl;
@@ -352,18 +352,18 @@ bool MsgHandler::handlePlvMessage(const std::string& message)
         try {
             playerNumber = std::stoi(playerNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                       << playerNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                   << playerNumberStr << colors::RESET << std::endl;
         return false;
     }
 
     if (iss.fail() || prefix != "plv" || playerNumber < 0 || level < 1) {
-        std::cerr << colors::RED << "[WARNING] Invalid player level format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player level format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -373,7 +373,7 @@ bool MsgHandler::handlePlvMessage(const std::string& message)
         _gameInfos->updatePlayerLevel(playerNumber, level);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+    std::cout << colors::T_YELLOW << "[INFO] Player " << playerNumber
               << " level updated to " << level
               << colors::RESET << std::endl;
     return true;
@@ -396,12 +396,12 @@ bool MsgHandler::handlePinMessage(const std::string& message)
         try {
             playerNumber = std::stoi(playerNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                       << playerNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                   << playerNumberStr << colors::RESET << std::endl;
         return false;
     }
@@ -409,7 +409,7 @@ bool MsgHandler::handlePinMessage(const std::string& message)
     if (iss.fail() || prefix != "pin" || playerNumber < 0 || x < 0 || y < 0 ||
         food < 0 || linemate < 0 || deraumere < 0 ||
         sibur < 0 || mendiane < 0 || phiras < 0 || thystame < 0) {
-        std::cerr << colors::RED << "[WARNING] Invalid player inventory format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player inventory format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -421,7 +421,7 @@ bool MsgHandler::handlePinMessage(const std::string& message)
         _gameInfos->updatePlayerInventory(playerNumber, inventory);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+    std::cout << colors::T_YELLOW << "[INFO] Player " << playerNumber
               << " inventory updated: Food: " << food
               << ", Linemate: " << linemate
               << ", Deraumere: " << deraumere
@@ -448,18 +448,18 @@ bool MsgHandler::handlePexMessage(const std::string& message)
         try {
             playerNumber = std::stoi(playerNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                       << playerNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                   << playerNumberStr << colors::RESET << std::endl;
         return false;
     }
 
     if (iss.fail() || prefix != "pex" || playerNumber < 0) {
-        std::cerr << colors::RED << "[WARNING] Invalid player expulsion format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player expulsion format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -469,7 +469,7 @@ bool MsgHandler::handlePexMessage(const std::string& message)
         _gameInfos->updatePlayerExpulsion(playerNumber);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+    std::cout << colors::T_YELLOW << "[INFO] Player " << playerNumber
               << " has been expelled."
               << colors::RESET << std::endl;
     return true;
@@ -491,18 +491,18 @@ bool MsgHandler::handlePbcMessage(const std::string& message)
         try {
             playerNumber = std::stoi(playerNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                       << playerNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                   << playerNumberStr << colors::RESET << std::endl;
         return false;
     }
 
     if (iss.fail() || prefix != "pbc" || playerNumber < 0 || broadcastMessage.empty()) {
-        std::cerr << colors::RED << "[WARNING] Invalid player broadcast format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player broadcast format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -512,7 +512,7 @@ bool MsgHandler::handlePbcMessage(const std::string& message)
         _gameInfos->addPlayerBroadcast(playerNumber, broadcastMessage);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+    std::cout << colors::T_YELLOW << "[INFO] Player " << playerNumber
               << " broadcasted: " << broadcastMessage
               << colors::RESET << std::endl;
     return true;
@@ -531,7 +531,7 @@ bool MsgHandler::handlePicMessage(const std::string& message)
 
     iss >> prefix >> x >> y >> level;
     if (iss.fail() || prefix != "pic" || x < 0 || y < 0 || level < 1) {
-        std::cerr << colors::RED << "[WARNING] Invalid incantation format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid incantation format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -542,12 +542,13 @@ bool MsgHandler::handlePicMessage(const std::string& message)
                 int playerNumber = std::stoi(playerStr.substr(1));
                 players.push_back(playerNumber);
             } catch (const std::exception& e) {
-                std::cerr << colors::RED << "[WARNING] Invalid player number in incantation: "
+                std::cerr << colors::T_RED
+                          << "[WARNING] Invalid player number in incantation: "
                           << playerStr << colors::RESET << std::endl;
                 return false;
             }
         } else {
-            std::cerr << colors::RED
+            std::cerr << colors::T_RED
                       << "[WARNING] Invalid player number format in incantation: "
                       << playerStr << colors::RESET << std::endl;
             return false;
@@ -560,7 +561,7 @@ bool MsgHandler::handlePicMessage(const std::string& message)
         _gameInfos->addIncantation(incantation);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Incantation at (" << x << ", " << y
+    std::cout << colors::T_YELLOW << "[INFO] Incantation at (" << x << ", " << y
               << ") for level " << level << " with players: ";
     for (const auto &playerNum : players) {
         std::cout << playerNum << " ";
@@ -580,7 +581,7 @@ bool MsgHandler::handlePieMessage(const std::string& message)
 
     iss >> prefix >> x >> y >> result;
     if (iss.fail() || prefix != "pie" || x < 0 || y < 0 || (result != 0 && result != 1)) {
-        std::cerr << colors::RED << "[WARNING] Invalid incantation result format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid incantation result format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -590,7 +591,7 @@ bool MsgHandler::handlePieMessage(const std::string& message)
         _gameInfos->removeIncantation(x, y, result);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Incantation at (" << x << ", " << y
+    std::cout << colors::T_YELLOW << "[INFO] Incantation at (" << x << ", " << y
               << ") result: " << (result == 1 ? "Success" : "Failure")
               << colors::RESET << std::endl;
     return true;
@@ -611,18 +612,18 @@ bool MsgHandler::handlePfkMessage(const std::string& message)
         try {
             playerNumber = std::stoi(playerNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                       << playerNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                   << playerNumberStr << colors::RESET << std::endl;
         return false;
     }
 
     if (iss.fail() || prefix != "pfk" || playerNumber < 0) {
-        std::cerr << colors::RED << "[WARNING] Invalid player fork format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player fork format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -632,7 +633,7 @@ bool MsgHandler::handlePfkMessage(const std::string& message)
         _gameInfos->updatePlayerFork(playerNumber);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+    std::cout << colors::T_YELLOW << "[INFO] Player " << playerNumber
               << " is laying an egg."
               << colors::RESET << std::endl;
     return true;
@@ -654,19 +655,19 @@ bool MsgHandler::handlePdrMessage(const std::string& message)
         try {
             playerNumber = std::stoi(playerNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                       << playerNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                   << playerNumberStr << colors::RESET << std::endl;
         return false;
     }
 
     if (iss.fail() || prefix != "pdr" || playerNumber < 0 || resourceId < 0
         || resourceId > 6) {
-        std::cerr << colors::RED << "[WARNING] Invalid resource dropping format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid resource dropping format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -688,7 +689,7 @@ bool MsgHandler::handlePdrMessage(const std::string& message)
         default: resourceName = "unknown"; break;
     }
 
-    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+    std::cout << colors::T_YELLOW << "[INFO] Player " << playerNumber
               << " dropped resource: " << resourceName
               << colors::RESET << std::endl;
     return true;
@@ -710,19 +711,19 @@ bool MsgHandler::handlePgtMessage(const std::string& message)
         try {
             playerNumber = std::stoi(playerNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                       << playerNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                   << playerNumberStr << colors::RESET << std::endl;
         return false;
     }
 
     if (iss.fail() || prefix != "pgt" || playerNumber < 0 || resourceId < 0
         || resourceId > 6) {
-        std::cerr << colors::RED << "[WARNING] Invalid resource collecting format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid resource collecting format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -744,7 +745,7 @@ bool MsgHandler::handlePgtMessage(const std::string& message)
         default: resourceName = "unknown"; break;
     }
 
-    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+    std::cout << colors::T_YELLOW << "[INFO] Player " << playerNumber
               << " collected resource: " << resourceName
               << colors::RESET << std::endl;
     return true;
@@ -765,18 +766,18 @@ bool MsgHandler::handlePdiMessage(const std::string& message)
         try {
             playerNumber = std::stoi(playerNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                       << playerNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                   << playerNumberStr << colors::RESET << std::endl;
         return false;
     }
 
     if (iss.fail() || prefix != "pdi" || playerNumber < 0) {
-        std::cerr << colors::RED << "[WARNING] Invalid player death format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player death format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -786,7 +787,7 @@ bool MsgHandler::handlePdiMessage(const std::string& message)
         _gameInfos->updatePlayerDeath(playerNumber);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Player " << playerNumber
+    std::cout << colors::T_YELLOW << "[INFO] Player " << playerNumber
               << " has died."
               << colors::RESET << std::endl;
     return true;
@@ -808,12 +809,12 @@ bool MsgHandler::handleEnwMessage(const std::string& message)
         try {
             eggNumber = std::stoi(eggNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid egg number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid egg number format: "
                       << eggNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid egg number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid egg number format: "
                   << eggNumberStr << colors::RESET << std::endl;
         return false;
     }
@@ -823,19 +824,19 @@ bool MsgHandler::handleEnwMessage(const std::string& message)
         try {
             playerNumber = std::stoi(playerNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                       << playerNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid player number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
                   << playerNumberStr << colors::RESET << std::endl;
         return false;
     }
 
     if (iss.fail() || prefix != "enw" || eggNumber < 0 || playerNumber < -1
         || x < 0 || y < 0) {
-        std::cerr << colors::RED << "[WARNING] Invalid egg laying format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid egg laying format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -855,7 +856,7 @@ bool MsgHandler::handleEnwMessage(const std::string& message)
         _gameInfos->addEgg(egg);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Egg " << eggNumber
+    std::cout << colors::T_YELLOW << "[INFO] Egg " << eggNumber
               << " laid by player " << playerNumber
               << " at (" << x << ", " << y << ") from team " << teamName
               << colors::RESET << std::endl;
@@ -877,18 +878,18 @@ bool MsgHandler::handleEboMessage(const std::string& message)
         try {
             eggNumber = std::stoi(eggNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid egg number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid egg number format: "
                       << eggNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid egg number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid egg number format: "
                   << eggNumberStr << colors::RESET << std::endl;
         return false;
     }
 
     if (iss.fail() || prefix != "ebo" || eggNumber < 0) {
-        std::cerr << colors::RED << "[WARNING] Invalid egg hatching format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid egg hatching format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -898,7 +899,7 @@ bool MsgHandler::handleEboMessage(const std::string& message)
         _gameInfos->updateEggHatched(eggNumber);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Egg " << eggNumber
+    std::cout << colors::T_YELLOW << "[INFO] Egg " << eggNumber
               << " has hatched and a player has connected."
               << colors::RESET << std::endl;
     return true;
@@ -919,18 +920,18 @@ bool MsgHandler::handleEdiMessage(const std::string& message)
         try {
             eggNumber = std::stoi(eggNumberStr.substr(1));
         } catch (const std::exception& e) {
-            std::cerr << colors::RED << "[WARNING] Invalid egg number format: "
+            std::cerr << colors::T_RED << "[WARNING] Invalid egg number format: "
                       << eggNumberStr << colors::RESET << std::endl;
             return false;
         }
     } else {
-        std::cerr << colors::RED << "[WARNING] Invalid egg number format: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid egg number format: "
                   << eggNumberStr << colors::RESET << std::endl;
         return false;
     }
 
     if (iss.fail() || prefix != "edi" || eggNumber < 0) {
-        std::cerr << colors::RED << "[WARNING] Invalid egg death format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid egg death format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -940,7 +941,7 @@ bool MsgHandler::handleEdiMessage(const std::string& message)
         _gameInfos->updateEggDeath(eggNumber);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Egg " << eggNumber
+    std::cout << colors::T_YELLOW << "[INFO] Egg " << eggNumber
               << " has died."
               << colors::RESET << std::endl;
     return true;
@@ -957,7 +958,7 @@ bool MsgHandler::handleSstMessage(const std::string& message)
 
     iss >> prefix >> timeUnit;
     if (iss.fail() || prefix != "sst" || timeUnit <= 0) {
-        std::cerr << colors::RED
+        std::cerr << colors::T_RED
                   << "[WARNING] Invalid time unit modification format received: "
                   << message << colors::RESET << std::endl;
         return false;
@@ -968,7 +969,7 @@ bool MsgHandler::handleSstMessage(const std::string& message)
         _gameInfos->setTimeUnit(timeUnit);
     }
 
-    std::cout << colors::YELLOW << "[INFO] Time unit modified to: " << timeUnit
+    std::cout << colors::T_YELLOW << "[INFO] Time unit modified to: " << timeUnit
               << colors::RESET << std::endl;
     return true;
 }
@@ -983,7 +984,7 @@ bool MsgHandler::handleSegMessage(const std::string& message)
 
     iss >> prefix >> teamName;
     if (iss.fail() || prefix != "seg") {
-        std::cerr << colors::RED << "[WARNING] Invalid end of game format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid end of game format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
@@ -993,7 +994,7 @@ bool MsgHandler::handleSegMessage(const std::string& message)
         _gameInfos->setGameOver(teamName);
     }
 
-    std::cout << colors::GREEN << "[GAME OVER] Team " << teamName
+    std::cout << colors::T_GREEN << "[GAME OVER] Team " << teamName
               << " has won the game!" << colors::RESET << std::endl;
     return true;
 }
@@ -1010,12 +1011,12 @@ bool MsgHandler::handleSmgMessage(const std::string& message)
     std::getline(iss, serverMessage);
 
     if (iss.fail() || prefix != "smg") {
-        std::cerr << colors::RED << "[WARNING] Invalid server message format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid server message format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
 
-    std::cout << colors::CYAN << "[SERVER MESSAGE] " << serverMessage
+    std::cout << colors::T_CYAN << "[SERVER MESSAGE] " << serverMessage
               << colors::RESET << std::endl;
     return true;
 }
@@ -1026,12 +1027,12 @@ bool MsgHandler::handleSucMessage(const std::string& message)
         return false;
 
     if (message != "suc") {
-        std::cerr << colors::RED << "[WARNING] Invalid unknown command format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid unknown command format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
 
-    std::cout << colors::RED << "[SERVER] Unknown command received by server"
+    std::cout << colors::T_RED << "[SERVER] Unknown command received by server"
               << colors::RESET << std::endl;
     return true;
 }
@@ -1042,12 +1043,12 @@ bool MsgHandler::handleSbpMessage(const std::string& message)
         return false;
 
     if (message != "sbp") {
-        std::cerr << colors::RED << "[WARNING] Invalid command parameter format received: "
+        std::cerr << colors::T_RED << "[WARNING] Invalid command parameter format received: "
                   << message << colors::RESET << std::endl;
         return false;
     }
 
-    std::cout << colors::RED << "[SERVER] Bad parameters in command"
+    std::cout << colors::T_RED << "[SERVER] Bad parameters in command"
               << colors::RESET << std::endl;
     return true;
 }

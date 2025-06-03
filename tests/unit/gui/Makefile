@@ -21,6 +21,8 @@ SRC =	../../../gui/src/Client/Client.cpp \
 		../../../gui/src/CLI/CLI.cpp \
 		../../../gui/src/Communication/Communication.cpp \
 		../../../gui/src/Game/GameInfos.cpp \
+		../../../gui/src/Graphic/RayLib/RayLib.cpp \
+		../../../gui/src/Graphic/GUI.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
@@ -37,7 +39,7 @@ INCLUDES = -I./include
 CFLAGS =	-std=c++20 -Wall -Wextra -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
-LIBS =
+LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 NAME = zappy_gui
 
@@ -83,7 +85,7 @@ coverage: tests_run
 tests_run: $(SRC) $(TEST_SRC)
 	@echo -e "$(BLUE)ᒥ🧪ᒧ Compiling Google Test unit tests...$(NC)"
 	$(CC) -o $(UNIT_TESTS) $(SRC) $(TEST_SRC) $(CFLAGS_COVERAGE) $(INCLUDES) \
-		-lgtest -lgtest_main
+		$(LIBS) -lgtest -lgtest_main
 	@echo -e "$(GREEN)ᒥ✅ᒧ Unit tests compiled! Running...$(NC)"
 	./$(UNIT_TESTS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ All tests completed!$(NC)"

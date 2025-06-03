@@ -24,14 +24,14 @@ namespace zappy::constants {
 
 namespace colors {
 
-    inline const char *BOLD = "\033[1m";
-    inline const char *RED = "\033[1m\033[31m";
-    inline const char *GREEN = "\033[1m\033[32m";
-    inline const char *YELLOW = "\033[1m\033[33m";
-    inline const char *BLUE = "\033[1m\033[34m";
-    inline const char *MAGENTA = "\033[1m\033[35m";
-    inline const char *CYAN = "\033[1m\033[36m";
-    inline const char *WHITE = "\033[1m\033[37m";
+    inline const char *T_BOLD = "\033[1m";
+    inline const char *T_RED = "\033[1m\033[31m";
+    inline const char *T_GREEN = "\033[1m\033[32m";
+    inline const char *T_YELLOW = "\033[1m\033[33m";
+    inline const char *T_BLUE = "\033[1m\033[34m";
+    inline const char *T_MAGENTA = "\033[1m\033[35m";
+    inline const char *T_CYAN = "\033[1m\033[36m";
+    inline const char *T_WHITE = "\033[1m\033[37m";
     inline const char *RESET = "\033[0m";
 
 };
@@ -119,5 +119,9 @@ namespace zappy::structs {
               hatched(hatched), teamName(teamName) {}
     };
 };
+
+inline const int WINDOW_WIDTH = 1920;
+inline const int WINDOW_HEIGHT = 1080;
+inline const std::string WINDOW_TITLE = "Zappy GUI";
 
 #endif /* !CONSTANTS_HPP_ */

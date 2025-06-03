@@ -11,6 +11,7 @@
 #include "../Utils/Constants.hpp"
 #include "../Communication/ICommunication.hpp"
 #include "../Game/GameInfos.hpp"
+#include "../Graphic/GUI.hpp"
 #include "MsgHandler.hpp"
 
 #include <memory>
@@ -20,8 +21,6 @@ class Client {
         Client(int ac, const char *const *av);
         ~Client();
 
-        void run();
-
     private:
         zappy::structs::Config _config;
         void initialize(int ac, const char * const *av);
@@ -29,6 +28,7 @@ class Client {
         std::shared_ptr<ICommunication> _communication;
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<MsgHandler> _msgHandler;
+        std::unique_ptr<GUI> _gui;
 };
 
 #endif /* !CLIENT_HPP_ */
