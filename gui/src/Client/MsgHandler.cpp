@@ -269,7 +269,7 @@ bool MsgHandler::handlePnwMessage(const std::string& message)
     }
 
     if (iss.fail() || prefix != "pnw" || playerNumber < 0 || x < 0 || y < 0 ||
-        orientation < 0 || orientation > 3 || level < 1 || teamName.empty()) {
+        orientation < 1 || orientation > 4 || level < 1 || teamName.empty()) {
         std::cerr << colors::T_RED << "[WARNING] Invalid player data format received: "
                   << message << colors::RESET << std::endl;
         return false;
@@ -326,7 +326,7 @@ bool MsgHandler::handlePpoMessage(const std::string& message)
     }
 
     if (iss.fail() || prefix != "ppo" || playerNumber < 0 || x < 0 || y < 0 ||
-        orientation < 0 || orientation > 3) {
+        orientation < 1 || orientation > 4) {
         std::cerr << colors::T_RED << "[WARNING] Invalid player position format received: "
                   << message << colors::RESET << std::endl;
         return false;

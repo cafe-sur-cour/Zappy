@@ -44,6 +44,7 @@ void Map::draw()
 
     for (const auto &tile : tiles) {
         drawTile(tile.x, tile.y, tile);
+        drawEggs(tile.x, tile.y);
         drawPlayers(tile.x, tile.y);
     }
 }
@@ -68,14 +69,16 @@ void Map::drawPlayers(int x, int y)
         }
     }
 
+    if (playersOnTile.empty())
+        return;
+
     float cylinderHeight = 0.4f;
     float cylinderRadius = 0.25f;
-    float baseHeight = 0.1f;
 
     for (size_t i = 0; i < playersOnTile.size(); ++i) {
         Vector3 position = {
             static_cast<float>(x),
-            baseHeight + cylinderHeight * (i + 0.5f),
+            getOffset(DisplayPriority::PLAYER, x, y, i),
             static_cast<float>(y)
         };
 
@@ -121,4 +124,61 @@ void Map::drawOrientationArrow(const Vector3 &position, int orientation, float p
         case 3: coneEnd = {end.x - arrowHeadSize, end.y, end.z}; break;
     }
     _raylib->drawCylinderEx(coneStart, coneEnd, arrowWidth, 0.0f, 8, RED);
+}
+
+void Map::drawEggs(int x, int y)
+{
+    const auto& eggs = _gameInfos->getEggs();
+    std::vector<const zappy::structs::Egg*> eggsOnTile;
+
+    for (const auto& egg : eggs) {
+        if (egg.x == x && egg.y == y && !egg.hatched) {
+            eggsOnTile.push_back(&egg);
+        }
+    }
+
+    float eggRadius = 0.2f;
+
+    for (size_t i = 0; i < eggsOnTile.size(); ++i) {
+        Vector3 position = {
+            static_cast<float>(x),
+            getOffset(DisplayPriority::EGG, x, y, i),
+            static_cast<float>(y)
+        };
+
+        Color teamColor = getTeamColor(eggsOnTile[i]->teamName);
+        _raylib->drawSphere(position, eggRadius, teamColor);
+        _raylib->drawSphereWires(position, eggRadius, 8, 8, BLACK);
+    }
+}
+
+float Map::getOffset(DisplayPriority priority, int x, int y, size_t stackIndex)
+{
+    switch (priority) {
+        case DisplayPriority::TILE:
+            return BASE_HEIGHT_TILE;
+
+        case DisplayPriority::EGG:
+            return BASE_HEIGHT_EGG + (stackIndex * EGG_HEIGHT);
+
+        case DisplayPriority::PLAYER: {
+            const auto& eggs = _gameInfos->getEggs();
+            size_t eggCount = 0;
+
+            for (const auto& egg : eggs) {
+                if (egg.x == x && egg.y == y && !egg.hatched) {
+                    eggCount++;
+                }
+            }
+
+            float basePlayerHeight = BASE_HEIGHT_PLAYER;
+            if (eggCount > 0)
+                basePlayerHeight = BASE_HEIGHT_EGG + (eggCount * EGG_HEIGHT);
+
+            return basePlayerHeight + (stackIndex * PLAYER_HEIGHT);
+        }
+
+        default:
+            return 0.5f + (stackIndex * 0.2f);
+    }
 }
