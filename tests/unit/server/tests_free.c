@@ -93,7 +93,6 @@ Test(free_server, test_complete_server)
     
     // Create graph
     server->graph = malloc(sizeof(graph_t));
-    server->graph->pollfd = malloc(sizeof(struct pollfd));
     
     server->sockfd = -1;
     
@@ -225,7 +224,6 @@ Test(free_server, test_server_with_null_pollfd)
     server->map = NULL;
     
     server->graph = malloc(sizeof(graph_t));
-    server->graph->pollfd = NULL;
     
     void *result = free_server(server);
     cr_assert_null(result);
