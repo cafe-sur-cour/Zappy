@@ -27,7 +27,8 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/checkers.c					\
 				../../../server/src/server.c					\
 				../../../server/src/protocol.c					\
-				../../../server/src/client.c
+				../../../server/src/client.c					\
+				../../../server/src/accept.c
 
 
 OBJ 		= 	$(SRC:.c=.o)
