@@ -64,7 +64,7 @@ static int accept_client(server_t *server)
         close(new_sockfd);
         return -1;
     }
-    if (!valid_team_name(message, server->params)) {
+    if (!graphic(message, new_sockfd, server)) {
         printfd("\033[1;31mInvalid team name.\033[0m", new_sockfd);
         free(message);
         close(new_sockfd);

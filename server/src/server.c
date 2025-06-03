@@ -55,18 +55,6 @@ static int listen_socket(server_t *server)
     return 0;
 }
 
-void *free_server(server_t *server)
-{
-    if (!server)
-        return NULL;
-    if (server->params)
-        free_params(server->params);
-    if (server->sockfd != -1)
-        close(server->sockfd);
-    free(server);
-    return NULL;
-}
-
 server_t *init_server(int argc, char **argv)
 {
     server_t *server = malloc(sizeof(server_t));

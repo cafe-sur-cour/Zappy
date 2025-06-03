@@ -23,10 +23,16 @@ typedef struct params_s {
     bool is_debug;
 } params_t;
 
+typedef struct graph_s {
+    int fd;
+    struct pollfd *pollfd;
+} graph_t;
+
 typedef struct server_s {
     int sockfd;
     params_t *params;
     map_t *map;
+    graph_t *graph;
 } server_t;
 
 typedef struct command_pf_s {
@@ -60,7 +66,12 @@ int start_protocol(server_t *server);
 
 /* client.c */
 bool valid_team_name(const char *team_name, params_t *params);
+bool graphic(const char *team_name, int fd, server_t *server);
 
 /* init_map.c */
 void inti_map(server_t *server);
+
+/* free server  */
+void *free_server(server_t *server);
+void *free_params(params_t *params);
 #endif /* !ZAPPY_H_ */
