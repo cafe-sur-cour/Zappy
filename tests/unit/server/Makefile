@@ -30,7 +30,9 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/protocol.c					\
 				../../../server/src/client.c					\
 				../../../server/src/map_init.c					\
-				../../../server/src/algo.c
+				../../../server/src/algo.c						\
+				../../../server/src/buffer.c					\
+				../../../server/src/free.c
 
 
 OBJ 		= 	$(SRC:.c=.o)

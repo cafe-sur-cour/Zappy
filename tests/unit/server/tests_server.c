@@ -23,11 +23,14 @@ Test(init_server, init_server_valid, .init = redirect_all_std) {
     int argc = 14;
 
     server_t *server = init_server(argc, argv);
+    server->map = malloc(sizeof(map_t));
+    server->params = malloc(sizeof(params_t));
+    server->graph = malloc(sizeof(graph_t));
     cr_assert_not_null(server, "Expected server initialization to succeed.");
     free_server(server);
 }
 
-Test(init_server, init_server_invalid, .init = redirect_all_std) {
+Test(init_server, init_server_invalid) {
     char *argv[] = {"./server"};
     int argc = 1;
 
@@ -45,5 +48,8 @@ Test(free_server, free_server_valid, .init = redirect_all_std) {
     int argc = 14;
 
     server_t *server = init_server(argc, argv);
+    server->map = malloc(sizeof(map_t));
+    server->params = malloc(sizeof(params_t));
+    server->graph = malloc(sizeof(graph_t));
     cr_assert_null(free_server(server), "Expected free_server to return NULL after freeing.");
 }
