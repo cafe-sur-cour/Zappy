@@ -17,7 +17,9 @@ TESTS 	    =   tests_params.c			\
 				tests_errors.c			\
 				tests_checkers.c		\
 				tests_server.c			\
-				test_map_init.c
+				tests_map_init.c		\
+				tests_buffer.c			\
+				tests_free.c
 
 MAIN 		= 	../../../server/src/main.c
 
@@ -78,7 +80,7 @@ tests_run: unit_test
 
 coverage: tests_run
 	@echo -e "$(BLUE)ᒥ📊ᒧ Generating coverage report...$(NC)"
-	@gcovr --exclude /tests
+	@gcovr --root ../../../ --exclude tests/* --exclude-unreachable-branches
 
 re: fclean all
 
