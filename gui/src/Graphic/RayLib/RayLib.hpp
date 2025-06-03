@@ -25,6 +25,13 @@ class RayLib {
         void clearBackground(Color color = WHITE);
         bool isWindowReady() const;
 
+        // Collision methods
+        bool checkCollisionPointRec(Vector2 point, Rectangle rec) const;
+
+        // Texture methods
+        void drawTextureRec(Texture2D texture, Rectangle source, Vector2 position, Color tint);
+        void unloadTexture(Texture2D texture);
+
         // Input methods
         bool isMouseButtonDown(int button) const;
         bool isMouseButtonPressed(int button) const;
@@ -64,6 +71,11 @@ class RayLib {
         void drawCylinderEx(Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color);
         void drawPlane(Vector3 position, Vector2 size, Color color);
         void drawLine3D(Vector3 startPos, Vector3 endPos, Color color);
+
+        // 2D Drawing methods
+        void drawRectangleRec(Rectangle rec, Color color);
+        void drawText(const std::string& text, float x, float y, float fontSize, Color color);
+        float measureText(const std::string& text, float fontSize) const;
 
     protected:
     private:
