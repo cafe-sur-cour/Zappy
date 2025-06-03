@@ -7,6 +7,8 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include <poll.h>
 #include <stdio.h>
 #include <signal.h>
@@ -30,10 +32,8 @@ static void diplay_help(int port)
 
 struct pollfd *init_pollfds(server_t *server)
 {
-    client_t *current = server->clients;
-    int i = 1;
-    struct pollfd *poll_fds = calloc(
-        get_nb_clients(server->clients) + 1, sizeof(struct pollfd));
+    struct pollfd *poll_fds = calloc(server->params->nb_client *
+        server->params->nb_team + 2, sizeof(struct pollfd));
 
     if (!poll_fds) {
         error_message("Failed to allocate memory for poll file descriptors.");
@@ -41,24 +41,33 @@ struct pollfd *init_pollfds(server_t *server)
     }
     poll_fds[0].fd = server->sockfd;
     poll_fds[0].events = POLLIN;
-    while (current != NULL) {
-        poll_fds[i] = current->pollfd;
-        current = current->next;
-        i++;
-    }
+    for (int i = 1; i < server->params->nb_client *
+        server->params->nb_team + 1; i++)
+        poll_fds[i].fd = -1;
     return poll_fds;
 };
 
 static int accept_client(server_t *server)
 {
+    char *message = NULL;
     int new_sockfd = accept(server->sockfd, NULL, NULL);
 
     if (new_sockfd == -1) {
-        printf("\033[0;31mFailed to accept new client connection.\033[0m");
+        error_message("Failed to accept new client connection.");
         return -1;
     }
-    printfd("WELCOME", new_sockfd);
-    printf("New client connected.\n");
+    printfd("\033[1;32mWelcome to Trantor!\33[0m\n", new_sockfd);
+    write(new_sockfd, "WELCOME\n", 8);
+    message = get_message(new_sockfd, server);
+    if (!message) {
+        close(new_sockfd);
+        return -1;
+    }
+    if (!graphic(message, new_sockfd, server)) {
+        free(message);
+        close(new_sockfd);
+        return -1;
+    }
     return 0;
 }
 
@@ -80,21 +89,19 @@ static void setup_signal(void)
 
 int start_protocol(server_t *server)
 {
-    struct pollfd *pollfds;
+    struct pollfd *pollfds = init_pollfds(server);
 
     setup_signal();
     diplay_help(server->params->port);
     while (*get_running_state()) {
-        pollfds = init_pollfds(server);
-        if (poll(pollfds, get_nb_clients(server->clients) + 1, 0) == -1
-            && *get_running_state()) {
+        if (poll(pollfds, server->params->nb_client *
+            server->params->nb_team + 2, 0) == -1 && *get_running_state()) {
             error_message("Poll failed.");
             free(pollfds);
             return -1;
         }
         if (pollfds[0].revents & POLLIN)
             accept_client(server);
-        free(pollfds);
     }
     printf("\033[1;33mServer stopped.\033[0m\n");
     return 0;
