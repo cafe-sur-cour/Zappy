@@ -14,6 +14,8 @@ char *my_itoa(unsigned int nb)
     char *str = malloc(sizeof(char) * (my_unsignedlen(nb) + 1));
     int i = my_unsignedlen(nb);
 
+    if (str == NULL)
+        return (NULL);
     str[i] = '\0';
     i--;
     while (i >= 0) {

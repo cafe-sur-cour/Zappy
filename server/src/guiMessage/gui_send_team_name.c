@@ -18,6 +18,9 @@ static void create_buffer(const char *team_name, server_t *server)
     int xLength = strlen(team_name) + 6;
     char *message = malloc(sizeof(char) * (xLength));
 
+    if (message == NULL) {
+        return;
+    }
     snprintf(message, xLength, "tna %s\n", team_name);
     write_message(server->graph->fd, message);
     free(message);

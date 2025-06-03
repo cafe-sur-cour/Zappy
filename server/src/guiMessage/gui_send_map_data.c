@@ -14,6 +14,8 @@ static int *calloc_int(void)
 {
     int *elem = malloc(sizeof(int) * 7);
 
+    if (elem == NULL)
+        return NULL;
     for (int i = 0; i < 7; i++)
         elem[i] = 0;
     return elem;
@@ -21,20 +23,13 @@ static int *calloc_int(void)
 
 static int *count_cases(ressources_t *current, int *elem)
 {
-    if (current->type == FOOD)
-        elem[0]++;
-    if (current->type == LINEMATE)
-        elem[1]++;
-    if (current->type == DERAUMERE)
-        elem[2]++;
-    if (current->type == SIBUR)
-        elem[3]++;
-    if (current->type == MENDIANE)
-        elem[4]++;
-    if (current->type == PHIRAS)
-        elem[5]++;
-    if (current->type == THYSTAME)
-        elem[6]++;
+    crystal_t *cryst = malloc(sizeof(crystal_t) * 7);
+
+    for (int i = 0; i < 7; i++) {
+        if (current->type == cryst[i]) {
+            elem[i] += 1;
+        }
+    }
     return elem;
 }
 
