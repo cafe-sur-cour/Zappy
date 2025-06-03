@@ -9,6 +9,7 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <mutex>
 
 #include "GameInfos.hpp"
 
@@ -46,6 +47,8 @@ int GameInfos::getTimeUnit() const
 
 void GameInfos::updateTile(const zappy::structs::Tile tile)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
     if (tile.x < 0 || tile.y < 0 || tile.x >= _mapWidth || tile.y >= _mapHeight)
         return;
 
@@ -64,11 +67,14 @@ void GameInfos::updateTile(const zappy::structs::Tile tile)
 
 const std::vector<zappy::structs::Tile> GameInfos::getTiles() const
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     return _tiles;
 }
 
 const zappy::structs::Tile GameInfos::getTile(int x, int y) const
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
     for (const auto &tile : _tiles) {
         if (tile.x == x && tile.y == y)
             return tile;
