@@ -49,8 +49,9 @@ jobs:
 
       - name: Install Raylib
         run: |
-          apt-get update
-          apt-get install -y libraylib-dev
+          add-apt-repository ppa:alex-p/raylib
+          apt update
+          apt install raylib
 
       - name: Compilation
         run: make
@@ -177,8 +178,9 @@ jobs:
 
       - name: Install Raylib
         run: |
-          apt-get update
-          apt-get install -y libraylib-dev
+          add-apt-repository ppa:alex-p/raylib
+          apt update
+          apt install raylib
 
       - name: Run functional tests
         run: |
@@ -219,8 +221,9 @@ jobs:
 
       - name: Install Raylib
         run: |
-          apt-get update
-          apt-get install -y libraylib-dev
+          add-apt-repository ppa:alex-p/raylib
+          apt update
+          apt install raylib
 
       - name: Run Unit Tests
         run: make tests_run
