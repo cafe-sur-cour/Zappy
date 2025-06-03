@@ -10,18 +10,45 @@ from src.Exceptions.Exceptions import (
     CommunicationHandshakeException,
     CommunicationInvalidResponseException,
 )
+from ..Exceptions.Exceptions import PlayerDead
 
 
 class Communication:
     def __init__(self, name: str, host: str, port: int):
+        self._isDead: bool = False
+        self._message_queue: list[tuple[int, str]] = []
         self._name = name
         self._host = host
         self._port = port
         self._socket = Socket(host, port)
 
+    def receive_data(self) -> str:
+        r = self._socket.receive()
+        if r == "dead\n":
+            self._isDead = True
+            return ""
+        if r.startswith("message"):
+            parts = r.split(" ")
+            number = int(parts[1].strip(","))
+            data = parts[2]
+            self._message_queue.append((number, data))
+            return self.receive_data()
+        return r
+
+    def get_size_message_queue(self) -> int:
+        return len(self._message_queue)
+
+    def get_message_from_queue(self) -> tuple[int, str]:
+        if not self._message_queue:
+            return 0, ""
+        return self._message_queue.pop(0)
+
+    def is_dead(self) -> bool:
+        return self._isDead
+
     def connectToServer(self):
         self._socket.connect()
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if (response[:-1] != "WELCOME"):
             raise CommunicationInvalidResponseException(
@@ -29,7 +56,7 @@ class Communication:
             )
 
         self._socket.send(f"{self._name}\n")
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if response[:-1] == "ko":
             raise CommunicationHandshakeException(
@@ -43,7 +70,7 @@ class Communication:
                 f"Invalid number of slots: {response[:-1]}"
             )
 
-        response = self._socket.receive()
+        response = self.receive_data()
         if (response[-1] != '\n'):
             raise CommunicationInvalidResponseException(
                 f"Response from server after slots is not terminated with a newline"
@@ -67,7 +94,7 @@ class Communication:
 
     def sendForward(self):
         self._socket.send("Forward\n")
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
@@ -76,7 +103,7 @@ class Communication:
 
     def sendRight(self):
         self._socket.send("Right\n")
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
@@ -85,7 +112,7 @@ class Communication:
 
     def sendLeft(self):
         self._socket.send("Left\n")
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
@@ -94,7 +121,7 @@ class Communication:
 
     def getLook(self) -> list[dict[str, int]]:
         self._socket.send("Look\n")
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if (not response[:-1].startswith("[") or not response[:-1].endswith("]")):
             raise CommunicationInvalidResponseException(
@@ -119,7 +146,7 @@ class Communication:
 
     def getInventory(self) -> dict[str, int]:
         self._socket.send("Inventory\n")
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if (not response[:-1].startswith("[") or not response[:-1].endswith("]")):
             raise CommunicationInvalidResponseException(
@@ -149,7 +176,7 @@ class Communication:
 
     def sendBroadcast(self, message: str):
         self._socket.send(f"Broadcast {message}\n")
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
@@ -158,7 +185,7 @@ class Communication:
 
     def getCetConnectNbr(self) -> int:
         self._socket.send("Connect_nbr\n")
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if (not response[:-1].isdecimal()):
             raise CommunicationInvalidResponseException(
@@ -169,7 +196,7 @@ class Communication:
 
     def sendFork(self):
         self._socket.send("Fork\n")
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
@@ -178,7 +205,7 @@ class Communication:
 
     def sendEject(self):
         self._socket.send("Eject\n")
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
@@ -187,7 +214,7 @@ class Communication:
 
     def sendTakeObject(self, object_name: str):
         self._socket.send(f"Take {object_name}\n")
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
@@ -196,7 +223,7 @@ class Communication:
 
     def sendSetObject(self, object_name: str):
         self._socket.send(f"Set {object_name}\n")
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if (response[:-1] != "ok"):
             raise CommunicationInvalidResponseException(
@@ -205,7 +232,7 @@ class Communication:
 
     def sendIncantation(self):
         self._socket.send("Incantation\n")
-        response = self._socket.receive()
+        response = self.receive_data()
 
         if (response[:-1] == "ko"):
             raise CommunicationInvalidResponseException(

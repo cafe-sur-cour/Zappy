@@ -29,14 +29,12 @@ class Socket:
         self._socket.sendall(content.encode("utf-8"))
 
     def receive(self) -> str:
-        while ('\n' not in self._buffer):
+        while '\n' not in self._buffer:
             data = self._socket.recv(BUFFER_SIZE)
             if not data:
                 raise SocketException("Socket connection closed by the server")
             self._buffer += data.decode("utf-8")
         message, self._buffer = self._buffer.split('\n', 1)
-        if message == "dead":
-            raise PlayerDead()
         return message + '\n'
 
     def close(self):
