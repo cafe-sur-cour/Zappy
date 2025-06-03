@@ -30,14 +30,10 @@ class Socket:
 
     def receive(self) -> str:
         while ('\n' not in self._buffer):
-            try:
-                self._socket.settimeout(3.0)
-                data = self._socket.recv(BUFFER_SIZE)
-                if not data:
-                    raise SocketException("Socket connection closed by the server")
-                self._buffer += data.decode("utf-8")
-            except socket.timeout:
-                raise SocketException("Socket receive timed out")
+            data = self._socket.recv(BUFFER_SIZE)
+            if not data:
+                raise SocketException("Socket connection closed by the server")
+            self._buffer += data.decode("utf-8")
         if '\n' in self._buffer:
             message, self._buffer = self._buffer.split('\n', 1)
             return message + '\n'
