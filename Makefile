@@ -13,10 +13,7 @@ SERVER_DIR = server
 GUI_DIR = gui
 AI_DIR = ai
 
-AI_TESTS_SRC = 	ai/CLI/test_cli.py \
-				ai/Communication/test_com.py \
-				ai/Communication/test_integration.py \
-				ai/Communication/test_socket.py
+AI_TEST_SRC = $(shell cat tests/unit/ai/src.txt)
 
 all: $(SERVER_NAME) $(GUI_NAME) $(AI_NAME)
 
@@ -64,7 +61,7 @@ tests_run: $(GUI_NAME)
 	@make tests_run_ai
 
 tests_run_ai: $(AI_NAME)
-	@cd tests/unit/ && python3 -m pytest ${AI_TESTS_SRC} -v
+	@python3 -m pytest $(AI_TEST_SRC) -v
 
 tests_run_gui:
 	@make -C tests/unit/gui/ tests_run
@@ -78,9 +75,10 @@ coverage: $(GUI_NAME) $(SERVER_NAME) $(AI_NAME)
 	@make coverage_ai
 
 coverage_ai:
-	@cd tests/unit/ && python3 -m pytest ${AI_TESTS_SRC} \
-	 -v --cov=src --cov-report=term --cov-report=html:coverage_report
-	@firefox $(shell pwd)/tests/unit/coverage_report/index.html &> /dev/null
+	@echo "Compiling $(AI_NAME)..."
+	@python3 -m pytest $(AI_TEST_SRC) \
+	-v --cov=src --cov-report=term --cov-report=html:coverage_report
+	@firefox ai/coverage_report/index.html &> /dev/null
 
 coverage_gui:
 	@make -C tests/unit/gui/ coverage
