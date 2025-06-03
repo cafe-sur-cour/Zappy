@@ -9,6 +9,9 @@
 #include <utility>
 #include <unordered_map>
 #include <algorithm>
+#include <vector>
+#include <string>
+
 #include "RayLib/RayLib.hpp"
 #include "Map.hpp"
 
@@ -24,10 +27,11 @@ Map::~Map()
 Color Map::getTeamColor(const std::string &teamName)
 {
     if (_teamColors.find(teamName) == _teamColors.end()) {
+        unsigned int seed = static_cast<unsigned int>(time(nullptr));
         _teamColors[teamName] = {
-            static_cast<unsigned char>(rand() % 200 + 55),
-            static_cast<unsigned char>(rand() % 200 + 55),
-            static_cast<unsigned char>(rand() % 200 + 55),
+            static_cast<unsigned char>(rand_r(&seed) % 200 + 55),
+            static_cast<unsigned char>(rand_r(&seed) % 200 + 55),
+            static_cast<unsigned char>(rand_r(&seed) % 200 + 55),
             255
         };
     }
