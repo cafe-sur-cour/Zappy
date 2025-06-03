@@ -28,21 +28,21 @@ class Player:
                 f"Alive: {self.alive}, "
                 f"In Incantation: {self.in_incantation}")
 
-    def beginIncantation(self) -> None:
-        print(f"Player team: {self.teamName} has started an incentive!")
+    def begin_incantation(self) -> None:
+        print(f"Player team: {self.teamName} has started an incantation!")
         self.in_incantation = True
         sleep(10)
-        print(f"Player team: {self.teamName} has ended an incentive!")
+        print(f"Player team: {self.teamName} has ended an incantation!")
         self.in_incantation = False
         self.level = self.level + 1
 
-    def layAEgg(self) -> None:
+    def lay_an_egg(self) -> None:
         print(f"Player team: {self.teamName} has laid an egg!")
 
     def loop(self) -> None:
         # This is a default loop for the player to simulate actions it's not definitive
         while self.alive:
-            msg = self.hash.hashMessage("J'ai tous les objets pour incanter !")
+            msg = self.hash.hashMessage("J'ai tous les objets pour incantation !")
             print(f"Crypted message: {msg}")
             print(f"Decrypted message: {self.hash.unHashMessage(msg)}")
             sleep(1)
