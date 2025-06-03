@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-/* Permet de melanger de manière equiable les pos*/
+/* Allows the pos to be equally shuffled */
 tiles_t *shuffle_fisher(int width, int heigth)
 {
     int total = width * heigth;

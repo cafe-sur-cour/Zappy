@@ -9,13 +9,13 @@
 #include "zappy.h"
 
 
-/* Utiliser cette fonction pour wrap */
+/* This functions allows you to wrap arround in the buffer */
 int advance(int idx)
 {
     return (idx + 1) % BUFFER_SIZE;
 }
 
-/* Ajouter un élément dans le buffer*/
+/* Here you can add elesm in the buffer */
 void cb_write(buffer_t *cb, char c)
 {
     cb->data[cb->head] = c;
@@ -25,7 +25,7 @@ void cb_write(buffer_t *cb, char c)
     cb->full = (cb->head == cb->tail);
 }
 
-/* Utiliser la line lu pour remplir le bufer */
+/* This function alows you to read a buuffer */
 int cb_getline(buffer_t *cb, char *line, int max_len)
 {
     int i = 0;
