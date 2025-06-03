@@ -28,12 +28,14 @@ def main():
         cli = CLI()
         config = cli.parse_args(argv)
 
-        print(f"{Colors.GREEN}"
+        print(
+            f"{Colors.GREEN}"
             "AI initialized with configuration: "
             f"Port: {config['port']}, "
             f"Team name: {config['name']}, "
             f"Machine: {config['machine']}"
-            f"{Colors.RESET}")
+            f"{Colors.RESET}"
+        )
 
         app = App(config)
         return app.run()

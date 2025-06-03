@@ -15,10 +15,11 @@ from src.Exceptions.Exceptions import (
     CommunicationException
 )
 
+
 class App:
     def __init__(self, config: dict[str]):
         self.port = config["port"]
-        self.name = config["app"]
+        self.name = config["name"]
         self.ip = config["machine"]
         self.childs = []
 
