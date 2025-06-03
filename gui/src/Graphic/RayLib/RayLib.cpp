@@ -10,13 +10,16 @@
 #define TRACELOG_SILENT
 
 #include <string>
+#include <cmath>
 #include "RayLib.hpp"
 #include "raylib.h"
+#include "raymath.h"
 
-RayLib::RayLib() : _isInitialized(false)
+RayLib::RayLib() : _isInitialized(false), _isCursorLocked(false)
 {
     _camera = {{ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f },
         0.0f, CAMERA_PERSPECTIVE };
+    _previousMousePosition = (Vector2){ 0.0f, 0.0f };
 }
 
 RayLib::~RayLib()
@@ -65,6 +68,76 @@ bool RayLib::isWindowReady() const
     return IsWindowReady();
 }
 
+bool RayLib::isMouseButtonDown(int button) const
+{
+    return IsMouseButtonDown(button);
+}
+
+bool RayLib::isMouseButtonPressed(int button) const
+{
+    return IsMouseButtonPressed(button);
+}
+
+bool RayLib::isMouseButtonReleased(int button) const
+{
+    return IsMouseButtonReleased(button);
+}
+
+bool RayLib::isKeyDown(int key) const
+{
+    return IsKeyDown(key);
+}
+
+Vector2 RayLib::getMousePosition() const
+{
+    return GetMousePosition();
+}
+
+void RayLib::setMousePosition(int x, int y)
+{
+    SetMousePosition(x, y);
+}
+
+void RayLib::disableCursor()
+{
+    if (!_isCursorLocked) {
+        DisableCursor();
+        _isCursorLocked = true;
+    }
+}
+
+void RayLib::enableCursor()
+{
+    if (_isCursorLocked) {
+        EnableCursor();
+        _isCursorLocked = false;
+    }
+}
+
+int RayLib::getScreenWidth() const
+{
+    return GetScreenWidth();
+}
+
+int RayLib::getScreenHeight() const
+{
+    return GetScreenHeight();
+}
+
+Vector2 RayLib::getMouseDelta()
+{
+    if (_isCursorLocked) {
+        return GetMouseDelta();
+    } else {
+        Vector2 currentMousePosition = GetMousePosition();
+        Vector2 delta = { currentMousePosition.x - _previousMousePosition.x,
+            currentMousePosition.y - _previousMousePosition.y };
+
+        this->_previousMousePosition = currentMousePosition;
+        return delta;
+    }
+}
+
 void RayLib::begin3DMode()
 {
     BeginMode3D(_camera);
@@ -77,7 +150,7 @@ void RayLib::end3DMode()
 
 void RayLib::initCamera()
 {
-    _camera.position = (Vector3){ 10.0f, 10.0f, 10.0f };
+    _camera.position = (Vector3){ 0.0f, 30.0f, 30.0f };
     _camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
     _camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     _camera.fovy = 45.0f;
@@ -112,6 +185,96 @@ void RayLib::setCameraProjection(int projection)
 void RayLib::updateCamera(int mode)
 {
     UpdateCamera(&_camera, mode);
+}
+
+void RayLib::updateCameraCustom()
+{
+    const float moveSpeed = 0.025f;
+    const float rotationSpeed = 0.001f;
+
+    Vector3 forward = Vector3Subtract(_camera.target, _camera.position);
+    forward = Vector3Normalize(forward);
+
+    Vector3 right = Vector3CrossProduct(forward, _camera.up);
+    right = Vector3Normalize(right);
+
+    if (IsKeyDown(KEY_Z) || IsKeyDown(KEY_W)) {
+        _camera.position = Vector3Add(_camera.position,
+                                    Vector3Scale(forward, moveSpeed));
+        _camera.target = Vector3Add(_camera.target, Vector3Scale(forward, moveSpeed));
+    }
+    if (IsKeyDown(KEY_S)) {
+        _camera.position = Vector3Subtract(_camera.position,
+                                        Vector3Scale(forward, moveSpeed));
+        _camera.target = Vector3Subtract(_camera.target, Vector3Scale(forward, moveSpeed));
+    }
+    if (IsKeyDown(KEY_Q) || IsKeyDown(KEY_A)) {
+        _camera.position = Vector3Subtract(_camera.position,
+                                        Vector3Scale(right, moveSpeed));
+        _camera.target = Vector3Subtract(_camera.target, Vector3Scale(right, moveSpeed));
+    }
+    if (IsKeyDown(KEY_D)) {
+        _camera.position = Vector3Add(_camera.position, Vector3Scale(right, moveSpeed));
+        _camera.target = Vector3Add(_camera.target, Vector3Scale(right, moveSpeed));
+    }
+    if (IsKeyDown(KEY_SPACE)) {
+        _camera.position.y += moveSpeed * 0.5;
+        _camera.target.y += moveSpeed * 0.5;
+    }
+    if (IsKeyDown(KEY_LEFT_CONTROL)) {
+        _camera.position.y -= moveSpeed * 0.5;
+        _camera.target.y -= moveSpeed * 0.5;
+    }
+
+    if (isMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        int screenCenterX = getScreenWidth() / 2;
+        int screenCenterY = getScreenHeight() / 2;
+
+        setMousePosition(screenCenterX, screenCenterY);
+        _previousMousePosition = Vector2{ static_cast<float>(screenCenterX),
+            static_cast<float>(screenCenterY) };
+        disableCursor();
+    }
+
+    if (isMouseButtonReleased(MOUSE_BUTTON_LEFT))
+        enableCursor();
+
+    if (isMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        Vector2 mouseDelta = getMouseDelta();
+
+        if (mouseDelta.x != 0) {
+            Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+            float rotAngle = mouseDelta.x * rotationSpeed;
+
+            float cosRotAngle = cosf(rotAngle);
+            float sinRotAngle = sinf(rotAngle);
+            float newDirX = viewDir.x * cosRotAngle - viewDir.z * sinRotAngle;
+            float newDirZ = viewDir.x * sinRotAngle + viewDir.z * cosRotAngle;
+            viewDir.x = newDirX;
+            viewDir.z = newDirZ;
+
+            _camera.target = Vector3Add(_camera.position, viewDir);
+        }
+
+        if (mouseDelta.y != 0) {
+            Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+            float rotAngle = -mouseDelta.y * rotationSpeed;
+
+            Vector3 right = Vector3CrossProduct(viewDir, _camera.up);
+            right = Vector3Normalize(right);
+            viewDir = Vector3RotateByAxisAngle(viewDir, right, rotAngle);
+
+            Vector3 newUp = Vector3CrossProduct(right, viewDir);
+            if (newUp.y > 0.0f)
+                _camera.target = Vector3Add(_camera.position, viewDir);
+        }
+
+        if (_isCursorLocked) {
+            int screenCenterX = getScreenWidth() / 2;
+            int screenCenterY = getScreenHeight() / 2;
+            setMousePosition(screenCenterX, screenCenterY);
+        }
+    }
 }
 
 Camera3D RayLib::getCamera() const

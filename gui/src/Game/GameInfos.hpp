@@ -11,6 +11,7 @@
 #include <utility>
 #include <vector>
 #include <memory>
+#include <mutex>
 
 #include "../Utils/Constants.hpp"
 
@@ -71,6 +72,8 @@ class GameInfos {
 
         bool _gameOver;
         std::string _winningTeam;
+
+        mutable std::mutex _dataMutex;
 };
 
 #endif /* !GAMEINFOS_HPP_ */

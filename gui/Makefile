@@ -22,6 +22,7 @@ SRC =	src/Client/Client.cpp \
 		src/Game/GameInfos.cpp \
 		src/Graphic/RayLib/RayLib.cpp \
 		src/Graphic/GUI.cpp \
+		src/Graphic/Map.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 

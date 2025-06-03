@@ -9,20 +9,23 @@
 #define GUI_HPP_
 
 #include "RayLib/RayLib.hpp"
+#include "../Game/GameInfos.hpp"
+#include "Map.hpp"
 
 class GUI {
     public:
-        GUI();
+        GUI(std::shared_ptr<GameInfos> gameInfos);
         ~GUI();
 
         void run();
 
     private:
         void updateCamera();
-        void drawEnvironment();
 
-        RayLib _raylib;
         bool _isRunning;
+        std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<GameInfos> _gameInfos;
+        std::unique_ptr<Map> _map;
 };
 
 #endif /* !GUI_HPP_ */
