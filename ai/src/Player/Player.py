@@ -59,8 +59,11 @@ class Player:
                 self.inventory = self.communication.getInventory()
                 # TODO: check if the player is dead after sending the command
                 if self.communication.get_size_message_queue() > 0:
-                    message  = self.communication.get_message_from_queue()
-                    print(f"Message received from the server {self.hash.unHashMessage(str(message[1][:-1]))}")
+                    message = self.communication.get_message_from_queue()
+                    print(
+                        "Message received from the server "
+                        f"{self.hash.unHashMessage(str(message[1][:-1]))}"
+                    )
                 # TODO: Identifier le / les messages reçu / decrypter les messages
                 if self.inventory["food"] <= 5:
                     self.send_help_message()
