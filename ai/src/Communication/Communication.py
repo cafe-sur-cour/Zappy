@@ -58,7 +58,7 @@ class Communication:
                 f"Invalid coordinates from server: {response[:-1]}"
             )
 
-        if slots < 1 or x < 1 or y < 1:
+        if slots < 0 or x < 0 or y < 0:
             raise CommunicationHandshakeException(
                 f"Invalid handshake values: slots={slots}, x={x}, y={y}"
             )
