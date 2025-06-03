@@ -1,0 +1,55 @@
+/*
+** EPITECH PROJECT, 2025
+** B-YEP-400-NAN-4-1-zappy-albane.merian
+** File description:
+** GUI
+*/
+
+#include <cmath>
+#include <memory>
+#include "GUI.hpp"
+#include "../Utils/Constants.hpp"
+
+GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
+    _gameInfos(gameInfos)
+{
+    _raylib = std::make_shared<RayLib>();
+    _raylib->initWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
+    _raylib->initCamera();
+    _isRunning = _raylib->isWindowReady();
+    _map = std::make_unique<Map>(_gameInfos, _raylib);
+    _hud = std::make_unique<HUD>(_raylib);
+    _hud->initDefaultLayout(250.0f, 250.0f);
+}
+
+GUI::~GUI()
+{
+    _raylib->closeWindow();
+}
+
+void GUI::run()
+{
+    if (!_isRunning)
+        return;
+
+    while (!_raylib->windowShouldClose()) {
+        updateCamera();
+        _raylib->beginDrawing();
+        _raylib->clearBackground(RAYWHITE);
+        _raylib->begin3DMode();
+
+        _map->draw();
+
+        _raylib->end3DMode();
+
+        _hud->update();
+        _hud->draw();
+
+        _raylib->endDrawing();
+    }
+}
+
+void GUI::updateCamera()
+{
+    _raylib->updateCameraCustom();
+}
