@@ -69,6 +69,7 @@ tests_run_gui:
 	@make -C tests/unit/gui/ tests_run
 
 tests_run_server:
+	@make -C server/lib/my
 	@make -C tests/unit/server/ tests_run
 
 coverage: $(GUI_NAME) $(SERVER_NAME) $(AI_NAME)

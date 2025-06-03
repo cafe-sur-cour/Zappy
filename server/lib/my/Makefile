@@ -23,6 +23,7 @@ $(NAME):	$(OBJ)
 		cp my.h ../../include
 		@$(AR) rc $(NAME) $(OBJ)
 		cp $(NAME) ../../
+		cp $(NAME) ../../../tests/unit/server/
 		@echo -e "\e[1;36m{ libmy.a ready and my.h duplicated !! }\e[00;37m"
 
 clean:
@@ -32,6 +33,7 @@ clean:
 
 fclean: clean
 	$(RM) $(NAME)
+	-rm ../../../../tests/unit/server/$(NAME)
 	@echo -e "\e[1;33m[ libmy.a has been deleted ]\e[00;37m"
 
 re: fclean all
