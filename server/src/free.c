@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdio.h>
 
 void *free_params(params_t *params)
 {
@@ -63,8 +64,11 @@ static void free_teams(team_t *teams)
         if (current->name) {
             free(current->name);
         }
-        free_players(current->players);
-        free(current);
+        if (current->players) {
+            free_players(current->players);
+        }
+        if (current)
+            free(current);
         current = next;
     }
 }
@@ -73,8 +77,10 @@ static void free_map(map_t *map)
 {
     if (!map)
         return;
-    free_teams(map->teams);
-    free_ressources(map->ressources);
+    if (map->teams)
+        free_teams(map->teams);
+    if (map->ressources)
+        free_ressources(map->ressources);
     free(map);
 }
 
