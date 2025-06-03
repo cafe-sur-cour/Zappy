@@ -59,7 +59,10 @@ class RayLib {
         void drawCubeWires(Vector3 position, float width, float height, float length, Color color);
         void drawSphere(Vector3 position, float radius, Color color);
         void drawCylinder(Vector3 position, float radiusTop, float radiusBottom, float height, int slices, Color color);
+        void drawCylinderWires(Vector3 position, float radiusTop, float radiusBottom, float height, int slices, Color color);
+        void drawCylinderEx(Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color);
         void drawPlane(Vector3 position, Vector2 size, Color color);
+        void drawLine3D(Vector3 startPos, Vector3 endPos, Color color);
 
     protected:
     private:

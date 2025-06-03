@@ -309,7 +309,24 @@ void RayLib::drawCylinder(Vector3 position, float radiusTop, float radiusBottom,
     DrawCylinder(position, radiusTop, radiusBottom, height, slices, color);
 }
 
+void RayLib::drawCylinderWires(Vector3 position, float radiusTop, float radiusBottom,
+    float height, int slices, Color color)
+{
+    DrawCylinderWires(position, radiusTop, radiusBottom, height, slices, color);
+}
+
+void RayLib::drawCylinderEx(Vector3 startPos, Vector3 endPos, float startRadius,
+    float endRadius, int sides, Color color)
+{
+    DrawCylinderEx(startPos, endPos, startRadius, endRadius, sides, color);
+}
+
 void RayLib::drawPlane(Vector3 position, Vector2 size, Color color)
 {
     DrawPlane(position, size, color);
+}
+
+void RayLib::drawLine3D(Vector3 startPos, Vector3 endPos, Color color)
+{
+    DrawLine3D(startPos, endPos, color);
 }
