@@ -84,5 +84,8 @@ void *free_params(params_t *params);
 
 /* gui_send_message.c */
 void send_map_size(server_t *server);
+void send_entrie_map(server_t *server);
+void send_map_tile(ressources_t *ressource, server_t *server,
+    int posX, int posY);
 
 #endif /* !ZAPPY_H_ */

@@ -21,28 +21,20 @@ static int *calloc_int(void)
 
 static int *count_cases(ressources_t *current, int *elem)
 {
-    switch (current->type) {
-        case FOOD:
-            elem[0]++;
-            break;
-        case LINEMATE:
-            elem[1]++;
-            break;
-        case DERAUMERE:
-            elem[2]++;
-            break;
-        case SIBUR:
-            elem[3]++;
-            break;
-        case MENDIANE:
-            elem[4]++;
-            break;
-        case PHIRAS:
-            elem[5]++;
-            break;
-        case THYSTAME: elem[6]++;
-            break;
-    }
+    if (current->type == FOOD)
+        elem[0]++;
+    if (current->type == LINEMATE)
+        elem[1]++;
+    if (current->type == DERAUMERE)
+        elem[2]++;
+    if (current->type == SIBUR)
+        elem[3]++;
+    if (current->type == MENDIANE)
+        elem[4]++;
+    if (current->type == PHIRAS)
+        elem[5]++;
+    if (current->type == THYSTAME)
+        elem[6]++;
     return elem;
 }
 
@@ -82,7 +74,6 @@ void send_map_tile(ressources_t *ressource, server_t *server,
     free(elem);
 }
 
-
 void send_entrie_map(server_t *server)
 {
     ressources_t *current = server->map->ressources;
@@ -92,7 +83,6 @@ void send_entrie_map(server_t *server)
         current = current->next;
     }
 }
-
 
 /* Send  the msz message to the gui */
 void send_map_size(server_t *server)
