@@ -25,16 +25,14 @@ typedef struct params_s {
 
 typedef struct graph_s {
     int fd;
-    struct pollfd *pollfd;
 } graph_t;
 
 typedef struct server_s {
     int sockfd;
-    int nb_poll;
-    params_t *params;
     map_t *map;
-    struct pollfd *poll_fds;
     graph_t *graph;
+    params_t *params;
+    struct pollfd pollserver;
 } server_t;
 
 typedef struct command_pf_s {
@@ -47,7 +45,7 @@ int helper(void);
 void error_message(const char *message);
 void printfd(char const *message, int fd);
 int write_message(int fd, const char *message);
-char *get_message(int fd, server_t *server);
+char *get_message(int fd);
 
 /* checkers.c */
 bool check_port(char const *flag, char const *value, params_t *params);
@@ -66,7 +64,6 @@ void *free_server(server_t *server);
 
 /* protocol.c */
 int start_protocol(server_t *server);
-void realloc_pollfds(server_t *server, int new_fd);
 
 /* client.c */
 bool valid_team_name(const char *team_name, server_t *server);
