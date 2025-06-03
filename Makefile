@@ -35,6 +35,7 @@ clean:
 	@echo "Cleaning server..."
 	@make -C $(SERVER_DIR) clean
 	@make -C $(GUI_DIR) clean
+	@make -C server/lib/my clean
 
 fclean: clean
 	@echo "Full clean server..."
@@ -46,6 +47,7 @@ fclean: clean
 	@rm -rf $(AI_DIR)/coverage_report
 	@rm -rf *.log
 	@make -C tests/unit/gui/ fclean
+	@make -C server/lib/my fclean
 	@make -C tests/unit/server/ fclean
 
 

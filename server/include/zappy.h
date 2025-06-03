@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <poll.h>
 #include "game.h"
+#include "my.h"
 
 #ifndef ZAPPY_H_
     #define ZAPPY_H_
@@ -25,7 +26,6 @@ typedef struct params_s {
 
 typedef struct graph_s {
     int fd;
-    struct pollfd *pollfd;
 } graph_t;
 
 typedef struct server_s {
@@ -81,5 +81,8 @@ int accept_client(server_t *server);
 /* free server  */
 void *free_server(server_t *server);
 void *free_params(params_t *params);
+
+/* gui_send_message.c */
+void send_map_size(server_t *server);
 
 #endif /* !ZAPPY_H_ */

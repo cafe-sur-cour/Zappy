@@ -48,7 +48,9 @@ static void diplay_help(int port)
 
 static int init_pollfds(server_t *server)
 {
-    server->poll_fds = calloc(server->nb_poll, sizeof(struct pollfd));
+    int max_fds = server->params->nb_client * server->params->nb_team + 1;
+
+    server->poll_fds = calloc(max_fds, sizeof(struct pollfd));
     if (!server->poll_fds) {
         error_message("Failed to allocate memory for poll file descriptors.");
         return -1;
@@ -68,7 +70,7 @@ void realloc_pollfds(server_t *server, int new_fd)
         (server->nb_poll + 1) * sizeof(struct pollfd));
 
     if (!new_poll_fds) {
-        error_message("Failed to reallocate memory for poll file descriptors.");
+        error_message("Failed to reallocate memory for poll");
         return;
     }
     server->poll_fds = new_poll_fds;
@@ -91,6 +93,9 @@ int start_protocol(server_t *server)
         }
         if (server->poll_fds[0].revents & POLLIN)
             accept_client(server);
+        if (server->graph->fd != -1){
+            send_map_size(server);
+        }
     }
     printf("\033[1;33mServer stopped.\033[0m\n");
     return 0;

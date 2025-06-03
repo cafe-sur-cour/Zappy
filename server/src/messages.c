@@ -37,6 +37,7 @@ static void print_received_message(char c, server_t *server)
         printf("Read character: '%c' (0x%02x)\n", c, (unsigned char)c);
     }
 }
+
 char *get_message(int fd, server_t *server)
 {
     static buffer_t cb = {0};
@@ -52,7 +53,10 @@ char *get_message(int fd, server_t *server)
         }
         cb_write(&cb, c);
         print_received_message(c, server);
+        if (c == '\n')
+            break;
     }
+    return cb.data;
 }
 
 int write_message(int fd, const char *message)

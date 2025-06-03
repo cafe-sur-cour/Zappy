@@ -88,9 +88,6 @@ static void free_graph(graph_t *graph)
 {
     if (!graph)
         return;
-    if (graph->pollfd) {
-        free(graph->pollfd);
-    }
     free(graph);
 }
 

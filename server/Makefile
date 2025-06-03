@@ -26,7 +26,8 @@ SRC 		=	src/params.c					\
 				src/buffer.c					\
 				src/free.c						\
 				src/algo.c						\
-				src/accept.c
+				src/accept.c					\
+				src/gui_send_message.c
 
 OBJ 		= 	$(SRC:.c=.o)
 
@@ -34,7 +35,7 @@ INCLUDES 	= 	-I./include
 
 CFLAGS 		=	-Wall -Wextra -Werror -Wshadow -g
 
-LIBS 		=
+LIBS 		= -L./ -lmy
 
 NAME 		= 	zappy_server
 
@@ -42,7 +43,11 @@ CC 			= 	gcc
 
 CRIT 		= 	-lcriterion --coverage
 
-all: $(NAME)
+all: libmy $(NAME)
+
+
+libmy:
+	$(MAKE) -C lib/my
 
 $(NAME): $(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
@@ -56,6 +61,7 @@ clean:
 	@rm -rf $(OBJ)
 	@rm -rf $(MAIN_OBJ)
 	@rm -rf *.gc*
+	-rm libmy.a
 
 fclean: clean
 	@rm -rf $(NAME)
