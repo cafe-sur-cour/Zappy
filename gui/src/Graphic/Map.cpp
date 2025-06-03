@@ -46,6 +46,7 @@ void Map::draw()
         drawTile(tile.x, tile.y, tile);
         drawEggs(tile.x, tile.y);
         drawPlayers(tile.x, tile.y);
+        drawFood(tile.x, tile.y, tile);
     }
 }
 
@@ -152,6 +153,26 @@ void Map::drawEggs(int x, int y)
     }
 }
 
+void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
+{
+    if (tile.food <= 0)
+        return;
+
+    Color foodColor = BROWN;
+    float foodSize = 0.25f;
+
+    for (int i = 0; i < tile.food; ++i) {
+        Vector3 position = {
+            static_cast<float>(x),
+            getOffset(DisplayPriority::FOOD, x, y, static_cast<size_t>(i)),
+            static_cast<float>(y)
+        };
+
+        _raylib->drawCube(position, foodSize, foodSize, foodSize, foodColor);
+        _raylib->drawCubeWires(position, foodSize, foodSize, foodSize, BLACK);
+    }
+}
+
 float Map::getOffset(DisplayPriority priority, int x, int y, size_t stackIndex)
 {
     switch (priority) {
@@ -176,6 +197,35 @@ float Map::getOffset(DisplayPriority priority, int x, int y, size_t stackIndex)
                 basePlayerHeight = BASE_HEIGHT_EGG + (eggCount * EGG_HEIGHT);
 
             return basePlayerHeight + (stackIndex * PLAYER_HEIGHT);
+        }
+
+        case DisplayPriority::FOOD: {
+            const auto& eggs = _gameInfos->getEggs();
+            size_t eggCount = 0;
+
+            for (const auto& egg : eggs) {
+                if (egg.x == x && egg.y == y && !egg.hatched) {
+                    eggCount++;
+                }
+            }
+
+            const auto& players = _gameInfos->getPlayers();
+            size_t playerCount = 0;
+
+            for (const auto& player : players) {
+                if (player.x == x && player.y == y) {
+                    playerCount++;
+                }
+            }
+
+            float baseFoodHeight = BASE_HEIGHT_FOOD;
+            if (eggCount > 0)
+                baseFoodHeight = BASE_HEIGHT_EGG + (eggCount * EGG_HEIGHT);
+
+            if (playerCount > 0)
+                baseFoodHeight += (playerCount * PLAYER_HEIGHT);
+
+            return baseFoodHeight + (stackIndex * FOOD_HEIGHT);
         }
 
         default:
