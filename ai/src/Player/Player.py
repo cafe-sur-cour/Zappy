@@ -39,9 +39,10 @@ class Player:
     def layAEgg(self) -> None:
         print(f"Player team: {self.teamName} has laid an egg!")
 
-    def loop(self) -> None:
+    def loop(self) -> None: # This is a default loop for the player to simulate actions it's not definitive
         while self.alive:
             msg = self.hash.hashMessage("J'ai tous les objets pour incanter !")
             print(f"Crypted message: {msg}")
-            print(f"Uncrypted message: {self.hash.unHashMessage(msg)}")
+            print(f"Decrypted message: {self.hash.unHashMessage(msg)}")
             sleep(1)
+            self.alive = False
