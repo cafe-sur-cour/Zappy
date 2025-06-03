@@ -29,6 +29,10 @@ void Text::draw()
 {
 }
 
+void Text::update()
+{
+}
+
 void Text::setText(const std::string& text)
 {
     _text = text;

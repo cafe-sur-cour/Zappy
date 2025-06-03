@@ -9,6 +9,7 @@
 
 #include "../UIElement/AUIElement.hpp"
 #include "../../RayLib/RayLib.hpp"
+#include <memory>
 
 /**
  * @brief Text UI element
