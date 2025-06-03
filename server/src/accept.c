@@ -25,7 +25,7 @@ static int check_team_name(server_t *server, int new_sockfd)
         close(new_sockfd);
         return -1;
     }
-    if (!graphic(message, new_sockfd, server)) {
+    if (!process_new_client(message, new_sockfd, server)) {
         free(message);
         close(new_sockfd);
         return -1;
