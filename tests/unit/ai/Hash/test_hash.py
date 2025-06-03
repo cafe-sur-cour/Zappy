@@ -9,9 +9,7 @@
 import unittest
 import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../../../ai/src'))
-
-from Hash.Hash import Hash
+from ai.src.Hash.Hash import Hash
 
 class TestHash(unittest.TestCase):
     def setUp(self):
