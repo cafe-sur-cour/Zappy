@@ -26,8 +26,7 @@ def main():
               f"Port: {config['port']}, "
               f"Team name: {config['name']}, "
               f"Machine: {config['machine']}{Colors.RESET}")
-        com = Communication(config['name'], config['machine'], config['port'])
-        player = Player(config['name'], com)
+        player = Player(config['name'], config['machine'], config['port'])
         player.loop()
         # TODO: Implement AI and Communication logic here
         return 0

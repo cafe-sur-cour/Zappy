@@ -12,9 +12,11 @@ from src.Communication.Communication import Communication
 
 
 class Player:
-    def __init__(self, name: str, com: Communication):
-        self.communication: Communication = com
+    def __init__(self, name: str, ip : str, port: int = 4242) -> None:
+        self.communication: Communication = Communication(name, ip, port)
         self.teamName: str = name
+        self.ip: str = ip
+        self.port: int = port
         self.level: int = 1
         self.hash: Hash = Hash(name)
         self.inventory: dict[str, int] = {

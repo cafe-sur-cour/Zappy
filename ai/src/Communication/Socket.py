@@ -34,12 +34,10 @@ class Socket:
             if not data:
                 raise SocketException("Socket connection closed by the server")
             self._buffer += data.decode("utf-8")
-        if '\n' in self._buffer:
-            message, self._buffer = self._buffer.split('\n', 1)
-            if message == "dead":
-                raise PlayerDead()
-            return message + '\n'
-        raise SocketException("No complete message received from the socket")
+        message, self._buffer = self._buffer.split('\n', 1)
+        if message == "dead":
+            raise PlayerDead()
+        return message + '\n'
 
     def close(self):
         self._socket.close()
