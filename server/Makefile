@@ -29,7 +29,8 @@ SRC 		=	src/params.c					\
 				src/protocol.c					\
 				src/client.c					\
 				src/map_init.c					\
-				src/algo.c
+				src/algo.c						\
+				src/accept.c
 
 OBJ 		= 	$(SRC:.c=.o)
 

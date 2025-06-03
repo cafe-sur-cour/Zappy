@@ -130,7 +130,7 @@ static bool check_all_params(int argc, char **argv, bool is_ok,
     return is_ok;
 }
 
-static void print_elem(params_t *params)
+void print_elem(params_t *params)
 {
     if (params->isDebug == false)
         return;

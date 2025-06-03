@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <poll.h>
 
 int helper(void)
 {
@@ -70,4 +71,26 @@ char *get_message(int fd)
             return NULL;
     }
     return buffer;
+}
+
+int write_message(int fd, const char *message)
+{
+    struct pollfd pollfd = {.fd = fd, .events = POLLOUT};
+
+    if (poll(&pollfd, 1, 10) == -1) {
+        error_message("Client socket not ready for writing.");
+        close(fd);
+        return -1;
+    }
+    if (pollfd.revents & POLLOUT) {
+        if (write(fd, message, strlen(message)) == -1) {
+            error_message("Failed to write message to client.");
+            close(fd);
+            return -1;
+        }
+        return 0;
+    }
+    error_message("Client socket not ready for writing.");
+    close(fd);
+    return -1;
 }

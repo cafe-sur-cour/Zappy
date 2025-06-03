@@ -59,6 +59,8 @@ void *free_server(server_t *server)
 {
     if (!server)
         return NULL;
+    if (server->poll_fds)
+        free(server->poll_fds);
     if (server->params)
         free_params(server->params);
     if (server->sockfd != -1)
@@ -75,6 +77,9 @@ server_t *init_server(int argc, char **argv)
         error_message("Memory allocation failed for server.");
         return NULL;
     }
+    server->nb_poll = 0;
+    server->map = NULL;
+    server->poll_fds = NULL;
     server->params = check_args(argc, argv);
     if (!server->params)
         return free_server(server);

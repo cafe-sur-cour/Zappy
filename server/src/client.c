@@ -13,10 +13,11 @@
 
 #include "zappy.h"
 
-bool valid_team_name(const char *team_name, params_t *params)
+bool valid_team_name(const char *team_name, server_t *server)
 {
-    for (int i = 0; i < params->nb_team; i++) {
-        if (strcmp(team_name, params->teams[i]) == 0) {
+    for (int i = 0; i < server->params->nb_team; i++) {
+        if (strcmp(team_name, server->params->teams[i]) == 0) {
+            printf(" New client connected with team name: %s\n", team_name);
             return true;
         }
     }

@@ -25,8 +25,10 @@ typedef struct params_s {
 
 typedef struct server_s {
     int sockfd;
+    int nb_poll;
     params_t *params;
     map_t *map;
+    struct pollfd *poll_fds;
 } server_t;
 
 typedef struct command_pf_s {
@@ -39,6 +41,7 @@ int helper(void);
 void error_message(const char *message);
 void printfd(char const *message, int fd);
 char *get_message(int fd);
+int write_message(int fd, const char *message);
 
 /* checkers.c */
 bool check_port(char const *flag, char const *value, params_t *params);
@@ -57,10 +60,15 @@ void *free_server(server_t *server);
 
 /* protocol.c */
 int start_protocol(server_t *server);
+void realloc_pollfds(server_t *server, int new_fd);
 
 /* client.c */
-bool valid_team_name(const char *team_name, params_t *params);
+bool valid_team_name(const char *team_name, server_t *server);
 
 /* init_map.c */
-void inti_map(server_t *server);
+void init_map(server_t *server);
+
+/* accept.c */
+int accept_client(server_t *server);
+
 #endif /* !ZAPPY_H_ */
