@@ -37,6 +37,10 @@ static graph_t *init_graph(void)
 {
     graph_t *graph = malloc(sizeof(graph_t));
 
+    if (!graph) {
+        error_message("Failed to allocate memory for graph.");
+        exit(84);
+    }
     graph->fd = -1;
     graph->pollfd = NULL;
     return graph;
