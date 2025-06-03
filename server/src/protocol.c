@@ -79,13 +79,12 @@ void realloc_pollfds(server_t *server, int new_fd)
     server->nb_poll++;
 }
 
-static bool send_gui_message(server_t *server)
+static bool send_gui_message(server_t *server, bool tmp)
 {
-    bool tmp = false;
-
     if (server->graph->fd != -1 && tmp == false) {
         send_map_size(server);
         send_entrie_map(server);
+        send_team_name(server);
         tmp = true;
     }
     return tmp;
@@ -107,7 +106,7 @@ int start_protocol(server_t *server)
         }
         if (server->poll_fds[0].revents & POLLIN)
             accept_client(server);
-        temp = send_gui_message(server);
+        temp = send_gui_message(server, temp);
     }
     printf("\033[1;33mServer stopped.\033[0m\n");
     return 0;

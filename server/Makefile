@@ -27,7 +27,8 @@ SRC 		=	src/params.c					\
 				src/free.c						\
 				src/algo.c						\
 				src/accept.c					\
-				src/gui_send_message.c
+				src/guiMessage/gui_send_map_data.c	\
+				src/guiMessage/gui_send_team_name.c
 
 OBJ 		= 	$(SRC:.c=.o)
 

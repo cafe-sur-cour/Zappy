@@ -82,10 +82,11 @@ int accept_client(server_t *server);
 void *free_server(server_t *server);
 void *free_params(params_t *params);
 
-/* gui_send_message.c */
+/* Function to send info to the gui */
 void send_map_size(server_t *server);
 void send_entrie_map(server_t *server);
 void send_map_tile(ressources_t *ressource, server_t *server,
     int posX, int posY);
+void send_team_name(server_t *server);
 
 #endif /* !ZAPPY_H_ */

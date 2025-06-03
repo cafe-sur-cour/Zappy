@@ -95,4 +95,7 @@ void send_map_size(server_t *server)
 
     snprintf(message, xLenthth, "msz %s %s\n", x, y);
     write_message(server->graph->fd, message);
+    free(message);
+    free(x);
+    free(y);
 }
