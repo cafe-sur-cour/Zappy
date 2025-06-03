@@ -1,4 +1,4 @@
-PROJECT_NAME           = "Arcade architecture"
+PROJECT_NAME           = "Zappy architecture"
 OUTPUT_DIRECTORY       = doc
 INPUT                  = ./
 RECURSIVE              = YES
@@ -11,7 +11,7 @@ MARKDOWN_SUPPORT       = YES
 EXTRACT_PRIVATE        = YES
 SHOW_FILES             = YES
 SHOW_NAMESPACES        = YES
-PROJECT_LOGO           = styleDoc/logo-arcade.svg
+PROJECT_LOGO           = styleDoc/zappy.png
 
 
 HTML_EXTRA_STYLESHEET  = styleDoc/doxygen-awesome.css \
@@ -24,7 +24,7 @@ HTML_EXTRA_FILES       = styleDoc/doxygen-awesome-darkmode-toggle.js \
                         styleDoc/doxygen-awesome-paragraph-link.js \
                         styleDoc/doxygen-awesome-tabs.js \
                         styleDoc/header.html    \
-                        styleDoc/logo-arcade.svg
+                        styleDoc/zappy.png
 
 HTML_HEADER            = styleDoc/header.html
 
