@@ -11,6 +11,9 @@
 #include <unistd.h>
 #include <poll.h>
 
+#include "zappy.h"
+#include "buffer.h"
+
 int helper(void)
 {
     printf("USAGE: ./zappy_server -p port -x width -y height ");
@@ -28,49 +31,47 @@ void printfd(char const *message, int fd)
     dprintf(fd, "%s\n", message);
 }
 
-static char *allocate_buffer(void)
+static void print_received_message(char c, server_t *server)
 {
-    char *buffer = calloc(1, sizeof(char));
-
-    if (!buffer) {
-        error_message("Failed to allocate memory for message buffer.");
-        return NULL;
+    if (server->params->is_debug == true) {
+        printf("Read character: '%c' (0x%02x)\n", c, (unsigned char)c);
     }
-    return buffer;
 }
 
-static char *resize_buffer(char *buffer, size_t len, char c)
+static char *get_current_char(buffer_t *cb)
 {
-    buffer = realloc(buffer, len + 2);
-    if (!buffer) {
-        error_message("Failed to reallocate memory for message buffer.");
-        return NULL;
+    char *line = malloc(BUFFER_SIZE);
+
+    if (cb_getline(cb, line, BUFFER_SIZE) > 0) {
+        if (strchr(line, '\n')) {
+            line[strcspn(line, "\n")] = '\0';
+            return line;
+        }
     }
-    buffer[len] = c;
-    return buffer;
+    return NULL;
 }
 
-char *get_message(int fd)
+char *get_message(int fd, server_t *server)
 {
+    static buffer_t cb = {0};
     char c = 0;
-    char *buffer = allocate_buffer();
+    char *line = malloc(BUFFER_SIZE);
+    int bytes_read;
 
-    if (!buffer)
+    if (!line)
         return NULL;
-    for (size_t len = 0; c != '\n'; len++) {
-        if (read(fd, &c, 1) <= 0) {
-            free(buffer);
+    while (1) {
+        line = get_current_char(&cb);
+        if (line != NULL)
+            return line;
+        bytes_read = read(fd, &c, 1);
+        if (bytes_read <= 0) {
+            free(line);
             return NULL;
         }
-        if (c == '\n') {
-            buffer[len] = '\0';
-            return buffer;
-        }
-        buffer = resize_buffer(buffer, len, c);
-        if (!buffer)
-            return NULL;
+        cb_write(&cb, c);
+        print_received_message(c, server);
     }
-    return buffer;
 }
 
 int write_message(int fd, const char *message)

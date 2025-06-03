@@ -10,13 +10,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/* Allows the pos to be equally shuffled */
 tiles_t *shuffle_fisher(int width, int heigth)
 {
     int total = width * heigth;
-    tiles_t *tiles = malloc(sizeof(tiles_t) * total);
+    tiles_t *tiles = calloc(total, sizeof(tiles_t));
     tiles_t tmp = {0, 0};
     int j = 0;
 
+    if (!tiles)
+        exit(84);
     for (int i = 0; i < total; i++) {
         tiles[i].x = i % width;
         tiles[i].y = i / width;

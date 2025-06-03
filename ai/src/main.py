@@ -1,6 +1,6 @@
 ##
 ## EPITECH PROJECT, 2025
-## B-YEP-400-NAN-4-1-zappy-albane.merian
+## zappy
 ## File description:
 ## main
 ##
@@ -8,7 +8,8 @@
 from src.Utils.Utils import USAGE_STRING, Colors
 from src.CLI.CLI import CLI
 from src.Exceptions.Exceptions import CLIParsingException
-from sys import argv, exit
+from src.Player.Player import Player
+from sys import argv
 
 
 def main():
@@ -24,7 +25,8 @@ def main():
               f"Port: {config['port']}, "
               f"Team name: {config['name']}, "
               f"Machine: {config['machine']}{Colors.RESET}")
-
+        player = Player(config['name'])
+        player.loop()
         # TODO: Implement AI and Communication logic here
         return 0
 

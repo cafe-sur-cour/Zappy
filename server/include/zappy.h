@@ -20,8 +20,13 @@ typedef struct params_s {
     char **teams;
     int nb_client;
     int freq;
-    bool isDebug;
+    bool is_debug;
 } params_t;
+
+typedef struct graph_s {
+    int fd;
+    struct pollfd *pollfd;
+} graph_t;
 
 typedef struct server_s {
     int sockfd;
@@ -29,6 +34,7 @@ typedef struct server_s {
     params_t *params;
     map_t *map;
     struct pollfd *poll_fds;
+    graph_t *graph;
 } server_t;
 
 typedef struct command_pf_s {
@@ -40,8 +46,8 @@ typedef struct command_pf_s {
 int helper(void);
 void error_message(const char *message);
 void printfd(char const *message, int fd);
-char *get_message(int fd);
 int write_message(int fd, const char *message);
+char *get_message(int fd, server_t *server);
 
 /* checkers.c */
 bool check_port(char const *flag, char const *value, params_t *params);
@@ -64,11 +70,16 @@ void realloc_pollfds(server_t *server, int new_fd);
 
 /* client.c */
 bool valid_team_name(const char *team_name, server_t *server);
+bool graphic(const char *team_name, int fd, server_t *server);
 
 /* init_map.c */
 void init_map(server_t *server);
 
 /* accept.c */
 int accept_client(server_t *server);
+
+/* free server  */
+void *free_server(server_t *server);
+void *free_params(params_t *params);
 
 #endif /* !ZAPPY_H_ */

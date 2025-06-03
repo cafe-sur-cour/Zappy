@@ -9,7 +9,7 @@
 #define MSGHANDLER_HPP_
 
 #include "../Game/GameInfos.hpp"
-#include "../Communication/Communication.hpp"
+#include "../Communication/ICommunication.hpp"
 #include "../Utils/Constants.hpp"
 
 #include <memory>
@@ -24,7 +24,7 @@
 
 class MsgHandler {
     public:
-        MsgHandler(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<Communication> communication);
+        MsgHandler(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<ICommunication> communication);
         ~MsgHandler();
 
         void start();
@@ -67,7 +67,7 @@ class MsgHandler {
         std::condition_variable _condition;
 
         std::shared_ptr<GameInfos> _gameInfos;
-        std::shared_ptr<Communication> _communication;
+        std::shared_ptr<ICommunication> _communication;
         std::mutex _gameInfosMutex;
 
         std::map<std::string, std::function<bool(const std::string&)>> _messageHandlers;

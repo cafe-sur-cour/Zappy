@@ -11,12 +11,6 @@ RED=\033[1;31m
 YELLOW=\033[1;33m
 NC=\033[0m
 
-UNIT 	    = 	unit_tests
-
-TESTS 	    =   tests/ctest_params.c			\
-				tests/ctest_messages.c			\
-				tests/ctest_checkers.c			\
-				tests/ctest_server.c
 
 MAIN 		= 	src/main.c
 
@@ -29,6 +23,8 @@ SRC 		=	src/params.c					\
 				src/protocol.c					\
 				src/client.c					\
 				src/map_init.c					\
+				src/buffer.c					\
+				src/free.c						\
 				src/algo.c						\
 				src/accept.c
 
@@ -66,18 +62,6 @@ fclean: clean
 	@rm -rf $(UNIT)
 	@rm -f tests/*.c
 
-unit_test: fclean
-	@echo -e "$(YELLOW)ᒥ🧪ᒧ Compiling unit tests...$(NC)"
-	@cp -f ../tests/unit/ctest_*.c tests/
-	@$(CC) -o $(UNIT) $(TESTS) $(SRC) $(CFLAGS) $(INCLUDES) $(CRIT)
-
-tests_run: unit_test
-	@echo -e "$(YELLOW)ᒥ🧪ᒧ Running unit tests...$(NC)"
-	@./$(UNIT)
-
-coverage: tests_run
-	@echo -e "$(BLUE)ᒥ📊ᒧ Generating coverage report...$(NC)"
-	@gcovr --exclude /tests
 
 re: fclean all
 
