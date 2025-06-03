@@ -81,6 +81,8 @@ void realloc_pollfds(server_t *server, int new_fd)
 
 int start_protocol(server_t *server)
 {
+    bool temp = false;
+
     setup_signal();
     diplay_help(server->params->port);
     if (init_pollfds(server) == -1)
@@ -93,8 +95,10 @@ int start_protocol(server_t *server)
         }
         if (server->poll_fds[0].revents & POLLIN)
             accept_client(server);
-        if (server->graph->fd != -1){
+        if (server->graph->fd != -1 && temp == false) {
             send_map_size(server);
+            send_entrie_map(server);
+            temp = true;
         }
     }
     printf("\033[1;33mServer stopped.\033[0m\n");

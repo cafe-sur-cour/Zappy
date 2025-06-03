@@ -9,17 +9,92 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-// void send_entrie_map(server_t *server)
-// {
 
-// }
+static int *calloc_int(void)
+{
+    int *elem = malloc(sizeof(int) * 7);
 
-// void send_map_tile(server_t *sever)
-// {
+    for (int i = 0; i < 7; i++)
+        elem[i] = 0;
+    return elem;
+}
 
-// }
+static int *count_cases(ressources_t *current, int *elem)
+{
+    switch (current->type) {
+        case FOOD:
+            elem[0]++;
+            break;
+        case LINEMATE:
+            elem[1]++;
+            break;
+        case DERAUMERE:
+            elem[2]++;
+            break;
+        case SIBUR:
+            elem[3]++;
+            break;
+        case MENDIANE:
+            elem[4]++;
+            break;
+        case PHIRAS:
+            elem[5]++;
+            break;
+        case THYSTAME: elem[6]++;
+            break;
+    }
+    return elem;
+}
+
+static int *nb_elem(ressources_t *ressources, int x, int y)
+{
+    ressources_t *current = ressources;
+    int *elem = calloc_int();
+
+    while (current != NULL) {
+        if (current->posX == x && current->posY == y) {
+            elem = count_cases(current, elem);
+        }
+        current = current->next;
+    }
+    return elem;
+}
+
+/* Send the bct message to the gui */
+void send_map_tile(ressources_t *ressource, server_t *server,
+    int posX, int posY)
+{
+    int *elem = nb_elem(ressource, posX, posY);
+    int xLength = int_str_len(ressource->posX) +
+        int_str_len(ressource->posY) +
+        int_str_len(elem[0]) + int_str_len(elem[1]) +
+        int_str_len(elem[2]) + int_str_len(elem[3]) +
+        int_str_len(elem[4]) + int_str_len(elem[5]) +
+        int_str_len(elem[6]) + 14;
+    char *message = malloc(sizeof(char) * xLength);
+
+    snprintf(message, xLength, "bct %d %d %d %d %d %d %d %d %d\n",
+        ressource->posX, ressource->posY,
+        elem[0], elem[1], elem[2], elem[3],
+        elem[4], elem[5], elem[6]);
+    write_message(server->graph->fd, message);
+    free(message);
+    free(elem);
+}
 
 
+void send_entrie_map(server_t *server)
+{
+    ressources_t *current = server->map->ressources;
+
+    while (current != NULL) {
+        send_map_tile(current, server, current->posX, current->posY);
+        current = current->next;
+    }
+}
+
+
+/* Send  the msz message to the gui */
 void send_map_size(server_t *server)
 {
     int xLenthth = int_str_len(server->map->width) +
