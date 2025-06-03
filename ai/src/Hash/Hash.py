@@ -1,14 +1,8 @@
 #
 # EPITECH PROJECT, ${YEAR}
-# ${PROJECT_NAME}
+# zappy
 # File description:
-# ${FILE_NAME}
-#
-#
-# EPITECH PROJECT, ${YEAR}
-# ${PROJECT_NAME}
-# File description:
-# ${FILE_NAME}
+# hash.py
 #
 
 class Hash:
@@ -24,6 +18,6 @@ class Hash:
         return "".join(f"{b:02x}" for b in hashed)  # hex encode
 
     def unHashMessage(self, hex_message: str) -> str:
-        encrypted = bytes(int(hex_message[i:i+2], 16) for i in range(0, len(hex_message), 2))
+        encrypted = bytes(int(hex_message[i:i + 2], 16) for i in range(0, len(hex_message), 2))
         decrypted = self.simple_xor(encrypted)
         return decrypted.decode()
