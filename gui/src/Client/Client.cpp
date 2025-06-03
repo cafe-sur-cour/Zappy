@@ -30,7 +30,7 @@ Client::Client(int ac, const char *const *av) :
     if (!_communication->isConnected())
         return;
 
-    _gui = std::make_unique<GUI>();
+    _gui = std::make_unique<GUI>(_gameInfos);
     _gui->run();
 }
 
