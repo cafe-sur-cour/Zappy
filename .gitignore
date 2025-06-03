@@ -12,6 +12,7 @@ zappy_ref-v3.0.0
 .DS_Store
 zappy_ai
 zappy_gui
+zappy_gui.AppImage
 zappy_server
 .vscode
 .idea
