@@ -90,7 +90,7 @@ Test(map_init, init_map_basic, .init = redirect_all_std)
 {
     server_t *server = create_test_server(5, 5, false);
     
-    inti_map(server);
+    init_map(server);
     
     cr_assert_not_null(server->map, "Map should be initialized");
     cr_assert_eq(server->map->width, 5, "Map width should be set correctly");
@@ -104,7 +104,7 @@ Test(map_init, resource_distribution, .init = redirect_all_std)
 {
     server_t *server = create_test_server(10, 10, false);
     
-    inti_map(server);
+    init_map(server);
     
     // Count resources by type
     int resource_count[7] = {0};
@@ -139,7 +139,7 @@ Test(map_init, debug_output, .init = redirect_all_std)
 {
     server_t *server = create_test_server(3, 3, true);
     
-    inti_map(server);
+    init_map(server);
     
     // Debug mode should produce output
     fflush(stdout);
@@ -150,7 +150,7 @@ Test(map_init, empty_map, .init = redirect_all_std)
 {
     server_t *server = create_test_server(1, 1, false);
     
-    inti_map(server);
+    init_map(server);
     
     cr_assert_not_null(server->map, "Even 1x1 map should be initialized");
     cr_assert_eq(server->map->width, 1, "1x1 map width should be 1");
@@ -166,7 +166,7 @@ Test(map_init, large_map, .init = redirect_all_std)
 {
     server_t *server = create_test_server(50, 50, false);
     
-    inti_map(server);
+    init_map(server);
     
     cr_assert_not_null(server->map, "Large map should be initialized");
     cr_assert_eq(server->map->width, 50, "Large map width should be correct");
