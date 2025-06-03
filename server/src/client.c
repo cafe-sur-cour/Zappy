@@ -6,33 +6,20 @@
 */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <unistd.h>
+#include <stdbool.h>
+#include <string.h>
 
 #include "zappy.h"
 
-void free_clients(client_t *clients)
+bool valid_team_name(const char *team_name, params_t *params)
 {
-    client_t *current = clients;
-    client_t *next;
-
-    while (current) {
-        next = current->next;
-        close(current->sockfd);
-        free(current);
-        current = next;
+    for (int i = 0; i < params->nb_team; i++) {
+        if (strcmp(team_name, params->teams[i]) == 0) {
+            return true;
+        }
     }
-}
-
-int get_nb_clients(client_t *clients)
-{
-    int result = 0;
-    client_t *current = clients;
-
-    if (!current)
-        return result;
-    while (current) {
-        result++;
-        current = current->next;
-    }
-    return result;
+    error_message("Invalid team name provided.");
+    return false;
 }

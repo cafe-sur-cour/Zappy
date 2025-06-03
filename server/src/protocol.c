@@ -7,6 +7,8 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include <poll.h>
 #include <stdio.h>
 #include <signal.h>
@@ -47,14 +49,27 @@ struct pollfd *init_pollfds(server_t *server)
 
 static int accept_client(server_t *server)
 {
+    char *message = NULL;
     int new_sockfd = accept(server->sockfd, NULL, NULL);
 
     if (new_sockfd == -1) {
-        printf("\033[0;31mFailed to accept new client connection.\033[0m");
+        error_message("Failed to accept new client connection.");
         return -1;
     }
-    printfd("WELCOME", new_sockfd);
-    printf("New client connected.\n");
+    printfd("\033[1;32mWelcome to Trantor!\33[0m\n", new_sockfd);
+    send(new_sockfd, "WELCOME\n", 8, 0);
+    message = get_message(new_sockfd);
+    if (!message) {
+        error_message("Failed to read team name message from client.");
+        close(new_sockfd);
+        return -1;
+    }
+    if (!valid_team_name(message, server->params)) {
+        printfd("\033[1;31mInvalid team name.\033[0m", new_sockfd);
+        free(message);
+        close(new_sockfd);
+        return -1;
+    }
     return 0;
 }
 

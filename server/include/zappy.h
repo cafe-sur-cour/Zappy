@@ -23,13 +23,6 @@ typedef struct params_s {
     bool isDebug;
 } params_t;
 
-typedef struct client_s {
-    int id;
-    int sockfd;
-    struct pollfd pollfd;
-    struct client_s *next;
-} client_t;
-
 typedef struct server_s {
     int sockfd;
     params_t *params;
@@ -45,6 +38,7 @@ typedef struct command_pf_s {
 int helper(void);
 void error_message(const char *message);
 void printfd(char const *message, int fd);
+char *get_message(int fd);
 
 /* checkers.c */
 bool check_port(char const *flag, char const *value, params_t *params);
@@ -65,9 +59,7 @@ void *free_server(server_t *server);
 int start_protocol(server_t *server);
 
 /* client.c */
-void free_clients(client_t *clients);
-int get_nb_clients(client_t *clients);
-
+bool valid_team_name(const char *team_name, params_t *params);
 
 /* init_map.c */
 void inti_map(server_t *server);
