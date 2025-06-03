@@ -25,6 +25,8 @@ static int *count_cases(ressources_t *current, int *elem)
 {
     crystal_t *cryst = malloc(sizeof(crystal_t) * 7);
 
+    if (cryst == NULL)
+        return NULL;
     for (int i = 0; i < 7; i++) {
         if (current->type == cryst[i]) {
             elem[i] += 1;
@@ -38,6 +40,8 @@ static int *nb_elem(ressources_t *ressources, int x, int y)
     ressources_t *current = ressources;
     int *elem = calloc_int();
 
+    if (elem == NULL)
+        return NULL;
     while (current != NULL) {
         if (current->posX == x && current->posY == y) {
             elem = count_cases(current, elem);
@@ -52,14 +56,18 @@ void send_map_tile(ressources_t *ressource, server_t *server,
     int posX, int posY)
 {
     int *elem = nb_elem(ressource, posX, posY);
-    int xLength = int_str_len(ressource->posX) +
+    int xLength = 0;
+    char *message = NULL;
+
+    if (elem == NULL)
+        return;
+    xLength = int_str_len(ressource->posX) +
         int_str_len(ressource->posY) +
         int_str_len(elem[0]) + int_str_len(elem[1]) +
         int_str_len(elem[2]) + int_str_len(elem[3]) +
         int_str_len(elem[4]) + int_str_len(elem[5]) +
         int_str_len(elem[6]) + 14;
-    char *message = malloc(sizeof(char) * xLength);
-
+    message = malloc(sizeof(char) * xLength);
     snprintf(message, xLength, "bct %d %d %d %d %d %d %d %d %d\n",
         ressource->posX, ressource->posY,
         elem[0], elem[1], elem[2], elem[3],
