@@ -88,7 +88,7 @@ class Communication:
                 f"Invalid response from Left: {response[:-1]}"
             )
 
-    def getLook(self) -> list[str]:
+    def getLook(self) -> list[dict[str, int]]:
         self._socket.send("Look\n")
         response = self._socket.receive()
 
@@ -97,9 +97,23 @@ class Communication:
                 f"Invalid response from Look: {response[:-1]}"
             )
 
-        return [d.strip() for d in response[:-1][1:-1].split(",")]
+        result = []
+        items = response[:-1][1:-1].split(",")
+        for item in items:
+            result.append({})
+            if not item:
+                continue
+            tile = item.strip().split(" ")
+            tile = [d.strip() for d in tile if d and d.strip()]
+            for data in tile:
+                if not data:
+                    continue
+                if (data not in result[-1]):
+                    result[-1][data] = 0
+                result[-1][data] += 1
+        return result
 
-    def getInventory(self) -> list[tuple[str, int]]:
+    def getInventory(self) -> dict[str, int]:
         self._socket.send("Inventory\n")
         response = self._socket.receive()
 
@@ -109,7 +123,7 @@ class Communication:
             )
 
         items = response[:-1][1:-1].split(",")
-        inventory = []
+        inventory = dict()
         for item in items:
             if not item:
                 continue
@@ -121,7 +135,7 @@ class Communication:
                 name, quantity = data
                 if not name or not quantity:
                     raise ValueError("Invalid item format")
-                inventory.append((name, int(quantity)))
+                inventory[name] = int(quantity)
             except ValueError:
                 raise CommunicationInvalidResponseException(
                     f"Invalid item format in Inventory: {item}"
