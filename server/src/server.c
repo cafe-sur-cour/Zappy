@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <stdio.h>
 
 #include "zappy.h"
 
@@ -55,18 +56,12 @@ static int listen_socket(server_t *server)
     return 0;
 }
 
-void *free_server(server_t *server)
+void null_elem(server_t *server, int argc, char **argv)
 {
-    if (!server)
-        return NULL;
-    if (server->params)
-        free_params(server->params);
-    if (server->clients)
-        free_clients(server->clients);
-    if (server->sockfd != -1)
-        close(server->sockfd);
-    free(server);
-    return NULL;
+    server->graph = NULL;
+    server->map = NULL;
+    server->params = NULL;
+    server->params = check_args(argc, argv);
 }
 
 server_t *init_server(int argc, char **argv)
@@ -77,10 +72,9 @@ server_t *init_server(int argc, char **argv)
         error_message("Memory allocation failed for server.");
         return NULL;
     }
-    server->params = check_args(argc, argv);
+    null_elem(server, argc, argv);
     if (!server->params)
         return free_server(server);
-    server->clients = NULL;
     if (set_socket(server) == -1)
         return free_server(server);
     if (bind_socket(server) == -1)

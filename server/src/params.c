@@ -100,20 +100,6 @@ static bool check_names_flag(int argc, char **argv, params_t *params)
         (const char **) &argv[pos + 1], names_count, params) == 0;
 }
 
-void *free_params(params_t *params)
-{
-    if (!params)
-        return NULL;
-    if (params->teams) {
-        for (int i = 0; i < params->nb_team; i++) {
-            free(params->teams[i]);
-        }
-        free(params->teams);
-    }
-    free(params);
-    return NULL;
-}
-
 static bool check_all_params(int argc, char **argv, bool is_ok,
     params_t *params)
 {

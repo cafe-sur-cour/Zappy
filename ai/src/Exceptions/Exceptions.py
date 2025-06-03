@@ -1,6 +1,6 @@
 ##
 ## EPITECH PROJECT, 2025
-## B-YEP-400-NAN-4-1-zappy-albane.merian
+## zappy
 ## File description:
 ## Exceptions
 ##
@@ -40,3 +40,27 @@ class CLIInvalidArgumentException(CLIParsingException):
 
     def __init__(self, message: str):
         super().__init__(f"Invalid Argument: {message}")
+
+
+class SocketException(Exception):
+
+    def __init__(self, message: str):
+        super().__init__(f"Socket Error: {message}")
+
+
+class CommunicationException(Exception):
+
+    def __init__(self, message: str):
+        super().__init__(message)
+
+
+class CommunicationHandshakeException(CommunicationException):
+
+    def __init__(self, message: str):
+        super().__init__(f"Handshake Error: {message}")
+
+
+class CommunicationInvalidResponseException(CommunicationException):
+
+    def __init__(self, message: str):
+        super().__init__(f"Invalid response from server: {message}")
