@@ -124,7 +124,7 @@ int RayLib::getScreenHeight() const
     return GetScreenHeight();
 }
 
-Vector2 RayLib::getMouseDelta() const
+Vector2 RayLib::getMouseDelta()
 {
     if (_isCursorLocked) {
         return GetMouseDelta();
@@ -133,7 +133,7 @@ Vector2 RayLib::getMouseDelta() const
         Vector2 delta = { currentMousePosition.x - _previousMousePosition.x,
             currentMousePosition.y - _previousMousePosition.y };
 
-        ((RayLib*)this)->_previousMousePosition = currentMousePosition;
+        this->_previousMousePosition = currentMousePosition;
         return delta;
     }
 }
@@ -231,7 +231,8 @@ void RayLib::updateCameraCustom()
         int screenCenterY = getScreenHeight() / 2;
 
         setMousePosition(screenCenterX, screenCenterY);
-        _previousMousePosition = (Vector2){ (float)screenCenterX, (float)screenCenterY };
+        _previousMousePosition = Vector2{ static_cast<float>(screenCenterX),
+            static_cast<float>(screenCenterY) };
         disableCursor();
     }
 

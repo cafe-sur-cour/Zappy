@@ -30,7 +30,7 @@ class RayLib {
         bool isMouseButtonPressed(int button) const;
         bool isMouseButtonReleased(int button) const;
         bool isKeyDown(int key) const;
-        Vector2 getMouseDelta() const;
+        Vector2 getMouseDelta();
         Vector2 getMousePosition() const;
         void setMousePosition(int x, int y);
         void disableCursor();

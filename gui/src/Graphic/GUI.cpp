@@ -6,6 +6,7 @@
 */
 
 #include <cmath>
+#include <memory>
 #include "GUI.hpp"
 #include "../Utils/Constants.hpp"
 
