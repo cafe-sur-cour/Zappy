@@ -11,7 +11,7 @@ if ! command -v pycodestyle &> /dev/null; then
 fi
 
 # Run pycodestyle on all .py files in the ai directory, excluding tests/ and bonus/
-find ./ai -type f -name "*.py" ! -path "*/tests/*" ! -path "*/bonus/*" ! -path "*/__pycache__/*" | while read -r file; do
+find ./ai -type f -name "*.py" ! -path "*/tests/*" ! -path "*/bonus/*" ! -path "*/__pycache__/*" ! -path "*venv*" | while read -r file; do
     echo "Checking $file..."
     # Using --ignore=E266 to ignore the Epitech header style (multiple # characters at start of comments)
     # Setting max-line-length to 95 characters

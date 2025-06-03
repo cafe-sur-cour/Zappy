@@ -14,5 +14,8 @@ zappy_ai
 zappy_gui
 zappy_server
 .vscode
+.idea
+.coverage
 unit_tests
 server/tests/ctest*.c
+*__pycache_*
