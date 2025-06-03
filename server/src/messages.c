@@ -31,87 +31,33 @@ void printfd(char const *message, int fd)
     dprintf(fd, "%s\n", message);
 }
 
-// static char *allocate_buffer(void)
+// static void print_received_message(char c, server_t *server)
 // {
-//     char *buffer = calloc(1, sizeof(char));
-
-//     if (!buffer) {
-//         error_message("Failed to allocate memory for message buffer.");
-//         return NULL;
+//     if (server->params->is_debug == true) {
+//         printf("Read character: '%c' (0x%02x)\n", c, (unsigned char)c);
 //     }
-//     return buffer;
 // }
 
-// static char *resize_buffer(char *buffer, size_t len, char c)
-// {
-//     buffer = realloc(buffer, len + 2);
-//     if (!buffer) {
-//         error_message("Failed to reallocate memory for message buffer.");
-//         return NULL;
-//     }
-//     buffer[len] = c;
-//     return buffer;
-// }
-
-// static int handle_poll(struct pollfd *pollfd, size_t len, char *buffer)
-// {
-//     int poll_result = poll(pollfd, 1, 100);
-
-//     if (buffer == NULL) {
-//         error_message("Buffer to read is NULL.");
-//         return -1;
-//     }
-//     if (poll_result == -1) {
-//         error_message("Failed to poll from client socket.");
-//         free(buffer);
-//         return -1;
-//     }
-//     if (!(pollfd->revents & POLLIN)) {
-//         if (len == 0) {
-//             free(buffer);
-//             return -1;
-//         }
-//         return 1;
-//     }
-//     return 0;
-// }
-
-// static int read_character(int fd, char *c, char *buffer)
-// {
-//     if (read(fd, c, 1) <= 0) {
-//         error_message("Failed to read character from client socket.");
-//         free(buffer);
-//         return -1;
-//     }
-//     return 0;
-// }
-
-static void print_received_message(char c, server_t *server)
-{
-    if (server->params->is_debug == true) {
-        printf("Read character: '%c' (0x%02x)\n", c, (unsigned char)c);
-    }
-}
-
-char *get_message(int fd, server_t *server)
+char *get_message(int fd)
 {
     static buffer_t cb = {0};
     char c = 0;
-    char *line = NULL;
-    int bytes_read = 0;
+    struct pollfd pollfd = {.fd = fd, .events = POLLIN};
 
     while (1) {
-        bytes_read = read(fd, &c, 1);
-        if (bytes_read <= 0) {
-            free(line);
+        if (poll(&pollfd, 1, 100) == -1) {
+            error_message("Failed to poll from client socket.");
             return NULL;
         }
+        if (!(pollfd.revents & POLLIN))
+            return NULL;
+        if (read(fd, &c, 1) <= 0)
+            return NULL;
         if (c == '\n') {
             cb_write(&cb, '\0');
             break;
         }
         cb_write(&cb, c);
-        print_received_message(c, server);
     }
     return cb.data;
 }
