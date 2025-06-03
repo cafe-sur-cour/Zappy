@@ -39,16 +39,14 @@ static int complete_connection(server_t *server, int fd, const char *message)
 
     if (!team || !buffer)
         return -1;
-    snprintf(buffer, sizeof(buffer), "%d\n",
-        server->params->nb_client - team->nbPlayers);
+    snprintf(buffer, 12, "%d\n", server->params->nb_client - team->nbPlayers);
     if (write_message(fd, buffer) == -1)
         return -1;
     free(buffer);
     buffer = calloc(27, sizeof(char));
     if (!buffer)
         return -1;
-    snprintf(buffer, sizeof(buffer), "%d %d\n", server->params->x,
-        server->params->y);
+    snprintf(buffer, 27, "%d %d\n", server->params->x, server->params->y);
     if (write_message(fd, buffer) == -1)
         return -1;
     free(buffer);
@@ -71,9 +69,7 @@ int accept_client(server_t *server)
     }
     if (complete_connection(server, new_sockfd, message) == -1) {
         close(new_sockfd);
-        free(message);
         return -1;
     }
-    free(message);
     return 0;
 }
