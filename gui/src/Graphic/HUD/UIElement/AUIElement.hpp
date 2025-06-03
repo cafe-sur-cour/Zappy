@@ -8,7 +8,7 @@
 #pragma once
 
 #include "IUIElement.hpp"
-#include "Graphic/RayLib/RayLib.hpp"
+#include "../../RayLib/RayLib.hpp"
 
 /**
  * @brief Abstract base class for UI elements
