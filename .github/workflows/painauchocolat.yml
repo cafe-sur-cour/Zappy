@@ -49,9 +49,20 @@ jobs:
 
       - name: Install Raylib
         run: |
-          add-apt-repository ppa:alex-p/raylib
-          apt update
-          apt install raylib
+          apt-get update
+          apt-get install -y software-properties-common
+          apt-get install -y build-essential git cmake
+          apt-get install -y libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev
+          apt-get install -y libxinerama-dev libxcursor-dev
+
+          git clone https://github.com/raysan5/raylib.git raylib
+          cd raylib
+          mkdir build && cd build
+          cmake -DSHARED=ON -DBUILD_EXAMPLES=OFF ..
+          make -j$(nproc)
+          make install
+          ldconfig
+          cd ../..
 
       - name: Compilation
         run: make
@@ -178,9 +189,20 @@ jobs:
 
       - name: Install Raylib
         run: |
-          add-apt-repository ppa:alex-p/raylib
-          apt update
-          apt install raylib
+          apt-get update
+          apt-get install -y software-properties-common
+          apt-get install -y build-essential git cmake
+          apt-get install -y libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev
+          apt-get install -y libxinerama-dev libxcursor-dev
+
+          git clone https://github.com/raysan5/raylib.git raylib
+          cd raylib
+          mkdir build && cd build
+          cmake -DSHARED=ON -DBUILD_EXAMPLES=OFF ..
+          make -j$(nproc)
+          make install
+          ldconfig
+          cd ../..
 
       - name: Run functional tests
         run: |
@@ -221,9 +243,20 @@ jobs:
 
       - name: Install Raylib
         run: |
-          add-apt-repository ppa:alex-p/raylib
-          apt update
-          apt install raylib
+          apt-get update
+          apt-get install -y software-properties-common
+          apt-get install -y build-essential git cmake
+          apt-get install -y libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev
+          apt-get install -y libxinerama-dev libxcursor-dev
+
+          git clone https://github.com/raysan5/raylib.git raylib
+          cd raylib
+          mkdir build && cd build
+          cmake -DSHARED=ON -DBUILD_EXAMPLES=OFF ..
+          make -j$(nproc)
+          make install
+          ldconfig
+          cd ../..
 
       - name: Run Unit Tests
         run: make tests_run
