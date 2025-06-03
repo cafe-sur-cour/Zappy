@@ -7,7 +7,7 @@
 
 #include "Containers.hpp"
 
-Containers::Containers(RayLib& raylib, float x, float y, float width, float height, Color backgroundColor)
+Containers::Containers(std::shared_ptr<RayLib> raylib, float x, float y, float width, float height, Color backgroundColor)
     : AContainers(raylib, x, y, width, height), _raylib(raylib), _hasBackgroundTexture(false), _elements()
 {
     _backgroundColor = backgroundColor;
@@ -16,7 +16,7 @@ Containers::Containers(RayLib& raylib, float x, float y, float width, float heig
 Containers::~Containers()
 {
     if (_hasBackgroundTexture)
-        _raylib.unloadTexture(_backgroundTexture);
+        _raylib->unloadTexture(_backgroundTexture);
 }
 
 void Containers::draw()
@@ -26,12 +26,12 @@ void Containers::draw()
 
     if (_hasBackground) {
         if (_hasBackgroundTexture) {
-            _raylib.drawTextureRec(_backgroundTexture,
+            _raylib->drawTextureRec(_backgroundTexture,
                 (Rectangle){0, 0, _bounds.width, _bounds.height},
                 (Vector2){_bounds.x, _bounds.y},
                 WHITE);
         } else {
-            _raylib.drawRectangleRec(_bounds, _backgroundColor);
+            _raylib->drawRectangleRec(_bounds, _backgroundColor);
         }
     }
 
@@ -63,7 +63,7 @@ void Containers::setHasBackground(bool hasBackground)
 void Containers::setBackgroundTexture(Texture2D texture)
 {
     if (_hasBackgroundTexture)
-        _raylib.unloadTexture(_backgroundTexture);
+        _raylib->unloadTexture(_backgroundTexture);
 
     _backgroundTexture = texture;
     _hasBackgroundTexture = true;
