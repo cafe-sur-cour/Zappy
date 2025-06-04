@@ -16,19 +16,20 @@ MAIN 		= 	src/main.c
 
 MAIN_OBJ 	= 	$(MAIN:.c=.o)
 
-SRC 		=	src/params.c					\
-				src/messages.c					\
-				src/checkers.c					\
-				src/server.c					\
-				src/protocol.c					\
-				src/client.c					\
-				src/game.c						\
-				src/buffer.c					\
-				src/free.c						\
-				src/algo.c						\
-				src/accept.c					\
-				src/guiMessage/gui_send_map_data.c	\
-				src/guiMessage/gui_send_team_name.c
+SRC 		=	src/params.c							\
+				src/messages.c							\
+				src/checkers.c							\
+				src/server.c							\
+				src/protocol.c							\
+				src/client.c							\
+				src/game.c								\
+				src/buffer.c							\
+				src/free.c								\
+				src/algo.c								\
+				src/accept.c							\
+				src/guiMessage/gui_send_map_data.c		\
+				src/guiMessage/gui_send_team_name.c		\
+				src/aiMessage/forward.c
 
 OBJ 		= 	$(SRC:.c=.o)
 

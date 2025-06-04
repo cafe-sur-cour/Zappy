@@ -13,8 +13,8 @@
 /* Definition of the directions */
 typedef enum direction_e {
     NORTH,
-    SOUTH,
     EAST,
+    SOUTH,
     WEST
 } direction_t;
 

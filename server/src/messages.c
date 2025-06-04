@@ -87,7 +87,7 @@ int write_message(int fd, const char *message)
     struct pollfd pollfd = {.fd = fd, .events = POLLOUT};
 
     if (poll(&pollfd, 1, 1000) == -1) {
-        error_message("Client socket not ready for writing 1 .");
+        error_message("Client socket not ready for writing");
         close(fd);
         return -1;
     }
@@ -99,7 +99,7 @@ int write_message(int fd, const char *message)
         }
         return 0;
     }
-    error_message("Client socket not ready for writing 2 .");
+    error_message("Client socket not ready for writing");
     close(fd);
     return -1;
 }

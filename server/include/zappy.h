@@ -89,4 +89,7 @@ void send_map_tile(ressources_t *ressource, server_t *server,
     int posX, int posY);
 void send_team_name(server_t *server);
 
+/* AI messages */
+int forward_message(player_t *player, params_t *params);
+
 #endif /* !ZAPPY_H_ */
