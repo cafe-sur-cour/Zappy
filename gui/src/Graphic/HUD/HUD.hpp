@@ -9,6 +9,7 @@
 
 #include "Containers/Containers.hpp"
 #include "../RayLib/RayLib.hpp"
+#include "../../Game/GameInfos.hpp"
 #include <vector>
 #include <unordered_map>
 
@@ -161,6 +162,24 @@ class HUD {
          * Creates a button that resets the camera position when clicked
          */
         void initCameraResetButton();
+
+        /**
+         * @brief Initialize team and player display in the side container
+         * 
+         * Creates text elements to show teams and their players
+         * 
+         * @param gameInfos The game information containing teams and players
+         */
+        void initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos);
+        
+        /**
+         * @brief Update team and player display in the side container
+         * 
+         * Updates the text elements showing teams and their players
+         * 
+         * @param gameInfos The game information containing teams and players
+         */
+        void updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos);
 
     private:
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
