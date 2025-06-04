@@ -98,17 +98,17 @@ void HUD::initDefaultLayout(float sideWidth, float bottomHeight)
     float squareSize = sideWidth;
 
     addContainer(
-        "side_container",
-        0, 0,
-        sideWidth, screenHeight,
-        {40, 40, 40, 200}
-    );
-
-    addContainer(
         "square_container",
         0, 0,
         squareSize, squareSize,
         {60, 60, 60, 220}
+    );
+
+    addContainer(
+        "side_container",
+        0, 0,
+        sideWidth, screenHeight,
+        {40, 40, 40, 200}
     );
 
     addContainer(
@@ -156,9 +156,9 @@ void HUD::initExitButton()
         [this]() {
             _raylib->closeWindow();
         },
-        {220, 60, 60, 255},
-        {240, 80, 80, 255},
-        {180, 40, 40, 255},
+        {240, 60, 60, 255},
+        {255, 100, 100, 255},
+        {200, 40, 40, 255},
         {255, 255, 255, 255}
     );
 }
