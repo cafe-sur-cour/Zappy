@@ -25,16 +25,15 @@ void *free_params(params_t *params)
     return NULL;
 }
 
-static void free_ressources(ressources_t *ressources)
+void free_map(map_t *map)
 {
-    ressources_t *current = ressources;
-    ressources_t *next;
-
-    while (current) {
-        next = current->next;
-        free(current);
-        current = next;
+    for (int i = 0; i < map->height; i++) {
+        if (map->tiles[i]) {
+            free(map->tiles[i]);
+        }
     }
+    free(map->tiles);
+    free(map);
 }
 
 static void free_players(player_t *player)
@@ -45,9 +44,6 @@ static void free_players(player_t *player)
         next_player = player->next;
         if (player->inventory) {
             free(player->inventory);
-        }
-        if (player->lives) {
-            free(player->lives);
         }
         free(player);
         player = next_player;
@@ -79,31 +75,31 @@ static void free_game(game_t *game)
         return;
     if (game->teams)
         free_teams(game->teams);
-    if (game->ressources)
-        free_ressources(game->ressources);
+    if (game->map)
+        free_map(game->map);
     free(game);
 }
 
-static void free_graph(graph_t *graph)
+static void free_graph(graph_net_t *graph)
 {
     if (!graph)
         return;
     free(graph);
 }
 
-void *free_server(server_t *server)
+void *free_zappy(zappy_t *zappy)
 {
-    if (!server)
+    if (!zappy)
         return NULL;
-    if (server->params)
-        free_params(server->params);
-    if (server->sockfd != -1)
-        close(server->sockfd);
-    if (server->game)
-        free_game(server->game);
-    if (server->graph)
-        free_graph(server->graph);
-    free(server);
+    if (zappy->params)
+        free_params(zappy->params);
+    if (zappy->network->sockfd != -1)
+        close(zappy->network->sockfd);
+    if (zappy->game)
+        free_game(zappy->game);
+    if (zappy->graph)
+        free_graph(zappy->graph);
+    free(zappy);
     return NULL;
 }
 
@@ -113,8 +109,6 @@ void *free_player(player_t *player)
         return NULL;
     if (player->inventory)
         free(player->inventory);
-    if (player->lives)
-        free(player->lives);
     free(player);
     return NULL;
 }

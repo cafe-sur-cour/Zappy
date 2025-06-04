@@ -13,7 +13,7 @@
 #include <stdio.h>
 
 
-static game_t *create_game(server_t *server)
+static game_t *create_game(void)
 {
     game_t *game = malloc(sizeof(game_t));
 
@@ -21,81 +21,120 @@ static game_t *create_game(server_t *server)
         error_message("Failed to allocate memory for game structure.");
         exit(84);
     }
-    game->width = server->params->x;
-    game->heigt = server->params->y;
     game->teams = NULL;
-    game->ressources = NULL;
+    game->map = NULL;
     return game;
 }
 
-static int nb_total(server_t *server)
+static void print_tile(zappy_t *zappy, int x, int y)
+{
+    inventory_t *tile = &zappy->game->map->tiles[y][x];
+
+    if (tile->nbFood > 0 || tile->nbLinemate > 0 || tile->nbDeraumere > 0 ||
+        tile->nbSibur > 0 || tile->nbMendiane > 0 || tile->nbPhiras > 0 ||
+        tile->nbThystame > 0) {
+        printf("Tile (%d,%d): F:%d L:%d D:%d S:%d M:%d P:%d T:%d\n",
+            x, y, tile->nbFood, tile->nbLinemate, tile->nbDeraumere,
+            tile->nbSibur, tile->nbMendiane, tile->nbPhiras, tile->nbThystame);
+    }
+}
+
+static void print_map_tiles(zappy_t *zappy)
+{
+    printf("Map size: %d x %d\n", zappy->params->x, zappy->params->y);
+    for (int y = 0; y < zappy->params->y; y++) {
+        for (int x = 0; x < zappy->params->x; x++) {
+            print_tile(zappy, x, y);
+        }
+    }
+}
+
+static int *distrib_tiles(int *tile_index, tiles_t *shuffled_tiles,
+    int mapValue)
+{
+    int *pos = malloc(sizeof(int) * 2);
+
+    if (pos == NULL) {
+        error_message("Failed to allocate memory for tile position.");
+        exit(84);
+    }
+    if (*tile_index >= mapValue) {
+        *tile_index = 0;
+    }
+    pos[0] = shuffled_tiles[*tile_index].x;
+    pos[1] = shuffled_tiles[*tile_index].y;
+    (*tile_index)++;
+    return pos;
+}
+
+static map_t *set_tile(int x, int y, map_t *map, int type)
+{
+    inventory_t *tile = &map->tiles[y][x];
+    int *counters[] = { &tile->nbFood, &tile->nbLinemate, &tile->nbDeraumere,
+        &tile->nbSibur, &tile->nbMendiane, &tile->nbPhiras, &tile->nbThystame};
+
+    if (type >= 0 && type < 7)
+        (*counters[type])++;
+    return map;
+}
+
+static void distribute_resources(zappy_t *server)
 {
     int mapValue = server->params->x * server->params->y;
     float density[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
-    int total = ((mapValue * density[0]) + (mapValue * density[1]) + (mapValue
-        * density[2]) + (mapValue * density[3]) + (mapValue * density[4]) +
-        (mapValue * density[5]) + (mapValue * density[6]));
+    int resources_count[7];
+    tiles_t *shuffled_tiles = shuffle_fisher(server->params->x,
+        server->params->y);
+    int tile_index = 0;
+    int *pos = NULL;
 
-    return total;
-}
-
-static const char *get_type(crystal_t type)
-{
-    const char *crystal_names[] = {"food", "linemate", "deraumere", "sibur",
-        "mendiane", "phiras", "thystame" };
-
-    if (type >= 0 && type < 7)
-        return crystal_names[type];
-    return "unknown";
-}
-
-static void print_map(server_t *server)
-{
-    int total = nb_total(server);
-    ressources_t *current = server->game->ressources;
-
-    printf("Map size: %d x %d\n", server->params->x, server->params->y);
-    printf("Total resources: %d\n", total);
-    while (current) {
-        printf("Resource type: %s at position (%d, %d)\n",
-            get_type(current->type), current->posX, current->posY);
-        current = current->next;
-    }
-}
-
-static ressources_t *init_ressource(int j, int i, tiles_t *tiles,
-    ressources_t *ressource)
-{
-    ressources_t *new_ressource = malloc(sizeof(ressources_t));
-
-    if (!new_ressource)
-        exit(84);
-    new_ressource->type = i;
-    new_ressource->posX = tiles[j].x;
-    new_ressource->posY = tiles[j].y;
-    new_ressource->next = ressource;
-    return new_ressource;
-}
-
-static void init_tiles(server_t *server)
-{
-    int mapV = server->params->x * server->params->y;
-    float den[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
-    int nb[7] = {(mapV * den[0]), (mapV * den[1]), (mapV * den[2]), (mapV *
-        den[3]), (mapV * den[4]), (mapV * den[5]), (mapV * den[6])};
-    tiles_t *tiles = shuffle_fisher(server->params->x, server->params->y);
-
-    for (int i = 0; i < 7; i++) {
-        for (int j = 0; j < nb[i]; j++) {
-            server->game->ressources = init_ressource(j, i, tiles,
-                server->game->ressources);
+    for (int i = 0; i < 7; i++)
+        resources_count[i] = (int)(mapValue * density[i]);
+    for (int type = 0; type < 7; type++) {
+        for (int count = 0; count < resources_count[type]; count++) {
+            pos = distrib_tiles(&tile_index, shuffled_tiles, mapValue);
+            server->game->map = set_tile(pos[0], pos[1], server->game->map,
+                type);
         }
     }
-    if (server->params->is_debug == true)
-        print_map(server);
+    free(shuffled_tiles);
 }
 
-static void init_teams(server_t *server)
+static map_t *malloc_tiles(int width, int height,
+    map_t *map)
+{
+    for (int i = 0; i < height; i++) {
+        map->tiles[i] = calloc(width, sizeof(inventory_t));
+        if (!map->tiles[i]) {
+            error_message("Failed to allocate memory for map row.");
+            free_map(map);
+            exit(84);
+        }
+    }
+    return map;
+}
+
+static map_t *create_map(int width, int height)
+{
+    map_t *map = malloc(sizeof(map_t));
+
+    if (!map) {
+        error_message("Failed to allocate memory for map structure.");
+        exit(84);
+    }
+    map->width = width;
+    map->height = height;
+    map->tiles = malloc(sizeof(inventory_t *) * height);
+    if (!map->tiles) {
+        error_message("Failed to allocate memory for map tiles.");
+        free_map(map);
+        exit(84);
+    }
+    map = malloc_tiles(width, height, map);
+    return map;
+}
+
+static void init_teams(zappy_t *server)
 {
     team_t *current = server->game->teams;
 
@@ -114,9 +153,12 @@ static void init_teams(server_t *server)
     }
 }
 
-void init_game(server_t *server)
+void init_game(zappy_t *zappy)
 {
-    server->game = create_game(server);
-    init_tiles(server);
-    init_teams(server);
+    zappy->game = create_game();
+    zappy->game->map = create_map(zappy->params->x, zappy->params->y);
+    distribute_resources(zappy);
+    init_teams(zappy);
+    if (zappy->params->is_debug == true)
+        print_map_tiles(zappy);
 }

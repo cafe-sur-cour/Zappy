@@ -11,17 +11,17 @@
 
 int main(int argc, char **argv)
 {
-    server_t *server = NULL;
+    zappy_t *zappy = NULL;
 
     if (argc == 2 && (strcmp(argv[1], "-h") == 0 ||
         strcmp(argv[1], "-help") == 0)) {
         return helper();
     }
-    server = init_server(argc, argv);
-    if (server == NULL)
+    zappy = init_server(argc, argv);
+    if (zappy == NULL)
         return 84;
-    init_game(server);
-    start_protocol(server);
-    free_server(server);
+    init_game(zappy);
+    start_protocol(zappy);
+    free_zappy(zappy);
     return 0;
 }
