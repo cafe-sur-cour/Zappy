@@ -26,7 +26,7 @@ class HUD {
          *
          * @param raylib Reference to the RayLib instance
          */
-        HUD(std::shared_ptr<RayLib> raylib);
+        HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos);
 
         /**
          * @brief Destroy the HUD object
@@ -165,18 +165,18 @@ class HUD {
 
         /**
          * @brief Initialize team and player display in the side container
-         * 
+         *
          * Creates text elements to show teams and their players
-         * 
+         *
          * @param gameInfos The game information containing teams and players
          */
         void initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos);
-        
+
         /**
          * @brief Update team and player display in the side container
-         * 
+         *
          * Updates the text elements showing teams and their players
-         * 
+         *
          * @param gameInfos The game information containing teams and players
          */
         void updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos);
@@ -184,4 +184,5 @@ class HUD {
     private:
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<GameInfos> _gameInfos;
 };
