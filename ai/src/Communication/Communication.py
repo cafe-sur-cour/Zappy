@@ -92,26 +92,29 @@ class Communication:
 
         return look
 
-    def handleResponse(self, response: str) -> None:
-        if response == "ko":
-            return
+    def handleResponse(self, response: str) -> str:
         if response == "dead":
             with self.mutex:
                 self._isDead = True
+            return ""
         elif response.startswith("message "):
             parts = response.split(" ")
             number = int(parts[1].strip(","))
             data = parts[2]
             with self.mutex:
                 self._message_queue.append((number, data))
+            return ""
         inventory = self.tryGetInventory(response)
         if inventory is not None:
             with self.mutex:
                 self._lastInventory = inventory
+            return ""
         look = self.tryGetLook(response)
         if look is not None:
             with self.mutex:
                 self._lastLook = look
+            return ""
+        return response
 
     def receive_data(self) -> str:
         r = self._socket.receive()
@@ -121,8 +124,7 @@ class Communication:
                 firstNewlineIndex = self._response_buffer.index('\n')
                 data = self._response_buffer[:firstNewlineIndex + 1]
                 self._response_buffer = self._response_buffer[firstNewlineIndex + 1:]
-                self.handleResponse(data.strip())
-                return data.strip()
+                return self.handleResponse(data.strip())
         return ""
 
     def receive(self) -> None:
@@ -167,24 +169,24 @@ class Communication:
         self._socket.connect()
         response = self.receive_data()
 
-        if (response[:-1] != "WELCOME"):
+        if (response != "WELCOME"):
             raise CommunicationInvalidResponseException(
-                f"Invalid response from server handshake: {response[:-1]}"
+                f"Invalid response from server handshake: {response}"
             )
 
         self._socket.send(f"{self._name}\n")
         response = self.receive_data()
 
-        if response[:-1] == "ko":
+        if response == "ko":
             raise CommunicationHandshakeException(
                 f"Handshake failed: server return KO after sending: '{self._name}'"
             )
         slots = 0
         try:
-            slots = int(response[:-1])
+            slots = int(response)
         except ValueError:
             raise CommunicationInvalidResponseException(
-                f"Invalid number of slots: {response[:-1]}"
+                f"Invalid number of slots: {response}"
             )
 
         response = self.receive_data()
@@ -196,10 +198,10 @@ class Communication:
         x = 0
         y = 0
         try:
-            x, y = map(int, response[:-1].split(" "))
+            x, y = map(int, response.split(" "))
         except ValueError:
             raise CommunicationInvalidResponseException(
-                f"Invalid coordinates from server: {response[:-1]}"
+                f"Invalid coordinates from server: {response}"
             )
 
         if slots < 0 or x < 0 or y < 0:
@@ -210,7 +212,7 @@ class Communication:
 
     def sendCommand(self, message: str) -> None:
         with self.mutex:
-            self._request_queue.append(f"{message}\n")
+            self._request_queue.append(message)
 
     def sendForward(self):
         self.sendCommand("Forward\n")
