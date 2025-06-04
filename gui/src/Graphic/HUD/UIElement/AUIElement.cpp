@@ -6,8 +6,14 @@
 */
 
 #include "AUIElement.hpp"
+#include <memory>
 
-AUIElement::AUIElement(std::shared_ptr<RayLib> raylib, float x, float y, float width, float height)
+AUIElement::AUIElement(
+    std::shared_ptr<RayLib> raylib,
+    float x,
+    float y,
+    float width,
+    float height)
     : _raylib(raylib), _bounds({x, y, width, height}), _visible(true)
 {
     _relativePos.xPercent = 0;
@@ -48,7 +54,11 @@ void AUIElement::setSize(float width, float height)
     _bounds.height = height;
 }
 
-void AUIElement::setRelativePosition(float xPercent, float yPercent, float widthPercent, float heightPercent)
+void AUIElement::setRelativePosition(
+    float xPercent,
+    float yPercent,
+    float widthPercent,
+    float heightPercent)
 {
     _relativePos.xPercent = xPercent;
     _relativePos.yPercent = yPercent;
