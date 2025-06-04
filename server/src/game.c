@@ -54,6 +54,10 @@ static int *distrib_tiles(int *tile_index, tiles_t *shuffled_tiles,
 {
     int *pos = malloc(sizeof(int) * 2);
 
+    if (pos == NULL) {
+        error_message("Failed to allocate memory for tile position.");
+        exit(84);
+    }
     if (*tile_index >= mapValue) {
         *tile_index = 0;
     }

@@ -69,7 +69,8 @@ fclean: clean
 	@rm -rf $(NAME)
 	@rm -rf $(UNIT)
 	@rm -f tests/*.c
-
+	-rm libmy.a
+	-rm libnetwork.a
 
 re: fclean all
 

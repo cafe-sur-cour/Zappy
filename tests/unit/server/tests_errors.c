@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "network.h"
+
 #include "zappy.h"
 
 static void redirect_all_std(void)

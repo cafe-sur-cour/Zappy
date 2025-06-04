@@ -22,11 +22,11 @@ CC 		= 	gcc
 all:	$(NAME)
 
 $(NAME):	$(OBJ)
-		cp *.h ../../include
-		@$(AR) rc $(NAME) $(OBJ)
-		cp $(NAME) ../../
-		cp $(NAME) ../../../tests/unit/server/
-		@echo -e "\e[1;36m{ libs duplicated !! }\e[00;37m"
+	cp *.h ../../include
+	@$(AR) rc $(NAME) $(OBJ)
+	cp $(NAME) ../../
+	cp $(NAME) ../../../tests/unit/server/
+	@echo -e "\e[1;36m{ libs duplicated !! }\e[00;37m"
 
 clean:
 	@rm -f $(OBJ)
