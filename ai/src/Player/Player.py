@@ -14,7 +14,6 @@ from src.Communication.Communication import Communication
 class Player:
     def __init__(self, name: str, ip: str, port: int = 4242) -> None:
         self.communication: Communication = Communication(name, ip, port)
-        self.help_message_send: int = 0
         self.teamName: str = name
         self.ip: str = ip
         self.port: int = port
@@ -69,10 +68,6 @@ class Player:
                         f"{self.hash.unHashMessage(str(message[1][:-1]))}"
                     )
                 # TODO: Identifier le / les messages reçu / decrypter les messages
-                if self.inventory["food"] <= 5:
-                    self.send_help_message()
-                else:
-                    self.help_message_send = 0
                 print("Current inventory:", self.inventory)
             except PlayerDead:
                 print(f"The player is dead")
