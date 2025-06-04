@@ -15,7 +15,7 @@ Text::Text(
     const std::string& text,
     float fontSize,
     Color color
-) : AUIElement(x, y, raylib->measureText(text, fontSize), fontSize),
+) : AUIElement(raylib, x, y, raylib->measureText(text, fontSize), fontSize),
     _text(text),
     _fontSize(fontSize),
     _color(color),
@@ -27,6 +27,10 @@ Text::Text(
 
 void Text::draw()
 {
+    if (!_visible)
+        return;
+
+    _raylib->drawText(_text, _bounds.x, _bounds.y, _fontSize, _color);
 }
 
 void Text::update()
@@ -66,4 +70,12 @@ void Text::setColor(Color color)
 Color Text::getColor() const
 {
     return _color;
+}
+
+void Text::setSize(float width, float height)
+{
+    (void)width;
+    setFontSize(height);
+
+    _bounds.width = _raylib->measureText(_text, _fontSize);
 }
