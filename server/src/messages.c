@@ -31,24 +31,22 @@ void printfd(char const *message, int fd)
     dprintf(fd, "%s\n", message);
 }
 
-// static void print_received_message(char c, server_t *server)
-// {
-//     if (server->params->is_debug == true) {
-//         printf("Read character: '%c' (0x%02x)\n", c, (unsigned char)c);
-//     }
-// }
+static void print_received_message(char c, server_t *server)
+{
+    if (server->params->is_debug == true) {
+        printf("Read character: '%c' (0x%02x)\n", c, (unsigned char)c);
+    }
+}
 
-char *get_message(int fd)
+char *get_message(int fd, server_t *server)
 {
     static buffer_t cb = {0};
     char c = 0;
     struct pollfd pollfd = {.fd = fd, .events = POLLIN};
 
     while (1) {
-        if (poll(&pollfd, 1, 100) == -1) {
-            error_message("Failed to poll from client socket.");
+        if (poll(&pollfd, 1, 100) == -1)
             return NULL;
-        }
         if (!(pollfd.revents & POLLIN))
             return NULL;
         if (read(fd, &c, 1) <= 0)
@@ -58,6 +56,7 @@ char *get_message(int fd)
             break;
         }
         cb_write(&cb, c);
+        print_received_message(c, server);
     }
     return cb.data;
 }
@@ -66,8 +65,8 @@ int write_message(int fd, const char *message)
 {
     struct pollfd pollfd = {.fd = fd, .events = POLLOUT};
 
-    if (poll(&pollfd, 1, 10) == -1) {
-        error_message("Client socket not ready for writing.");
+    if (poll(&pollfd, 1, 1000) == -1) {
+        error_message("Client socket not ready for writing 1 .");
         close(fd);
         return -1;
     }
@@ -79,7 +78,7 @@ int write_message(int fd, const char *message)
         }
         return 0;
     }
-    error_message("Client socket not ready for writing.");
+    error_message("Client socket not ready for writing 2 .");
     close(fd);
     return -1;
 }

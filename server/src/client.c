@@ -28,7 +28,7 @@ static bool valid_team_name(const char *team_name, server_t *server)
 
 bool process_new_client(const char *team_name, int fd, server_t *server)
 {
-    if (strcmp(team_name, "GRAPHIC\n") == 0) {
+    if (strcmp(team_name, "GRAPHIC") == 0) {
         if (server->graph->fd != -1) {
             error_message("A graphic client is already connected.");
             return false;
@@ -104,7 +104,6 @@ static int check_team_capacity(server_t *server, const char *team_name,
             server->game->teams->players = new_player;
             server->game->teams->nbPlayers++;
             server->game->teams->nbPlayerAlive++;
-            printf("New player added to team %s.\n", team_name);
             return server->params->nb_client - server->game->teams->nbPlayers;
         }
         server->game->teams = server->game->teams->next;
@@ -124,6 +123,8 @@ team_t *add_client_to_team(const char *team_name, int fd, server_t *server)
         close(fd);
         return NULL;
     }
+    if (strcmp(team_name, "GRAPHIC") == 0)
+        return NULL;
     if (check_team_capacity(server, team_name, new_player) == -1) {
         error_message("Requested team is full.");
         server->game->teams = save;

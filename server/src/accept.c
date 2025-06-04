@@ -19,7 +19,7 @@ static char *check_team_name(server_t *server, int new_sockfd)
 
     if (write_message(new_sockfd, "WELCOME\n") == -1)
         return NULL;
-    message = get_message(new_sockfd);
+    message = get_message(new_sockfd, server);
     if (!message) {
         error_message("Failed to read team name message from client.");
         close(new_sockfd);
@@ -37,6 +37,8 @@ static int complete_connection(server_t *server, int fd, const char *message)
     char *buffer = calloc(12, sizeof(char));
     team_t *team = add_client_to_team(message, fd, server);
 
+    if (strcmp(message, "GRAPHIC") == 0)
+        return 0;
     if (!team || !buffer)
         return -1;
     snprintf(buffer, 12, "%d\n", server->params->nb_client - team->nbPlayers);
