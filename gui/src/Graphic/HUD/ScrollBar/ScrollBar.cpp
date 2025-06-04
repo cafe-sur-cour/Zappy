@@ -62,9 +62,16 @@ void ScrollBar::update()
     Rectangle handleBounds = getHandleBounds();
 
     _isHandleHovered = _raylib->checkCollisionPointRec(mousePoint, handleBounds);
+    bool isScrollBarBodyHovered = _raylib->checkCollisionPointRec(mousePoint, _bounds);
 
     if (_raylib->isMouseButtonPressed(MOUSE_LEFT_BUTTON) && _isHandleHovered)
         _isDragging = true;
+
+    else if (_raylib->isMouseButtonPressed(MOUSE_LEFT_BUTTON) && isScrollBarBodyHovered) {
+        _value = calculateValueFromMousePosition(mousePoint);
+        if (_onValueChanged)
+            _onValueChanged(_value);
+    }
 
     if (_raylib->isMouseButtonReleased(MOUSE_LEFT_BUTTON))
         _isDragging = false;
@@ -73,6 +80,16 @@ void ScrollBar::update()
         _value = calculateValueFromMousePosition(mousePoint);
         if (_onValueChanged)
             _onValueChanged(_value);
+    }
+
+    if (isScrollBarBodyHovered) {
+        float wheel = _raylib->getMouseWheelMove();
+        if (wheel != 0.0f) {
+            float scrollStep = 0.05f;
+            _value = std::max(0.0f, std::min(1.0f, _value - wheel * scrollStep));
+            if (_onValueChanged)
+                _onValueChanged(_value);
+        }
     }
 }
 
@@ -88,6 +105,16 @@ void ScrollBar::setValue(float value)
 float ScrollBar::getValue() const
 {
     return _value;
+}
+
+void ScrollBar::setHandleSize(float handleSize)
+{
+    _handleSize = std::max(0.05f, std::min(1.0f, handleSize));
+}
+
+float ScrollBar::getHandleSize() const
+{
+    return _handleSize;
 }
 
 void ScrollBar::setColors(
@@ -129,12 +156,22 @@ float ScrollBar::calculateValueFromMousePosition(Vector2 mousePosition) const
 
     if (_orientation == ScrollBarOrientation::VERTICAL) {
         position = _bounds.y;
-        size = _bounds.height * (1.0f - _handleSize);
-        mousePos = mousePosition.y - position;
+        size = _bounds.height - (_bounds.height * _handleSize);
+
+        float handleHalfHeight = (_bounds.height * _handleSize) / 2.0f;
+        mousePos = mousePosition.y - position - handleHalfHeight;
+
+        if (mousePos < 0) mousePos = 0;
+        if (mousePos > size) mousePos = size;
     } else {
         position = _bounds.x;
-        size = _bounds.width * (1.0f - _handleSize);
-        mousePos = mousePosition.x - position;
+        size = _bounds.width - (_bounds.width * _handleSize);
+        float handleHalfWidth = (_bounds.width * _handleSize) / 2.0f;
+        mousePos = mousePosition.x - position - handleHalfWidth;
+        if (mousePos < 0)
+            mousePos = 0;
+        if (mousePos > size)
+            mousePos = size;
     }
 
     float value = mousePos / size;
