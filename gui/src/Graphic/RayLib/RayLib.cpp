@@ -68,6 +68,16 @@ bool RayLib::isWindowReady() const
     return IsWindowReady();
 }
 
+int RayLib::getMonitorWidth(int monitor) const
+{
+    return GetMonitorWidth(monitor);
+}
+
+int RayLib::getMonitorHeight(int monitor) const
+{
+    return GetMonitorHeight(monitor);
+}
+
 bool RayLib::isMouseButtonDown(int button) const
 {
     return IsMouseButtonDown(button);
@@ -146,6 +156,11 @@ Vector2 RayLib::getMouseDelta()
         this->_previousMousePosition = currentMousePosition;
         return delta;
     }
+}
+
+float RayLib::getMouseWheelMove() const
+{
+    return GetMouseWheelMove();
 }
 
 void RayLib::begin3DMode()
@@ -379,4 +394,19 @@ void RayLib::unloadTexture(Texture2D texture)
 bool RayLib::checkCollisionPointRec(Vector2 point, Rectangle rec) const
 {
     return CheckCollisionPointRec(point, rec);
+}
+
+float RayLib::vector3Distance(Vector3 v1, Vector3 v2) const
+{
+    return Vector3Distance(v1, v2);
+}
+
+Vector3 RayLib::vector3Normalize(Vector3 v) const
+{
+    return Vector3Normalize(v);
+}
+
+Vector3 RayLib::vector3Subtract(Vector3 v1, Vector3 v2) const
+{
+    return Vector3Subtract(v1, v2);
 }

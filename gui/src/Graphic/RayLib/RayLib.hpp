@@ -24,6 +24,8 @@ class RayLib {
         void endDrawing();
         void clearBackground(Color color = WHITE);
         bool isWindowReady() const;
+        int getMonitorWidth(int monitor) const;
+        int getMonitorHeight(int monitor) const;
 
         // Collision methods
         bool checkCollisionPointRec(Vector2 point, Rectangle rec) const;
@@ -46,10 +48,14 @@ class RayLib {
         void enableCursor();
         int getScreenWidth() const;
         int getScreenHeight() const;
+        float getMouseWheelMove() const;
 
         // 3D Environment methods
         void begin3DMode();
         void end3DMode();
+        float vector3Distance(Vector3 v1, Vector3 v2) const;
+        Vector3 vector3Normalize(Vector3 v) const;
+        Vector3 vector3Subtract(Vector3 v1, Vector3 v2) const;
 
         // Camera methods
         void initCamera();
