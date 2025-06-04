@@ -16,6 +16,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
 {
     _raylib = std::make_shared<RayLib>();
 
+    _cameraMode = zappy::gui::CameraMode::FREE;
     _windowWidth = GetMonitorWidth(0);
     _windowHeight = GetMonitorHeight(0);
 
@@ -26,6 +27,16 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _hud = std::make_unique<HUD>(_raylib);
     _hud->initDefaultLayout(250.0f, 250.0f);
     _hud->initExitButton();
+
+    _cameraManager = std::make_unique<CameraManager>(_raylib);
+    const auto& mapSize = _gameInfos->getMapSize();
+
+    Vector3 mapCenter = {
+        static_cast<float>(mapSize.first - 1) / 2.0f, 0.0f,
+        static_cast<float>(mapSize.second - 1) / 2.0f
+    };
+    _cameraManager->setMapCenter(mapCenter);
+    _cameraManager->setMapSize(mapSize.first, mapSize.second);
 }
 
 GUI::~GUI()
@@ -46,11 +57,13 @@ void GUI::run()
 
 void GUI::updateCamera()
 {
-    _raylib->updateCameraFreeMode();
+    _cameraManager->updateCamera(_cameraMode);
 }
 
 void GUI::update()
 {
+    if (_raylib->isKeyReleased(KEY_TAB))
+        switchCameraModeNext();
     updateCamera();
     _hud->update();
 }
@@ -98,4 +111,30 @@ void GUI::setWindowHeight(int height)
     _windowHeight = height;
     _raylib->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
     _hud->handleResize(GetScreenWidth(), GetScreenHeight(), _windowWidth, _windowHeight);
+}
+
+void GUI::switchCameraMode(zappy::gui::CameraMode mode)
+{
+    if (mode == zappy::gui::CameraMode::TARGETED && _cameraMode != zappy::gui::CameraMode::TARGETED) {
+        const auto& mapSize = _gameInfos->getMapSize();
+
+        Vector3 mapCenter = {
+            static_cast<float>(mapSize.first - 1) / 2.0f, 0.0f,
+            static_cast<float>(mapSize.second - 1) / 2.0f
+        };
+
+        _cameraManager->setMapCenter(mapCenter);
+        _cameraManager->initTargetPositionFromCurrentCamera();
+    }
+
+    _cameraMode = mode;
+}
+
+void GUI::switchCameraModeNext()
+{
+    zappy::gui::CameraMode newMode = static_cast<zappy::gui::CameraMode>(
+        (static_cast<int>(_cameraMode) + 1) %
+            static_cast<int>(zappy::gui::CameraMode::NB_MODES));
+
+    switchCameraMode(newMode);
 }

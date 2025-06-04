@@ -12,6 +12,8 @@
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
 #include "HUD/HUD.hpp"
+#include "../Utils/Constants.hpp"
+#include "Camera/CameraManager.hpp"
 
 class GUI {
     public:
@@ -25,6 +27,9 @@ class GUI {
         void setWindowWidth(int width);
         void setWindowHeight(int height);
 
+        void switchCameraMode(zappy::gui::CameraMode mode);
+        void switchCameraModeNext();
+
     private:
         void updateCamera();
         void update();
@@ -35,9 +40,12 @@ class GUI {
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<Map> _map;
         std::unique_ptr<HUD> _hud;
+        std::unique_ptr<CameraManager> _cameraManager;
 
         int _windowWidth;
         int _windowHeight;
+
+        zappy::gui::CameraMode _cameraMode;
 };
 
 #endif /* !GUI_HPP_ */
