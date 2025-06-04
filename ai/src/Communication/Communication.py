@@ -56,6 +56,8 @@ class Communication:
             return ""
         with self.mutex:
             self._response_buffer += r
+            for line in r.split('\n'):
+                self._request_queue.append(line + "\n")
         return r
 
     def receive(self) -> None:
