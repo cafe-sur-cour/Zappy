@@ -29,6 +29,8 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _hud->initExitButton();
 
     _cameraManager = std::make_unique<CameraManager>(_raylib);
+    _cameraManager->setGameInfos(_gameInfos);
+    _cameraManager->setMapInstance(std::shared_ptr<Map>(_map.get(), [](Map*){}));
     const auto& mapSize = _gameInfos->getMapSize();
 
     Vector3 mapCenter = {
@@ -64,6 +66,14 @@ void GUI::update()
 {
     if (_raylib->isKeyReleased(KEY_TAB))
         switchCameraModeNext();
+
+    if (_cameraMode == zappy::gui::CameraMode::PLAYER) {
+        if (_raylib->isKeyReleased(KEY_RIGHT))
+            switchToNextPlayer();
+        if (_raylib->isKeyReleased(KEY_LEFT))
+            switchToPreviousPlayer();
+    }
+
     updateCamera();
     _hud->update();
 }
@@ -130,6 +140,17 @@ void GUI::switchCameraMode(zappy::gui::CameraMode mode)
         _cameraManager->initTargetPositionFromCurrentCamera();
     }
 
+    if (mode == zappy::gui::CameraMode::PLAYER) {
+        if (_cameraManager->getPlayerId() < 0 ||
+            !playerExists(_cameraManager->getPlayerId())) {
+            if (!selectFirstAvailablePlayer()) {
+                mode = static_cast<zappy::gui::CameraMode>(
+                    (static_cast<int>(mode) + 1) %
+                        static_cast<int>(zappy::gui::CameraMode::NB_MODES));
+            }
+        }
+    }
+
     _cameraMode = mode;
 }
 
@@ -140,4 +161,84 @@ void GUI::switchCameraModeNext()
             static_cast<int>(zappy::gui::CameraMode::NB_MODES));
 
     switchCameraMode(newMode);
+}
+
+void GUI::setPlayerToFollow(int playerId)
+{
+    _cameraManager->setPlayerId(playerId);
+}
+
+int GUI::getPlayerToFollow() const
+{
+    return _cameraManager->getPlayerId();
+}
+
+bool GUI::selectFirstAvailablePlayer()
+{
+    const auto& players = _gameInfos->getPlayers();
+
+    if (players.empty())
+        return false;
+
+    int firstPlayerId = players.front().number;
+    _cameraManager->setPlayerId(firstPlayerId);
+    return true;
+}
+
+bool GUI::playerExists(int playerId) const
+{
+    const auto& players = _gameInfos->getPlayers();
+
+    return std::any_of(players.begin(), players.end(),
+        [playerId](const zappy::structs::Player& player) {
+            return player.number == playerId;
+        });
+}
+
+void GUI::switchToNextPlayer()
+{
+    const auto& players = _gameInfos->getPlayers();
+
+    if (players.empty())
+        return;
+
+    int currentPlayerId = _cameraManager->getPlayerId();
+    bool foundCurrent = false;
+    int nextPlayerId = -1;
+
+    for (const auto& player : players) {
+        if (foundCurrent) {
+            nextPlayerId = player.number;
+            break;
+        }
+        if (player.number == currentPlayerId) {
+            foundCurrent = true;
+        }
+    }
+
+    if (nextPlayerId == -1)
+        nextPlayerId = players.front().number;
+    _cameraManager->setPlayerId(nextPlayerId);
+}
+
+void GUI::switchToPreviousPlayer()
+{
+    const auto& players = _gameInfos->getPlayers();
+
+    if (players.empty())
+        return;
+
+    int currentPlayerId = _cameraManager->getPlayerId();
+    int prevPlayerId = -1;
+
+    for (const auto& player : players) {
+        if (player.number == currentPlayerId) {
+            break;
+        }
+        prevPlayerId = player.number;
+    }
+
+    if (prevPlayerId == -1)
+        prevPlayerId = players.back().number;
+    _cameraManager->setPlayerId(prevPlayerId);
 }

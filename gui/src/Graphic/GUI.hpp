@@ -29,11 +29,17 @@ class GUI {
 
         void switchCameraMode(zappy::gui::CameraMode mode);
         void switchCameraModeNext();
+        void setPlayerToFollow(int playerId);
+        int getPlayerToFollow() const;
+        bool selectFirstAvailablePlayer();
+        void switchToNextPlayer();
+        void switchToPreviousPlayer();
 
     private:
         void updateCamera();
         void update();
         void draw();
+        bool playerExists(int playerId) const;
 
         bool _isRunning;
         std::shared_ptr<RayLib> _raylib;
