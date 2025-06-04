@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <memory>
+#include <iostream>
 #include "GUI.hpp"
 #include "../Utils/Constants.hpp"
 
@@ -34,23 +35,35 @@ void GUI::run()
         return;
 
     while (!_raylib->windowShouldClose()) {
-        updateCamera();
-        _raylib->beginDrawing();
-        _raylib->clearBackground(RAYWHITE);
-        _raylib->begin3DMode();
-
-        _map->draw();
-
-        _raylib->end3DMode();
-
-        _hud->update();
-        _hud->draw();
-
-        _raylib->endDrawing();
+        update();
+        draw();
     }
 }
 
 void GUI::updateCamera()
 {
     _raylib->updateCameraCustom();
+}
+
+void GUI::update()
+{
+    updateCamera();
+    _hud->update();
+}
+
+void GUI::draw()
+{
+    if (!_isRunning || _raylib->windowShouldClose())
+        return;
+
+    _raylib->beginDrawing();
+    _raylib->clearBackground(RAYWHITE);
+
+    _raylib->begin3DMode();
+    _map->draw();
+    _raylib->end3DMode();
+
+    _hud->draw();
+
+    _raylib->endDrawing();
 }

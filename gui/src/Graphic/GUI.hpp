@@ -22,6 +22,8 @@ class GUI {
 
     private:
         void updateCamera();
+        void update();
+        void draw();
 
         bool _isRunning;
         std::shared_ptr<RayLib> _raylib;
