@@ -15,7 +15,7 @@ Button::Button(
     float width, float height,
     const std::string& text,
     std::function<void()> callback
-) : AUIElement(x, y, width, height),
+) : AUIElement(raylib, x, y, width, height),
     _text(text),
     _callback(callback),
     _normalColor({230, 230, 230, 255}),
@@ -90,4 +90,9 @@ void Button::setColors(
     _hoverColor = hover;
     _pressedColor = pressed;
     _textColor = textColor;
+}
+
+void Button::setSize(float width, float height)
+{
+    AUIElement::setSize(width, height);
 }

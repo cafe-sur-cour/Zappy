@@ -24,8 +24,11 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _isRunning = _raylib->isWindowReady();
     _map = std::make_unique<Map>(_gameInfos, _raylib);
     _hud = std::make_unique<HUD>(_raylib);
-    _hud->initDefaultLayout(250.0f, 250.0f);
+    _hud->initDefaultLayout(15.0f, 20.0f);
     _hud->initExitButton();
+    _hud->initSettingsButton();
+    _hud->initHelpButton();
+    _hud->initCameraResetButton();
 }
 
 GUI::~GUI()

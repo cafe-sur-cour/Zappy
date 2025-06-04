@@ -66,7 +66,6 @@ class ScrollBar : public AUIElement {
          * @param value New value (between 0.0 and 1.0)
          */
         void setValue(float value);
-
         /**
          * @brief Get the current value
          *
@@ -90,11 +89,19 @@ class ScrollBar : public AUIElement {
         );
 
         /**
-         * @brief Set the callback for value changes
+         * @brief Set the value changed callback
          *
          * @param onValueChanged Callback function
          */
         void setOnValueChanged(std::function<void(float)> onValueChanged);
+
+        /**
+         * @brief Set the size of the scrollbar
+         *
+         * @param width New width
+         * @param height New height
+         */
+        void setSize(float width, float height) override;
 
     private:
         std::shared_ptr<RayLib> _raylib;
@@ -110,7 +117,6 @@ class ScrollBar : public AUIElement {
         Color _handlePressedColor;
 
         bool _isHandleHovered;
-
         /**
          * @brief Calculate the bounds of the handle
          *

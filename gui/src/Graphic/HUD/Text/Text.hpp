@@ -92,6 +92,15 @@ class Text : public AUIElement {
          */
         Color getColor() const;
 
+        /**
+         * @brief Set the size of the text element
+         * For text elements, height determines font size and width is calculated based on text content
+         *
+         * @param width Desired width (may be adjusted based on text content)
+         * @param height Desired height (used as font size)
+         */
+        void setSize(float width, float height) override;
+
     private:
         std::string _text;
         float _fontSize;
