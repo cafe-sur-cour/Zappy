@@ -69,7 +69,6 @@ class Communication:
             print(f"event received: {event} on descriptor {fd}")
             self.receive_data()
 
-
     def get_size_message_queue(self) -> int:
         with self.mutex:
             return len(self._message_queue)
