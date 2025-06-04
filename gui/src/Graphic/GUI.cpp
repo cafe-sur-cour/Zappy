@@ -46,7 +46,7 @@ void GUI::run()
 
 void GUI::updateCamera()
 {
-    _raylib->updateCameraCustom();
+    _raylib->updateCameraFreeMode();
 }
 
 void GUI::update()
