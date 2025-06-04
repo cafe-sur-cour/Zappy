@@ -33,7 +33,7 @@ class TestPlayer:
         assert player.ip == "127.0.0.1"
         assert player.port == 4242
         assert player.level == 1
-        assert not player.communication._is_dead() is True
+        assert not player.communication.is_dead() is True
         assert player.in_incantation is False
         assert player.inventory == {
             "food": 10, "linemate": 0, "deraumere": 0, "sibur": 0,
