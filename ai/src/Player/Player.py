@@ -4,6 +4,8 @@
 # File description:
 # player.py
 #
+
+from random import randint
 from threading import Thread
 from time import sleep
 from src.Hash.Hash import Hash
@@ -45,29 +47,22 @@ class Player:
         self.x = x
         self.y = y
 
-    def begin_incantation(self) -> None:
-        # TODO: Send to the server the command to start an incantation
-        self.in_incantation = True
-        print("Incantation started!")
-
-    def lay_an_egg(self) -> None:
-        # TODO: Send to the server the command to lay an egg
-        print("Lay a new egg!")
-
     def loop(self) -> None:
-        # This is a default loop for the player to simulate actions it's not definitive
         while not self.communication.is_dead():
-            try:
-                self.communication.sendForward()
-                # TODO: check if the player is dead after sending the command
-                self.inventory = self.communication.getInventory()
-                # TODO: check if the player is dead after sending the command
-                if self.communication.get_size_message_queue() > 0:
-                    message = self.communication.get_message_from_queue()
-                    print(
-                        "Message received from the server "
-                        f"{self.hash.unHashMessage(str(message[1][:-1]))}"
-                    )
-                # TODO: Identifier le / les messages reçu / decrypter les messages
-            except PlayerDead:
-                print(f"The player is dead")
+            direction = randint(0, 3)
+            if direction == 0:
+                self.communication.sendLeft()
+            elif direction == 1:
+                self.communication.sendRight()
+            self.communication.sendForward()
+
+            newInventory = self.communication.getInventory()
+            if newInventory:
+                self.inventory = newInventory
+
+            if self.communication.get_size_message_queue() > 0:
+                message = self.communication.get_message_from_queue()
+                print(
+                    "Message received from the server "
+                    f"{self.hash.unHashMessage(str(message[1][:-1]))}"
+                )
