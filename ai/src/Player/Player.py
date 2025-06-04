@@ -5,17 +5,23 @@
 # player.py
 #
 
+import os
 from random import randint
 from threading import Thread
 from time import sleep
 from src.Hash.Hash import Hash
-from src.Exceptions.Exceptions import PlayerDead
+from src.Exceptions.Exceptions import (
+    CommunicationException
+)
+
 from src.Communication.Communication import Communication
+from src.Utils.Utils import SUCCESS, FAILURE
 
 
 class Player:
     def __init__(self, name: str, ip: str, port: int = 4242) -> None:
         self.communication: Communication = Communication(name, ip, port)
+        self.childs: list[int] = []
         self.teamName: str = name
         self.ip: str = ip
         self.port: int = port
@@ -32,6 +38,16 @@ class Player:
             target=self.communication.loop,
             name=f"CommunicationThread-{self.teamName}"
         )
+        slots, x, y = self.communication.connectToServer()
+        self.setMapSize(x, y)
+        if slots > 0:
+            self.childs.append(self.create_child())
+
+    def __del__(self):
+        if len(self.childs) == 0:
+            return
+        for pid in self.childs:
+            os.waitpid(pid, os.WNOHANG)
 
     def __str__(self):
         return (f"Player team: {self.teamName}, "
@@ -39,6 +55,20 @@ class Player:
                 f"Inventory: {self.inventory}, "
                 f"Alive: {not self.communication.is_dead()}, "
                 f"In Incantation: {self.in_incantation}")
+
+    def create_child(self) -> int:
+        pid: int = os.fork()
+        if pid < 0:
+            return -1
+        if pid == 0:
+            try:
+                p = Player(self.teamName, self.ip, self.port)
+                p.startComThread()
+                p.loop()
+            except CommunicationException:
+                exit(FAILURE)
+            exit(SUCCESS)
+        return pid
 
     def startComThread(self) -> None:
         self._commThread.start()

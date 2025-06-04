@@ -15,7 +15,6 @@ from src.Exceptions.Exceptions import (
     CommunicationHandshakeException,
     CommunicationInvalidResponseException,
 )
-from ..Exceptions.Exceptions import PlayerDead
 
 
 class Communication:
@@ -93,32 +92,33 @@ class Communication:
         return look
 
     def handleResponse(self, response: str) -> str:
-        if response == "dead":
-            with self.mutex:
-                self._isDead = True
+        if response.startswith("dead"):
+            self._isDead = True
             return ""
         elif response.startswith("message "):
             parts = response.split(" ")
             number = int(parts[1].strip(","))
             data = parts[2]
-            with self.mutex:
-                self._message_queue.append((number, data))
+            self._message_queue.append((number, data))
             return ""
         inventory = self.tryGetInventory(response)
         if inventory is not None:
-            with self.mutex:
-                self._lastInventory = inventory
+            self._lastInventory = inventory
             return ""
         look = self.tryGetLook(response)
         if look is not None:
-            with self.mutex:
-                self._lastLook = look
+            self._lastLook = look
             return ""
         return response
 
     def receive_data(self) -> str:
-        r = self._socket.receive()
         with self.mutex:
+            if '\n' in self._response_buffer:
+                firstNewlineIndex = self._response_buffer.index('\n')
+                data = self._response_buffer[:firstNewlineIndex + 1]
+                self._response_buffer = self._response_buffer[firstNewlineIndex + 1:]
+                return self.handleResponse(data.strip())
+            r = self._socket.receive()
             self._response_buffer += r
             if '\n' in self._response_buffer:
                 firstNewlineIndex = self._response_buffer.index('\n')
@@ -133,9 +133,8 @@ class Communication:
         fd_vs_event = poller_object.poll(200)
 
         for fd, event in fd_vs_event:
-            print(f"event received: {event} on descriptor {fd}")
             self.receive_data()
-    
+
     def getInventory(self) -> dict[str, int]:
         with self.mutex:
             return self._lastInventory
@@ -163,13 +162,14 @@ class Communication:
             return self._response_buffer.split('\n')
 
     def is_dead(self) -> bool:
-        return self._isDead
+        with self.mutex:
+            return self._isDead
 
     def connectToServer(self):
         self._socket.connect()
         response = self.receive_data()
 
-        if (response != "WELCOME"):
+        if response != "WELCOME":
             raise CommunicationInvalidResponseException(
                 f"Invalid response from server handshake: {response}"
             )
@@ -190,10 +190,6 @@ class Communication:
             )
 
         response = self.receive_data()
-        if (response[-1] != '\n'):
-            raise CommunicationInvalidResponseException(
-                f"Response from server after slots is not terminated with a newline"
-            )
 
         x = 0
         y = 0
@@ -208,7 +204,7 @@ class Communication:
             raise CommunicationHandshakeException(
                 f"Invalid handshake values: slots={slots}, x={x}, y={y}"
             )
-        return (slots, x, y)
+        return slots, x, y
 
     def sendCommand(self, message: str) -> None:
         with self.mutex:
