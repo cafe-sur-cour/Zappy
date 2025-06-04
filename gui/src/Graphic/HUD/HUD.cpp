@@ -90,33 +90,52 @@ void HUD::clearAllContainers()
     _containers.clear();
 }
 
-void HUD::initDefaultLayout(float sideWidth, float bottomHeight)
+void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
 {
+    if (sideWidthPercent <= 0.0f)
+        sideWidthPercent = 15.0f;
+    if (bottomHeightPercent <= 0.0f)
+        bottomHeightPercent = 20.0f;
+
     int screenHeight = _raylib->getScreenHeight();
     int screenWidth = _raylib->getScreenWidth();
 
+    float sideWidth = (screenWidth * sideWidthPercent) / 100.0f;
+    float bottomHeight = (screenHeight * bottomHeightPercent) / 100.0f;
     float squareSize = sideWidth;
 
-    addContainer(
+    auto squareContainer = addContainer(
         "square_container",
         0, 0,
         squareSize, squareSize,
         {60, 60, 60, 220}
     );
 
-    addContainer(
+    if (squareContainer) {
+        squareContainer->setRelativePosition(0, 0, sideWidthPercent, sideWidthPercent);
+    }
+
+    auto sideContainer = addContainer(
         "side_container",
         0, 0,
         sideWidth, screenHeight,
         {40, 40, 40, 200}
     );
 
-    addContainer(
+    if (sideContainer) {
+        sideContainer->setRelativePosition(0, 0, sideWidthPercent, 100.0f);
+    }
+
+    auto bottomContainer = addContainer(
         "bottom_container",
         0, screenHeight - bottomHeight,
         screenWidth, bottomHeight,
         {40, 40, 40, 200}
     );
+
+    if (bottomContainer) {
+        bottomContainer->setRelativePosition(0, 100.0f - bottomHeightPercent, 100.0f, bottomHeightPercent);
+    }
 }
 
 std::shared_ptr<Containers> HUD::getSideContainer() const
@@ -140,18 +159,10 @@ void HUD::initExitButton()
     if (!squareContainer)
         return;
 
-    Rectangle bounds = squareContainer->getBounds();
-
-    float buttonWidth = bounds.width * 0.7f;
-    float buttonHeight = bounds.height * 0.15f;
-
-    float buttonX = (bounds.width - buttonWidth) / 2;
-    float buttonY = bounds.height * 0.1f;
-
-    squareContainer->addButton(
+    squareContainer->addButtonPercent(
         "exit_button",
-        buttonX, buttonY,
-        buttonWidth, buttonHeight,
+        15.0f, 10.0f,
+        70.0f, 15.0f,
         "EXIT",
         [this]() {
             _raylib->closeWindow();
@@ -159,6 +170,69 @@ void HUD::initExitButton()
         {240, 60, 60, 255},
         {255, 100, 100, 255},
         {200, 40, 40, 255},
+        {255, 255, 255, 255}
+    );
+}
+
+void HUD::initSettingsButton()
+{
+    auto squareContainer = getSquareContainer();
+    if (!squareContainer)
+        return;
+
+    squareContainer->addButtonPercent(
+        "settings_button",
+        15.0f, 30.0f,
+        70.0f, 15.0f,
+        "SETTINGS",
+        []() {
+            // Placeholder for settings functionality
+        },
+        {60, 60, 240, 255},
+        {100, 100, 255, 255},
+        {40, 40, 200, 255},
+        {255, 255, 255, 255}
+    );
+}
+
+void HUD::initHelpButton()
+{
+    auto squareContainer = getSquareContainer();
+    if (!squareContainer)
+        return;
+
+    squareContainer->addButtonPercent(
+        "help_button",
+        15.0f, 50.0f,
+        70.0f, 15.0f,
+        "HELP",
+        []() {
+            // Placeholder for help functionality
+        },
+        {60, 240, 60, 255},
+        {100, 255, 100, 255},
+        {40, 200, 40, 255},
+        {255, 255, 255, 255}
+    );
+}
+
+void HUD::initCameraResetButton()
+{
+    auto squareContainer = getSquareContainer();
+    if (!squareContainer)
+        return;
+
+    squareContainer->addButtonPercent(
+        "camera_reset_button",
+        15.0f, 70.0f,
+        70.0f, 15.0f,
+        "RESET CAMERA",
+        []() {
+            // Placeholder for camera reset functionality
+        },
+        {240, 240, 60, 255},
+        {255, 255, 100, 255},
+        {200, 200, 40, 255},
         {255, 255, 255, 255}
     );
 }
