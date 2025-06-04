@@ -47,11 +47,6 @@ class Player:
         # TODO: Send to the server the command to lay an egg
         print("Lay a new egg!")
 
-    def send_help_message(self) -> None:
-        self.help_message_send += 1
-        message = self.hash.hashMessage(f"HELP {self.help_message_send}")
-        self.communication.sendBroadcast(message)
-
     def loop(self) -> None:
         # This is a default loop for the player to simulate actions it's not definitive
         while not self.communication.is_dead():
