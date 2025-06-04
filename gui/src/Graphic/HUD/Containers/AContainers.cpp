@@ -73,7 +73,11 @@ bool AContainers::isVisible() const
     return _visible;
 }
 
-void AContainers::setRelativePosition(float xPercent, float yPercent, float widthPercent, float heightPercent)
+void AContainers::setRelativePosition(
+    float xPercent,
+    float yPercent,
+    float widthPercent,
+    float heightPercent)
 {
     _relativePos.xPercent = xPercent;
     _relativePos.yPercent = yPercent;
