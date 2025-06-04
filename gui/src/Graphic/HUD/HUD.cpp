@@ -239,3 +239,77 @@ void HUD::initCameraResetButton()
         {255, 255, 255, 255}
     );
 }
+
+void HUD::initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
+{
+    auto sideContainer = getSideContainer();
+    if (!sideContainer || !gameInfos)
+        return;
+
+    for (int i = 0; i < 100; i++) {
+        std::string idBase = "team_display_" + std::to_string(i);
+        sideContainer->removeElement(idBase + "_title");
+
+        for (int j = 0; j < 50; j++) {
+            sideContainer->removeElement(idBase + "_player_" + std::to_string(j));
+        }
+    }
+
+    const std::vector<std::string> teams = gameInfos->getTeamNames();
+    const std::vector<zappy::structs::Player> players = gameInfos->getPlayers();
+
+    float yPos = 15.0f;
+
+    for (size_t i = 0; i < teams.size(); i++) {
+        std::string teamId = "team_display_" + std::to_string(i);
+        const std::string& teamName = teams[i];
+
+        sideContainer->addTextPercent(
+            teamId + "_title",
+            5.0f,
+            yPos,
+            "TEAM: " + teamName,
+            6.0f,
+            {255, 255, 255, 255}
+        );
+
+        yPos += 8.0f;
+
+        int playerCount = 0;
+        for (const auto& player : players) {
+            if (player.teamName == teamName) {
+                sideContainer->addTextPercent(
+                    teamId + "_player_" + std::to_string(playerCount),
+                    10.0f,
+                    yPos,
+                    "Player " + std::to_string(player.number) + " (Level " + std::to_string(player.level) + ")",
+                    5.0f,
+                    {200, 200, 200, 255}
+                );
+
+                yPos += 6.0f;
+                playerCount++;
+            }
+        }
+
+        if (playerCount == 0) {
+            sideContainer->addTextPercent(
+                teamId + "_player_0",
+                10.0f,
+                yPos,
+                "No players",
+                5.0f,
+                {150, 150, 150, 255}
+            );
+
+            yPos += 6.0f;
+        }
+
+        yPos += 4.0f;
+    }
+}
+
+void HUD::updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
+{
+    initTeamPlayersDisplay(gameInfos);
+}
