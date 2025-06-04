@@ -187,7 +187,7 @@ void RayLib::updateCamera(int mode)
     UpdateCamera(&_camera, mode);
 }
 
-void RayLib::updateCameraCustom()
+void RayLib::updateCameraFreeMode()
 {
     const float moveSpeed = 0.025f;
     const float rotationSpeed = 0.001f;

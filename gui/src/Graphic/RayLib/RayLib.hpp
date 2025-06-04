@@ -57,7 +57,7 @@ class RayLib {
         void setCameraFovy(float fovy);
         void setCameraProjection(int projection);
         void updateCamera(int mode = CAMERA_FREE);
-        void updateCameraCustom();
+        void updateCameraFreeMode();
         Camera3D getCamera() const;
 
         // 3D Drawing methods
