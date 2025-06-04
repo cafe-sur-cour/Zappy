@@ -318,7 +318,14 @@ std::shared_ptr<Button> Containers::addButtonPercent(
     Color textColor
 )
 {
-    auto button = addButtonPercent(id, xPercent, yPercent, widthPercent, heightPercent, text, callback);
+    auto button = addButtonPercent(
+        id,
+        xPercent,
+        yPercent,
+        widthPercent,
+        heightPercent,
+        text,
+        callback);
 
     if (button)
         button->setColors(normalColor, hoverColor, pressedColor, textColor);
