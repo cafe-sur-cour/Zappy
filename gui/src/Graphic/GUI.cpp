@@ -100,7 +100,8 @@ void GUI::setWindowWidth(int width)
 
     _windowWidth = width;
     _raylib->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
-    _hud->handleResize(_raylib->getScreenWidth(), _raylib->getScreenHeight(), _windowWidth, _windowHeight);
+    _hud->handleResize(_raylib->getScreenWidth(), _raylib->getScreenHeight(),
+        _windowWidth, _windowHeight);
 }
 
 void GUI::setWindowHeight(int height)
@@ -110,12 +111,14 @@ void GUI::setWindowHeight(int height)
 
     _windowHeight = height;
     _raylib->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
-    _hud->handleResize(_raylib->getScreenWidth(), _raylib->getScreenHeight(), _windowWidth, _windowHeight);
+    _hud->handleResize(_raylib->getScreenWidth(), _raylib->getScreenHeight(),
+        _windowWidth, _windowHeight);
 }
 
 void GUI::switchCameraMode(zappy::gui::CameraMode mode)
 {
-    if (mode == zappy::gui::CameraMode::TARGETED && _cameraMode != zappy::gui::CameraMode::TARGETED) {
+    if (mode == zappy::gui::CameraMode::TARGETED &&
+        _cameraMode != zappy::gui::CameraMode::TARGETED) {
         const auto& mapSize = _gameInfos->getMapSize();
 
         Vector3 mapCenter = {

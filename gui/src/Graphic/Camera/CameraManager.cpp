@@ -6,6 +6,7 @@
 */
 
 #include <cmath>
+#include <algorithm>
 #include "CameraManager.hpp"
 #include "raylib.h"
 #include "raymath.h"
