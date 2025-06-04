@@ -107,7 +107,7 @@ class TestCommunication:
         mock_socket_class.return_value = mock_socket
         mock_socket.receive.side_effect = [
             "WELCOME\n",
-            "0\n",
+            "-1\n",
             "10 15\n"
         ]
 
@@ -116,7 +116,7 @@ class TestCommunication:
         with pytest.raises(CommunicationHandshakeException) as excinfo:
             comm.connectToServer()
 
-        assert "Invalid handshake values: slots=0, x=10, y=15" in str(excinfo.value)
+        assert "Invalid handshake values: slots=-1, x=10, y=15" in str(excinfo.value)
 
     @patch('src.Communication.Communication.Socket')
     def test_send_forward_success(self, mock_socket_class):

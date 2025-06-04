@@ -24,6 +24,13 @@ SRC =	../../../gui/src/Client/Client.cpp \
 		../../../gui/src/Graphic/RayLib/RayLib.cpp \
 		../../../gui/src/Graphic/GUI.cpp \
 		../../../gui/src/Graphic/Map.cpp \
+		../../../gui/src/Graphic/HUD/Button/Button.cpp \
+		../../../gui/src/Graphic/HUD/Containers/Containers.cpp \
+		../../../gui/src/Graphic/HUD/Containers/AContainers.cpp \
+		../../../gui/src/Graphic/HUD/ScrollBar/ScrollBar.cpp \
+		../../../gui/src/Graphic/HUD/Text/Text.cpp \
+		../../../gui/src/Graphic/HUD/UIElement/AUIElement.cpp \
+		../../../gui/src/Graphic/HUD/HUD.cpp
 
 OBJ = $(SRC:.cpp=.o)
 
@@ -37,7 +44,7 @@ TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
 INCLUDES = -I./include
 
-CFLAGS =	-std=c++20 -Wall -Wextra -Werror
+CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11

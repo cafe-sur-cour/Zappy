@@ -2,5 +2,5 @@
 
 make fclean
 coding-style . .
-grep -v "./documentation" coding-style-reports.log > coding-style-reports.log
-cat coding-style-reports.log
+grep -v "./documentation" coding-style-reports.log > new-coding.log
+cat new-coding.log
