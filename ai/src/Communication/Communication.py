@@ -9,6 +9,7 @@ import select
 import socket
 import os
 import threading
+from time import sleep
 
 from .Socket import Socket
 from src.Exceptions.Exceptions import (
@@ -40,10 +41,15 @@ class Communication:
     def loop(self) -> None:
         while not self._isDead:
             with self.mutex:
+                # Attention au surchargement
+                # de la quest trop de donnée peuvent mettre du temp
+                # s à traiter une donnée importante queue
                 if len(self._request_queue) > 0 and len(self._pending_queue) < 10:
                     request = self._request_queue.pop(0)
                     self._socket.send(request)
                     self._pending_queue.append(request)
+                else:
+                    sleep(0.1)
             self.receive()
 
     def tryGetInventory(self, response: str) -> dict[str, int] | None:
@@ -104,11 +110,11 @@ class Communication:
         inventory = self.tryGetInventory(response)
         if inventory is not None:
             self._lastInventory = inventory
-            return ""
+            return "inventory\n"
         look = self.tryGetLook(response)
         if look is not None:
             self._lastLook = look
-            return ""
+            return "look\n"
         return response
 
     def receive_data(self) -> str:
@@ -133,7 +139,8 @@ class Communication:
         fd_vs_event = poller_object.poll(200)
 
         for fd, event in fd_vs_event:
-            self.receive_data()
+            if self.receive_data() != "":  # TODO: Move this ?
+                self._pending_queue.pop()
 
     def getInventory(self) -> dict[str, int]:
         with self.mutex:
