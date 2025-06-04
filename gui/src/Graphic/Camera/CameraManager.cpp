@@ -24,7 +24,7 @@ float CameraManager::getCurrentCameraDistance() const
 {
     Camera3D camera = _raylib->getCamera();
 
-    return Vector3Distance(camera.position, camera.target);
+    return _raylib->vector3Distance(camera.position, camera.target);
 }
 
 void CameraManager::setTargetDistance(float distance)
@@ -42,10 +42,10 @@ void CameraManager::initTargetPositionFromCurrentCamera()
 {
     Camera3D camera = _raylib->getCamera();
 
-    float distance = Vector3Distance(camera.position, camera.target);
-    Vector3 direction = Vector3Subtract(camera.position, _mapCenter);
+    float distance = _raylib->vector3Distance(camera.position, _mapCenter);
+    Vector3 direction = _raylib->vector3Subtract(camera.position, _mapCenter);
 
-    direction = Vector3Normalize(direction);
+    direction = _raylib->vector3Normalize(direction);
     _targetAngleY = asinf(direction.y);
     _targetAngleXZ = atan2f(direction.z, direction.x);
     _targetDistance = distance;
@@ -109,7 +109,7 @@ void CameraManager::updateCameraTargetMode()
         }
     }
 
-    float wheelMove = GetMouseWheelMove();
+    float wheelMove = _raylib->getMouseWheelMove();
     if (wheelMove != 0) {
         _targetDistance -= wheelMove * 2.0f;
 

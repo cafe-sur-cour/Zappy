@@ -17,8 +17,8 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _raylib = std::make_shared<RayLib>();
 
     _cameraMode = zappy::gui::CameraMode::FREE;
-    _windowWidth = GetMonitorWidth(0);
-    _windowHeight = GetMonitorHeight(0);
+    _windowWidth = _raylib->getMonitorWidth(0);
+    _windowHeight = _raylib->getMonitorHeight(0);
 
     _raylib->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
     _raylib->initCamera();
@@ -95,22 +95,22 @@ int GUI::getWindowHeight() const
 }
 void GUI::setWindowWidth(int width)
 {
-    if (width <= 0 || width > GetMonitorWidth(0))
+    if (width <= 0 || width > _raylib->getMonitorWidth(0))
         return;
 
     _windowWidth = width;
     _raylib->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
-    _hud->handleResize(GetScreenWidth(), GetScreenHeight(), _windowWidth, _windowHeight);
+    _hud->handleResize(_raylib->getScreenWidth(), _raylib->getScreenHeight(), _windowWidth, _windowHeight);
 }
 
 void GUI::setWindowHeight(int height)
 {
-    if (height <= 0 || height > GetMonitorHeight(0))
+    if (height <= 0 || height > _raylib->getMonitorHeight(0))
         return;
 
     _windowHeight = height;
     _raylib->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
-    _hud->handleResize(GetScreenWidth(), GetScreenHeight(), _windowWidth, _windowHeight);
+    _hud->handleResize(_raylib->getScreenWidth(), _raylib->getScreenHeight(), _windowWidth, _windowHeight);
 }
 
 void GUI::switchCameraMode(zappy::gui::CameraMode mode)
