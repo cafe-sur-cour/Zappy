@@ -45,7 +45,7 @@ typedef struct command_pf_s {
 /* messages.c */
 int helper(void);
 void error_message(const char *message);
-void printfd(char const *message, int fd);
+void printfd(char const *message);
 int write_message(int fd, const char *message);
 char *get_message(int fd, server_t *server);
 

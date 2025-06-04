@@ -37,8 +37,6 @@ static int complete_connection(server_t *server, int fd, const char *message)
     char *buffer = calloc(12, sizeof(char));
     team_t *team = add_client_to_team(message, fd, server);
 
-    if (strcmp(message, "GRAPHIC") == 0)
-        return 0;
     if (!team || !buffer)
         return -1;
     snprintf(buffer, 12, "%d\n", server->params->nb_client - team->nbPlayers);
@@ -52,8 +50,7 @@ static int complete_connection(server_t *server, int fd, const char *message)
     if (write_message(fd, buffer) == -1)
         return -1;
     free(buffer);
-    printf("Client number %d connected to team '%s'.\n",
-           team->nbPlayers, team->name);
+    printfd("New AI client connected.");
     return 0;
 }
 
@@ -70,6 +67,10 @@ int accept_client(server_t *server)
     if (!message) {
         close(new_sockfd);
         return -1;
+    }
+    if (strcmp(message, "GRAPHIC") == 0) {
+        printfd("New GUI client connected.");
+        return 0;
     }
     if (complete_connection(server, new_sockfd, message) == -1) {
         close(new_sockfd);
