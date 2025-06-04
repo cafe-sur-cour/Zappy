@@ -95,11 +95,20 @@ void HUD::initDefaultLayout(float sideWidth, float bottomHeight)
     int screenHeight = _raylib->getScreenHeight();
     int screenWidth = _raylib->getScreenWidth();
 
+    float squareSize = sideWidth;
+
     addContainer(
         "side_container",
         0, 0,
         sideWidth, screenHeight,
         {40, 40, 40, 200}
+    );
+
+    addContainer(
+        "square_container",
+        0, 0,
+        squareSize, squareSize,
+        {60, 60, 60, 220}
     );
 
     addContainer(
@@ -118,4 +127,38 @@ std::shared_ptr<Containers> HUD::getSideContainer() const
 std::shared_ptr<Containers> HUD::getBottomContainer() const
 {
     return getContainer("bottom_container");
+}
+
+std::shared_ptr<Containers> HUD::getSquareContainer() const
+{
+    return getContainer("square_container");
+}
+
+void HUD::initExitButton()
+{
+    auto squareContainer = getSquareContainer();
+    if (!squareContainer)
+        return;
+
+    Rectangle bounds = squareContainer->getBounds();
+
+    float buttonWidth = bounds.width * 0.7f;
+    float buttonHeight = bounds.height * 0.15f;
+
+    float buttonX = (bounds.width - buttonWidth) / 2;
+    float buttonY = bounds.height * 0.1f;
+
+    squareContainer->addButton(
+        "exit_button",
+        buttonX, buttonY,
+        buttonWidth, buttonHeight,
+        "EXIT",
+        [this]() {
+            _raylib->closeWindow();
+        },
+        {220, 60, 60, 255},
+        {240, 80, 80, 255},
+        {180, 40, 40, 255},
+        {255, 255, 255, 255}
+    );
 }
