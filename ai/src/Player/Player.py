@@ -32,7 +32,7 @@ class Player:
         return (f"Player team: {self.teamName}, "
                 f"Level: {self.level}, "
                 f"Inventory: {self.inventory}, "
-                f"Alive: {self.communication.is_dead()}, "
+                f"Alive: {not self.communication.is_dead()}, "
                 f"In Incantation: {self.in_incantation}")
 
     def begin_incantation(self) -> None:

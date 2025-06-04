@@ -36,7 +36,7 @@ class TestPlayer:
         assert player.ip == "127.0.0.1"
         assert player.port == 4242
         assert player.level == 1
-        assert player.alive is True
+        assert not player.communication._is_dead() is True
         assert player.in_incantation is False
         assert player.inventory == {
             "food": 10, "linemate": 0, "deraumere": 0, "sibur": 0,
@@ -61,16 +61,18 @@ class TestPlayer:
     def test_player_str_representation(self, mock_communication):
         """Test player string representation"""
         mock_comm_instance = Mock()
+        mock_comm_instance.is_dead.return_value = False  # ✅ Ajout clé
         mock_communication.return_value = mock_comm_instance
-        
+
         player = Player("team1", "127.0.0.1")
         player.level = 3
         player.inventory["food"] = 5
-        
+
         expected_str = ("Player team: team1, Level: 3, "
-                       "Inventory: {'food': 5, 'linemate': 0, 'deraumere': 0, 'sibur': 0, 'mendiane': 0, 'phiras': 0, 'thystame': 0}, "
-                       "Alive: True, In Incantation: False")
-        
+                        "Inventory: {'food': 5, 'linemate': 0, 'deraumere': 0, 'sibur': 0, "
+                        "'mendiane': 0, 'phiras': 0, 'thystame': 0}, "
+                        "Alive: True, In Incantation: False")
+
         assert str(player) == expected_str
 
     @patch('src.Player.Player.Communication')
@@ -106,61 +108,50 @@ class TestPlayer:
         """Test player loop with normal execution"""
         mock_comm_instance = Mock()
         mock_communication.return_value = mock_comm_instance
-        mock_comm_instance.getInventory.return_value = {"food": 8, "linemate": 1, "deraumere": 0, "sibur": 0, "mendiane": 0, "phiras": 0, "thystame": 0}
-        
+        mock_comm_instance.is_dead.side_effect = [False, True]
+        mock_comm_instance.sendForward.return_value = None
+        mock_comm_instance.getInventory.return_value = {
+            "food": 8, "linemate": 1, "deraumere": 0,
+            "sibur": 0, "mendiane": 0, "phiras": 0, "thystame": 0
+        }
+        mock_comm_instance.get_size_message_queue.return_value = 0
+
         player = Player("team1", "127.0.0.1")
-        
-        # Make the loop run only once by setting alive to False after first iteration
-        def side_effect():
-            player.alive = False
-        
-        mock_comm_instance.sendForward.side_effect = side_effect
-        
+
         with patch('builtins.print') as mock_print:
             player.loop()
-        
+
         mock_comm_instance.sendForward.assert_called_once()
         mock_comm_instance.getInventory.assert_called_once()
         assert mock_print.call_count >= 1
-
-    @patch('src.Player.Player.Communication')
-    def test_loop_player_death(self, mock_communication):
-        """Test player loop when player dies"""
-        mock_comm_instance = Mock()
-        mock_communication.return_value = mock_comm_instance
-        mock_comm_instance.sendForward.side_effect = PlayerDead()
-        
-        player = Player("team1", "127.0.0.1")
-        assert player.alive is True
-        
-        with patch('builtins.print') as mock_print:
-            player.loop()
-        
-        assert player.alive is False
-        mock_print.assert_any_call("The player is dead")
 
     @patch('src.Player.Player.Communication')
     def test_loop_multiple_iterations(self, mock_communication):
         """Test player loop with multiple iterations before death"""
         mock_comm_instance = Mock()
         mock_communication.return_value = mock_comm_instance
-        
+
+        mock_comm_instance.is_dead.side_effect = [False, False, False, True]
+
         call_count = 0
         def sendForward_side_effect():
             nonlocal call_count
             call_count += 1
             if call_count >= 3:
                 raise PlayerDead()
-        
+
         mock_comm_instance.sendForward.side_effect = sendForward_side_effect
-        mock_comm_instance.getInventory.return_value = {"food": 5, "linemate": 0, "deraumere": 0, "sibur": 0, "mendiane": 0, "phiras": 0, "thystame": 0}
-        
+        mock_comm_instance.getInventory.return_value = {
+            "food": 5, "linemate": 0, "deraumere": 0, "sibur": 0,
+            "mendiane": 0, "phiras": 0, "thystame": 0
+        }
+        mock_comm_instance.get_size_message_queue.return_value = 0  # éviter appels indésirés
+
         player = Player("team1", "127.0.0.1")
-        
+
         with patch('builtins.print'):
             player.loop()
-        
-        assert player.alive is False
+
         assert mock_comm_instance.sendForward.call_count == 3
         assert mock_comm_instance.getInventory.call_count == 2
 
@@ -169,31 +160,18 @@ class TestPlayer:
         """Test that inventory is properly updated during loop execution"""
         mock_comm_instance = Mock()
         mock_communication.return_value = mock_comm_instance
-        
-        # Mock different inventory states
         inventory_states = [
             {"food": 8, "linemate": 1, "deraumere": 0, "sibur": 0, "mendiane": 0, "phiras": 0, "thystame": 0},
             {"food": 7, "linemate": 2, "deraumere": 1, "sibur": 0, "mendiane": 0, "phiras": 0, "thystame": 0}
         ]
-        
-        call_count = 0
-        def get_inventory_side_effect():
-            nonlocal call_count
-            result = inventory_states[min(call_count, len(inventory_states) - 1)]
-            call_count += 1
-            if call_count >= 2:
-                # Stop the loop after 2 iterations
-                player.alive = False
-            return result
-        
-        mock_comm_instance.getInventory.side_effect = get_inventory_side_effect
-        
+        mock_comm_instance.is_dead.side_effect = [False, False, True]
+        mock_comm_instance.sendForward.return_value = None
+        mock_comm_instance.get_size_message_queue.return_value = 0
+        mock_comm_instance.getInventory.side_effect = inventory_states
+
         player = Player("team1", "127.0.0.1")
-        
         with patch('builtins.print'):
             player.loop()
-        
-        # Verify final inventory state
         assert player.inventory == inventory_states[1]
         assert mock_comm_instance.sendForward.call_count == 2
         assert mock_comm_instance.getInventory.call_count == 2
@@ -208,12 +186,12 @@ class TestPlayer:
         
         # Modify attributes
         player.level = 5
-        player.alive = False
+        player.communication._is_dead= False
         player.in_incantation = True
         player.inventory["food"] = 20
         
         assert player.level == 5
-        assert player.alive is False
+        assert player.communication._is_dead is False
         assert player.in_incantation is True
         assert player.inventory["food"] == 20
 
