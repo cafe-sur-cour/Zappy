@@ -132,6 +132,27 @@ std::shared_ptr<Button> Containers::addButton(
     return nullptr;
 }
 
+std::shared_ptr<Button> Containers::addButton(
+    const std::string& id,
+    float x, float y,
+    float width, float height,
+    const std::string& text,
+    std::function<void()> callback,
+    Color normalColor,
+    Color hoverColor,
+    Color pressedColor,
+    Color textColor
+)
+{
+    auto button = std::make_shared<Button>(_raylib, x, y, width, height, text, callback);
+    button->setColors(normalColor, hoverColor, pressedColor, textColor);
+
+    if (addElement(id, button))
+        return button;
+
+    return nullptr;
+}
+
 std::shared_ptr<Text> Containers::addText(
     const std::string& id,
     float x, float y,

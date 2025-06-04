@@ -121,6 +121,20 @@ class HUD {
          */
         std::shared_ptr<Containers> getBottomContainer() const;
 
+        /**
+         * @brief Get the square container in the top-left corner
+         *
+         * @return std::shared_ptr<Containers> Pointer to the square container
+         */
+        std::shared_ptr<Containers> getSquareContainer() const;
+
+        /**
+         * @brief Initialize an exit button in the square container
+         *
+         * Creates a button that closes the application when clicked
+         */
+        void initExitButton();
+
     private:
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<RayLib> _raylib;

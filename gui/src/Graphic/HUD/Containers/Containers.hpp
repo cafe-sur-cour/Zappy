@@ -133,6 +133,35 @@ class Containers : public AContainers {
         );
 
         /**
+         * @brief Create and add a button to the container with custom colors
+         *
+         * @param id Unique identifier for the button
+         * @param x X coordinate relative to container
+         * @param y Y coordinate relative to container
+         * @param width Button width
+         * @param height Button height
+         * @param text Button text
+         * @param callback Function to call when button is clicked
+         * @param normalColor Color when not interacting
+         * @param hoverColor Color when mouse is hovering over button
+         * @param pressedColor Color when button is pressed
+         * @param textColor Color of the button text
+         *
+         * @return std::shared_ptr<Button> Pointer to the created button, or nullptr if ID already exists
+         */
+        std::shared_ptr<Button> addButton(
+            const std::string& id,
+            float x, float y,
+            float width, float height,
+            const std::string& text,
+            std::function<void()> callback,
+            Color normalColor,
+            Color hoverColor,
+            Color pressedColor,
+            Color textColor
+        );
+
+        /**
          * @brief Create and add a text element to the container
          *
          * @param id Unique identifier for the text element
