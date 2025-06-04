@@ -25,6 +25,11 @@ class Socket:
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._socket.connect(self._address)
 
+    def get_fd(self) -> int:
+        if self._socket is None:
+            raise SocketException("Socket is not connected")
+        return self._socket.fileno()
+
     def send(self, content: str):
         self._socket.sendall(content.encode("utf-8"))
 

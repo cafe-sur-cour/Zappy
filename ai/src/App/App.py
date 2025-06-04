@@ -41,6 +41,7 @@ class App:
                 player.setMapSize(x, y)
             except CommunicationException:
                 exit(FAILURE)
+            player.startComThread()
             player.loop()
 
         return SUCCESS

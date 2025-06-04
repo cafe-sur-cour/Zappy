@@ -4,7 +4,7 @@
 # File description:
 # player.py
 #
-
+from threading import Thread
 from time import sleep
 from src.Hash.Hash import Hash
 from src.Exceptions.Exceptions import PlayerDead
@@ -26,6 +26,10 @@ class Player:
         self.in_incantation: bool = False
         self.x = 0
         self.y = 0
+        self._commThread: Thread = Thread(
+            target=self.communication.loop,
+            name=f"CommunicationThread-{self.teamName}"
+        )
 
     def __str__(self):
         return (f"Player team: {self.teamName}, "
@@ -33,6 +37,9 @@ class Player:
                 f"Inventory: {self.inventory}, "
                 f"Alive: {not self.communication.is_dead()}, "
                 f"In Incantation: {self.in_incantation}")
+
+    def startComThread(self) -> None:
+        self._commThread.start()
 
     def setMapSize(self, x: int, y: int) -> None:
         self.x = x
@@ -53,7 +60,6 @@ class Player:
             try:
                 self.communication.sendForward()
                 # TODO: check if the player is dead after sending the command
-                print("Player go forward")
                 self.inventory = self.communication.getInventory()
                 # TODO: check if the player is dead after sending the command
                 if self.communication.get_size_message_queue() > 0:
@@ -63,6 +69,5 @@ class Player:
                         f"{self.hash.unHashMessage(str(message[1][:-1]))}"
                     )
                 # TODO: Identifier le / les messages reçu / decrypter les messages
-                print("Current inventory:", self.inventory)
             except PlayerDead:
                 print(f"The player is dead")
