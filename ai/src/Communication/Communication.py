@@ -34,7 +34,7 @@ class Communication:
     def loop(self) -> None:
         while not self._isDead:
             with self.mutex:
-                if len(self._request_queue) > 0:
+                if len(self._request_queue) > 0 and len(self._pending_queue) < 10:
                     request = self._request_queue.pop(0)
                     self._socket.send(request)
                     self._pending_queue.append(request)
