@@ -120,6 +120,16 @@ namespace zappy::structs {
     };
 };
 
-inline const std::string WINDOW_TITLE = "Zappy GUI";
+namespace zappy::gui {
+
+    inline const std::string WINDOW_TITLE = "Zappy GUI";
+
+    enum class CameraMode {
+        FREE = 0,
+        TARGETED = 1,
+        PLAYER = 2,
+        NB_MODES = 3,
+    };
+}
 
 #endif /* !CONSTANTS_HPP_ */

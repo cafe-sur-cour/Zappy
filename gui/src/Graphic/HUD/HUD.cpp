@@ -13,6 +13,11 @@
 HUD::HUD(std::shared_ptr<RayLib> raylib)
     : _containers(), _raylib(raylib)
 {
+    initDefaultLayout(15.0f, 20.0f);
+    initExitButton();
+    initSettingsButton();
+    initHelpButton();
+    initCameraResetButton();
 }
 
 HUD::~HUD()
