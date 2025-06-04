@@ -19,7 +19,6 @@ class Socket:
         self._port = port
         self._address = (host, port)
         self._socket = None
-        self._buffer = ""
 
     def connect(self):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -34,13 +33,10 @@ class Socket:
         self._socket.sendall(content.encode("utf-8"))
 
     def receive(self) -> str:
-        while '\n' not in self._buffer:
-            data = self._socket.recv(BUFFER_SIZE)
-            if not data:
-                raise SocketException("Socket connection closed by the server")
-            self._buffer += data.decode("utf-8")
-        message, self._buffer = self._buffer.split('\n', 1)
-        return message + '\n'
+        data = self._socket.recv(BUFFER_SIZE)
+        if not data:
+            raise SocketException("Socket connection closed by the server")
+        return data.decode("utf-8")
 
     def close(self):
         self._socket.close()
