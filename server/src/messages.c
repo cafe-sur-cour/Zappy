@@ -31,30 +31,33 @@ void printfd(char const *message, int fd)
     dprintf(fd, "%s\n", message);
 }
 
-static void print_received_message(char c, server_t *server)
-{
-    if (server->params->is_debug == true) {
-        printf("Read character: '%c' (0x%02x)\n", c, (unsigned char)c);
-    }
-}
+// static void print_received_message(char c, server_t *server)
+// {
+//     if (server->params->is_debug == true) {
+//         printf("Read character: '%c' (0x%02x)\n", c, (unsigned char)c);
+//     }
+// }
 
-char *get_message(int fd, server_t *server)
+char *get_message(int fd)
 {
     static buffer_t cb = {0};
     char c = 0;
-    char *line = NULL;
-    int bytes_read;
+    struct pollfd pollfd = {.fd = fd, .events = POLLIN};
 
     while (1) {
-        bytes_read = read(fd, &c, 1);
-        if (bytes_read <= 0) {
-            free(line);
+        if (poll(&pollfd, 1, 100) == -1) {
+            error_message("Failed to poll from client socket.");
             return NULL;
         }
-        cb_write(&cb, c);
-        print_received_message(c, server);
-        if (c == '\n')
+        if (!(pollfd.revents & POLLIN))
+            return NULL;
+        if (read(fd, &c, 1) <= 0)
+            return NULL;
+        if (c == '\n') {
+            cb_write(&cb, '\0');
             break;
+        }
+        cb_write(&cb, c);
     }
     return cb.data;
 }

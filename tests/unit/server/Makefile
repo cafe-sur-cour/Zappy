@@ -28,7 +28,7 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/protocol.c					\
 				../../../server/src/client.c					\
 				../../../server/src/accept.c					\
-				../../../server/src/map_init.c					\
+				../../../server/src/game.c						\
 				../../../server/src/algo.c						\
 				../../../server/src/buffer.c					\
 				../../../server/src/free.c						\

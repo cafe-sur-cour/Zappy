@@ -22,7 +22,7 @@ SRC 		=	src/params.c					\
 				src/server.c					\
 				src/protocol.c					\
 				src/client.c					\
-				src/map_init.c					\
+				src/game.c						\
 				src/buffer.c					\
 				src/free.c						\
 				src/algo.c						\

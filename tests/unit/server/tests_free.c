@@ -56,7 +56,7 @@ Test(free_server, test_minimal_server)
     server_t *server = malloc(sizeof(server_t));
     server->params = NULL;
     server->sockfd = -1;
-    server->map = NULL;
+    server->game = NULL;
     server->graph = NULL;
     
     void *result = free_server(server);
@@ -69,7 +69,7 @@ Test(free_server, test_server_with_socket)
     server_t *server = malloc(sizeof(server_t));
     server->params = NULL;
     server->sockfd = 1; // Valid fd
-    server->map = NULL;
+    server->game = NULL;
     server->graph = NULL;
     
     void *result = free_server(server);
@@ -86,10 +86,10 @@ Test(free_server, test_complete_server)
     server->params->teams = NULL;
     server->params->nb_team = 0;
     
-    // Create map
-    server->map = malloc(sizeof(map_t));
-    server->map->teams = NULL;
-    server->map->ressources = NULL;
+    // Create game
+    server->game = malloc(sizeof(game_t));
+    server->game->teams = NULL;
+    server->game->ressources = NULL;
     
     // Create graph
     server->graph = malloc(sizeof(graph_t));
@@ -100,7 +100,7 @@ Test(free_server, test_complete_server)
     cr_assert_null(result);
 }
 
-// Test map with teams
+// Test game with teams
 Test(free_server, test_server_with_teams)
 {
     server_t *server = malloc(sizeof(server_t));
@@ -108,19 +108,19 @@ Test(free_server, test_server_with_teams)
     server->sockfd = -1;
     server->graph = NULL;
     
-    // Create map with teams
-    server->map = malloc(sizeof(map_t));
-    server->map->ressources = NULL;
-    server->map->teams = malloc(sizeof(team_t));
-    server->map->teams->name = malloc(10);
-    server->map->teams->players = NULL;
-    server->map->teams->next = NULL;
+    // Create game with teams
+    server->game = malloc(sizeof(game_t));
+    server->game->ressources = NULL;
+    server->game->teams = malloc(sizeof(team_t));
+    server->game->teams->name = malloc(10);
+    server->game->teams->players = NULL;
+    server->game->teams->next = NULL;
     
     void *result = free_server(server);
     cr_assert_null(result);
 }
 
-// Test map with players
+// Test game with players
 Test(free_server, test_server_with_players)
 {
     server_t *server = malloc(sizeof(server_t));
@@ -128,24 +128,24 @@ Test(free_server, test_server_with_players)
     server->sockfd = -1;
     server->graph = NULL;
     
-    // Create map with teams and players
-    server->map = malloc(sizeof(map_t));
-    server->map->ressources = NULL;
-    server->map->teams = malloc(sizeof(team_t));
-    server->map->teams->name = malloc(10);
-    server->map->teams->next = NULL;
+    // Create game with teams and players
+    server->game = malloc(sizeof(game_t));
+    server->game->ressources = NULL;
+    server->game->teams = malloc(sizeof(team_t));
+    server->game->teams->name = malloc(10);
+    server->game->teams->next = NULL;
     
     // Create player
-    server->map->teams->players = malloc(sizeof(player_t));
-    server->map->teams->players->inventory = malloc(sizeof(int) * 7);
-    server->map->teams->players->lives = malloc(sizeof(lives_t));
-    server->map->teams->players->next = NULL;
+    server->game->teams->players = malloc(sizeof(player_t));
+    server->game->teams->players->inventory = malloc(sizeof(int) * 7);
+    server->game->teams->players->lives = malloc(sizeof(lives_t));
+    server->game->teams->players->next = NULL;
     
     void *result = free_server(server);
     cr_assert_null(result);
 }
 
-// Test map with ressources
+// Test game with ressources
 Test(free_server, test_server_with_ressources)
 {
     server_t *server = malloc(sizeof(server_t));
@@ -153,12 +153,12 @@ Test(free_server, test_server_with_ressources)
     server->sockfd = -1;
     server->graph = NULL;
     
-    // Create map with ressources
-    server->map = malloc(sizeof(map_t));
-    server->map->teams = NULL;
-    server->map->ressources = malloc(sizeof(ressources_t));
-    server->map->ressources->next = malloc(sizeof(ressources_t));
-    server->map->ressources->next->next = NULL;
+    // Create game with ressources
+    server->game = malloc(sizeof(game_t));
+    server->game->teams = NULL;
+    server->game->ressources = malloc(sizeof(ressources_t));
+    server->game->ressources->next = malloc(sizeof(ressources_t));
+    server->game->ressources->next->next = NULL;
     
     void *result = free_server(server);
     cr_assert_null(result);
@@ -172,20 +172,20 @@ Test(free_server, test_server_with_multiple_players)
     server->sockfd = -1;
     server->graph = NULL;
     
-    server->map = malloc(sizeof(map_t));
-    server->map->ressources = NULL;
-    server->map->teams = malloc(sizeof(team_t));
-    server->map->teams->name = malloc(10);
-    server->map->teams->next = NULL;
+    server->game = malloc(sizeof(game_t));
+    server->game->ressources = NULL;
+    server->game->teams = malloc(sizeof(team_t));
+    server->game->teams->name = malloc(10);
+    server->game->teams->next = NULL;
     
     // Create multiple players
-    server->map->teams->players = malloc(sizeof(player_t));
-    server->map->teams->players->inventory = NULL;
-    server->map->teams->players->lives = NULL;
-    server->map->teams->players->next = malloc(sizeof(player_t));
-    server->map->teams->players->next->inventory = malloc(sizeof(int) * 7);
-    server->map->teams->players->next->lives = malloc(sizeof(lives_t));
-    server->map->teams->players->next->next = NULL;
+    server->game->teams->players = malloc(sizeof(player_t));
+    server->game->teams->players->inventory = NULL;
+    server->game->teams->players->lives = NULL;
+    server->game->teams->players->next = malloc(sizeof(player_t));
+    server->game->teams->players->next->inventory = malloc(sizeof(int) * 7);
+    server->game->teams->players->next->lives = malloc(sizeof(lives_t));
+    server->game->teams->players->next->next = NULL;
     
     void *result = free_server(server);
     cr_assert_null(result);
@@ -199,17 +199,17 @@ Test(free_server, test_server_with_multiple_teams)
     server->sockfd = -1;
     server->graph = NULL;
     
-    server->map = malloc(sizeof(map_t));
-    server->map->ressources = NULL;
+    server->game = malloc(sizeof(game_t));
+    server->game->ressources = NULL;
     
     // Create multiple teams
-    server->map->teams = malloc(sizeof(team_t));
-    server->map->teams->name = malloc(10);
-    server->map->teams->players = NULL;
-    server->map->teams->next = malloc(sizeof(team_t));
-    server->map->teams->next->name = NULL;
-    server->map->teams->next->players = NULL;
-    server->map->teams->next->next = NULL;
+    server->game->teams = malloc(sizeof(team_t));
+    server->game->teams->name = malloc(10);
+    server->game->teams->players = NULL;
+    server->game->teams->next = malloc(sizeof(team_t));
+    server->game->teams->next->name = NULL;
+    server->game->teams->next->players = NULL;
+    server->game->teams->next->next = NULL;
     
     void *result = free_server(server);
     cr_assert_null(result);
@@ -221,7 +221,7 @@ Test(free_server, test_server_with_null_pollfd)
     server_t *server = malloc(sizeof(server_t));
     server->params = NULL;
     server->sockfd = -1;
-    server->map = NULL;
+    server->game = NULL;
     
     server->graph = malloc(sizeof(graph_t));
     

@@ -46,39 +46,6 @@ static void diplay_help(int port)
     printf("\033[1;29mServer listening on port: %d\033[0m\n\n", port);
 }
 
-static int init_pollfds(server_t *server)
-{
-    int max_fds = server->params->nb_client * server->params->nb_team + 1;
-
-    server->poll_fds = calloc(max_fds, sizeof(struct pollfd));
-    if (!server->poll_fds) {
-        error_message("Failed to allocate memory for poll file descriptors.");
-        return -1;
-    }
-    server->nb_poll = 1;
-    server->poll_fds[0].fd = server->sockfd;
-    server->poll_fds[0].events = POLLIN;
-    for (int i = 1; i < server->params->nb_client *
-        server->params->nb_team + 1; i++)
-        server->poll_fds[i].fd = -1;
-    return 0;
-}
-
-void realloc_pollfds(server_t *server, int new_fd)
-{
-    struct pollfd *new_poll_fds = realloc(server->poll_fds,
-        (server->nb_poll + 1) * sizeof(struct pollfd));
-
-    if (!new_poll_fds) {
-        error_message("Failed to reallocate memory for poll");
-        return;
-    }
-    server->poll_fds = new_poll_fds;
-    server->poll_fds[server->nb_poll].fd = new_fd;
-    server->poll_fds[server->nb_poll].events = POLLIN;
-    server->nb_poll++;
-}
-
 static bool send_gui_message(server_t *server, bool tmp)
 {
     if (server->graph->fd != -1 && tmp == false) {
@@ -96,15 +63,13 @@ int start_protocol(server_t *server)
 
     setup_signal();
     diplay_help(server->params->port);
-    if (init_pollfds(server) == -1)
-        return -1;
     while (*get_running_state()) {
-        if (poll(server->poll_fds, server->nb_poll, 0) == -1
+        if (poll(&server->pollserver, 1, 100) == -1
             && *get_running_state()) {
             error_message("Poll failed.");
             return -1;
         }
-        if (server->poll_fds[0].revents & POLLIN)
+        if (server->pollserver.revents & POLLIN)
             accept_client(server);
         temp = send_gui_message(server, temp);
     }
