@@ -15,10 +15,10 @@
 #include "zappy.h"
 #include "algo.h"
 
-static bool valid_team_name(const char *team_name, server_t *server)
+static bool valid_team_name(const char *team_name, zappy_t *zappy)
 {
-    for (int i = 0; i < server->params->nb_team; i++) {
-        if (strcmp(team_name, server->params->teams[i]) == 0) {
+    for (int i = 0; i < zappy->params->nb_team; i++) {
+        if (strcmp(team_name, zappy->params->teams[i]) == 0) {
             return true;
         }
     }
@@ -26,17 +26,17 @@ static bool valid_team_name(const char *team_name, server_t *server)
     return false;
 }
 
-bool process_new_client(const char *team_name, int fd, server_t *server)
+bool process_new_client(const char *team_name, int fd, zappy_t *zappy)
 {
     if (strcmp(team_name, "GRAPHIC") == 0) {
-        if (server->graph->fd != -1) {
+        if (zappy->graph->fd != -1) {
             error_message("A graphic client is already connected.");
             return false;
         }
-        server->graph->fd = fd;
+        zappy->graph->fd = fd;
         return true;
     }
-    return valid_team_name(team_name, server);
+    return valid_team_name(team_name, zappy);
 }
 
 static inventory_t *init_inventory(void)
@@ -56,22 +56,26 @@ static inventory_t *init_inventory(void)
     return inventory;
 }
 
-static lives_t *init_lives(int freq)
+static player_t *malloc_player(player_t *player)
 {
-    lives_t *lives = malloc(sizeof(lives_t));
-
-    if (!lives) {
-        error_message("Failed to allocate memory for player lives.");
+    player->id = -1;
+    player->network = malloc(sizeof(network_t));
+    if (!player->network) {
+        error_message("Failed to allocate memory for player network.");
+        free(player);
         return NULL;
     }
-    lives->freq = freq;
-    lives->nbFood = 0;
-    lives->startRefresh = time(NULL);
-    lives->endRefresh = time(NULL);
-    return lives;
+    player->network->buffer = malloc(sizeof(buffer_t));
+    if (!player->network->buffer) {
+        error_message("Failed to allocate memory for player buffer.");
+        free(player->network);
+        free(player);
+        return NULL;
+    }
+    return player;
 }
 
-static player_t *init_player(int fd, int freq, tiles_t tile)
+static player_t *init_player(int fd, tiles_t tile)
 {
     player_t *player = malloc(sizeof(player_t));
 
@@ -79,22 +83,19 @@ static player_t *init_player(int fd, int freq, tiles_t tile)
         error_message("Failed to allocate memory for new player.");
         return NULL;
     }
-    player->id = fd;
+    player = malloc_player(player);
+    player->network->fd = fd;
     player->level = 1;
     player->posX = tile.x;
     player->posY = tile.y;
-    player->isAlive = true;
     player->direction = rand() % 4;
     player->inventory = init_inventory();
     if (!player->inventory)
         return free_player(player);
-    player->lives = init_lives(freq);
-    if (!player->lives)
-        return free_player(player);
     return player;
 }
 
-static int check_team_capacity(server_t *server, const char *team_name,
+static int check_team_capacity(zappy_t *server, const char *team_name,
     player_t *new_player)
 {
     while (server->game->teams) {
@@ -104,6 +105,7 @@ static int check_team_capacity(server_t *server, const char *team_name,
             server->game->teams->players = new_player;
             server->game->teams->nbPlayers++;
             server->game->teams->nbPlayerAlive++;
+            new_player->id = server->game->teams->nbPlayers;
             return server->params->nb_client - server->game->teams->nbPlayers;
         }
         server->game->teams = server->game->teams->next;
@@ -111,10 +113,11 @@ static int check_team_capacity(server_t *server, const char *team_name,
     return -1;
 }
 
-team_t *add_client_to_team(const char *team_name, int fd, server_t *server)
+team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server)
 {
-    tiles_t *tiles = shuffle_fisher(server->game->width, server->game->heigt);
-    player_t *new_player = init_player(fd, server->params->freq, tiles[0]);
+    tiles_t *tiles = shuffle_fisher(server->game->map->width,
+        server->game->map->height);
+    player_t *new_player = init_player(fd, tiles[0]);
     team_t *save = server->game->teams;
     team_t *result = NULL;
 
@@ -126,7 +129,6 @@ team_t *add_client_to_team(const char *team_name, int fd, server_t *server)
     if (strcmp(team_name, "GRAPHIC") == 0)
         return NULL;
     if (check_team_capacity(server, team_name, new_player) == -1) {
-        error_message("Requested team is full.");
         server->game->teams = save;
         return NULL;
     }

@@ -23,7 +23,6 @@ SRC 		=	src/params.c					\
 				src/protocol.c					\
 				src/client.c					\
 				src/game.c						\
-				src/buffer.c					\
 				src/free.c						\
 				src/algo.c						\
 				src/accept.c					\
@@ -36,7 +35,7 @@ INCLUDES 	= 	-I./include
 
 CFLAGS 		=	-Wall -Wextra -Werror -Wshadow
 
-LIBS 		= -L./ -lmy
+LIBS 		= -L./ -lmy -lnetwork
 
 NAME 		= 	zappy_server
 
@@ -44,11 +43,12 @@ CC 			= 	gcc
 
 CRIT 		= 	-lcriterion --coverage
 
-all: libmy $(NAME)
+all: libs $(NAME)
 
 
-libmy:
-	$(MAKE) -C lib/my
+libs:
+	$(MAKE) -C lib/my/
+	$(MAKE) -C src/network/
 
 $(NAME): $(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
@@ -63,6 +63,7 @@ clean:
 	@rm -rf $(MAIN_OBJ)
 	@rm -rf *.gc*
 	-rm libmy.a
+	-rm libnetwork.a
 
 fclean: clean
 	@rm -rf $(NAME)

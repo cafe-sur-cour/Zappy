@@ -13,7 +13,7 @@
 
 
 /* Use the length name to create the buffer */
-static void create_buffer(const char *team_name, server_t *server)
+static void create_buffer(const char *team_name, zappy_t *server)
 {
     int xLength = strlen(team_name) + 6;
     char *message = malloc(sizeof(char) * (xLength));
@@ -27,7 +27,7 @@ static void create_buffer(const char *team_name, server_t *server)
 }
 
 /* This function serves as the cover to send the TNA */
-void send_team_name(server_t *server)
+void send_team_name(zappy_t *server)
 {
     for (int i = 0; i < server->params->nb_team; i++) {
         if (server->params->teams[i] == NULL)
