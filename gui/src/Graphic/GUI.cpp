@@ -8,6 +8,7 @@
 #include <cmath>
 #include <memory>
 #include <iostream>
+#include <algorithm>
 #include "GUI.hpp"
 #include "../Utils/Constants.hpp"
 
