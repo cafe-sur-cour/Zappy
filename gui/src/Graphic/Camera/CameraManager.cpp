@@ -176,26 +176,24 @@ void CameraManager::handlePlayerCameraMouseInput()
 Vector3 CameraManager::calculatePlayerPosition(const zappy::structs::Player& player)
 {
     if (!_map) {
-        // Fallback si Map n'est pas disponible
         const float basePlayerHeight = 0.2f;
         const float playerHeight = 0.5f;
         const float totalHeight = basePlayerHeight + playerHeight;
-        
+
         return {
             static_cast<float>(player.x),
             totalHeight,
             static_cast<float>(player.y)
         };
     }
-    
+
     int playerX = player.x;
     int playerY = player.y;
-    
-    // Trouver l'index du joueur sur sa case
+
     size_t playerIndex = 0;
     const auto& allPlayers = _gameInfos->getPlayers();
     size_t playerCount = 0;
-    
+
     for (const auto& p : allPlayers) {
         if (p.x == playerX && p.y == playerY) {
             if (p.number == player.number) {
@@ -204,13 +202,12 @@ Vector3 CameraManager::calculatePlayerPosition(const zappy::structs::Player& pla
             playerCount++;
         }
     }
-    
-    // Obtenir la hauteur correcte en utilisant getOffset
-    float playerHeightOffset = _map->getOffset(DisplayPriority::PLAYER, playerX, playerY, playerIndex);
-    // Ajouter la moitié de la hauteur du joueur pour cibler le centre du joueur
-    float playerEntityHeight = 0.4f; // Hauteur approximative du modèle du joueur
+
+    float playerHeightOffset = _map->getOffset(DisplayPriority::PLAYER, playerX,
+        playerY, playerIndex);
+    float playerEntityHeight = 0.4f;
     float targetHeight = playerHeightOffset + playerEntityHeight / 2.0f;
-    
+
     return {
         static_cast<float>(playerX),
         targetHeight,
