@@ -88,6 +88,16 @@ bool RayLib::isKeyDown(int key) const
     return IsKeyDown(key);
 }
 
+bool RayLib::isKeyPressed(int key) const
+{
+    return IsKeyPressed(key);
+}
+
+bool RayLib::isKeyReleased(int key) const
+{
+    return IsKeyReleased(key);
+}
+
 Vector2 RayLib::getMousePosition() const
 {
     return GetMousePosition();
