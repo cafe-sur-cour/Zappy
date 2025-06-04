@@ -105,7 +105,13 @@ class HUD {
          * @param sideWidth Width of the side container (default: 250 pixels)
          * @param bottomHeight Height of the bottom container (default: 200 pixels)
          */
-        void initDefaultLayout(float sideWidth = 250.0f, float bottomHeight = 200.0f);
+        /**
+         * @brief Initialize default layout with side and bottom containers
+         *
+         * @param sideWidthPercent Width of side container as percentage of screen width (default: 15%)
+         * @param bottomHeightPercent Height of bottom container as percentage of screen height (default: 20%)
+         */
+        void initDefaultLayout(float sideWidthPercent = 15.0f, float bottomHeightPercent = 20.0f);
 
         /**
          * @brief Get the side container
@@ -134,6 +140,27 @@ class HUD {
          * Creates a button that closes the application when clicked
          */
         void initExitButton();
+
+        /**
+         * @brief Initialize a settings button in the square container
+         *
+         * Creates a button that opens the settings menu when clicked
+         */
+        void initSettingsButton();
+
+        /**
+         * @brief Initialize a help button in the square container
+         *
+         * Creates a button that opens the help menu when clicked
+         */
+        void initHelpButton();
+
+        /**
+         * @brief Initialize a camera reset button in the square container
+         *
+         * Creates a button that resets the camera position when clicked
+         */
+        void initCameraResetButton();
 
     private:
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
