@@ -335,6 +335,7 @@ bool MsgHandler::handlePpoMessage(const std::string& message)
     {
         std::lock_guard<std::mutex> lock(_gameInfosMutex);
         _gameInfos->updatePlayerPosition(playerNumber, x, y);
+        _gameInfos->updatePlayerOrientation(playerNumber, orientation);
     }
 
     std::cout << colors::T_YELLOW << "[INFO] Player " << playerNumber
