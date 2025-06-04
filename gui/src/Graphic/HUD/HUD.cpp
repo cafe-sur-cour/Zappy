@@ -11,14 +11,15 @@
 #include "../../Utils/Constants.hpp"
 #include "HUD.hpp"
 
-HUD::HUD(std::shared_ptr<RayLib> raylib)
-    : _containers(), _raylib(raylib)
+HUD::HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos)
+    : _containers(), _raylib(raylib), _gameInfos(gameInfos)
 {
     initDefaultLayout(15.0f, 20.0f);
     initExitButton();
     initSettingsButton();
     initHelpButton();
     initCameraResetButton();
+    initTeamPlayersDisplay(_gameInfos);
 }
 
 HUD::~HUD()
@@ -38,6 +39,7 @@ void HUD::update()
     for (auto& pair : _containers) {
         pair.second->update();
     }
+    updateTeamPlayersDisplay(_gameInfos);
 }
 
 std::shared_ptr<Containers> HUD::addContainer(
@@ -121,15 +123,130 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
         squareContainer->setRelativePosition(0, 0, sideWidthPercent, sideWidthPercent);
     }
 
+    float sideYStart = squareSize;
+    float sideHeight = screenHeight - squareSize - bottomHeight;
+
     auto sideContainer = addContainer(
         "side_container",
-        0, 0,
-        sideWidth, screenHeight,
+        0, sideYStart,
+        sideWidth, sideHeight,
         {40, 40, 40, 200}
     );
 
     if (sideContainer) {
-        sideContainer->setRelativePosition(0, 0, sideWidthPercent, 100.0f);
+
+        sideContainer->setRelativePosition(
+            0,
+            sideWidthPercent,
+            sideWidthPercent,
+            100.0f - sideWidthPercent - bottomHeightPercent);
+
+        sideContainer->addScrollBarPercent(
+            "side_scrollbar",
+            92.0f, 0.0f,
+            100.0f, 2.0f,
+            ScrollBarOrientation::VERTICAL,
+            [sideContainer](float value) {
+                static std::unordered_map<std::string, float> initialYPositions;
+                static float lastContainerHeight = 0;
+                Rectangle containerBounds = sideContainer->getBounds();
+                float containerHeight = containerBounds.height;
+
+                bool positionsNeedUpdate = lastContainerHeight != containerHeight;
+
+                if (positionsNeedUpdate || initialYPositions.empty()) {
+                    initialYPositions.clear();
+                    positionsNeedUpdate = false;
+                    lastContainerHeight = containerHeight;
+
+                    for (int i = 0; i < 100; i++) {
+                        std::string idBase = "team_display_" + std::to_string(i);
+
+                        auto separatorElem = sideContainer->getElement(idBase + "_separator");
+                        if (separatorElem) {
+                            initialYPositions[idBase + "_separator"] = separatorElem->getBounds().y;
+                        }
+
+                        auto titleElem = sideContainer->getElement(idBase + "_title");
+                        if (titleElem) {
+                            initialYPositions[idBase + "_title"] = titleElem->getBounds().y;
+
+                            auto statsElem = sideContainer->getElement(idBase + "_stats");
+                            if (statsElem) {
+                                initialYPositions[idBase + "_stats"] = statsElem->getBounds().y;
+                            }
+
+                            for (int j = 0; j < 50; j++) {
+                                std::string playerID = idBase + "_player_" + std::to_string(j);
+                                auto playerElem = sideContainer->getElement(playerID);
+                                if (playerElem) {
+                                    initialYPositions[playerID] = playerElem->getBounds().y;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                float maxY = containerBounds.y;
+
+                for (const auto& pair : initialYPositions) {
+                    auto element = sideContainer->getElement(pair.first);
+                    if (element) {
+                        Rectangle bounds = element->getBounds();
+                        float elemBottom = bounds.y + bounds.height;
+                        if (elemBottom > maxY) maxY = elemBottom;
+                    }
+                }
+
+                float contentHeight = maxY - containerBounds.y;
+                float teamCount = 0;
+                for (int i = 0; i < 100; i++) {
+                    if (sideContainer->getElement("team_display_" + std::to_string(i) + "_title"))
+                        teamCount++;
+                }
+
+                float extraSpace = teamCount > 10 ? (teamCount - 10) * 20.0f : 100.0f;
+                contentHeight += extraSpace;
+                float scrollableDistance = contentHeight - containerHeight;
+
+                if (scrollableDistance <= 0.01f)
+                    return;
+
+                float scrollFactor = 1.0f + (teamCount / 20.0f);
+                float offset = -value * scrollableDistance * scrollFactor;
+
+                for (int i = 0; i < 100; i++) {
+                    std::string idBase = "team_display_" + std::to_string(i);
+
+                    auto separatorElem = sideContainer->getElement(idBase + "_separator");
+                    if (separatorElem && initialYPositions.find(idBase + "_separator") != initialYPositions.end()) {
+                        float initialY = initialYPositions[idBase + "_separator"];
+                        separatorElem->setPosition(separatorElem->getBounds().x, initialY + offset);
+                    }
+
+                    auto titleElem = sideContainer->getElement(idBase + "_title");
+                    if (titleElem && initialYPositions.find(idBase + "_title") != initialYPositions.end()) {
+                        float initialY = initialYPositions[idBase + "_title"];
+                        titleElem->setPosition(titleElem->getBounds().x, initialY + offset);
+
+                        auto statsElem = sideContainer->getElement(idBase + "_stats");
+                        if (statsElem && initialYPositions.find(idBase + "_stats") != initialYPositions.end()) {
+                            float initialStatsY = initialYPositions[idBase + "_stats"];
+                            statsElem->setPosition(statsElem->getBounds().x, initialStatsY + offset);
+                        }
+                    }
+
+                    for (int j = 0; j < 50; j++) {
+                        std::string playerID = idBase + "_player_" + std::to_string(j);
+                        auto playerElem = sideContainer->getElement(playerID);
+                        if (playerElem && initialYPositions.find(playerID) != initialYPositions.end()) {
+                            float initialY = initialYPositions[playerID];
+                            playerElem->setPosition(playerElem->getBounds().x, initialY + offset);
+                        }
+                    }
+                }
+            }
+        );
     }
 
     auto bottomContainer = addContainer(
@@ -252,9 +369,12 @@ void HUD::initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
     if (!sideContainer || !gameInfos)
         return;
 
+    // Clear existing elements
     for (int i = 0; i < 100; i++) {
         std::string idBase = "team_display_" + std::to_string(i);
         sideContainer->removeElement(idBase + "_title");
+        sideContainer->removeElement(idBase + "_separator");
+        sideContainer->removeElement(idBase + "_stats");
 
         for (int j = 0; j < 50; j++) {
             sideContainer->removeElement(idBase + "_player_" + std::to_string(j));
@@ -264,59 +384,192 @@ void HUD::initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
     const std::vector<std::string> teams = gameInfos->getTeamNames();
     const std::vector<zappy::structs::Player> players = gameInfos->getPlayers();
 
-    float yPos = 15.0f;
+    auto scrollbar = std::dynamic_pointer_cast<ScrollBar>(sideContainer->getElement("side_scrollbar"));
+    if (scrollbar)
+        scrollbar->setValue(0.0f);
 
-    for (size_t i = 0; i < teams.size(); i++) {
+    float yPos = 5.0f;
+
+    for (int i = static_cast<int>(teams.size()) - 1; i >= 0; i--) {
         std::string teamId = "team_display_" + std::to_string(i);
         const std::string& teamName = teams[i];
+
+        if (i < static_cast<int>(teams.size()) - 1) {
+            sideContainer->addTextPercent(
+                teamId + "_separator",
+                5.0f,
+                yPos - 0.5f,
+                std::string(90, '-'),
+                1.0f,
+                {120, 120, 120, 150}
+            );
+            yPos += 1.0f;
+        }
 
         sideContainer->addTextPercent(
             teamId + "_title",
             5.0f,
             yPos,
             "TEAM: " + teamName,
-            6.0f,
+            3.5f,
             {255, 255, 255, 255}
         );
 
-        yPos += 8.0f;
+        yPos += 4.0f;
 
-        int playerCount = 0;
+        std::vector<int> teamPlayerNumbers;
         for (const auto& player : players) {
             if (player.teamName == teamName) {
-                sideContainer->addTextPercent(
-                    teamId + "_player_" + std::to_string(playerCount),
-                    10.0f,
-                    yPos,
-                    "Player " + std::to_string(player.number) +
-                    " (Level " + std::to_string(player.level) + ")",
-                    5.0f,
-                    {200, 200, 200, 255}
-                );
-
-                yPos += 6.0f;
-                playerCount++;
+                teamPlayerNumbers.push_back(player.number);
             }
         }
 
-        if (playerCount == 0) {
+        if (!teamPlayerNumbers.empty()) {
+            std::string playerList = "Players: ";
+            for (size_t j = 0; j < teamPlayerNumbers.size(); ++j) {
+                playerList += std::to_string(teamPlayerNumbers[j]);
+                if (j < teamPlayerNumbers.size() - 1) {
+                    playerList += ", ";
+                }
+            }
+
+            sideContainer->addTextPercent(
+                teamId + "_player_0",
+                10.0f,
+                yPos,
+                playerList,
+                2.2f,
+                {200, 200, 200, 255}
+            );
+            yPos += 3.0f;
+        } else {
             sideContainer->addTextPercent(
                 teamId + "_player_0",
                 10.0f,
                 yPos,
                 "No players",
-                5.0f,
-                {150, 150, 150, 255}
+                2.0f,
+                {150, 150, 150, 200}
             );
-
-            yPos += 6.0f;
+            yPos += 3.0f;
         }
 
-        yPos += 4.0f;
+        yPos += 2.0f;
+    }
+
+    if (scrollbar) {
+        scrollbar->setValue(0.0f);
+
+        float numTeams = static_cast<float>(teams.size());
+        float baseRatio = 90.0f / (numTeams * 15.0f);
+
+        if (numTeams > 10) {
+            baseRatio *= 0.5f;
+        }
+
+        float contentRatio = std::max(0.01f, std::min(1.0f, baseRatio));
+        scrollbar->setHandleSize(contentRatio);
     }
 }
 
 void HUD::updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
 {
-    initTeamPlayersDisplay(gameInfos);
+    auto sideContainer = getSideContainer();
+    if (!sideContainer || !gameInfos)
+        return;
+
+    static std::vector<std::string> lastTeamNames;
+    const std::vector<std::string> currentTeamNames = gameInfos->getTeamNames();
+
+    if (lastTeamNames != currentTeamNames) {
+        lastTeamNames = currentTeamNames;
+        initTeamPlayersDisplay(gameInfos);
+        return;
+    }
+
+    const std::vector<zappy::structs::Player> players = gameInfos->getPlayers();
+    auto scrollbar = std::dynamic_pointer_cast<ScrollBar>(sideContainer->getElement("side_scrollbar"));
+
+    if (scrollbar) {
+        float maxTeams = static_cast<float>(currentTeamNames.size());
+        float baseHeight = 35.0f;
+        float totalContentHeight = maxTeams * baseHeight;
+        float viewportHeight = sideContainer->getBounds().height;
+        float viewportRatio = std::min(1.0f, viewportHeight / totalContentHeight);
+
+        if (maxTeams > 10) {
+            viewportRatio *= 0.8f;
+        }
+
+        viewportRatio = std::max(0.05f, viewportRatio);
+        scrollbar->setHandleSize(viewportRatio);
+    }
+
+    float yPos = 5.0f;
+
+    for (int i = static_cast<int>(currentTeamNames.size()) - 1; i >= 0; i--) {
+        std::string teamId = "team_display_" + std::to_string(i);
+        const std::string& teamName = currentTeamNames[i];
+
+        auto titleElem = std::dynamic_pointer_cast<Text>(sideContainer->getElement(teamId + "_title"));
+        if (titleElem) {
+            yPos = titleElem->getBounds().y - sideContainer->getBounds().y;
+            yPos = yPos / sideContainer->getBounds().height * 100.0f;
+            yPos += 4.0f;
+
+            for (int j = 0; j < 50; j++) {
+                sideContainer->removeElement(teamId + "_player_" + std::to_string(j));
+            }
+
+            std::vector<int> teamPlayerNumbers;
+            for (const auto& player : players) {
+                if (player.teamName == teamName) {
+                    teamPlayerNumbers.push_back(player.number);
+                }
+            }
+
+            if (!teamPlayerNumbers.empty()) {
+                std::string playerList = "Players: ";
+                for (size_t j = 0; j < teamPlayerNumbers.size(); ++j) {
+                    playerList += std::to_string(teamPlayerNumbers[j]);
+                    if (j < teamPlayerNumbers.size() - 1) {
+                        playerList += ", ";
+                    }
+                }
+
+                sideContainer->addTextPercent(
+                    teamId + "_player_0",
+                    10.0f,
+                    yPos,
+                    playerList,
+                    2.2f,
+                    {200, 200, 200, 255}
+                );
+
+                yPos += 3.0f;
+            } else {
+                sideContainer->addTextPercent(
+                    teamId + "_player_0",
+                    10.0f,
+                    yPos,
+                    "No players",
+                    2.0f,
+                    {150, 150, 150, 200}
+                );
+
+                yPos += 3.0f;
+            }
+
+            yPos += 2.0f;
+        }
+    }
+    if (scrollbar && yPos > 90.0f) {
+        float contentRatio = 90.0f / (yPos + 50.0f);
+        contentRatio = std::max(0.02f, std::min(0.9f, contentRatio));
+        scrollbar->setHandleSize(contentRatio);
+    } else if (scrollbar) {
+        scrollbar->setHandleSize(1.0f);
+    }
 }
+
+
