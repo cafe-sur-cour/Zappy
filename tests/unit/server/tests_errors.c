@@ -26,7 +26,7 @@ Test(helper, helper_valid, .init = redirect_all_std) {
 
 /* Server :: Errors :: Error Message */
 
-Test(error_message, error_message_valid) {
+Test(error_message, error_message_valid, .init = redirect_all_std) {
     FILE *tmp_file = fopen("/tmp/criterion_test_output.txt", "w");
     cr_assert_not_null(tmp_file, "Failed to create temporary file");
 
@@ -50,4 +50,31 @@ Test(error_message, error_message_valid) {
 
     const char *expected = "\033[1;31m[SERVER]\033[0m \033[0;31mThis is a test error message.\033[0m\n";
     cr_assert_str_eq(buffer, expected, "Error message output doesn't match expected format");
+}
+
+Test(errors, error_message_output, .init = cr_redirect_stderr)
+{
+    error_message("Test error message");
+
+}
+
+Test(errors, write_message_valid_fd, .init = cr_redirect_stdout)
+{
+    int result = write_message(1, "Test message");
+    
+    cr_assert_geq(result, 0);
+}
+
+Test(errors, write_message_invalid_fd,  .init = cr_redirect_stderr)
+{
+    int result = write_message(-1, "Test message");
+    
+    cr_assert_eq(result, -1);
+}
+
+Test(errors, helper_function, .init = cr_redirect_stdout)
+{
+    int result = helper();
+    
+    cr_assert_eq(result, 84);
 }

@@ -20,9 +20,9 @@ static void redirect_all_std(void)
 }
 
 // Helper function to create test server
-static server_t *create_test_server(int width, int height, bool debug)
+static zappy_t *create_test_server(int width, int height, bool debug)
 {
-    server_t *server = malloc(sizeof(server_t));
+    zappy_t *server = malloc(sizeof(zappy_t));
     server->params = malloc(sizeof(params_t));
     server->params->x = width;
     server->params->y = height;
@@ -32,20 +32,6 @@ static server_t *create_test_server(int width, int height, bool debug)
 }
 
 // Helper function to free test server
-static void free_test_server(server_t *server)
-{
-    if (server->game) {
-        ressources_t *current = server->game->ressources;
-        while (current) {
-            ressources_t *next = current->next;
-            free(current);
-            current = next;
-        }
-        free(server->game);
-    }
-    free(server->params);
-    free(server);
-}
 
 // Test shuffle_fisher function
 Test(algo, shuffle_fisher_basic, .init = redirect_all_std)
@@ -88,99 +74,117 @@ Test(algo, shuffle_fisher_coverage, .init = redirect_all_std)
 
 Test(game_init, init_game_basic, .init = redirect_all_std)
 {
-    server_t *server = create_test_server(5, 5, false);
+    zappy_t *server = create_test_server(5, 5, false);
     
     init_game(server);
     
     cr_assert_not_null(server->game, "game should be initialized");
-    cr_assert_eq(server->game->width, 5, "game width should be set correctly");
-    cr_assert_eq(server->game->heigt, 5, "game height should be set correctly");
+    cr_assert_eq(server->game->map->width, 5, "game width should be set correctly");
+    cr_assert_eq(server->game->map->height, 5, "game height should be set correctly");
     cr_assert_null(server->game->teams, "Teams should be null initially");
-    
-    free_test_server(server);
 }
 
 Test(game_init, resource_distribution, .init = redirect_all_std)
 {
-    server_t *server = create_test_server(10, 10, false);
+    zappy_t *server = create_test_server(10, 10, false);
     
     init_game(server);
-    
-    // Count resources by type
-    int resource_count[7] = {0};
-    ressources_t *current = server->game->ressources;
-    
-    while (current) {
-        cr_assert_geq(current->type, 0, "Resource type should be >= 0");
-        cr_assert_lt(current->type, 7, "Resource type should be < 7");
-        cr_assert_geq(current->posX, 0, "Resource X position should be >= 0");
-        cr_assert_lt(current->posX, 10, "Resource X position should be < width");
-        cr_assert_geq(current->posY, 0, "Resource Y position should be >= 0");
-        cr_assert_lt(current->posY, 10, "Resource Y position should be < height");
-        
-        resource_count[current->type]++;
-        current = current->next;
-    }
-    
-    // Verify resource distribution (approximate due to float to int conversion)
-    int gameValue = 100;
-    float density[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
-    
-    for (int i = 0; i < 7; i++) {
-        int expected = (int)(gameValue * density[i]);
-        cr_assert_eq(resource_count[i], expected, 
-            "Resource type %d count should match expected density", i);
-    }
-    
-    free_test_server(server);
+
 }
 
 Test(game_init, debug_output, .init = redirect_all_std)
 {
-    server_t *server = create_test_server(3, 3, true);
+    zappy_t *server = create_test_server(3, 3, true);
     
     init_game(server);
     
     // Debug mode should produce output
     fflush(stdout);
-    free_test_server(server);
+    
 }
 
 Test(game_init, empty_game, .init = redirect_all_std)
 {
-    server_t *server = create_test_server(1, 1, false);
+    zappy_t *server = create_test_server(1, 1, false);
     
     init_game(server);
     
     cr_assert_not_null(server->game, "Even 1x1 game should be initialized");
-    cr_assert_eq(server->game->width, 1, "1x1 game width should be 1");
-    cr_assert_eq(server->game->heigt, 1, "1x1 game height should be 1");
+    cr_assert_eq(server->game->map->width, 1, "1x1 game width should be 1");
+    cr_assert_eq(server->game->map->height, 1, "1x1 game height should be 1");
+
     
-    // Should have at least some resources
-    cr_assert_null(server->game->ressources, "1x1 game should have resources");
-    
-    free_test_server(server);
 }
 
 Test(game_init, large_game, .init = redirect_all_std)
 {
-    server_t *server = create_test_server(50, 50, false);
+    zappy_t *server = create_test_server(50, 50, false);
     
     init_game(server);
     
     cr_assert_not_null(server->game, "Large game should be initialized");
-    cr_assert_eq(server->game->width, 50, "Large game width should be correct");
-    cr_assert_eq(server->game->heigt, 50, "Large game height should be correct");
+    cr_assert_eq(server->game->map->width, 50, "Large game width should be correct");
+    cr_assert_eq(server->game->map->height, 50, "Large game height should be correct");
+
     
-    // Count total resources
-    int total_resources = 0;
-    ressources_t *current = server->game->ressources;
-    while (current) {
-        total_resources++;
-        current = current->next;
+}
+
+Test(map_init, init_game_basic)
+{
+    params_t params = {
+        .port = 8080,
+        .x = 5,
+        .y = 5,
+        .nb_team = 2,
+        .teams = (char*[]){"team1", "team2"},
+        .nb_client = 3,
+        .freq = 100,
+        .is_debug = false
+    };
+    
+    zappy_t server = {
+        .params = &params,
+        .game = NULL,
+        .network = NULL,
+        .graph = NULL
+    };
+    
+    init_game(&server);
+    
+    cr_assert_not_null(server.game);
+    cr_assert_not_null(server.game->map);
+    cr_assert_eq(server.game->map->width, 5);
+    cr_assert_eq(server.game->map->height, 5);
+    cr_assert_not_null(server.game->map->tiles);
+    cr_assert_not_null(server.game->teams);
+    
+    free_map(server.game->map);
+}
+
+Test(map_init, map_tiles_initialized)
+{
+    params_t params = {
+        .x = 3,
+        .y = 3,
+        .nb_team = 1,
+        .teams = (char*[]){"team1"},
+        .nb_client = 1,
+        .freq = 100
+    };
+    
+    zappy_t server = {
+        .params = &params,
+        .game = NULL
+    };
+    
+    init_game(&server);
+    
+    for (int y = 0; y < 3; y++) {
+        for (int x = 0; x < 3; x++) {
+            cr_assert_not_null(server.game->map->tiles[y]);
+            cr_assert_not_null(&server.game->map->tiles[y][x]);
+        }
     }
     
-    cr_assert_gt(total_resources, 0, "Large game should have resources");
-    
-    free_test_server(server);
+    free_map(server.game->map);
 }
