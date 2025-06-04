@@ -226,7 +226,7 @@ void RayLib::updateCameraCustom()
         _camera.target.y -= moveSpeed * 0.5;
     }
 
-    if (isMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    if (isMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
         int screenCenterX = getScreenWidth() / 2;
         int screenCenterY = getScreenHeight() / 2;
 
@@ -236,10 +236,10 @@ void RayLib::updateCameraCustom()
         disableCursor();
     }
 
-    if (isMouseButtonReleased(MOUSE_BUTTON_LEFT))
+    if (isMouseButtonReleased(MOUSE_BUTTON_RIGHT))
         enableCursor();
 
-    if (isMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+    if (isMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
         Vector2 mouseDelta = getMouseDelta();
 
         if (mouseDelta.x != 0) {

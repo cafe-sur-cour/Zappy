@@ -20,14 +20,24 @@ class GUI {
 
         void run();
 
+        int getWindowWidth() const;
+        int getWindowHeight() const;
+        void setWindowWidth(int width);
+        void setWindowHeight(int height);
+
     private:
         void updateCamera();
+        void update();
+        void draw();
 
         bool _isRunning;
         std::shared_ptr<RayLib> _raylib;
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<Map> _map;
         std::unique_ptr<HUD> _hud;
+
+        int _windowWidth;
+        int _windowHeight;
 };
 
 #endif /* !GUI_HPP_ */

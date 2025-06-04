@@ -120,8 +120,6 @@ namespace zappy::structs {
     };
 };
 
-inline const int WINDOW_WIDTH = 1920;
-inline const int WINDOW_HEIGHT = 1080;
 inline const std::string WINDOW_TITLE = "Zappy GUI";
 
 #endif /* !CONSTANTS_HPP_ */
