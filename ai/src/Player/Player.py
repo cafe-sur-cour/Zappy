@@ -38,10 +38,6 @@ class Player:
             target=self.communication.loop,
             name=f"CommunicationThread-{self.teamName}"
         )
-        slots, x, y = self.communication.connectToServer()
-        self.setMapSize(x, y)
-        if slots > 0:
-            self.childs.append(self.create_child())
 
     def __del__(self):
         if len(self.childs) == 0:
