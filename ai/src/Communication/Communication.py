@@ -20,15 +20,22 @@ from ..Exceptions.Exceptions import PlayerDead
 
 class Communication:
     def __init__(self, name: str, host: str, port: int):
-        self._isDead: bool = False
-        self._message_queue: list[tuple[int, str]] = []
         self._request_queue: list[str] = []
         self._pending_queue: list[str] = []
+
         self._response_buffer: str = ""
+
+        self._message_queue: list[tuple[int, str]] = []
+        self._isDead: bool = False
+        self._lastInventory: dict[str, int] = {}
+        self._lastLook: list[dict[str, int]] = []
+
         self._name = name
         self._host = host
         self._port = port
+
         self._socket = Socket(host, port)
+
         self.mutex = threading.Lock()
 
     def loop(self) -> None:
@@ -40,25 +47,83 @@ class Communication:
                     self._pending_queue.append(request)
             self.receive()
 
-    def receive_data(self) -> str:
-        r = self._socket.receive()
-        if r == "dead\n":
+    def tryGetInventory(self, response: str) -> dict[str, int] | None:
+        if not response[:-1].startswith("[") or not response[:-1].endswith("]"):
+            return None
+
+        items = response[:-1][1:-1].split(",")
+        inventory = dict()
+        for item in items:
+            if not item:
+                continue
+            try:
+                data = [d.strip() for d in item.strip().split(" ") if d and d.strip()]
+                if len(data) != 2:
+                    return None
+                name, quantity = data
+                if not name or not quantity:
+                    return None
+                inventory[name] = int(quantity)
+            except ValueError:
+                return None
+
+        return inventory
+
+    def tryGetLook(self, response: str) -> list[dict[str, int]] | None:
+        if not response[:-1].startswith("[") or not response[:-1].endswith("]"):
+            return None
+
+        look = []
+        items = response[:-1][1:-1].split(",")
+        if not items or len(items) == 0:
+            return None
+        for item in items:
+            look.append({})
+            if not item:
+                continue
+            tile = item.strip().split(" ")
+            tile = [d.strip() for d in tile if d and d.strip()]
+            for data in tile:
+                if not data:
+                    continue
+                if data not in look[-1]:
+                    look[-1][data] = 0
+                look[-1][data] += 1
+
+        return look
+
+    def handleResponse(self, response: str) -> None:
+        if response == "ko":
+            return
+        if response == "dead":
             with self.mutex:
                 self._isDead = True
-            return ""
-        if r.startswith("message"):
-            parts = r.split(" ")
+        elif response.startswith("message "):
+            parts = response.split(" ")
             number = int(parts[1].strip(","))
             data = parts[2]
             with self.mutex:
                 self._message_queue.append((number, data))
-            self.receive_data()
-            return ""
+        inventory = self.tryGetInventory(response)
+        if inventory is not None:
+            with self.mutex:
+                self._lastInventory = inventory
+        look = self.tryGetLook(response)
+        if look is not None:
+            with self.mutex:
+                self._lastLook = look
+
+    def receive_data(self) -> str:
+        r = self._socket.receive()
         with self.mutex:
             self._response_buffer += r
-            for line in r.split('\n'):
-                self._request_queue.append(line + "\n")
-        return r
+            if '\n' in self._response_buffer:
+                firstNewlineIndex = self._response_buffer.index('\n')
+                data = self._response_buffer[:firstNewlineIndex + 1]
+                self._response_buffer = self._response_buffer[firstNewlineIndex + 1:]
+                self.handleResponse(data.strip())
+                return data.strip()
+        return ""
 
     def receive(self) -> None:
         poller_object = select.poll()
@@ -68,6 +133,14 @@ class Communication:
         for fd, event in fd_vs_event:
             print(f"event received: {event} on descriptor {fd}")
             self.receive_data()
+    
+    def getInventory(self) -> dict[str, int]:
+        with self.mutex:
+            return self._lastInventory
+
+    def getLook(self) -> list[str]:
+        with self.mutex:
+            return self._lastLook
 
     def get_size_message_queue(self) -> int:
         with self.mutex:
