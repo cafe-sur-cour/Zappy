@@ -120,6 +120,9 @@ namespace zappy::structs {
     };
 };
 
-inline const std::string WINDOW_TITLE = "Zappy GUI";
+namespace zappy::gui {
+
+    inline const std::string WINDOW_TITLE = "Zappy GUI";
+}
 
 #endif /* !CONSTANTS_HPP_ */
