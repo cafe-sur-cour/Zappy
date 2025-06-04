@@ -13,7 +13,8 @@
 
 CameraManager::CameraManager(std::shared_ptr<RayLib> raylib) : _raylib(raylib),
     _mapCenter({ 0.0f, 0.0f, 0.0f }), _mapWidth(0), _mapHeight(0),
-    _targetDistance(30.0f), _targetAngleXZ(0.0f), _targetAngleY(0.5f), _isDragging(false)
+    _targetDistance(30.0f), _targetAngleXZ(0.0f), _targetAngleY(0.5f), _isDragging(false),
+    _playerId(-1), _playerAngleXZ(0.75f), _isPlayerViewDragging(false)
 {
 }
 
@@ -126,9 +127,134 @@ void CameraManager::updateCameraTargetMode()
     _raylib->setCameraTarget(_mapCenter);
 }
 
+void CameraManager::setPlayerId(int playerId)
+{
+    _playerId = playerId;
+}
+
+int CameraManager::getPlayerId() const
+{
+    return _playerId;
+}
+
+void CameraManager::setGameInfos(std::shared_ptr<GameInfos> gameInfos)
+{
+    _gameInfos = gameInfos;
+}
+
+void CameraManager::handlePlayerCameraMouseInput()
+{
+    if (_raylib->isMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+        _isPlayerViewDragging = true;
+
+        int screenCenterX = _raylib->getScreenWidth() / 2;
+        int screenCenterY = _raylib->getScreenHeight() / 2;
+
+        _raylib->setMousePosition(screenCenterX, screenCenterY);
+        _raylib->disableCursor();
+    }
+
+    if (_raylib->isMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
+        _isPlayerViewDragging = false;
+        _raylib->enableCursor();
+    }
+
+    if (_isPlayerViewDragging) {
+        Vector2 mouseDelta = _raylib->getMouseDelta();
+        const float rotationSensitivity = 0.005f;
+
+        // Modifier uniquement l'angle horizontal (XZ)
+        _playerAngleXZ += mouseDelta.x * rotationSensitivity;
+
+        // Recentrer le curseur pour permettre une rotation continue
+        int screenCenterX = _raylib->getScreenWidth() / 2;
+        int screenCenterY = _raylib->getScreenHeight() / 2;
+        _raylib->setMousePosition(screenCenterX, screenCenterY);
+    }
+}
+
+Vector3 CameraManager::calculatePlayerPosition(const zappy::structs::Player& player)
+{
+    if (!_map) {
+        // Fallback si Map n'est pas disponible
+        const float basePlayerHeight = 0.2f;
+        const float playerHeight = 0.5f;
+        const float totalHeight = basePlayerHeight + playerHeight;
+        
+        return {
+            static_cast<float>(player.x),
+            totalHeight,
+            static_cast<float>(player.y)
+        };
+    }
+    
+    int playerX = player.x;
+    int playerY = player.y;
+    
+    // Trouver l'index du joueur sur sa case
+    size_t playerIndex = 0;
+    const auto& allPlayers = _gameInfos->getPlayers();
+    size_t playerCount = 0;
+    
+    for (const auto& p : allPlayers) {
+        if (p.x == playerX && p.y == playerY) {
+            if (p.number == player.number) {
+                playerIndex = playerCount;
+            }
+            playerCount++;
+        }
+    }
+    
+    // Obtenir la hauteur correcte en utilisant getOffset
+    float playerHeightOffset = _map->getOffset(DisplayPriority::PLAYER, playerX, playerY, playerIndex);
+    // Ajouter la moitié de la hauteur du joueur pour cibler le centre du joueur
+    float playerEntityHeight = 0.4f; // Hauteur approximative du modèle du joueur
+    float targetHeight = playerHeightOffset + playerEntityHeight / 2.0f;
+    
+    return {
+        static_cast<float>(playerX),
+        targetHeight,
+        static_cast<float>(playerY)
+    };
+}
+
+Vector3 CameraManager::calculateCameraPosition(const Vector3& playerPos, float angleXZ)
+{
+    const float fixedAngleY = 0.5f;
+    const float fixedDistance = 6.0f;
+
+    float posX = playerPos.x + fixedDistance * cosf(fixedAngleY) * cosf(angleXZ);
+    float posY = playerPos.y + fixedDistance * sinf(fixedAngleY);
+    float posZ = playerPos.z + fixedDistance * cosf(fixedAngleY) * sinf(angleXZ);
+
+    return { posX, posY, posZ };
+}
+
 void CameraManager::updateCameraPlayerMode()
 {
-    updateCameraFreeMode();
+    if (!_gameInfos || _playerId < 0 || !_map) {
+        updateCameraFreeMode();
+        return;
+    }
+
+    const auto& players = _gameInfos->getPlayers();
+    auto playerIt = std::find_if(players.begin(), players.end(),
+        [this](const zappy::structs::Player& player) {
+            return player.number == _playerId;
+        });
+
+    if (playerIt == players.end()) {
+        updateCameraFreeMode();
+        return;
+    }
+
+    handlePlayerCameraMouseInput();
+
+    Vector3 playerPos = calculatePlayerPosition(*playerIt);
+    Vector3 cameraPos = calculateCameraPosition(playerPos, _playerAngleXZ);
+
+    _raylib->setCameraPosition(cameraPos);
+    _raylib->setCameraTarget(playerPos);
 }
 
 void CameraManager::setMapCenter(const Vector3& center)
@@ -143,4 +269,9 @@ void CameraManager::setMapSize(int width, int height)
 
     if (_targetDistance <= 0.0f)
         _targetDistance = std::max(_mapWidth, _mapHeight) * 1.5f;
+}
+
+void CameraManager::setMapInstance(std::shared_ptr<Map> map)
+{
+    _map = map;
 }

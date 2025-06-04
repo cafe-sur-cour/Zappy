@@ -11,6 +11,8 @@
 #include <memory>
 #include "../RayLib/RayLib.hpp"
 #include "../../Utils/Constants.hpp"
+#include "../../Game/GameInfos.hpp"
+#include "../Map.hpp"
 
 class CameraManager {
     public:
@@ -29,8 +31,15 @@ class CameraManager {
         void setTargetDistance(float distance);
         void initTargetPositionFromCurrentCamera();
 
+        void setPlayerId(int playerId);
+        int getPlayerId() const;
+        void setGameInfos(std::shared_ptr<GameInfos> gameInfos);
+        void setMapInstance(std::shared_ptr<Map> map);
+
     private:
         std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<GameInfos> _gameInfos;
+        std::shared_ptr<Map> _map;
         Vector3 _mapCenter;
         int _mapWidth;
         int _mapHeight;
@@ -39,6 +48,14 @@ class CameraManager {
         float _targetAngleXZ;
         float _targetAngleY;
         bool _isDragging;
+        int _playerId;
+
+        float _playerAngleXZ;
+        bool _isPlayerViewDragging;
+
+        void handlePlayerCameraMouseInput();
+        Vector3 calculatePlayerPosition(const zappy::structs::Player& player);
+        Vector3 calculateCameraPosition(const Vector3& playerPos, float angleXZ);
 };
 
 #endif /* !CAMERA_MANAGER_HPP_ */
