@@ -47,6 +47,7 @@ void Map::draw()
         drawEggs(tile.x, tile.y);
         drawPlayers(tile.x, tile.y);
         drawFood(tile.x, tile.y, tile);
+        drawRock(tile.x, tile.y, tile);
     }
 }
 
@@ -173,6 +174,28 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
     }
 }
 
+void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
+{
+    if (tile.linemate <= 0 && tile.deraumere <= 0 && tile.sibur <= 0 &&
+        tile.mendiane <= 0 && tile.phiras <= 0 && tile.thystame <= 0)
+        return;
+
+    Color rockColor = BLUE;
+    float foodSize = 0.25f;
+
+    for (int i = 0; i < tile.linemate + tile.deraumere + tile.sibur + tile.mendiane +
+            tile.phiras + tile.thystame; ++i) {
+        Vector3 position = {
+            static_cast<float>(x),
+            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(i)),
+            static_cast<float>(y)
+        };
+
+        _raylib->drawCube(position, foodSize, foodSize, foodSize, rockColor);
+        _raylib->drawCubeWires(position, foodSize, foodSize, foodSize, BLACK);
+    }
+}
+
 float Map::getOffset(DisplayPriority priority, int x, int y, size_t stackIndex)
 {
     switch (priority) {
@@ -226,6 +249,46 @@ float Map::getOffset(DisplayPriority priority, int x, int y, size_t stackIndex)
                 baseFoodHeight += (playerCount * PLAYER_HEIGHT);
 
             return baseFoodHeight + (stackIndex * FOOD_HEIGHT);
+        }
+
+        case DisplayPriority::ROCK: {
+            const auto& eggs = _gameInfos->getEggs();
+            size_t eggCount = 0;
+
+            for (const auto& egg : eggs) {
+                if (egg.x == x && egg.y == y && !egg.hatched) {
+                    eggCount++;
+                }
+            }
+
+            const auto& players = _gameInfos->getPlayers();
+            size_t playerCount = 0;
+
+            for (const auto& player : players) {
+                if (player.x == x && player.y == y) {
+                    playerCount++;
+                }
+            }
+
+            const auto& tiles = _gameInfos->getTiles();
+            size_t rockCount = 0;
+            for (const auto& tile : tiles) {
+                if (tile.x == x && tile.y == y &&
+                    (tile.linemate > 0 || tile.deraumere > 0 ||
+                     tile.sibur > 0 || tile.mendiane > 0 ||
+                     tile.phiras > 0 || tile.thystame > 0)) {
+                    rockCount++;
+                }
+            }
+
+            float baseRockHeight = BASE_HEIGHT_ROCK;
+            if (eggCount > 0)
+                baseRockHeight = BASE_HEIGHT_EGG + (eggCount * EGG_HEIGHT);
+            if (playerCount > 0)
+                baseRockHeight += (playerCount * PLAYER_HEIGHT);
+            if (rockCount > 0)
+                baseRockHeight += (rockCount * ROCK_HEIGHT);
+            return baseRockHeight + (stackIndex * ROCK_HEIGHT);
         }
 
         default:

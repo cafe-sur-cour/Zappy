@@ -19,6 +19,7 @@ enum class DisplayPriority {
     EGG = 1,
     PLAYER = 2,
     FOOD = 3,
+    ROCK = 4,
 };
 
 class Map {
@@ -28,6 +29,7 @@ class Map {
 
         void draw();
         void drawTile(int x, int y, const zappy::structs::Tile &tile);
+        void drawRock(int x, int y, const zappy::structs::Tile &tile);
         void drawFood(int x, int y, const zappy::structs::Tile &tile);
         void drawPlayers(int x, int y);
         void drawEggs(int x, int y);
@@ -42,9 +44,11 @@ class Map {
 
         static constexpr float BASE_HEIGHT_TILE = 0.0f;
         static constexpr float BASE_HEIGHT_FOOD = 0.2f;
+        static constexpr float BASE_HEIGHT_ROCK = 0.2f;
         static constexpr float BASE_HEIGHT_EGG = 0.2f;
         static constexpr float BASE_HEIGHT_PLAYER = 0.2f;
         static constexpr float FOOD_HEIGHT = 0.3f;
+        static constexpr float ROCK_HEIGHT = 0.3f;
         static constexpr float EGG_HEIGHT = 0.3f;
         static constexpr float PLAYER_HEIGHT = 0.5f;
 
