@@ -56,12 +56,23 @@ static int listen_socket(server_t *server)
     return 0;
 }
 
-void null_elem(server_t *server, int argc, char **argv)
+static graph_t *init_graph(void)
 {
-    server->graph = NULL;
-    server->map = NULL;
+    graph_t *graph = malloc(sizeof(graph_t));
+
+    if (!graph) {
+        error_message("Failed to allocate memory for graph.");
+        exit(84);
+    }
+    graph->fd = -1;
+    return graph;
+}
+
+static void fill_elements(server_t *server)
+{
+    server->graph = init_graph();
+    server->game = NULL;
     server->params = NULL;
-    server->params = check_args(argc, argv);
 }
 
 server_t *init_server(int argc, char **argv)
@@ -72,7 +83,8 @@ server_t *init_server(int argc, char **argv)
         error_message("Memory allocation failed for server.");
         return NULL;
     }
-    null_elem(server, argc, argv);
+    fill_elements(server);
+    server->params = check_args(argc, argv);
     if (!server->params)
         return free_server(server);
     if (set_socket(server) == -1)
@@ -81,5 +93,7 @@ server_t *init_server(int argc, char **argv)
         return free_server(server);
     if (listen_socket(server) == -1)
         return free_server(server);
+    server->pollserver.fd = server->sockfd;
+    server->pollserver.events = POLLIN;
     return server;
 }

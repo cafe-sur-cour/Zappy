@@ -9,22 +9,23 @@
 #include "algo.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 
 
-static map_t *create_map(server_t *server)
+static game_t *create_game(server_t *server)
 {
-    map_t *map = malloc(sizeof(map_t));
+    game_t *game = malloc(sizeof(game_t));
 
-    if (!map) {
-        error_message("Failed to allocate memory for map.");
+    if (!game) {
+        error_message("Failed to allocate memory for game structure.");
         exit(84);
     }
-    map->width = server->params->x;
-    map->heigt = server->params->y;
-    map->teams = NULL;
-    map->ressources = NULL;
-    return map;
+    game->width = server->params->x;
+    game->heigt = server->params->y;
+    game->teams = NULL;
+    game->ressources = NULL;
+    return game;
 }
 
 static int nb_total(server_t *server)
@@ -51,7 +52,7 @@ static const char *get_type(crystal_t type)
 static void print_map(server_t *server)
 {
     int total = nb_total(server);
-    ressources_t *current = server->map->ressources;
+    ressources_t *current = server->game->ressources;
 
     printf("Map size: %d x %d\n", server->params->x, server->params->y);
     printf("Total resources: %d\n", total);
@@ -62,7 +63,8 @@ static void print_map(server_t *server)
     }
 }
 
-static void malloc_ressource(server_t *server, int j, int i, tiles_t *tiles)
+static ressources_t *init_ressource(int j, int i, tiles_t *tiles,
+    ressources_t *ressource)
 {
     ressources_t *new_ressource = malloc(sizeof(ressources_t));
 
@@ -71,8 +73,8 @@ static void malloc_ressource(server_t *server, int j, int i, tiles_t *tiles)
     new_ressource->type = i;
     new_ressource->posX = tiles[j].x;
     new_ressource->posY = tiles[j].y;
-    new_ressource->next = server->map->ressources;
-    server->map->ressources = new_ressource;
+    new_ressource->next = ressource;
+    return new_ressource;
 }
 
 static void init_tiles(server_t *server)
@@ -85,15 +87,36 @@ static void init_tiles(server_t *server)
 
     for (int i = 0; i < 7; i++) {
         for (int j = 0; j < nb[i]; j++) {
-            malloc_ressource(server, j, i, tiles);
+            server->game->ressources = init_ressource(j, i, tiles,
+                server->game->ressources);
         }
     }
     if (server->params->is_debug == true)
         print_map(server);
 }
 
-void inti_map(server_t *server)
+static void init_teams(server_t *server)
 {
-    server->map = create_map(server);
+    team_t *current = server->game->teams;
+
+    for (int i = 0; i < server->params->nb_team; i++) {
+        current = malloc(sizeof(team_t));
+        if (!current) {
+            error_message("Failed to allocate memory for team structure.");
+            exit(84);
+        }
+        current->name = strdup(server->params->teams[i]);
+        current->nbPlayers = 0;
+        current->nbPlayerAlive = 0;
+        current->players = NULL;
+        current->next = server->game->teams;
+        server->game->teams = current;
+    }
+}
+
+void init_game(server_t *server)
+{
+    server->game = create_game(server);
     init_tiles(server);
+    init_teams(server);
 }

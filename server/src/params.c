@@ -148,6 +148,7 @@ params_t *check_args(int argc, char **argv)
         helper();
         return NULL;
     }
+    params->is_debug = false;
     if (!check_all_params(argc, argv, is_ok, params))
         return free_params(params);
     print_elem(params, argc, argv);

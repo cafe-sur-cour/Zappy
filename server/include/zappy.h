@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <poll.h>
 #include "game.h"
+#include "my.h"
 
 #ifndef ZAPPY_H_
     #define ZAPPY_H_
@@ -25,14 +26,15 @@ typedef struct params_s {
 
 typedef struct graph_s {
     int fd;
-    struct pollfd *pollfd;
+    struct graph_s *next;
 } graph_t;
 
 typedef struct server_s {
     int sockfd;
-    params_t *params;
-    map_t *map;
+    game_t *game;
     graph_t *graph;
+    params_t *params;
+    struct pollfd pollserver;
 } server_t;
 
 typedef struct command_pf_s {
@@ -44,7 +46,8 @@ typedef struct command_pf_s {
 int helper(void);
 void error_message(const char *message);
 void printfd(char const *message, int fd);
-char *get_message(int fd, server_t *server);
+int write_message(int fd, const char *message);
+char *get_message(int fd);
 
 /* checkers.c */
 bool check_port(char const *flag, char const *value, params_t *params);
@@ -65,13 +68,25 @@ void *free_server(server_t *server);
 int start_protocol(server_t *server);
 
 /* client.c */
-bool valid_team_name(const char *team_name, params_t *params);
-bool graphic(const char *team_name, int fd, server_t *server);
+bool process_new_client(const char *team_name, int fd, server_t *server);
+team_t *add_client_to_team(const char *team_name, int fd, server_t *server);
 
 /* init_map.c */
-void inti_map(server_t *server);
+void init_game(server_t *server);
+
+/* accept.c */
+int accept_client(server_t *server);
 
 /* free server  */
 void *free_server(server_t *server);
 void *free_params(params_t *params);
+void *free_player(player_t *player);
+
+/* Function to send info to the gui */
+void send_map_size(server_t *server);
+void send_entrie_map(server_t *server);
+void send_map_tile(ressources_t *ressource, server_t *server,
+    int posX, int posY);
+void send_team_name(server_t *server);
+
 #endif /* !ZAPPY_H_ */

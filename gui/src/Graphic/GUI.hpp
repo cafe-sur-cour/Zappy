@@ -11,6 +11,7 @@
 #include "RayLib/RayLib.hpp"
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
+#include "HUD/HUD.hpp"
 
 class GUI {
     public:
@@ -26,6 +27,7 @@ class GUI {
         std::shared_ptr<RayLib> _raylib;
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<Map> _map;
+        std::unique_ptr<HUD> _hud;
 };
 
 #endif /* !GUI_HPP_ */

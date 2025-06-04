@@ -130,6 +130,21 @@ void GameInfos::updatePlayerPosition(int playerNumber, int x, int y)
     }
 }
 
+void GameInfos::updatePlayerOrientation(int playerNumber, int orientation)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    if (orientation < 1 || orientation > 4)
+        return;
+
+    for (auto &player : _players) {
+        if (player.number == playerNumber) {
+            player.orientation = orientation;
+            return;
+        }
+    }
+}
+
 void GameInfos::updatePlayerLevel(int playerNumber, int level)
 {
     std::lock_guard<std::mutex> lock(_dataMutex);

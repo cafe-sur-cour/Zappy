@@ -18,6 +18,7 @@ enum class DisplayPriority {
     TILE = 0,
     EGG = 1,
     PLAYER = 2,
+    FOOD = 3,
 };
 
 class Map {
@@ -27,6 +28,7 @@ class Map {
 
         void draw();
         void drawTile(int x, int y, const zappy::structs::Tile &tile);
+        void drawFood(int x, int y, const zappy::structs::Tile &tile);
         void drawPlayers(int x, int y);
         void drawEggs(int x, int y);
         Color getTeamColor(const std::string &teamName);
@@ -39,10 +41,12 @@ class Map {
         std::unordered_map<std::string, Color> _teamColors;
 
         static constexpr float BASE_HEIGHT_TILE = 0.0f;
+        static constexpr float BASE_HEIGHT_FOOD = 0.2f;
         static constexpr float BASE_HEIGHT_EGG = 0.2f;
         static constexpr float BASE_HEIGHT_PLAYER = 0.2f;
+        static constexpr float FOOD_HEIGHT = 0.3f;
         static constexpr float EGG_HEIGHT = 0.3f;
-        static constexpr float PLAYER_HEIGHT = 0.4f;
+        static constexpr float PLAYER_HEIGHT = 0.5f;
 
         void drawOrientationArrow(const Vector3 &position, int orientation, float playerHeight);
 };

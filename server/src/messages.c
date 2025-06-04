@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <poll.h>
 
 #include "zappy.h"
 #include "buffer.h"
@@ -30,45 +31,55 @@ void printfd(char const *message, int fd)
     dprintf(fd, "%s\n", message);
 }
 
-static void print_received_message(char c, server_t *server)
-{
-    if (server->params->is_debug == true) {
-        printf("Read character: '%c' (0x%02x)\n", c, (unsigned char)c);
-    }
-}
+// static void print_received_message(char c, server_t *server)
+// {
+//     if (server->params->is_debug == true) {
+//         printf("Read character: '%c' (0x%02x)\n", c, (unsigned char)c);
+//     }
+// }
 
-static char *get_current_char(buffer_t *cb)
-{
-    char *line = malloc(BUFFER_SIZE);
-
-    if (cb_getline(cb, line, BUFFER_SIZE) > 0) {
-        if (strchr(line, '\n')) {
-            line[strcspn(line, "\n")] = '\0';
-            return line;
-        }
-    }
-    return NULL;
-}
-
-char *get_message(int fd, server_t *server)
+char *get_message(int fd)
 {
     static buffer_t cb = {0};
     char c = 0;
-    char *line = malloc(BUFFER_SIZE);
-    int bytes_read;
+    struct pollfd pollfd = {.fd = fd, .events = POLLIN};
 
-    if (!line)
-        return NULL;
     while (1) {
-        line = get_current_char(&cb);
-        if (line != NULL)
-            return line;
-        bytes_read = read(fd, &c, 1);
-        if (bytes_read <= 0) {
-            free(line);
+        if (poll(&pollfd, 1, 100) == -1) {
+            error_message("Failed to poll from client socket.");
             return NULL;
         }
+        if (!(pollfd.revents & POLLIN))
+            return NULL;
+        if (read(fd, &c, 1) <= 0)
+            return NULL;
+        if (c == '\n') {
+            cb_write(&cb, '\0');
+            break;
+        }
         cb_write(&cb, c);
-        print_received_message(c, server);
     }
+    return cb.data;
+}
+
+int write_message(int fd, const char *message)
+{
+    struct pollfd pollfd = {.fd = fd, .events = POLLOUT};
+
+    if (poll(&pollfd, 1, 10) == -1) {
+        error_message("Client socket not ready for writing.");
+        close(fd);
+        return -1;
+    }
+    if (pollfd.revents & POLLOUT) {
+        if (write(fd, message, strlen(message)) == -1) {
+            error_message("Failed to write message to client.");
+            close(fd);
+            return -1;
+        }
+        return 0;
+    }
+    error_message("Client socket not ready for writing.");
+    close(fd);
+    return -1;
 }

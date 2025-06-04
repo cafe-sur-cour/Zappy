@@ -260,11 +260,11 @@ void RayLib::updateCameraCustom()
             Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
             float rotAngle = -mouseDelta.y * rotationSpeed;
 
-            Vector3 right = Vector3CrossProduct(viewDir, _camera.up);
-            right = Vector3Normalize(right);
-            viewDir = Vector3RotateByAxisAngle(viewDir, right, rotAngle);
+            Vector3 rightVec = Vector3CrossProduct(viewDir, _camera.up);
+            rightVec = Vector3Normalize(rightVec);
+            viewDir = Vector3RotateByAxisAngle(viewDir, rightVec, rotAngle);
 
-            Vector3 newUp = Vector3CrossProduct(right, viewDir);
+            Vector3 newUp = Vector3CrossProduct(rightVec, viewDir);
             if (newUp.y > 0.0f)
                 _camera.target = Vector3Add(_camera.position, viewDir);
         }
@@ -335,4 +335,38 @@ void RayLib::drawPlane(Vector3 position, Vector2 size, Color color)
 void RayLib::drawLine3D(Vector3 startPos, Vector3 endPos, Color color)
 {
     DrawLine3D(startPos, endPos, color);
+}
+
+void RayLib::drawRectangleRec(Rectangle rec, Color color)
+{
+    DrawRectangleRec(rec, color);
+}
+
+void RayLib::drawText(const std::string& text, float x, float y, float fontSize, Color color)
+{
+    DrawText(text.c_str(),
+             static_cast<int>(x),
+             static_cast<int>(y),
+             static_cast<int>(fontSize),
+             color);
+}
+
+float RayLib::measureText(const std::string& text, float fontSize) const
+{
+    return static_cast<float>(MeasureText(text.c_str(), static_cast<int>(fontSize)));
+}
+
+void RayLib::drawTextureRec(Texture2D texture, Rectangle source, Vector2 position, Color tint)
+{
+    DrawTextureRec(texture, source, position, tint);
+}
+
+void RayLib::unloadTexture(Texture2D texture)
+{
+    UnloadTexture(texture);
+}
+
+bool RayLib::checkCollisionPointRec(Vector2 point, Rectangle rec) const
+{
+    return CheckCollisionPointRec(point, rec);
 }

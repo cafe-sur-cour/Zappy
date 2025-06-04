@@ -24,11 +24,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../../../ai'))
 
 class TestPlayer:
     
-    @patch('src.Player.Player.Communication')
-    def test_player_initialization_default_port(self, mock_communication):
+    def test_player_initialization_default_port(self):
         """Test player initialization with default port"""
-        mock_comm_instance = Mock()
-        mock_communication.return_value = mock_comm_instance
         
         player = Player("team1", "127.0.0.1")
         
@@ -42,7 +39,6 @@ class TestPlayer:
             "food": 10, "linemate": 0, "deraumere": 0, "sibur": 0,
             "mendiane": 0, "phiras": 0, "thystame": 0
         }
-        mock_comm_instance.connectToServer.assert_called_once()
 
     @patch('src.Player.Player.Communication')
     def test_player_initialization_custom_port(self, mock_communication):

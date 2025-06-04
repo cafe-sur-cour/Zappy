@@ -25,8 +25,8 @@ class Player:
             "mendiane": 0, "phiras": 0, "thystame": 0
         }
         self.in_incantation: bool = False
-        self.communication.connectToServer()
-        print("Ai connected to the server successfully!")
+        self.x = 0
+        self.y = 0
 
     def __str__(self):
         return (f"Player team: {self.teamName}, "
@@ -34,6 +34,10 @@ class Player:
                 f"Inventory: {self.inventory}, "
                 f"Alive: {not self.communication.is_dead()}, "
                 f"In Incantation: {self.in_incantation}")
+
+    def setMapSize(self, x: int, y: int) -> None:
+        self.x = x
+        self.y = y
 
     def begin_incantation(self) -> None:
         # TODO: Send to the server the command to start an incantation

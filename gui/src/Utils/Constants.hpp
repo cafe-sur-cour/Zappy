@@ -54,12 +54,12 @@ namespace zappy::structs {
         int phiras;
         int thystame;
 
-        Tile(int x = 0, int y = 0, int food = 0, int linemate = 0,
-             int deraumere = 0, int sibur = 0, int mendiane = 0,
-             int phiras = 0, int thystame = 0)
-            : x(x), y(y), food(food), linemate(linemate),
-              deraumere(deraumere), sibur(sibur),
-              mendiane(mendiane), phiras(phiras), thystame(thystame) {}
+        Tile(int _x = 0, int _y = 0, int _food = 0, int _linemate = 0,
+             int _deraumere = 0, int _sibur = 0, int _mendiane = 0,
+             int _phiras = 0, int _thystame = 0)
+            : x(_x), y(_y), food(_food), linemate(_linemate),
+              deraumere(_deraumere), sibur(_sibur),
+              mendiane(_mendiane), phiras(_phiras), thystame(_thystame) {}
     };
 
     struct Inventory {
@@ -71,12 +71,12 @@ namespace zappy::structs {
         int phiras;
         int thystame;
 
-        Inventory(int food = 0, int linemate = 0, int deraumere = 0,
-                  int sibur = 0, int mendiane = 0, int phiras = 0,
-                  int thystame = 0)
-            : food(food), linemate(linemate), deraumere(deraumere),
-              sibur(sibur), mendiane(mendiane), phiras(phiras),
-              thystame(thystame) {}
+        Inventory(int _food = 0, int _linemate = 0, int _deraumere = 0,
+                  int _sibur = 0, int _mendiane = 0, int _phiras = 0,
+                  int _thystame = 0)
+            : food(_food), linemate(_linemate), deraumere(_deraumere),
+              sibur(_sibur), mendiane(_mendiane), phiras(_phiras),
+              thystame(_thystame) {}
     };
     struct Player {
         int number;
@@ -87,11 +87,11 @@ namespace zappy::structs {
         std::string teamName;
         struct Inventory inventory;
 
-        Player(int number = 0, int x = 0, int y = 0, int orientation = 0,
-               int level = 1, const std::string &teamName = "",
-               struct Inventory inventory = Inventory())
-            : number(number), x(x), y(y), orientation(orientation),
-              level(level), teamName(teamName), inventory(inventory) {}
+        Player(int _number = 0, int _x = 0, int _y = 0, int _orientation = 0,
+               int _level = 1, const std::string &_teamName = "",
+               struct Inventory _inventory = Inventory())
+            : number(_number), x(_x), y(_y), orientation(_orientation),
+              level(_level), teamName(_teamName), inventory(_inventory) {}
     };
 
     struct Incantation {
@@ -100,9 +100,9 @@ namespace zappy::structs {
         int level;
         std::vector<int> players;
 
-        Incantation(int x = 0, int y = 0, int level = 1,
-                    const std::vector<int> &players = {})
-            : x(x), y(y), level(level), players(players) {}
+        Incantation(int _x = 0, int _y = 0, int _level = 1,
+                    const std::vector<int> &_players = {})
+            : x(_x), y(_y), level(_level), players(_players) {}
     };
 
     struct Egg {
@@ -113,10 +113,10 @@ namespace zappy::structs {
         bool hatched;
         std::string teamName;
 
-        Egg(int eggNumber = 0, int playerNumber = 0, int x = 0, int y = 0,
-            bool hatched = false, const std::string &teamName = "")
-            : eggNumber(eggNumber), playerNumber(playerNumber), x(x), y(y),
-              hatched(hatched), teamName(teamName) {}
+        Egg(int _eggNumber = 0, int _playerNumber = 0, int _x = 0, int _y = 0,
+            bool _hatched = false, const std::string &_teamName = "")
+            : eggNumber(_eggNumber), playerNumber(_playerNumber), x(_x), y(_y),
+              hatched(_hatched), teamName(_teamName) {}
     };
 };
 
