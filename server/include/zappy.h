@@ -52,7 +52,6 @@ typedef struct command_pf_s {
 /* messages.c */
 int helper(void);
 void error_message(const char *message);
-int write_message(int fd, const char *message);
 
 /* checkers.c */
 bool check_port(char const *flag, char const *value, params_t *params);

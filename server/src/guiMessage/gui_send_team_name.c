@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 #include "zappy.h"
-
+#include "network.h"
 
 /* Use the length name to create the buffer */
 static void create_buffer(const char *team_name, zappy_t *server)

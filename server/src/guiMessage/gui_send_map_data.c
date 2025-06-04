@@ -5,6 +5,7 @@
 ** gui_send_message
 */
 
+#include "network.h"
 #include "zappy.h"
 
 #include <stdlib.h>

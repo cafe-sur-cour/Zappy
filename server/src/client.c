@@ -84,6 +84,8 @@ static player_t *init_player(int fd, tiles_t tile)
         return NULL;
     }
     player = malloc_player(player);
+    if (!player)
+        return NULL;
     player->network->fd = fd;
     player->level = 1;
     player->posX = tile.x;
