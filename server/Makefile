@@ -52,7 +52,7 @@ libmy:
 
 $(NAME): $(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
-	@$(CC) -g -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
+	@$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ Compilation completed successfully!$(NC)"
 
 %.o: %.c
