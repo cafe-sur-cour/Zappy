@@ -49,7 +49,8 @@ typedef struct inventory_s {
 
 /* Player struct */
 typedef struct player_s {
-    int id; /* This is equal to the current FD */
+    int id;
+    int fd;
     int level;
     int posX;
     int posY;

@@ -79,7 +79,8 @@ static player_t *init_player(int fd, int freq, tiles_t tile)
         error_message("Failed to allocate memory for new player.");
         return NULL;
     }
-    player->id = fd;
+    player->id = -1;
+    player->fd = fd;
     player->level = 1;
     player->posX = tile.x;
     player->posY = tile.y;
@@ -104,7 +105,8 @@ static int check_team_capacity(server_t *server, const char *team_name,
             server->game->teams->players = new_player;
             server->game->teams->nbPlayers++;
             server->game->teams->nbPlayerAlive++;
-            return server->params->nb_client - server->game->teams->nbPlayers;
+            new_player->id = server->game->teams->nbPlayers;
+            return 0;
         }
         server->game->teams = server->game->teams->next;
     }

@@ -52,6 +52,8 @@ static int complete_connection(server_t *server, int fd, const char *message)
     if (write_message(fd, buffer) == -1)
         return -1;
     free(buffer);
+    printf("Client number %d connected to team '%s'.\n",
+           team->nbPlayers, team->name);
     return 0;
 }
 
