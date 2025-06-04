@@ -134,7 +134,10 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
     );
 
     if (bottomContainer) {
-        bottomContainer->setRelativePosition(0, 100.0f - bottomHeightPercent, 100.0f, bottomHeightPercent);
+        bottomContainer->setRelativePosition(
+            0,
+            100.0f - bottomHeightPercent,
+            100.0f, bottomHeightPercent);
     }
 }
 
