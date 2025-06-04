@@ -35,6 +35,13 @@ void Containers::draw()
     if (!_visible)
         return;
 
+    _raylib->beginScissorMode(
+        static_cast<int>(_bounds.x),
+        static_cast<int>(_bounds.y),
+        static_cast<int>(_bounds.width),
+        static_cast<int>(_bounds.height)
+    );
+
     if (_hasBackground) {
         if (_hasBackgroundTexture) {
             _raylib->drawTextureRec(_backgroundTexture,
@@ -47,7 +54,18 @@ void Containers::draw()
     }
 
     for (auto& pair : _elements) {
+        if (pair.first.find("scrollbar") != std::string::npos) {
+            continue;
+        }
         pair.second->draw();
+    }
+
+    _raylib->endScissorMode();
+
+    for (auto& pair : _elements) {
+        if (pair.first.find("scrollbar") != std::string::npos) {
+            pair.second->draw();
+        }
     }
 }
 
