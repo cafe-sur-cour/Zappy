@@ -410,3 +410,8 @@ Vector3 RayLib::vector3Subtract(Vector3 v1, Vector3 v2) const
 {
     return Vector3Subtract(v1, v2);
 }
+
+Vector3 RayLib::vector3Add(Vector3 v1, Vector3 v2) const
+{
+    return Vector3Add(v1, v2);
+}

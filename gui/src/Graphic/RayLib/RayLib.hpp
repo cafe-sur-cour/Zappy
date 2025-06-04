@@ -56,6 +56,7 @@ class RayLib {
         float vector3Distance(Vector3 v1, Vector3 v2) const;
         Vector3 vector3Normalize(Vector3 v) const;
         Vector3 vector3Subtract(Vector3 v1, Vector3 v2) const;
+        Vector3 vector3Add(Vector3 v1, Vector3 v2) const;
 
         // Camera methods
         void initCamera();
