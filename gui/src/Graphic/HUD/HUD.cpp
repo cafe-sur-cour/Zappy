@@ -7,6 +7,7 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 #include "../../Utils/Constants.hpp"
 #include "HUD.hpp"
 
@@ -287,7 +288,8 @@ void HUD::initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
                     teamId + "_player_" + std::to_string(playerCount),
                     10.0f,
                     yPos,
-                    "Player " + std::to_string(player.number) + " (Level " + std::to_string(player.level) + ")",
+                    "Player " + std::to_string(player.number) +
+                    " (Level " + std::to_string(player.level) + ")",
                     5.0f,
                     {200, 200, 200, 255}
                 );
