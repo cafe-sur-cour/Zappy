@@ -6,10 +6,20 @@
 */
 
 #include "AUIElement.hpp"
+#include <memory>
 
-AUIElement::AUIElement(float x, float y, float width, float height)
-    : _bounds({x, y, width, height}), _visible(true)
+AUIElement::AUIElement(
+    std::shared_ptr<RayLib> raylib,
+    float x,
+    float y,
+    float width,
+    float height)
+    : _raylib(raylib), _bounds({x, y, width, height}), _visible(true)
 {
+    _relativePos.xPercent = 0;
+    _relativePos.yPercent = 0;
+    _relativePos.widthPercent = 0;
+    _relativePos.heightPercent = 0;
 }
 
 void AUIElement::setPosition(float x, float y)
@@ -25,7 +35,7 @@ Rectangle AUIElement::getBounds() const
 
 bool AUIElement::contains(float x, float y) const
 {
-    return CheckCollisionPointRec({x, y}, _bounds);
+    return _raylib->checkCollisionPointRec({x, y}, _bounds);
 }
 
 void AUIElement::setVisible(bool visible)
@@ -36,4 +46,27 @@ void AUIElement::setVisible(bool visible)
 bool AUIElement::isVisible() const
 {
     return _visible;
+}
+
+void AUIElement::setSize(float width, float height)
+{
+    _bounds.width = width;
+    _bounds.height = height;
+}
+
+void AUIElement::setRelativePosition(
+    float xPercent,
+    float yPercent,
+    float widthPercent,
+    float heightPercent)
+{
+    _relativePos.xPercent = xPercent;
+    _relativePos.yPercent = yPercent;
+    _relativePos.widthPercent = widthPercent;
+    _relativePos.heightPercent = heightPercent;
+}
+
+UIRelativePosition AUIElement::getRelativePosition() const
+{
+    return _relativePos;
 }

@@ -217,6 +217,97 @@ class Containers : public AContainers {
          */
         void handleResize(int oldWidth, int oldHeight, int newWidth, int newHeight);
 
+        /**
+         * @brief Create and add a button to the container using relative percentages
+         *
+         * @param id Unique identifier for the button
+         * @param xPercent X position as percentage of container width (0-100)
+         * @param yPercent Y position as percentage of container height (0-100)
+         * @param widthPercent Width as percentage of container width (0-100)
+         * @param heightPercent Height as percentage of container height (0-100)
+         * @param text Button text
+         * @param callback Function to call when button is clicked
+         *
+         * @return std::shared_ptr<Button> Pointer to the created button, or nullptr if ID already exists
+         */
+        std::shared_ptr<Button> addButtonPercent(
+            const std::string& id,
+            float xPercent, float yPercent,
+            float widthPercent, float heightPercent,
+            const std::string& text,
+            std::function<void()> callback
+        );
+
+        /**
+         * @brief Create and add a button to the container with custom colors using relative percentages
+         *
+         * @param id Unique identifier for the button
+         * @param xPercent X position as percentage of container width (0-100)
+         * @param yPercent Y position as percentage of container height (0-100)
+         * @param widthPercent Width as percentage of container width (0-100)
+         * @param heightPercent Height as percentage of container height (0-100)
+         * @param text Button text
+         * @param callback Function to call when button is clicked
+         * @param normalColor Color when not interacting
+         * @param hoverColor Color when mouse is hovering over button
+         * @param pressedColor Color when button is pressed
+         * @param textColor Color of the button text
+         *
+         * @return std::shared_ptr<Button> Pointer to the created button, or nullptr if ID already exists
+         */
+        std::shared_ptr<Button> addButtonPercent(
+            const std::string& id,
+            float xPercent, float yPercent,
+            float widthPercent, float heightPercent,
+            const std::string& text,
+            std::function<void()> callback,
+            Color normalColor,
+            Color hoverColor,
+            Color pressedColor,
+            Color textColor
+        );
+
+        /**
+         * @brief Create and add a text element to the container using relative percentages
+         *
+         * @param id Unique identifier for the text element
+         * @param xPercent X position as percentage of container width (0-100)
+         * @param yPercent Y position as percentage of container height (0-100)
+         * @param text Text content
+         * @param fontSizePercent Font size as percentage of container height (0-100)
+         * @param color Text color
+         *
+         * @return std::shared_ptr<Text> Pointer to the created text element, or nullptr if ID already exists
+         */
+        std::shared_ptr<Text> addTextPercent(
+            const std::string& id,
+            float xPercent, float yPercent,
+            const std::string& text,
+            float fontSizePercent = 5.0f,
+            Color color = BLACK
+        );
+
+        /**
+         * @brief Create and add a scrollbar to the container using relative percentages
+         *
+         * @param id Unique identifier for the scrollbar
+         * @param xPercent X position as percentage of container width (0-100)
+         * @param yPercent Y position as percentage of container height (0-100)
+         * @param lengthPercent Length as percentage of container width/height (0-100)
+         * @param thicknessPercent Thickness as percentage of container width/height (0-100)
+         * @param orientation Orientation (vertical or horizontal)
+         * @param onValueChanged Callback when value changes
+         *
+         * @return std::shared_ptr<ScrollBar> Pointer to the created scrollbar, or nullptr if ID already exists
+         */
+        std::shared_ptr<ScrollBar> addScrollBarPercent(
+            const std::string& id,
+            float xPercent, float yPercent,
+            float lengthPercent, float thicknessPercent,
+            ScrollBarOrientation orientation = ScrollBarOrientation::VERTICAL,
+            std::function<void(float)> onValueChanged = nullptr
+        );
+
     private:
         std::shared_ptr<RayLib> _raylib;
         Texture2D _backgroundTexture;
