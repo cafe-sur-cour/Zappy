@@ -101,6 +101,9 @@ void send_egg(zappy_t *zappy, egg_t *egg);
 void send_entire_egg_list(zappy_t *zappy);
 void send_time_message(zappy_t *zappy);
 void send_egg_death(zappy_t *zappy, egg_t *egg);
+void send_egg_connect(zappy_t *zappy, egg_t *currentEgg);
+void send_player_connect(zappy_t *zappy, player_t *player);
+void send_player_pos(zappy_t *zappy, player_t *player);
 
 /* init_egg.c */
 void init_egg(zappy_t *zappy);

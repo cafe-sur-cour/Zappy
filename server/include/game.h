@@ -68,6 +68,7 @@ typedef struct player_s {
     int posY;
     direction_t direction;
     inventory_t *inventory;
+    char *team;
     struct player_s *next;
 } player_t;
 
