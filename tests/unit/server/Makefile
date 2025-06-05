@@ -18,7 +18,10 @@ TESTS 	    =   tests_params.c			\
 				tests_checkers.c		\
 				tests_server.c			\
 				tests_map_init.c		\
-				tests_free.c
+				tests_free.c			\
+				tests_guiMessage.c		\
+				tests_client.c			\
+				tests_network.c
 
 SRC 		=	../../../server/src/params.c					\
 				../../../server/src/messages.c					\

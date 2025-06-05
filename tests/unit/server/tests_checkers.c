@@ -6,9 +6,18 @@
 */
 
 #include <criterion/criterion.h>
+#include <criterion/redirect.h>
+
 #include "zappy.h"
 
-Test(checkers, check_port_valid_range)
+
+static void redirect_all_std(void)
+{
+    cr_redirect_stdout();
+    cr_redirect_stderr();
+}
+
+Test(checkers, check_port_valid_range, .init = redirect_all_std)
 {
     params_t params = {0};
     
@@ -19,7 +28,7 @@ Test(checkers, check_port_valid_range)
     cr_assert_eq(params.port, 65535);
 }
 
-Test(checkers, check_port_invalid_range)
+Test(checkers, check_port_invalid_range, .init = redirect_all_std)
 {
     params_t params = {0};
     
@@ -28,7 +37,7 @@ Test(checkers, check_port_invalid_range)
     cr_assert_eq(check_port("-p", "-1", &params), false);
 }
 
-Test(checkers, check_dimensions_valid)
+Test(checkers, check_dimensions_valid, .init = redirect_all_std)
 {
     params_t params = {0};
     
@@ -39,7 +48,7 @@ Test(checkers, check_dimensions_valid)
     cr_assert_eq(params.y, 20);
 }
 
-Test(checkers, check_dimensions_invalid)
+Test(checkers, check_dimensions_invalid, .init = redirect_all_std)
 {
     params_t params = {0};
     
@@ -48,7 +57,7 @@ Test(checkers, check_dimensions_invalid)
     cr_assert_eq(check_width("-x", "abc", &params), false);
 }
 
-Test(checkers, check_client_count)
+Test(checkers, check_client_count, .init = redirect_all_std)
 {
     params_t params = {0};
     
@@ -59,7 +68,7 @@ Test(checkers, check_client_count)
     cr_assert_eq(check_client("-c", "xyz", &params), false);
 }
 
-Test(checkers, check_frequency)
+Test(checkers, check_frequency, .init = redirect_all_std)
 {
     params_t params = {0};
     
