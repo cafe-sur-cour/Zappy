@@ -10,7 +10,6 @@
 
 #include "zappy.h"
 
-
 static void redirect_all_std(void)
 {
     cr_redirect_stdout();

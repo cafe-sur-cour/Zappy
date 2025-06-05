@@ -65,6 +65,8 @@ static int complete_connection(zappy_t *zappy, int fd, const char *message)
     if (!team || !buffer) {
         if (buffer)
             free(buffer);
+        if (strcmp(message, "GRAPHIC") == 0)
+            return 0;
         return -1;
     }
     if (complete_connection_rest(zappy, fd, buffer, team) == -1) {

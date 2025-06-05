@@ -18,7 +18,6 @@ static void redirect_all_std(void)
     cr_redirect_stderr();
 }
 
-
 // Test free_params with NULL
 Test(free_params, test_null_params, .init = redirect_all_std)
 {
