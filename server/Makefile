@@ -32,7 +32,14 @@ SRC 		=	src/params.c					\
 				src/guiMessage/gui_send_team_name.c	\
 				src/guiMessage/gui_send_eggs.c		\
 				src/guiMessage/gui_send_time.c		\
-				src/guiMessage/gui_send_egg_death.c
+				src/guiMessage/gui_send_egg_death.c \
+				src/guiMessage/gui_send_egg_connect.c	\
+				src/guiMessage/gui_send_player_info.c	\
+				src/guiMessage/gui_send_rest_info_player.c	\
+				src/guiMessage/gui_miscellaneous_send.c		\
+				src/guiMessage/gui_send_boradcast.c			\
+				src/guiMessage/gui_send_death_player.c		\
+				src/guiMessage/gui_send_ressource.c
 
 OBJ 		= 	$(SRC:.c=.o)
 

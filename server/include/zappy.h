@@ -104,6 +104,21 @@ void send_egg_death(zappy_t *zappy, egg_t *egg);
 void send_egg_connect(zappy_t *zappy, egg_t *currentEgg);
 void send_player_connect(zappy_t *zappy, player_t *player);
 void send_player_pos(zappy_t *zappy, player_t *player);
+void send_player_level(zappy_t *zappy, player_t *player);
+void send_player_inventory(zappy_t *zappy, player_t *player);
+void send_player_expelled(zappy_t *zappy, player_t *player);
+void send_broadcast_to_all(zappy_t *zappy, const char *message);
+void send_broadcast_to_player(zappy_t *zappy, player_t *player,
+    const char *message);
+void send_player_laying_egg(zappy_t *zappy, player_t *player);
+void send_ressource_droped(zappy_t *zappy, player_t *player,
+    int ressourceType);
+void send_player_death(zappy_t *zappy, player_t *player);
+void send_updated_time(zappy_t *zappy, int time);
+void send_end_game(zappy_t *zappy, const char *teamName);
+void send_str_message(zappy_t *zappy, const char *message);
+void send_unknown_command(zappy_t *zappy);
+void send_command_parameter(zappy_t *zappy);
 
 /* init_egg.c */
 void init_egg(zappy_t *zappy);
