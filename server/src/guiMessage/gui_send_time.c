@@ -16,6 +16,8 @@ void send_time_message(zappy_t *zappy)
     int xLength = int_str_len(zappy->params->freq) + 6;
     char *message = malloc(xLength * sizeof(char));
 
+    if (message == NULL)
+        return;
     snprintf(message, xLength, "sgt %d\n", zappy->params->freq);
     if (zappy->params->is_debug)
         printf("Sending time message: %s", message);

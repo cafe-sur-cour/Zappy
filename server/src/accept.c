@@ -57,14 +57,14 @@ static int complete_connection(zappy_t *zappy, int fd, const char *message)
     char *buffer = calloc(12, sizeof(char));
     team_t *team = add_client_to_team(message, fd, zappy);
 
-    if (strcmp(message, "GRAPHIC") == 0) {
-        free(buffer);
-        return 0;
-    }
     if (!team || !buffer) {
         if (buffer)
             free(buffer);
         return -1;
+    }
+    if (strcmp(message, "GRAPHIC") == 0) {
+        free(buffer);
+        return 0;
     }
     if (complete_connection_rest(zappy, fd, buffer, team) == -1) {
         free(buffer);

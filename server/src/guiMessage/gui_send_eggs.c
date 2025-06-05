@@ -20,6 +20,8 @@ void send_egg(zappy_t *zappy, egg_t *egg)
         int_str_len(current->idLayer) + 20;
     char *message = malloc(sizeof(char) * xLength);
 
+    if (message == NULL)
+        return;
     snprintf(message, xLength, "enw #%d #%d %d %d %s\n",
         current->id, current->idLayer, current->posX, current->posY,
         current->teamName);
