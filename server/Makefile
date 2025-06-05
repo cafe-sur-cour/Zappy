@@ -16,23 +16,21 @@ MAIN 		= 	src/main.c
 
 MAIN_OBJ 	= 	$(MAIN:.c=.o)
 
-SRC 		=	src/params.c							\
-				src/messages.c							\
-				src/checkers.c							\
-				src/server.c							\
-				src/protocol.c							\
-				src/client.c							\
-				src/game.c								\
-				src/buffer.c							\
-				src/free.c								\
-				src/algo.c								\
-				src/accept.c							\
-				src/guiMessage/gui_send_map_data.c		\
-				src/guiMessage/gui_send_team_name.c		\
-				src/guiMessage/gui_send_eggs.c			\
-				src/guiMessage/gui_send_time.c			\
-				src/aiMessage/forward.c
-
+SRC 		=	src/params.c					\
+				src/messages.c					\
+				src/checkers.c					\
+				src/server.c					\
+				src/protocol.c					\
+				src/game/client.c				\
+				src/game/game.c					\
+				src/game/init_egg.c				\
+				src/free.c						\
+				src/algo.c						\
+				src/accept.c					\
+				src/guiMessage/gui_send_map_data.c	\
+				src/guiMessage/gui_send_team_name.c	\
+				src/guiMessage/gui_send_eggs.c		\
+				src/guiMessage/gui_send_time.c
 OBJ 		= 	$(SRC:.c=.o)
 
 INCLUDES 	= 	-I./include

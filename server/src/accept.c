@@ -35,13 +35,11 @@ static char *check_team_name(zappy_t *zappy, int new_sockfd)
 static int complete_connection_rest(zappy_t *zappy, int fd,
     char *buffer, team_t *team)
 {
-    char *buffer = calloc(12, sizeof(char));
-    team_t *team = add_client_to_team(message, fd, server);
-
-    if (strcmp(message, "GRAPHIC") == 0)
-        return 0;
-    if (!team || !buffer)
+    snprintf(buffer, 12, "%d\n", zappy->params->nb_client - team->nbPlayers);
+    if (write_message(fd, buffer) == -1) {
+        free(buffer);
         return -1;
+    }
     free(buffer);
     buffer = calloc(27, sizeof(char));
     if (!buffer)
@@ -62,18 +60,14 @@ static int complete_connection(zappy_t *zappy, int fd, const char *message)
     if (!team || !buffer) {
         if (buffer)
             free(buffer);
+        if (strcmp(message, "GRAPHIC") == 0)
+            return 0;
         return -1;
-    }
-    if (strcmp(message, "GRAPHIC") == 0) {
-        free(buffer);
-        return 0;
     }
     if (complete_connection_rest(zappy, fd, buffer, team) == -1) {
         free(buffer);
         return -1;
     }
-    free(buffer);
-    printfd("New AI client connected.");
     return 0;
 }
 
@@ -87,7 +81,7 @@ int accept_client(zappy_t *zappy)
         close(new_sockfd);
         return -1;
     }
-    if (complete_connection(server, new_sockfd, message) == -1) {
+    if (complete_connection(zappy, new_sockfd, message) == -1) {
         close(new_sockfd);
         return -1;
     }

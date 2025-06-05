@@ -136,7 +136,6 @@ static team_t *add_client_team_rest(zappy_t *server, team_t *save,
     return server->game->teams;
 }
 
-/* This funcion adds one player to on of the team strcuturue */
 team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server)
 {
     tiles_t *tiles = shuffle_fisher(server->game->map->width,
@@ -150,8 +149,9 @@ team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server)
         close(fd);
         return NULL;
     }
-    if (add_client_team_rest(server, save, team_name, new_player) == NULL)
+    if (!add_client_team_rest(server, save, team_name, new_player)) {
         return NULL;
+    }
     result = server->game->teams;
     server->game->teams = save;
     return result;
