@@ -15,6 +15,7 @@
 #include "zappy.h"
 #include "algo.h"
 
+/* This function verify the the current team name is an existing one */
 static bool valid_team_name(const char *team_name, zappy_t *zappy)
 {
     for (int i = 0; i < zappy->params->nb_team; i++) {
@@ -26,6 +27,7 @@ static bool valid_team_name(const char *team_name, zappy_t *zappy)
     return false;
 }
 
+/* This function check if the name is graphic if not it verify the team name */
 bool process_new_client(const char *team_name, int fd, zappy_t *zappy)
 {
     if (strcmp(team_name, "GRAPHIC") == 0) {
@@ -39,6 +41,7 @@ bool process_new_client(const char *team_name, int fd, zappy_t *zappy)
     return valid_team_name(team_name, zappy);
 }
 
+/* This function initialize the inventory struct of the current player */
 static inventory_t *init_inventory(void)
 {
     inventory_t *inventory = malloc(sizeof(inventory_t));
@@ -56,6 +59,7 @@ static inventory_t *init_inventory(void)
     return inventory;
 }
 
+/* This function initialize the current player structure */
 static player_t *malloc_player(player_t *player)
 {
     player->id = -1;
@@ -75,6 +79,7 @@ static player_t *malloc_player(player_t *player)
     return player;
 }
 
+/* This function initialize the current player structure */
 static player_t *init_player(int fd, tiles_t tile)
 {
     player_t *player = malloc(sizeof(player_t));
@@ -97,6 +102,7 @@ static player_t *init_player(int fd, tiles_t tile)
     return player;
 }
 
+/* This function verify that the team the client wants to join as space */
 static int check_team_capacity(zappy_t *server, const char *team_name,
     player_t *new_player)
 {
@@ -115,6 +121,22 @@ static int check_team_capacity(zappy_t *server, const char *team_name,
     return -1;
 }
 
+static team_t *add_client_team_rest(zappy_t *server, team_t *save,
+    const char *team_name, player_t *new_player)
+{
+    if (strcmp(team_name, "GRAPHIC") == 0) {
+        free_player(new_player);
+        return NULL;
+    }
+    if (check_team_capacity(server, team_name, new_player) == -1) {
+        server->game->teams = save;
+        free_player(new_player);
+        return NULL;
+    }
+    return server->game->teams;
+}
+
+/* This funcion adds one player to on of the team strcuturue */
 team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server)
 {
     tiles_t *tiles = shuffle_fisher(server->game->map->width,
@@ -128,12 +150,8 @@ team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server)
         close(fd);
         return NULL;
     }
-    if (strcmp(team_name, "GRAPHIC") == 0)
+    if (add_client_team_rest(server, save, team_name, new_player) == NULL)
         return NULL;
-    if (check_team_capacity(server, team_name, new_player) == -1) {
-        server->game->teams = save;
-        return NULL;
-    }
     result = server->game->teams;
     server->game->teams = save;
     return result;

@@ -32,25 +32,44 @@ static char *check_team_name(zappy_t *zappy, int new_sockfd)
     return message;
 }
 
-static int complete_connection(zappy_t *zappy, int fd, const char *message)
+static int complete_connection_rest(zappy_t *zappy, int fd,
+    char *buffer, team_t *team)
 {
-    char *buffer = calloc(12, sizeof(char));
-    team_t *team = add_client_to_team(message, fd, zappy);
-
-    if (strcmp(message, "GRAPHIC") == 0)
-        return 0;
-    if (!team || !buffer)
-        return -1;
     snprintf(buffer, 12, "%d\n", zappy->params->nb_client - team->nbPlayers);
-    if (write_message(fd, buffer) == -1)
+    if (write_message(fd, buffer) == -1) {
+        free(buffer);
         return -1;
+    }
     free(buffer);
     buffer = calloc(27, sizeof(char));
     if (!buffer)
         return -1;
     snprintf(buffer, 27, "%d %d\n", zappy->params->x, zappy->params->y);
-    if (write_message(fd, buffer) == -1)
+    if (write_message(fd, buffer) == -1) {
+        free(buffer);
         return -1;
+    }
+    return 0;
+}
+
+static int complete_connection(zappy_t *zappy, int fd, const char *message)
+{
+    char *buffer = calloc(12, sizeof(char));
+    team_t *team = add_client_to_team(message, fd, zappy);
+
+    if (!team || !buffer) {
+        if (buffer)
+            free(buffer);
+        return -1;
+    }
+    if (strcmp(message, "GRAPHIC") == 0) {
+        free(buffer);
+        return 0;
+    }
+    if (complete_connection_rest(zappy, fd, buffer, team) == -1) {
+        free(buffer);
+        return -1;
+    }
     free(buffer);
     return 0;
 }

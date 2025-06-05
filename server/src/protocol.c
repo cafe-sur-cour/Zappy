@@ -50,8 +50,10 @@ static bool send_gui_message(zappy_t *server, bool tmp)
 {
     if (server->graph->fd != -1 && tmp == false) {
         send_map_size(server);
+        send_time_message(server);
         send_entrie_map(server);
         send_team_name(server);
+        send_entire_egg_list(server);
         tmp = true;
     }
     return tmp;

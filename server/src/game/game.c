@@ -13,6 +13,7 @@
 #include <stdio.h>
 
 
+/* This function initialize the Game structure */
 static game_t *create_game(void)
 {
     game_t *game = malloc(sizeof(game_t));
@@ -26,19 +27,23 @@ static game_t *create_game(void)
     return game;
 }
 
+/* This is a function for debug purposses that prints the map tiles*/
 static void print_tile(zappy_t *zappy, int x, int y)
 {
-    inventory_t *tile = &zappy->game->map->tiles[y][x];
+    inventory_t *tile = NULL;
 
-    if (tile->nbFood > 0 || tile->nbLinemate > 0 || tile->nbDeraumere > 0 ||
-        tile->nbSibur > 0 || tile->nbMendiane > 0 || tile->nbPhiras > 0 ||
-        tile->nbThystame > 0) {
-        printf("Tile (%d,%d): F:%d L:%d D:%d S:%d M:%d P:%d T:%d\n",
-            x, y, tile->nbFood, tile->nbLinemate, tile->nbDeraumere,
-            tile->nbSibur, tile->nbMendiane, tile->nbPhiras, tile->nbThystame);
+    if (y < 0 || y >= zappy->game->map->height ||
+        x < 0 || x >= zappy->game->map->width) {
+        printf("Error: Coordinates (%d,%d) out of bounds\n", x, y);
+        return;
     }
+    tile = &zappy->game->map->tiles[y][x];
+    printf("Tile (%d,%d): F:%d L:%d D:%d S:%d M:%d P:%d T:%d\n",
+        x, y, tile->nbFood, tile->nbLinemate, tile->nbDeraumere,
+        tile->nbSibur, tile->nbMendiane, tile->nbPhiras, tile->nbThystame);
 }
 
+/* This function allows use to pritn the tiles */
 static void print_map_tiles(zappy_t *zappy)
 {
     printf("Map size: %d x %d\n", zappy->params->x, zappy->params->y);
@@ -49,6 +54,7 @@ static void print_map_tiles(zappy_t *zappy)
     }
 }
 
+/* This function distribute a rzndom position from the tiles */
 static int *distrib_tiles(int *tile_index, tiles_t *shuffled_tiles,
     int mapValue)
 {
@@ -67,6 +73,7 @@ static int *distrib_tiles(int *tile_index, tiles_t *shuffled_tiles,
     return pos;
 }
 
+/* This function initialize the tiles of the map */
 static map_t *set_tile(int x, int y, map_t *map, int type)
 {
     inventory_t *tile = &map->tiles[y][x];
@@ -78,6 +85,7 @@ static map_t *set_tile(int x, int y, map_t *map, int type)
     return map;
 }
 
+/* This function distrbute the ressources on the tiles */
 static void distribute_resources(zappy_t *server)
 {
     int mapValue = server->params->x * server->params->y;
@@ -95,6 +103,7 @@ static void distribute_resources(zappy_t *server)
             pos = distrib_tiles(&tile_index, shuffled_tiles, mapValue);
             server->game->map = set_tile(pos[0], pos[1], server->game->map,
                 type);
+            free(pos);
         }
     }
     free(shuffled_tiles);
@@ -103,6 +112,7 @@ static void distribute_resources(zappy_t *server)
 static map_t *malloc_tiles(int width, int height,
     map_t *map)
 {
+    map->currentEggs = NULL;
     for (int i = 0; i < height; i++) {
         map->tiles[i] = calloc(width, sizeof(inventory_t));
         if (!map->tiles[i]) {
@@ -161,4 +171,5 @@ void init_game(zappy_t *zappy)
     init_teams(zappy);
     if (zappy->params->is_debug == true)
         print_map_tiles(zappy);
+    init_egg(zappy);
 }

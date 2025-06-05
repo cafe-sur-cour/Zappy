@@ -26,7 +26,11 @@ static graph_net_t *init_graph(void)
 
 static void fill_elements(zappy_t *zappy)
 {
-    zappy->network = malloc(sizeof(zappy_t));
+    zappy->network = malloc(sizeof(network_t));
+    if (!zappy->network) {
+        error_message("Memory allocation failed for network.");
+        exit(84);
+    }
     zappy->graph = init_graph();
     zappy->game = NULL;
     zappy->params = NULL;
