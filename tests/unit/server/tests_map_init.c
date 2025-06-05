@@ -129,7 +129,7 @@ Test(game_init, large_game, .init = redirect_all_std)
     
 }
 
-Test(map_init, init_game_basic)
+Test(map_init, init_game_basic, .init = redirect_all_std)
 {
     params_t params = {
         .port = 8080,
@@ -161,7 +161,7 @@ Test(map_init, init_game_basic)
     free_map(server.game->map);
 }
 
-Test(map_init, map_tiles_initialized)
+Test(map_init, map_tiles_initialized, .init = redirect_all_std)
 {
     params_t params = {
         .x = 3,
