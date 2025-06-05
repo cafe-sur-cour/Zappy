@@ -25,33 +25,19 @@ void *free_params(params_t *params)
     return NULL;
 }
 
-static void free_ressources(ressources_t *ressources)
-{
-    ressources_t *current = ressources;
-    ressources_t *next;
-
-    while (current) {
-        next = current->next;
-        free(current);
-        current = next;
-    }
-}
-
 static void free_players(player_t *player)
 {
-    player_t *next_player;
-
-    while (player) {
-        next_player = player->next;
-        if (player->inventory) {
-            free(player->inventory);
-        }
-        if (player->lives) {
-            free(player->lives);
-        }
-        free(player);
-        player = next_player;
+    if (!player)
+        return;
+    if (player->inventory)
+        free(player->inventory);
+    if (player->network) {
+        if (player->network->buffer)
+            free(player->network->buffer);
+        free(player->network);
     }
+    free(player);
+    return;
 }
 
 static void free_teams(team_t *teams)
@@ -79,31 +65,59 @@ static void free_game(game_t *game)
         return;
     if (game->teams)
         free_teams(game->teams);
-    if (game->ressources)
-        free_ressources(game->ressources);
+    if (game->map)
+        free_map(game->map);
     free(game);
 }
 
-static void free_graph(graph_t *graph)
+static void free_graph(graph_net_t *graph)
 {
     if (!graph)
         return;
     free(graph);
 }
 
-void *free_server(server_t *server)
+static void free_eggs(egg_t *currentEggs)
 {
-    if (!server)
+    egg_t *current = currentEggs;
+    egg_t *next;
+
+    while (current) {
+        next = current->next;
+        if (current->teamName)
+            free(current->teamName);
+        free(current);
+        current = next;
+    }
+}
+
+void free_map(map_t *map)
+{
+    for (int i = 0; i < map->height; i++) {
+        if (map->tiles[i]) {
+            free(map->tiles[i]);
+        }
+    }
+    free_eggs(map->currentEggs);
+    free(map->tiles);
+    free(map);
+}
+
+void *free_zappy(zappy_t *zappy)
+{
+    if (!zappy)
         return NULL;
-    if (server->params)
-        free_params(server->params);
-    if (server->sockfd != -1)
-        close(server->sockfd);
-    if (server->game)
-        free_game(server->game);
-    if (server->graph)
-        free_graph(server->graph);
-    free(server);
+    if (zappy->params)
+        free_params(zappy->params);
+    if (zappy->network->sockfd != -1)
+        close(zappy->network->sockfd);
+    if (zappy->game)
+        free_game(zappy->game);
+    if (zappy->graph)
+        free_graph(zappy->graph);
+    if (zappy->network)
+        free(zappy->network);
+    free(zappy);
     return NULL;
 }
 
@@ -113,8 +127,6 @@ void *free_player(player_t *player)
         return NULL;
     if (player->inventory)
         free(player->inventory);
-    if (player->lives)
-        free(player->lives);
     free(player);
     return NULL;
 }

@@ -21,14 +21,16 @@ SRC 		=	src/params.c					\
 				src/checkers.c					\
 				src/server.c					\
 				src/protocol.c					\
-				src/client.c					\
-				src/game.c						\
-				src/buffer.c					\
+				src/game/client.c				\
+				src/game/game.c					\
+				src/game/init_egg.c				\
 				src/free.c						\
 				src/algo.c						\
 				src/accept.c					\
 				src/guiMessage/gui_send_map_data.c	\
-				src/guiMessage/gui_send_team_name.c
+				src/guiMessage/gui_send_team_name.c	\
+				src/guiMessage/gui_send_eggs.c		\
+				src/guiMessage/gui_send_time.c
 
 OBJ 		= 	$(SRC:.c=.o)
 
@@ -36,7 +38,7 @@ INCLUDES 	= 	-I./include
 
 CFLAGS 		=	-Wall -Wextra -Werror -Wshadow
 
-LIBS 		= -L./ -lmy
+LIBS 		= -L./ -lmy -lnetwork
 
 NAME 		= 	zappy_server
 
@@ -44,11 +46,12 @@ CC 			= 	gcc
 
 CRIT 		= 	-lcriterion --coverage
 
-all: libmy $(NAME)
+all: libs $(NAME)
 
 
-libmy:
-	$(MAKE) -C lib/my
+libs:
+	$(MAKE) -C lib/my/
+	$(MAKE) -C src/network/
 
 $(NAME): $(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
@@ -63,12 +66,14 @@ clean:
 	@rm -rf $(MAIN_OBJ)
 	@rm -rf *.gc*
 	-rm libmy.a
+	-rm libnetwork.a
 
 fclean: clean
 	@rm -rf $(NAME)
 	@rm -rf $(UNIT)
 	@rm -f tests/*.c
-
+	-rm libmy.a
+	-rm libnetwork.a
 
 re: fclean all
 

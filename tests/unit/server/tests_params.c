@@ -18,11 +18,77 @@ static void redirect_all_std(void)
 
 /* Server :: Params */
 
-Test(check_args, check_args_valid, .init = redirect_all_std) {
-    char *argv[] = {"./server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "-c", "5", "-f", "50"};
+Test(params, check_port_valid) {
+    params_t params = {0};
+    bool result = check_port("-p", "8080", &params);
+
+    cr_assert_eq(result, true);
+    cr_assert_eq(params.port, 8080);
+}
+
+Test(params, check_port_invalid) {
+    params_t params = {0};
+    bool result = check_port("-p", "abc", &params);
+
+    cr_assert_eq(result, false);
+}
+
+Test(params, check_width_valid) {
+    params_t params = {0};
+    bool result = check_width("-x", "10", &params);
+
+    cr_assert_eq(result, true);
+    cr_assert_eq(params.x, 10);
+}
+
+Test(params, check_height_valid) {
+    params_t params = {0};
+    bool result = check_height("-y", "15", &params);
+
+    cr_assert_eq(result, true);
+    cr_assert_eq(params.y, 15);
+}
+
+Test(params, check_client_valid) {
+    params_t params = {0};
+    bool result = check_client("-c", "5", &params);
+
+    cr_assert_eq(result, true);
+    cr_assert_eq(params.nb_client, 5);
+}
+
+Test(params, check_freq_valid) {
+    params_t params = {0};
+    bool result = check_freq("-f", "100", &params);
+
+    cr_assert_eq(result, true);
+    cr_assert_eq(params.freq, 100);
+}
+
+Test(params, check_args_valid) {
+    char *argv[] = {"zappy_server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "-c", "3", "-f", "100"};
     int argc = 14;
 
-    cr_assert_not_null(check_args(argc, argv), "Expected valid arguments check to pass.");
+    params_t *params = check_args(argc, argv);
+
+    cr_assert_not_null(params);
+    cr_assert_eq(params->port, 8080);
+    cr_assert_eq(params->x, 10);
+    cr_assert_eq(params->y, 10);
+    cr_assert_eq(params->nb_client, 3);
+    cr_assert_eq(params->freq, 100);
+    cr_assert_eq(params->nb_team, 2);
+
+    free_params(params);
+}
+
+Test(params, check_args_missing_port) {
+    char *argv[] = {"zappy_server", "-x", "10", "-y", "10", "-n", "team1", "-c", "3", "-f", "100"};
+    int argc = 11;
+
+    params_t *params = check_args(argc, argv);
+
+    cr_assert_null(params);
 }
 
 Test(check_args, check_args_invalid, .init = redirect_all_std) {

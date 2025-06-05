@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "my.h"
 
+/* This function allows me to go from int to char * */
 char *my_itoa(unsigned int nb)
 {
     char *numbers = "0123456789";

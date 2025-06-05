@@ -1,13 +1,12 @@
 /*
 ** EPITECH PROJECT, 2025
-** Zappy
+** zappy
 ** File description:
-** Server tests
+** Unit tests for server
 */
 
 #include <criterion/criterion.h>
 #include <criterion/redirect.h>
-
 #include "zappy.h"
 
 static void redirect_all_std(void)
@@ -16,40 +15,42 @@ static void redirect_all_std(void)
     cr_redirect_stderr();
 }
 
-/* Server :: Server :: Init server */
-
-Test(init_server, init_server_valid, .init = redirect_all_std) {
-    char *argv[] = {"./zappy_server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "-c", "5", "-f", "50"};
+Test(server, init_server_valid_args, .init = redirect_all_std)
+{
+    char *argv[] = {"zappy_server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "-c", "3", "-f", "100"};
     int argc = 14;
-
-    server_t *server = init_server(argc, argv);
-    server->game = malloc(sizeof(game_t));
-    server->params = malloc(sizeof(params_t));
-    server->graph = malloc(sizeof(graph_t));
+    
+    zappy_t *server = init_server(argc, argv);
+    
     cr_assert_not_null(server, "Expected server initialization to succeed.");
-    free_server(server);
+    cr_assert_not_null(server->params, "Expected server params initialization to succeed.");
+    cr_assert_eq(server->params->port, 8080, "Expected server port to be 8080.");
+    cr_assert_eq(server->params->x, 10, "Expected server x size to be 10.");
+    cr_assert_eq(server->params->y, 10, "Expected server y size to be 10.");
+    
+    free_zappy(server);
 }
 
-Test(init_server, init_server_invalid, .init = redirect_all_std) {
-    char *argv[] = {"./zappy_server"};
-    int argc = 1;
-
-    cr_assert_null(init_server(argc, argv), "Expected server initialization to fail with insufficient arguments.");
+Test(server, init_server_invalid_args, .init = redirect_all_std)
+{
+    char *argv[] = {"zappy_server", "-p", "abc"};
+    int argc = 3;
+    
+    zappy_t *server = init_server(argc, argv);
+    
+    cr_assert_null(server, "Expected server initialization to fail with invalid arguments.");
 }
 
-/* Server :: Server :: Free server */
-
-Test(free_server, free_server_null, .init = redirect_all_std) {
-    cr_assert_null(free_server(NULL), "Expected free_server to handle NULL gracefully.");
+Test(server, free_zappy_null, .init = redirect_all_std)
+{
+    void *result = free_zappy(NULL);
+    
+    cr_assert_null(result, "Expected free_zappy to handle NULL gracefully.");
 }
 
-Test(free_server, free_server_valid, .init = redirect_all_std) {
-    char *argv[] = {"./zappy_server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "-c", "5", "-f", "50"};
-    int argc = 14;
-
-    server_t *server = init_server(argc, argv);
-    server->game = malloc(sizeof(game_t));
-    server->params = malloc(sizeof(params_t));
-    server->graph = malloc(sizeof(graph_t));
-    cr_assert_null(free_server(server), "Expected free_server to return NULL after freeing.");
+Test(server, free_params_null, .init = redirect_all_std)
+{
+    void *result = free_params(NULL);
+    
+    cr_assert_null(result, "Expected free_params to handle NULL gracefully.");
 }

@@ -5,6 +5,7 @@
 ** my_unsignedlen
 */
 
+/* This functions get's the length of and unsgined int */
 int my_unsignedlen(unsigned int nb)
 {
     int i = 0;
