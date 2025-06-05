@@ -106,4 +106,7 @@ void send_egg_death(zappy_t *zappy, egg_t *egg);
 void init_egg(zappy_t *zappy);
 egg_t *kil_egg_node(egg_t **head, int egg_id);
 
+/* AI messages */
+int forward_message(player_t *player, params_t *params);
+
 #endif /* !ZAPPY_H_ */

@@ -12,15 +12,21 @@
 #include "zappy.h"
 #include "algo.h"
 
+static void redirect_all_std(void)
+{
+    cr_redirect_stdout();
+    cr_redirect_stderr();
+}
+
 // Test free_params with NULL
-Test(free_params, test_null_params)
+Test(free_params, test_null_params, .init = redirect_all_std)
 {
     void *result = free_params(NULL);
     cr_assert_null(result);
 }
 
 // Test free_params with valid params but no teams
-Test(free_params, test_params_no_teams)
+Test(free_params, test_params_no_teams, .init = redirect_all_std)
 {
     params_t *params = malloc(sizeof(params_t));
     params->teams = NULL;
@@ -31,7 +37,7 @@ Test(free_params, test_params_no_teams)
 }
 
 // Test free_params with valid params and teams
-Test(free_params, test_params_with_teams)
+Test(free_params, test_params_with_teams, .init = redirect_all_std)
 {
     params_t *params = malloc(sizeof(params_t));
     params->nb_team = 2;
@@ -44,7 +50,7 @@ Test(free_params, test_params_with_teams)
 }
 
 // Test free_server with NULL
-Test(free_server, test_null_server)
+Test(free_server, test_null_server, .init = redirect_all_std)
 {
     void *result = free_zappy(NULL);
     cr_assert_null(result);

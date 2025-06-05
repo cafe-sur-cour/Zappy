@@ -18,7 +18,7 @@ static void redirect_all_std(void)
 
 /* Server :: Params */
 
-Test(params, check_port_valid) {
+Test(params, check_port_valid, .init = redirect_all_std) {
     params_t params = {0};
     bool result = check_port("-p", "8080", &params);
 
@@ -26,14 +26,14 @@ Test(params, check_port_valid) {
     cr_assert_eq(params.port, 8080);
 }
 
-Test(params, check_port_invalid) {
+Test(params, check_port_invalid, .init = redirect_all_std) {
     params_t params = {0};
     bool result = check_port("-p", "abc", &params);
 
     cr_assert_eq(result, false);
 }
 
-Test(params, check_width_valid) {
+Test(params, check_width_valid, .init = redirect_all_std) {
     params_t params = {0};
     bool result = check_width("-x", "10", &params);
 
@@ -41,7 +41,7 @@ Test(params, check_width_valid) {
     cr_assert_eq(params.x, 10);
 }
 
-Test(params, check_height_valid) {
+Test(params, check_height_valid, .init = redirect_all_std) {
     params_t params = {0};
     bool result = check_height("-y", "15", &params);
 
@@ -49,7 +49,7 @@ Test(params, check_height_valid) {
     cr_assert_eq(params.y, 15);
 }
 
-Test(params, check_client_valid) {
+Test(params, check_client_valid, .init = redirect_all_std) {
     params_t params = {0};
     bool result = check_client("-c", "5", &params);
 
@@ -57,7 +57,7 @@ Test(params, check_client_valid) {
     cr_assert_eq(params.nb_client, 5);
 }
 
-Test(params, check_freq_valid) {
+Test(params, check_freq_valid, .init = redirect_all_std) {
     params_t params = {0};
     bool result = check_freq("-f", "100", &params);
 
@@ -65,7 +65,7 @@ Test(params, check_freq_valid) {
     cr_assert_eq(params.freq, 100);
 }
 
-Test(params, check_args_valid) {
+Test(params, check_args_valid, .init = redirect_all_std) {
     char *argv[] = {"zappy_server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "-c", "3", "-f", "100"};
     int argc = 14;
 
@@ -82,7 +82,7 @@ Test(params, check_args_valid) {
     free_params(params);
 }
 
-Test(params, check_args_missing_port) {
+Test(params, check_args_missing_port, .init = redirect_all_std) {
     char *argv[] = {"zappy_server", "-x", "10", "-y", "10", "-n", "team1", "-c", "3", "-f", "100"};
     int argc = 11;
 
