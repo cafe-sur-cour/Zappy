@@ -37,6 +37,14 @@ class IUIElement {
         virtual void setPosition(float x, float y) = 0;
 
         /**
+         * @brief Set the size of the UI element
+         *
+         * @param width New width
+         * @param height New height
+         */
+        virtual void setSize(float width, float height) = 0;
+
+        /**
          * @brief Get the bounds of the UI element
          *
          * @return Rectangle The bounds of the element

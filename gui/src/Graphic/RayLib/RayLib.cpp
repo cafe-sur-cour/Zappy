@@ -68,6 +68,16 @@ bool RayLib::isWindowReady() const
     return IsWindowReady();
 }
 
+int RayLib::getMonitorWidth(int monitor) const
+{
+    return GetMonitorWidth(monitor);
+}
+
+int RayLib::getMonitorHeight(int monitor) const
+{
+    return GetMonitorHeight(monitor);
+}
+
 bool RayLib::isMouseButtonDown(int button) const
 {
     return IsMouseButtonDown(button);
@@ -86,6 +96,16 @@ bool RayLib::isMouseButtonReleased(int button) const
 bool RayLib::isKeyDown(int key) const
 {
     return IsKeyDown(key);
+}
+
+bool RayLib::isKeyPressed(int key) const
+{
+    return IsKeyPressed(key);
+}
+
+bool RayLib::isKeyReleased(int key) const
+{
+    return IsKeyReleased(key);
 }
 
 Vector2 RayLib::getMousePosition() const
@@ -138,6 +158,11 @@ Vector2 RayLib::getMouseDelta()
     }
 }
 
+float RayLib::getMouseWheelMove() const
+{
+    return GetMouseWheelMove();
+}
+
 void RayLib::begin3DMode()
 {
     BeginMode3D(_camera);
@@ -187,7 +212,7 @@ void RayLib::updateCamera(int mode)
     UpdateCamera(&_camera, mode);
 }
 
-void RayLib::updateCameraCustom()
+void RayLib::updateCameraFreeMode()
 {
     const float moveSpeed = 0.025f;
     const float rotationSpeed = 0.001f;
@@ -226,7 +251,7 @@ void RayLib::updateCameraCustom()
         _camera.target.y -= moveSpeed * 0.5;
     }
 
-    if (isMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    if (isMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
         int screenCenterX = getScreenWidth() / 2;
         int screenCenterY = getScreenHeight() / 2;
 
@@ -236,10 +261,10 @@ void RayLib::updateCameraCustom()
         disableCursor();
     }
 
-    if (isMouseButtonReleased(MOUSE_BUTTON_LEFT))
+    if (isMouseButtonReleased(MOUSE_BUTTON_RIGHT))
         enableCursor();
 
-    if (isMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+    if (isMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
         Vector2 mouseDelta = getMouseDelta();
 
         if (mouseDelta.x != 0) {
@@ -369,4 +394,24 @@ void RayLib::unloadTexture(Texture2D texture)
 bool RayLib::checkCollisionPointRec(Vector2 point, Rectangle rec) const
 {
     return CheckCollisionPointRec(point, rec);
+}
+
+float RayLib::vector3Distance(Vector3 v1, Vector3 v2) const
+{
+    return Vector3Distance(v1, v2);
+}
+
+Vector3 RayLib::vector3Normalize(Vector3 v) const
+{
+    return Vector3Normalize(v);
+}
+
+Vector3 RayLib::vector3Subtract(Vector3 v1, Vector3 v2) const
+{
+    return Vector3Subtract(v1, v2);
+}
+
+Vector3 RayLib::vector3Add(Vector3 v1, Vector3 v2) const
+{
+    return Vector3Add(v1, v2);
 }

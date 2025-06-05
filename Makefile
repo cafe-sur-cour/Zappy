@@ -36,6 +36,7 @@ clean:
 	@make -C $(SERVER_DIR) clean
 	@make -C $(GUI_DIR) clean
 	@make -C server/lib/my clean
+	@make -C server/src/network clean
 
 fclean: clean
 	@echo "Full clean server..."
@@ -49,6 +50,7 @@ fclean: clean
 	@make -C tests/unit/gui/ fclean
 	@make -C server/lib/my fclean
 	@make -C tests/unit/server/ fclean
+	@make -C server/src/network fclean
 
 
 re: fclean all
@@ -70,6 +72,7 @@ tests_run_gui:
 
 tests_run_server:
 	@make -C server/lib/my
+	@make -C server/src/network
 	@make -C tests/unit/server/ tests_run
 
 coverage: $(GUI_NAME) $(SERVER_NAME) $(AI_NAME)

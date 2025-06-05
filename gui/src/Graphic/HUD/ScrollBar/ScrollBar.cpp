@@ -16,6 +16,7 @@ ScrollBar::ScrollBar(
     ScrollBarOrientation orientation,
     std::function<void(float)> onValueChanged
 ) : AUIElement(
+      raylib,
       x, y,
       orientation == ScrollBarOrientation::VERTICAL ? thickness : length,
       orientation == ScrollBarOrientation::VERTICAL ? length : thickness
@@ -69,9 +70,9 @@ void ScrollBar::update()
         _isDragging = false;
 
     if (_isDragging) {
-        float newValue = calculateValueFromMousePosition(mousePoint);
-        if (newValue != _value)
-            setValue(newValue);
+        _value = calculateValueFromMousePosition(mousePoint);
+        if (_onValueChanged)
+            _onValueChanged(_value);
     }
 }
 
@@ -109,30 +110,44 @@ void ScrollBar::setOnValueChanged(std::function<void(float)> onValueChanged)
 
 Rectangle ScrollBar::getHandleBounds() const
 {
+    Rectangle handle = _bounds;
+
     if (_orientation == ScrollBarOrientation::VERTICAL) {
-        float handleLength = _bounds.height * _handleSize;
-        float handleY = _bounds.y + _value * (_bounds.height - handleLength);
-        return {_bounds.x, handleY, _bounds.width, handleLength};
+        handle.height = _bounds.height * _handleSize;
+        handle.y = _bounds.y + (_bounds.height - handle.height) * _value;
     } else {
-        float handleLength = _bounds.width * _handleSize;
-        float handleX = _bounds.x + _value * (_bounds.width - handleLength);
-        return {handleX, _bounds.y, handleLength, _bounds.height};
+        handle.width = _bounds.width * _handleSize;
+        handle.x = _bounds.x + (_bounds.width - handle.width) * _value;
     }
+
+    return handle;
 }
 
 float ScrollBar::calculateValueFromMousePosition(Vector2 mousePosition) const
 {
+    float position, size, mousePos;
+
     if (_orientation == ScrollBarOrientation::VERTICAL) {
-        float handleLength = _bounds.height * _handleSize;
-        float trackLength = _bounds.height - handleLength;
-        float relativeY = mousePosition.y - _bounds.y - handleLength / 2.0f;
-
-        return std::max(0.0f, std::min(1.0f, relativeY / trackLength));
+        position = _bounds.y;
+        size = _bounds.height * (1.0f - _handleSize);
+        mousePos = mousePosition.y - position;
     } else {
-        float handleLength = _bounds.width * _handleSize;
-        float trackLength = _bounds.width - handleLength;
-        float relativeX = mousePosition.x - _bounds.x - handleLength / 2.0f;
+        position = _bounds.x;
+        size = _bounds.width * (1.0f - _handleSize);
+        mousePos = mousePosition.x - position;
+    }
 
-        return std::max(0.0f, std::min(1.0f, relativeX / trackLength));
+    float value = mousePos / size;
+    return std::max(0.0f, std::min(1.0f, value));
+}
+
+void ScrollBar::setSize(float width, float height)
+{
+    if (_orientation == ScrollBarOrientation::VERTICAL) {
+        _bounds.width = width;
+        _bounds.height = height;
+    } else {
+        _bounds.width = height;
+        _bounds.height = width;
     }
 }

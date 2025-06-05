@@ -77,10 +77,10 @@ class Button : public AUIElement {
         /**
          * @brief Set the colors of the button
          *
-         * @param normal Color when not interacting
-         * @param hover Color when mouse is hovering over button
-         * @param pressed Color when button is pressed
-         * @param textColor Color of the button text
+         * @param normal Normal color
+         * @param hover Hover color
+         * @param pressed Pressed color
+         * @param textColor Text color
          */
         void setColors(
             Color normal,
@@ -88,6 +88,14 @@ class Button : public AUIElement {
             Color pressed,
             Color textColor
         );
+
+        /**
+         * @brief Set the size of the button
+         *
+         * @param width New button width
+         * @param height New button height
+         */
+        void setSize(float width, float height) override;
 
     private:
         std::string _text;

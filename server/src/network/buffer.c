@@ -6,7 +6,6 @@
 */
 
 #include "buffer.h"
-#include "zappy.h"
 
 
 /* This functions allows you to wrap arround in the buffer */

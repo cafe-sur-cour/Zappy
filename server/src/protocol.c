@@ -46,30 +46,32 @@ static void diplay_help(int port)
     printf("\033[1;29mServer listening on port: %d\033[0m\n\n", port);
 }
 
-static bool send_gui_message(server_t *server, bool tmp)
+static bool send_gui_message(zappy_t *server, bool tmp)
 {
     if (server->graph->fd != -1 && tmp == false) {
         send_map_size(server);
+        send_time_message(server);
         send_entrie_map(server);
         send_team_name(server);
+        send_entire_egg_list(server);
         tmp = true;
     }
     return tmp;
 }
 
-int start_protocol(server_t *server)
+int start_protocol(zappy_t *server)
 {
     bool temp = false;
 
     setup_signal();
     diplay_help(server->params->port);
     while (*get_running_state()) {
-        if (poll(&server->pollserver, 1, 100) == -1
+        if (poll(&server->network->pollserver, 1, 100) == -1
             && *get_running_state()) {
             error_message("Poll failed.");
             return -1;
         }
-        if (server->pollserver.revents & POLLIN)
+        if (server->network->pollserver.revents & POLLIN)
             accept_client(server);
         temp = send_gui_message(server, temp);
     }

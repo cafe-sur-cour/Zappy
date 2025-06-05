@@ -24,6 +24,8 @@ class RayLib {
         void endDrawing();
         void clearBackground(Color color = WHITE);
         bool isWindowReady() const;
+        int getMonitorWidth(int monitor) const;
+        int getMonitorHeight(int monitor) const;
 
         // Collision methods
         bool checkCollisionPointRec(Vector2 point, Rectangle rec) const;
@@ -37,6 +39,8 @@ class RayLib {
         bool isMouseButtonPressed(int button) const;
         bool isMouseButtonReleased(int button) const;
         bool isKeyDown(int key) const;
+        bool isKeyPressed(int key) const;
+        bool isKeyReleased(int key) const;
         Vector2 getMouseDelta();
         Vector2 getMousePosition() const;
         void setMousePosition(int x, int y);
@@ -44,10 +48,15 @@ class RayLib {
         void enableCursor();
         int getScreenWidth() const;
         int getScreenHeight() const;
+        float getMouseWheelMove() const;
 
         // 3D Environment methods
         void begin3DMode();
         void end3DMode();
+        float vector3Distance(Vector3 v1, Vector3 v2) const;
+        Vector3 vector3Normalize(Vector3 v) const;
+        Vector3 vector3Subtract(Vector3 v1, Vector3 v2) const;
+        Vector3 vector3Add(Vector3 v1, Vector3 v2) const;
 
         // Camera methods
         void initCamera();
@@ -57,7 +66,7 @@ class RayLib {
         void setCameraFovy(float fovy);
         void setCameraProjection(int projection);
         void updateCamera(int mode = CAMERA_FREE);
-        void updateCameraCustom();
+        void updateCameraFreeMode();
         Camera3D getCamera() const;
 
         // 3D Drawing methods

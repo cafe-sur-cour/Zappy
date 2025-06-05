@@ -5,6 +5,7 @@
 ** game
 */
 
+#include "buffer.h"
 #include <time.h>
 
 #ifndef GAME_H_
@@ -29,16 +30,25 @@ typedef enum crystal_e {
     THYSTAME
 } crystal_t;
 
-/* Struct that "counts" the current stat of the player */
-typedef struct lives_s {
-    int freq;
-    int nbFood;
-    time_t startRefresh;
-    time_t endRefresh;
-} lives_t;
 
-/* Struct defining the invetory of the player */
+typedef struct egg_s {
+    int id; /* Id of the egg */
+    int posX;
+    int posY;
+    char *teamName;  /* Name of the team that laid it */
+    int idLayer;  /* Id of the player that layed it */
+    struct egg_s *next;
+} egg_t;
+
+/* Struct that "handles" the network element */
+typedef struct network_s {
+    int fd;
+    buffer_t *buffer;
+} network_t;
+
+/* Struct defining the inventory of tiles and players */
 typedef struct inventory_s {
+    int nbFood;
     int nbLinemate;
     int nbDeraumere;
     int nbSibur;
@@ -47,17 +57,16 @@ typedef struct inventory_s {
     int nbThystame;
 } inventory_t;
 
+
 /* Player struct */
 typedef struct player_s {
     int id;
-    int fd;
+    network_t *network;
     int level;
     int posX;
     int posY;
-    bool isAlive;
     direction_t direction;
     inventory_t *inventory;
-    lives_t *lives;
     struct player_s *next;
 } player_t;
 
@@ -70,20 +79,20 @@ typedef struct team_s {
     struct team_s *next;
 } team_t;
 
-/* Ressources, and there pos on the map */
-typedef struct ressources_s {
-    crystal_t type;
-    int posX;
-    int posY;
-    struct ressources_s *next;
-} ressources_t;
+
+/* Structure that holds the size and array of tiles */
+typedef struct map_t {
+    int width;
+    int height;
+    egg_t *currentEggs;  /* List of current eggs */
+    inventory_t **tiles;  /* Here we call inv for the tile*/
+} map_t;
+
 
 /* Map struct */
 typedef struct game_s {
-    int width;
-    int heigt;
     team_t *teams;
-    ressources_t *ressources;
+    map_t *map;
 } game_t;
 
 #endif /* !GAME_H_ */

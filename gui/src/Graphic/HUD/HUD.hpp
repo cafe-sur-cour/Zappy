@@ -9,6 +9,7 @@
 
 #include "Containers/Containers.hpp"
 #include "../RayLib/RayLib.hpp"
+#include "../../Game/GameInfos.hpp"
 #include <vector>
 #include <unordered_map>
 
@@ -105,7 +106,13 @@ class HUD {
          * @param sideWidth Width of the side container (default: 250 pixels)
          * @param bottomHeight Height of the bottom container (default: 200 pixels)
          */
-        void initDefaultLayout(float sideWidth = 250.0f, float bottomHeight = 200.0f);
+        /**
+         * @brief Initialize default layout with side and bottom containers
+         *
+         * @param sideWidthPercent Width of side container as percentage of screen width (default: 15%)
+         * @param bottomHeightPercent Height of bottom container as percentage of screen height (default: 20%)
+         */
+        void initDefaultLayout(float sideWidthPercent = 15.0f, float bottomHeightPercent = 20.0f);
 
         /**
          * @brief Get the side container
@@ -120,6 +127,59 @@ class HUD {
          * @return std::shared_ptr<Containers> Pointer to the bottom container
          */
         std::shared_ptr<Containers> getBottomContainer() const;
+
+        /**
+         * @brief Get the square container in the top-left corner
+         *
+         * @return std::shared_ptr<Containers> Pointer to the square container
+         */
+        std::shared_ptr<Containers> getSquareContainer() const;
+
+        /**
+         * @brief Initialize an exit button in the square container
+         *
+         * Creates a button that closes the application when clicked
+         */
+        void initExitButton();
+
+        /**
+         * @brief Initialize a settings button in the square container
+         *
+         * Creates a button that opens the settings menu when clicked
+         */
+        void initSettingsButton();
+
+        /**
+         * @brief Initialize a help button in the square container
+         *
+         * Creates a button that opens the help menu when clicked
+         */
+        void initHelpButton();
+
+        /**
+         * @brief Initialize a camera reset button in the square container
+         *
+         * Creates a button that resets the camera position when clicked
+         */
+        void initCameraResetButton();
+
+        /**
+         * @brief Initialize team and player display in the side container
+         * 
+         * Creates text elements to show teams and their players
+         * 
+         * @param gameInfos The game information containing teams and players
+         */
+        void initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos);
+        
+        /**
+         * @brief Update team and player display in the side container
+         * 
+         * Updates the text elements showing teams and their players
+         * 
+         * @param gameInfos The game information containing teams and players
+         */
+        void updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos);
 
     private:
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
