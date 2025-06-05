@@ -60,6 +60,10 @@ bool check_height(char const *flag, char const *value, params_t *params);
 bool check_client(char const *flag, char const *value, params_t *params);
 bool check_freq(char const *flag, char const *value, params_t *params);
 
+/* signal.c */
+void setup_signal(void);
+int *get_running_state(void);
+
 /* params.c */
 params_t *check_args(int argc, char **argv);
 void *free_params(params_t *params);
@@ -96,8 +100,10 @@ void send_team_name(zappy_t *server);
 void send_egg(zappy_t *zappy, egg_t *egg);
 void send_entire_egg_list(zappy_t *zappy);
 void send_time_message(zappy_t *zappy);
+void send_egg_death(zappy_t *zappy, egg_t *egg);
 
 /* init_egg.c */
 void init_egg(zappy_t *zappy);
+egg_t *kil_egg_node(egg_t **head, int egg_id);
 
 #endif /* !ZAPPY_H_ */
