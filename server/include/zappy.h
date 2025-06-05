@@ -113,6 +113,8 @@ void send_broadcast_to_player(zappy_t *zappy, player_t *player,
 void send_player_laying_egg(zappy_t *zappy, player_t *player);
 void send_ressource_droped(zappy_t *zappy, player_t *player,
     int ressourceType);
+void send_ressource_collected(zappy_t *zappy, player_t *player,
+    int ressourceType);
 void send_player_death(zappy_t *zappy, player_t *player);
 void send_updated_time(zappy_t *zappy, int time);
 void send_end_game(zappy_t *zappy, const char *teamName);
