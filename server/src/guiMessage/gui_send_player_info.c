@@ -9,6 +9,7 @@
 #include "network.h"
 
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 /* This function sends the Connection player PNW */
@@ -33,7 +34,6 @@ void send_player_connect(zappy_t *zappy, player_t *player)
     free(message);
 }
 
-
 /* This functio send the position of a player */
 void send_player_pos(zappy_t *zappy, player_t *player)
 {
@@ -42,11 +42,29 @@ void send_player_pos(zappy_t *zappy, player_t *player)
     char *message = malloc(sizeof(char) * xLength);
 
     if (message == NULL) {
-        error_message("Failed to allocate memory for player position message.");
+        error_message("Failed to allocate memory for player position.");
         return;
     }
-    snprintf(message, xLength,"ppo #%d %d %d %d\n",
+    snprintf(message, xLength, "ppo #%d %d %d %d\n",
         player->id, player->posX, player->posY, player->direction);
+    if (zappy->params->is_debug == true) {
+        printf("Sending to GUI: %s", message);
+    }
+    write_message(zappy->graph->fd, message);
+    free(message);
+}
+
+/* This message allows use to send the level of a player */
+void send_player_level(zappy_t *zappy, player_t *player)
+{
+    int xLength = int_str_len(player->id) + int_str_len(player->level) + 8;
+    char *message = malloc(sizeof(char) *xLength);
+
+    if (message == NULL) {
+        error_message("Failed to allocate memory for player level message.");
+        return;
+    }
+    snprintf(message, xLength, "plv #%d %d\n", player->id, player->level);
     if (zappy->params->is_debug == true) {
         printf("Sending to GUI: %s", message);
     }
