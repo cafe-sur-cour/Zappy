@@ -103,6 +103,7 @@ static void distribute_resources(zappy_t *server)
 static map_t *malloc_tiles(int width, int height,
     map_t *map)
 {
+    map->currentEggs = NULL;
     for (int i = 0; i < height; i++) {
         map->tiles[i] = calloc(width, sizeof(inventory_t));
         if (!map->tiles[i]) {
@@ -161,4 +162,5 @@ void init_game(zappy_t *zappy)
     init_teams(zappy);
     if (zappy->params->is_debug == true)
         print_map_tiles(zappy);
+    init_egg(zappy);
 }

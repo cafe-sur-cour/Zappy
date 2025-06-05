@@ -93,5 +93,10 @@ void send_entrie_map(zappy_t *server);
 void send_map_tile(inventory_t **tiles, zappy_t *server,
     int posX, int posY);
 void send_team_name(zappy_t *server);
+void send_egg(zappy_t *zappy, egg_t *egg);
+void send_entire_egg_list(zappy_t *zappy);
+
+/* init_egg.c */
+void init_egg(zappy_t *zappy);
 
 #endif /* !ZAPPY_H_ */

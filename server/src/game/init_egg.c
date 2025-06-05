@@ -1,0 +1,86 @@
+/*
+** EPITECH PROJECT, 2025
+** B-YEP-400-NAN-4-1-zappy-albane.merian
+** File description:
+** init_egg
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "zappy.h"
+#include "game.h"
+#include "algo.h"
+
+/* This function allows the creation of one egg node */
+egg_t *add_egg_node(int id, int *pos, char *team_name, int id_layer)
+{
+    egg_t *new_egg = malloc(sizeof(egg_t));
+
+    if (!new_egg) {
+        error_message("Failed to allocate memory for new egg.");
+        return NULL;
+    }
+    new_egg->id = id;
+    new_egg->posX = pos[0];
+    new_egg->posY = pos[1];
+    if (team_name != NULL)
+        new_egg->teamName = strdup(team_name);
+    else
+        new_egg->teamName = NULL;
+    new_egg->idLayer = id_layer;
+    new_egg->next = NULL;
+    return new_egg;
+}
+
+/* Debug functions that allows you to print the list sent */
+static void print_eggs(zappy_t *zappy)
+{
+    egg_t *current = zappy->game->map->currentEggs;
+
+    if (zappy->params->is_debug == false)
+        return;
+    printf("Current Eggs:\n");
+    while (current) {
+        printf("Egg ID: %d, Position: (%d, %d), Team: %s, Layer ID: %d\n",
+            current->id, current->posX, current->posY,
+            current->teamName, current->idLayer);
+        current = current->next;
+    }
+}
+
+/* Sub function to allow to loop thrue the egg and be coding style */
+static void loop_for_eggs(zappy_t *zappy, tiles_t *tiles, int *pos)
+{
+    egg_t *new_egg = NULL;
+
+    for (int i = 0; i < zappy->params->nb_client *
+        zappy->params->nb_team; i++) {
+        pos[0] = tiles[i].x;
+        pos[1] = tiles[i].y;
+        new_egg = add_egg_node(i + 1, pos, NULL, -1);
+        if (!new_egg)
+            exit(84);
+        new_egg->next = zappy->game->map->currentEggs;
+        zappy->game->map->currentEggs = new_egg;
+        new_egg = NULL;
+        free(pos);
+    }
+}
+
+/* Sending function that allow the server to init the entire egg list */
+void init_egg(zappy_t *zappy)
+{
+    tiles_t *tiles = shuffle_fisher(zappy->game->map->width,
+        zappy->game->map->height);
+    int *pos = malloc(sizeof(int) * 2);
+
+    if (!pos) {
+        error_message("Failed to allocate memory for egg position.");
+        exit(84);
+    }
+    loop_for_eggs(zappy, tiles, pos);
+    print_eggs(zappy);
+    free(tiles);
+}

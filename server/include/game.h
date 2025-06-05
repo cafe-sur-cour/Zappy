@@ -37,6 +37,7 @@ typedef struct egg_s {
     int posY;
     char *teamName;  /* Name of the team that laid it */
     int idLayer;  /* Id of the player that layed it */
+    struct egg_s *next;
 } egg_t;
 
 /* Struct that "handles" the network element */
@@ -83,6 +84,7 @@ typedef struct team_s {
 typedef struct map_t {
     int width;
     int height;
+    egg_t *currentEggs;  /* List of current eggs */
     inventory_t **tiles;  /* Here we call inv for the tile*/
 } map_t;
 
