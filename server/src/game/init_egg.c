@@ -65,7 +65,6 @@ static void loop_for_eggs(zappy_t *zappy, tiles_t *tiles, int *pos)
         new_egg->next = zappy->game->map->currentEggs;
         zappy->game->map->currentEggs = new_egg;
         new_egg = NULL;
-        free(pos);
     }
 }
 
@@ -81,6 +80,8 @@ void init_egg(zappy_t *zappy)
         exit(84);
     }
     loop_for_eggs(zappy, tiles, pos);
+    if (pos)
+        free(pos);
     print_eggs(zappy);
     free(tiles);
 }

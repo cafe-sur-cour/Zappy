@@ -25,29 +25,19 @@ void *free_params(params_t *params)
     return NULL;
 }
 
-void free_map(map_t *map)
-{
-    for (int i = 0; i < map->height; i++) {
-        if (map->tiles[i]) {
-            free(map->tiles[i]);
-        }
-    }
-    free(map->tiles);
-    free(map);
-}
-
 static void free_players(player_t *player)
 {
-    player_t *next_player;
-
-    while (player) {
-        next_player = player->next;
-        if (player->inventory) {
-            free(player->inventory);
-        }
-        free(player);
-        player = next_player;
+    if (!player)
+        return;
+    if (player->inventory)
+        free(player->inventory);
+    if (player->network) {
+        if (player->network->buffer)
+            free(player->network->buffer);
+        free(player->network);
     }
+    free(player);
+    return;
 }
 
 static void free_teams(team_t *teams)
@@ -87,6 +77,32 @@ static void free_graph(graph_net_t *graph)
     free(graph);
 }
 
+static void free_eggs(egg_t *currentEggs)
+{
+    egg_t *current = currentEggs;
+    egg_t *next;
+
+    while (current) {
+        next = current->next;
+        if (current->teamName)
+            free(current->teamName);
+        free(current);
+        current = next;
+    }
+}
+
+void free_map(map_t *map)
+{
+    for (int i = 0; i < map->height; i++) {
+        if (map->tiles[i]) {
+            free(map->tiles[i]);
+        }
+    }
+    free_eggs(map->currentEggs);
+    free(map->tiles);
+    free(map);
+}
+
 void *free_zappy(zappy_t *zappy)
 {
     if (!zappy)
@@ -99,6 +115,8 @@ void *free_zappy(zappy_t *zappy)
         free_game(zappy->game);
     if (zappy->graph)
         free_graph(zappy->graph);
+    if (zappy->network)
+        free(zappy->network);
     free(zappy);
     return NULL;
 }
