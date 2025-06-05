@@ -49,6 +49,7 @@ static int complete_connection_rest(zappy_t *zappy, int fd,
         free(buffer);
         return -1;
     }
+    return 0;
 }
 
 static int complete_connection(zappy_t *zappy, int fd, const char *message)
