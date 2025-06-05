@@ -32,8 +32,6 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/algo.c						\
 				../../../server/src/free.c						\
 				../../../server/src/signal.c					\
-				../../../server/src/guiMessage/gui_send_map_data.c	\
-				../../../server/src/guiMessage/gui_send_team_name.c	\
 				../../../server/src/network/accept_connection.c			\
 				../../../server/src/network/buffer.c			\
 				../../../server/src/network/close.c		\
@@ -41,9 +39,18 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/network/hanlde_input.c		\
 				../../../server/src/network/print_error.c		\
 				../../../server/src/network/send_message.c		\
+				../../../server/src/guiMessage/gui_send_map_data.c	\
+				../../../server/src/guiMessage/gui_send_team_name.c	\
 				../../../server/src/guiMessage/gui_send_eggs.c		\
 				../../../server/src/guiMessage/gui_send_time.c		\
-				../../../server/src/guiMessage/gui_send_egg_death.c
+				../../../server/src/guiMessage/gui_send_egg_death.c \
+				../../../server/src/guiMessage/gui_send_egg_connect.c	\
+				../../../server/src/guiMessage/gui_send_player_info.c	\
+				../../../server/src/guiMessage/gui_send_rest_info_player.c	\
+				../../../server/src/guiMessage/gui_miscellaneous_send.c		\
+				../../../server/src/guiMessage/gui_send_boradcast.c			\
+				../../../server/src/guiMessage/gui_send_death_player.c		\
+				../../../server/src/guiMessage/gui_send_ressource.c
 
 INCLUDES 	= 	-I./../../../server/include
 
