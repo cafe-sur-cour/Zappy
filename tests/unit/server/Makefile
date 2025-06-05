@@ -31,6 +31,7 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/game/init_egg.c					\
 				../../../server/src/algo.c						\
 				../../../server/src/free.c						\
+				../../../server/src/signal.c					\
 				../../../server/src/guiMessage/gui_send_map_data.c	\
 				../../../server/src/guiMessage/gui_send_team_name.c	\
 				../../../server/src/network/accept_connection.c			\
@@ -41,7 +42,8 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/network/print_error.c		\
 				../../../server/src/network/send_message.c		\
 				../../../server/src/guiMessage/gui_send_eggs.c		\
-				../../../server/src/guiMessage/gui_send_time.c
+				../../../server/src/guiMessage/gui_send_time.c		\
+				../../../server/src/guiMessage/gui_send_egg_death.c
 
 INCLUDES 	= 	-I./../../../server/include
 

@@ -37,6 +37,7 @@ typedef struct egg_s {
     int posY;
     char *teamName;  /* Name of the team that laid it */
     int idLayer;  /* Id of the player that layed it */
+    bool isHatched;
     struct egg_s *next;
 } egg_t;
 

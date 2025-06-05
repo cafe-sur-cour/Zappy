@@ -31,7 +31,30 @@ egg_t *add_egg_node(int id, int *pos, char *team_name, int id_layer)
         new_egg->teamName = NULL;
     new_egg->idLayer = id_layer;
     new_egg->next = NULL;
+    new_egg->isHatched = false;
     return new_egg;
+}
+
+/* This function allows the removall of an egg once a player connected to it */
+egg_t *kil_egg_node(egg_t **head, int egg_id)
+{
+    egg_t *current = *head;
+    egg_t *prev = NULL;
+
+    while (current && current->id != egg_id) {
+        prev = current;
+        current = current->next;
+    }
+    if (!current)
+        return *head;
+    if (prev == NULL)
+        *head = current->next;
+    else
+        prev->next = current->next;
+    if (current->teamName)
+        free(current->teamName);
+    free(current);
+    return *head;
 }
 
 /* Debug functions that allows you to print the list sent */
