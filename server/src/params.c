@@ -71,7 +71,16 @@ static bool check_simple_flag(int argc, char **argv,
     char error_msg[28];
     int pos = find_flag(argc, argv, flag);
 
-    if (pos == -1 || pos + 1 >= argc) {
+    if (pos == -1) {
+        if (strcmp(flag, "-f") != 0) {
+            snprintf(error_msg, sizeof(error_msg),
+                "Missing or invalid %s flag.", flag);
+            error_message(error_msg);
+            return true;
+        }
+        return false;
+    }
+    if (pos + 1 >= argc) {
         snprintf(error_msg, sizeof(error_msg),
             "Missing or invalid %s flag.", flag);
         error_message(error_msg);
@@ -113,6 +122,11 @@ static bool check_all_params(int argc, char **argv, bool is_ok,
     if (port_error || width_error || height_error ||
         names_error || client_error || freq_error)
         is_ok = false;
+    
+    // Set default frequency only if -f flag was not found
+    if (find_flag(argc, argv, "-f") == -1)
+        params->freq = 100;
+    
     return is_ok;
 }
 
@@ -144,7 +158,7 @@ params_t *check_args(int argc, char **argv)
         error_message("Memory allocation failed for params.");
         return NULL;
     }
-    if (argc < 14) {
+    if (argc < 12) {
         helper();
         return NULL;
     }
