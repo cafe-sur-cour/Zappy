@@ -11,7 +11,6 @@
 #include "../UIElement/IUIElement.hpp"
 #include "../Button/Button.hpp"
 #include "../Text/Text.hpp"
-#include "../ScrollBar/ScrollBar.hpp"
 #include "../../RayLib/RayLib.hpp"
 #include <vector>
 #include <functional>
@@ -182,27 +181,6 @@ class Containers : public AContainers {
         );
 
         /**
-         * @brief Create and add a scrollbar to the container
-         *
-         * @param id Unique identifier for the scrollbar
-         * @param x X coordinate relative to container
-         * @param y Y coordinate relative to container
-         * @param length Length of the scrollbar
-         * @param thickness Thickness of the scrollbar
-         * @param orientation Orientation (vertical or horizontal)
-         * @param onValueChanged Callback when value changes
-         *
-         * @return std::shared_ptr<ScrollBar> Pointer to the created scrollbar, or nullptr if ID already exists
-         */
-        std::shared_ptr<ScrollBar> addScrollBar(
-            const std::string& id,
-            float x, float y,
-            float length, float thickness,
-            ScrollBarOrientation orientation = ScrollBarOrientation::VERTICAL,
-            std::function<void(float)> onValueChanged = nullptr
-        );
-
-        /**
          * @brief Clear all UI elements from the container
          */
         void clearElements();
@@ -285,27 +263,6 @@ class Containers : public AContainers {
             const std::string& text,
             float fontSizePercent = 5.0f,
             Color color = BLACK
-        );
-
-        /**
-         * @brief Create and add a scrollbar to the container using relative percentages
-         *
-         * @param id Unique identifier for the scrollbar
-         * @param xPercent X position as percentage of container width (0-100)
-         * @param yPercent Y position as percentage of container height (0-100)
-         * @param lengthPercent Length as percentage of container width/height (0-100)
-         * @param thicknessPercent Thickness as percentage of container width/height (0-100)
-         * @param orientation Orientation (vertical or horizontal)
-         * @param onValueChanged Callback when value changes
-         *
-         * @return std::shared_ptr<ScrollBar> Pointer to the created scrollbar, or nullptr if ID already exists
-         */
-        std::shared_ptr<ScrollBar> addScrollBarPercent(
-            const std::string& id,
-            float xPercent, float yPercent,
-            float lengthPercent, float thicknessPercent,
-            ScrollBarOrientation orientation = ScrollBarOrientation::VERTICAL,
-            std::function<void(float)> onValueChanged = nullptr
         );
 
     private:
