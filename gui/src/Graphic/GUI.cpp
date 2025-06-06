@@ -8,9 +8,9 @@
 #include <cmath>
 #include <memory>
 #include <iostream>
+#include <algorithm>
 #include "GUI.hpp"
 #include "../Utils/Constants.hpp"
-#include <algorithm>
 
 GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _gameInfos(gameInfos)
