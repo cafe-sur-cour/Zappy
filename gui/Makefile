@@ -27,7 +27,6 @@ SRC =	src/Client/Client.cpp \
 		src/Graphic/HUD/Button/Button.cpp \
 		src/Graphic/HUD/Containers/Containers.cpp \
 		src/Graphic/HUD/Containers/AContainers.cpp \
-		src/Graphic/HUD/ScrollBar/ScrollBar.cpp \
 		src/Graphic/HUD/Text/Text.cpp \
 		src/Graphic/HUD/UIElement/AUIElement.cpp \
 		src/Graphic/HUD/HUD.cpp

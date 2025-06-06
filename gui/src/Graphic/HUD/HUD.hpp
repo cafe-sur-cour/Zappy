@@ -227,13 +227,6 @@ class HUD {
             float bottomHeightPercent);
 
         /**
-         * @brief Setup the scrollbar for the side container
-         *
-         * @param container The container to add scrollbar to
-         */
-        void setupSideScrollbar(std::shared_ptr<Containers> container);
-
-        /**
          * @brief Record element positions for scrolling
          *
          * @param container The container with elements
@@ -305,25 +298,6 @@ class HUD {
          */
         void addPlayerListText(std::shared_ptr<Containers> container, const std::string& teamId,
                              float yPos, const std::vector<int>& playerNumbers);
-
-        /**
-         * @brief Configure scrollbar based on team count
-         *
-         * @param scrollbar Scrollbar to configure
-         * @param numTeams Number of teams
-         */
-        void configureScrollbar(std::shared_ptr<ScrollBar> scrollbar, float numTeams);
-
-        /**
-         * @brief Update scrollbar configuration based on content
-         *
-         * @param scrollbar Scrollbar to update
-         * @param yPos Current y position of content
-         * @param maxTeams Number of teams
-         * @param sideContainer Container reference
-         */
-        void updateScrollbarConfiguration(std::shared_ptr<ScrollBar> scrollbar, float yPos,
-                                        float maxTeams, std::shared_ptr<Containers> sideContainer);
 
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<RayLib> _raylib;

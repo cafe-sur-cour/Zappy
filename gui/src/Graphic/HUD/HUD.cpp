@@ -244,12 +244,6 @@ void HUD::initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
     const std::vector<std::string> teams = gameInfos->getTeamNames();
     const std::vector<zappy::structs::Player> players = gameInfos->getPlayers();
 
-    auto scrollbar = std::dynamic_pointer_cast<ScrollBar>(
-            sideContainer->getElement("side_scrollbar"));
-
-    if (scrollbar)
-        scrollbar->setValue(0.0f);
-
     float yPos = 5.0f;
 
     for (int i = static_cast<int>(teams.size()) - 1; i >= 0; i--) {
@@ -285,9 +279,6 @@ void HUD::initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
         yPos += 3.0f;
         yPos += 2.0f;
     }
-
-    if (scrollbar)
-        configureScrollbar(scrollbar, static_cast<float>(teams.size()));
 }
 
 void HUD::updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
@@ -306,22 +297,6 @@ void HUD::updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
     }
 
     const std::vector<zappy::structs::Player> players = gameInfos->getPlayers();
-    auto scrollbar = std::dynamic_pointer_cast<ScrollBar>(
-        sideContainer->getElement("side_scrollbar"));
-
-    if (scrollbar) {
-        float maxTeams = static_cast<float>(currentTeamNames.size());
-        float baseHeight = 35.0f;
-        float totalContentHeight = maxTeams * baseHeight;
-        float viewportHeight = sideContainer->getBounds().height;
-        float viewportRatio = std::min(1.0f, viewportHeight / totalContentHeight);
-
-        if (maxTeams > 10)
-            viewportRatio *= 0.8f;
-
-        viewportRatio = std::max(0.05f, viewportRatio);
-        scrollbar->setHandleSize(viewportRatio);
-    }
 
     for (int i = static_cast<int>(currentTeamNames.size()) - 1; i >= 0; i--) {
         std::string teamId = "team_display_" + std::to_string(i);
@@ -341,27 +316,6 @@ void HUD::updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
 
             std::vector<int> teamPlayerNumbers = getTeamPlayerNumbers(teamName, players);
             addPlayerListText(sideContainer, teamId, yPos, teamPlayerNumbers);
-        }
-    }
-
-    if (scrollbar) {
-        float yPos = 0.0f;
-        auto lastTeamId = "team_display_" + std::to_string(0);
-        auto lastPlayerElem = sideContainer->getElement(lastTeamId + "_player_0");
-
-        if (lastPlayerElem) {
-            yPos = (lastPlayerElem->getBounds().y +
-                    lastPlayerElem->getBounds().height -
-                    sideContainer->getBounds().y) /
-                    sideContainer->getBounds().height * 100.0f;
-        }
-
-        if (yPos > 90.0f) {
-            float contentRatio = 90.0f / (yPos + 50.0f);
-            contentRatio = std::max(0.02f, std::min(0.9f, contentRatio));
-            scrollbar->setHandleSize(contentRatio);
-        } else {
-            scrollbar->setHandleSize(1.0f);
         }
     }
 }
@@ -441,49 +395,6 @@ void HUD::addPlayerListText(
     }
 }
 
-void HUD::configureScrollbar(std::shared_ptr<ScrollBar> scrollbar, float numTeams)
-{
-    if (!scrollbar)
-        return;
-
-    scrollbar->setValue(0.0f);
-
-    float baseRatio = 90.0f / (numTeams * 15.0f);
-
-    if (numTeams > 10)
-        baseRatio *= 0.5f;
-
-    float contentRatio = std::max(0.01f, std::min(1.0f, baseRatio));
-    scrollbar->setHandleSize(contentRatio);
-}
-
-void HUD::updateScrollbarConfiguration(
-    std::shared_ptr<ScrollBar> scrollbar,
-    float yPos,
-    float maxTeams,
-    std::shared_ptr<Containers> sideContainer)
-{
-    if (!scrollbar || !sideContainer)
-        return;
-
-    if (yPos > 90.0f) {
-        float contentRatio = 90.0f / (yPos + 50.0f);
-        contentRatio = std::max(0.02f, std::min(0.9f, contentRatio));
-        scrollbar->setHandleSize(contentRatio);
-    } else {
-        float baseHeight = 35.0f;
-        float totalContentHeight = maxTeams * baseHeight;
-        float viewportHeight = sideContainer->getBounds().height;
-        float viewportRatio = std::min(1.0f, viewportHeight / totalContentHeight);
-
-        if (maxTeams > 10)
-            viewportRatio *= 0.8f;
-
-        viewportRatio = std::max(0.05f, viewportRatio);
-        scrollbar->setHandleSize(viewportRatio);
-    }
-}
-
 std::shared_ptr<Containers> HUD::createSquareContainer(
     float squareSize,
     float sideWidthPercent)
@@ -521,7 +432,6 @@ std::shared_ptr<Containers> HUD::createSideContainer(
             sideWidthPercent,
             sideWidthPercent,
             100.0f - sideWidthPercent - bottomHeightPercent);
-        setupSideScrollbar(sideContainer);
     }
 
     return sideContainer;
@@ -656,42 +566,3 @@ void HUD::updateElementPositions(
         }
     }
 }
-
-void HUD::setupSideScrollbar(std::shared_ptr<Containers> container)
-{
-    container->addScrollBarPercent(
-        "side_scrollbar",
-        92.0f, 0.0f,
-        100.0f, 2.0f,
-        ScrollBarOrientation::VERTICAL,
-        [container, this](float value) {
-            static std::unordered_map<std::string, float> initialYPositions;
-            static float lastContainerHeight = 0;
-            Rectangle containerBounds = container->getBounds();
-            float containerHeight = containerBounds.height;
-
-            bool positionsNeedUpdate = lastContainerHeight != containerHeight;
-
-            if (positionsNeedUpdate || initialYPositions.empty())
-                this->recordElementPositions(
-                    container,
-                    initialYPositions,
-                    lastContainerHeight);
-
-            auto [contentHeight, teamCount] = this->calculateContentMetrics(
-                container,
-                initialYPositions);
-
-            float scrollableDistance = contentHeight - containerHeight;
-            if (scrollableDistance <= 0.01f)
-                return;
-
-            float scrollFactor = 1.0f + (teamCount / 20.0f);
-            float offset = -value * scrollableDistance * scrollFactor;
-
-            this->updateElementPositions(container, initialYPositions, offset);
-        }
-    );
-}
-
-
