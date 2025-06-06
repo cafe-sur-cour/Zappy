@@ -78,7 +78,7 @@ int start_protocol(zappy_t *server);
 /* client.c */
 bool process_new_client(const char *team_name, int fd, zappy_t *server);
 team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server);
-
+int get_next_free_id(zappy_t *server);
 /* init_map.c */
 void init_game(zappy_t *server);
 

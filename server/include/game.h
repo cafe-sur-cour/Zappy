@@ -13,10 +13,10 @@
 
 /* Definition of the directions */
 typedef enum direction_e {
-    NORTH,
-    EAST,
-    SOUTH,
-    WEST
+    NORTH = 1,
+    EAST = 2,
+    SOUTH = 3,
+    WEST = 4
 } direction_t;
 
 /* definintion od the different element on the map */

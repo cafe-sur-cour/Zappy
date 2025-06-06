@@ -23,9 +23,6 @@ static void diplay_help(int port)
     printf("\033[1;29mServer listening on port: %d\033[0m\n\n", port);
 }
 
-/* Loop thru the player to see connection updates */
-// static void check_player(zappy_t *zappy)
-
 /* Loop thrue egg list to see updtes */
 static void check_eggs_status(zappy_t *zappy)
 {
@@ -36,10 +33,14 @@ static void check_eggs_status(zappy_t *zappy)
     current = zappy->game->map->currentEggs;
     while (current != NULL) {
         if (current->isHatched == true) {
+            send_egg_connect(zappy, current);
             send_egg_death(zappy, current);
             current = kil_egg_node(&zappy->game->map->currentEggs,
                 current->id);
+            send_entire_egg_list(zappy);
         }
+        if (current == NULL)
+            return;
         current = current->next;
     }
 }
@@ -56,6 +57,7 @@ static bool send_gui_message(zappy_t *zappy, bool tmp)
         tmp = true;
     }
     check_eggs_status(zappy);
+    check_player_status(zappy);
     return tmp;
 }
 

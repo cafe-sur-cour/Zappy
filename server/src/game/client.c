@@ -113,7 +113,7 @@ static player_t *init_player(int fd, zappy_t *zappy)
         return NULL;
     player->network->fd = fd;
     player->level = 1;
-    player->direction = rand() % 4;
+    player->direction = (direction_t)(rand() % 4 + 1);
     player->inventory = init_inventory();
     if (!player->inventory)
         return free_player(player);
@@ -132,7 +132,7 @@ static int check_team_capacity(zappy_t *server, const char *team_name,
             server->game->teams->players = new_player;
             server->game->teams->nbPlayers++;
             server->game->teams->nbPlayerAlive++;
-            new_player->id = server->game->teams->nbPlayers;
+            new_player->id = -1;
             return server->params->nb_client - server->game->teams->nbPlayers;
         }
         server->game->teams = server->game->teams->next;
