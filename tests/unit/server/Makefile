@@ -27,6 +27,7 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/messages.c					\
 				../../../server/src/checkers.c					\
 				../../../server/src/server.c					\
+				../../../server/src/game/player.c					\
 				../../../server/src/protocol.c					\
 				../../../server/src/game/client.c					\
 				../../../server/src/accept.c					\

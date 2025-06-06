@@ -12,13 +12,14 @@
 #include <string.h>
 
 /* This sub-function check the current id agains the other */
-static void loop_thru_players(player_t *current_player, int *highest_id)
+static int loop_thru_players(player_t *current_player, int highest_id)
 {
     while (current_player != NULL) {
         if (current_player->id > highest_id)
             highest_id = current_player->id;
         current_player = current_player->next;
     }
+    return highest_id;
 }
 
 /* This function returns the highest free id for a player */
@@ -30,7 +31,7 @@ int get_next_free_id(zappy_t *server)
 
     while (current_team != NULL) {
         current_player = current_team->players;
-        loop_thru_players(current_player, &highest_id);
+        highest_id = loop_thru_players(current_player, highest_id);
         current_team = current_team->next;
     }
     return highest_id + 1;

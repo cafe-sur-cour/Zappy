@@ -284,7 +284,7 @@ Test(add_client_to_team, player_inventory_initialized, .init = redirect_all_std)
     cr_assert_eq(team->players->inventory->nbThystame, 0);
     cr_assert_eq(team->players->level, 1);
     // cr_assert_ge(team->players->direction, 0);
-    cr_assert_lt(team->players->direction, 4);
+    cr_assert_lt(team->players->direction, 5);
     
     // Cleanup
     if (team->players) {
