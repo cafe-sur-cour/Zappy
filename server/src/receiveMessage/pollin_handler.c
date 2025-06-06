@@ -62,9 +62,13 @@ static int calculate_poll_timeout(player_t *player)
 /* This function "polls" the message and the queue it */
 static void poll_player_input(player_t *player, zappy_t *zappy)
 {
-    int timeout = calculate_poll_timeout(player);
-    char *message = get_message(player->network->fd, timeout);
+    int timeout = 0;
+    char *message = NULL;
 
+    if (!player || !player->network || player->network->fd < 0)
+        return;
+    timeout = calculate_poll_timeout(player);
+    message = get_message(player->network->fd, timeout);
     if (message) {
         queue_action(player, message, zappy);
         free(message);
@@ -74,9 +78,12 @@ static void poll_player_input(player_t *player, zappy_t *zappy)
 /* This functions loops thrue all player in all team to handle cmd */
 void smart_poll_players(zappy_t *zappy)
 {
-    team_t *team = zappy->game->teams;
+    team_t *team = NULL;
     player_t *player = NULL;
 
+    if (!zappy || !zappy->game || !zappy->game->teams)
+        return;
+    team = zappy->game->teams;
     while (team) {
         player = team->players;
         while (player) {
