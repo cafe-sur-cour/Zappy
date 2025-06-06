@@ -8,7 +8,6 @@
 #include <cmath>
 #include <memory>
 #include <iostream>
-#include <algorithm>
 #include "GUI.hpp"
 #include "../Utils/Constants.hpp"
 
@@ -38,6 +37,8 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     };
     _cameraManager->setMapCenter(mapCenter);
     _cameraManager->setMapSize(mapSize.first, mapSize.second);
+
+    initModels();
 }
 
 GUI::~GUI()
@@ -240,4 +241,11 @@ void GUI::switchToPreviousPlayer()
     if (prevPlayerId == -1)
         prevPlayerId = players.back().number;
     _cameraManager->setPlayerId(prevPlayerId);
+}
+
+void GUI::initModels()
+{
+    if (!_raylib->loadModel("player", "gui/assets/models/fallguys.glb", {0.0f, 0.0f, 2.5f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load player model."
+                  << colors::RESET << std::endl;
 }
