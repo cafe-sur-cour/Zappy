@@ -123,6 +123,9 @@ namespace zappy::structs {
 namespace zappy::gui {
 
     inline const std::string WINDOW_TITLE = "Zappy GUI";
+    inline const int FPS = 120;
+    inline const float CAMERA_SPEED = 7.5f;
+    inline const float CAMERA_SENSITIVITY = 0.001f;
 
     enum class CameraMode {
         FREE = 0,

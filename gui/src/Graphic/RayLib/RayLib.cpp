@@ -12,6 +12,7 @@
 #include <string>
 #include <cmath>
 #include <vector>
+#include "../../Utils/Constants.hpp"
 #include "RayLib.hpp"
 #include "raylib.h"
 #include "raymath.h"
@@ -84,6 +85,21 @@ int RayLib::getMonitorHeight(int monitor) const
 void RayLib::waitTime(float seconds) const
 {
     WaitTime(seconds);
+}
+
+void RayLib::setTargetFPS(int fps) const
+{
+    SetTargetFPS(fps);
+}
+
+int RayLib::getFPS() const
+{
+    return GetFPS();
+}
+
+float RayLib::getFrameTime() const
+{
+    return GetFrameTime();
 }
 
 bool RayLib::isMouseButtonDown(int button) const
@@ -222,8 +238,9 @@ void RayLib::updateCamera(int mode)
 
 void RayLib::updateCameraFreeMode()
 {
-    const float moveSpeed = 0.025f;
-    const float rotationSpeed = 0.001f;
+    float deltaTime = getFrameTime();
+    float moveSpeed = zappy::gui::CAMERA_SPEED * deltaTime;
+    float rotationSpeed = zappy::gui::CAMERA_SENSITIVITY;
 
     Vector3 forward = Vector3Subtract(_camera.target, _camera.position);
     forward = Vector3Normalize(forward);

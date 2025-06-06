@@ -78,6 +78,8 @@ void CameraManager::updateCameraFreeMode()
 
 void CameraManager::updateCameraTargetMode()
 {
+    float deltaTime = _raylib->getFrameTime();
+
     if (_raylib->isMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
         _isDragging = true;
 
@@ -95,7 +97,7 @@ void CameraManager::updateCameraTargetMode()
 
     if (_isDragging) {
         Vector2 mouseDelta = _raylib->getMouseDelta();
-        const float rotationSensitivity = 0.005f;
+        const float rotationSensitivity = zappy::gui::CAMERA_SENSITIVITY;
 
         _targetAngleXZ += mouseDelta.x * rotationSensitivity;
         _targetAngleY -= mouseDelta.y * rotationSensitivity;
@@ -113,7 +115,9 @@ void CameraManager::updateCameraTargetMode()
 
     float wheelMove = _raylib->getMouseWheelMove();
     if (wheelMove != 0) {
-        _targetDistance -= wheelMove * 2.0f;
+        const float baseZoomSpeed = 120.0f;
+        float zoomSpeed = baseZoomSpeed * deltaTime;
+        _targetDistance -= wheelMove * zoomSpeed;
 
         if (_targetDistance < 5.0f) _targetDistance = 5.0f;
         if (_targetDistance > 100.0f) _targetDistance = 100.0f;
@@ -161,12 +165,10 @@ void CameraManager::handlePlayerCameraMouseInput()
 
     if (_isPlayerViewDragging) {
         Vector2 mouseDelta = _raylib->getMouseDelta();
-        const float rotationSensitivity = 0.005f;
+        const float rotationSensitivity = zappy::gui::CAMERA_SENSITIVITY;
 
-        // Modifier uniquement l'angle horizontal (XZ)
         _playerAngleXZ += mouseDelta.x * rotationSensitivity;
 
-        // Recentrer le curseur pour permettre une rotation continue
         int screenCenterX = _raylib->getScreenWidth() / 2;
         int screenCenterY = _raylib->getScreenHeight() / 2;
         _raylib->setMousePosition(screenCenterX, screenCenterY);
