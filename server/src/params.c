@@ -111,8 +111,10 @@ static bool check_all_params(int argc, char **argv, bool is_ok,
     bool freq_error = check_simple_flag(argc, argv, "-f", params);
 
     if (port_error || width_error || height_error ||
-        names_error || client_error || freq_error)
+        names_error || client_error)
         is_ok = false;
+    if (freq_error)
+        params->freq = 100;
     return is_ok;
 }
 
@@ -144,7 +146,7 @@ params_t *check_args(int argc, char **argv)
         error_message("Memory allocation failed for params.");
         return NULL;
     }
-    if (argc < 14) {
+    if (argc < 12) {
         helper();
         return NULL;
     }
