@@ -21,12 +21,15 @@ TESTS 	    =   tests_params.c			\
 				tests_free.c			\
 				tests_guiMessage.c		\
 				tests_client.c			\
-				tests_network.c
+				tests_network.c			\
+				tests_aiMessage.c		\
+				tests_messaggeReception.c
 
 SRC 		=	../../../server/src/params.c					\
 				../../../server/src/messages.c					\
 				../../../server/src/checkers.c					\
 				../../../server/src/server.c					\
+				../../../server/src/game/player.c					\
 				../../../server/src/protocol.c					\
 				../../../server/src/game/client.c					\
 				../../../server/src/accept.c					\
@@ -53,7 +56,13 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/guiMessage/gui_miscellaneous_send.c		\
 				../../../server/src/guiMessage/gui_send_boradcast.c			\
 				../../../server/src/guiMessage/gui_send_death_player.c		\
-				../../../server/src/guiMessage/gui_send_ressource.c
+				../../../server/src/guiMessage/gui_send_ressource.c			\
+				../../../server/src/receiveMessage/action_handler.c			\
+				../../../server/src/receiveMessage/pollin_handler.c			\
+				../../../server/src/receiveMessage/loop_thru_command.c		\
+				../../../server/src/receiveMessage/queu_hanlder.c			\
+				../../../server/src/aiMessage/forward.c
+
 
 INCLUDES 	= 	-I./../../../server/include
 

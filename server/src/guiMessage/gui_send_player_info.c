@@ -25,8 +25,8 @@ void send_player_connect(zappy_t *zappy, player_t *player)
         return;
     }
     snprintf(message, xLenght, "pnw #%d %d %d %d %d %s\n",
-        player->id, player->posX, player->posY, player->level,
-        player->direction, player->team);
+        player->id, player->posX, player->posY, player->direction,
+        player->level, player->team);
     if (zappy->params->is_debug == true) {
         printf("Sending to GUI: %s", message);
     }

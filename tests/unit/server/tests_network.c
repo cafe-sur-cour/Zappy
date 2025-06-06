@@ -163,8 +163,8 @@ Test(get_message, valid_fd_with_data, .init = redirect_all_std)
     
     const char *test_data = "Test message";
     write(test_client_fd, test_data, strlen(test_data));
-    
-    char *result = get_message(test_server_fd);
+
+    char *result = get_message(test_server_fd, 100);
     
     if (result) {
         cr_assert_str_eq(result, test_data);
@@ -176,7 +176,7 @@ Test(get_message, valid_fd_with_data, .init = redirect_all_std)
 
 Test(get_message, invalid_fd, .init = redirect_all_std)
 {
-    char *result = get_message(-1);
+    char *result = get_message(-1, 100);
     
     cr_assert_null(result);
 }
@@ -187,7 +187,7 @@ Test(get_message, no_data_available, .init = redirect_all_std)
     cr_expect_neq(test_server_fd, -1);
     
     // Don't write any data
-    char *result = get_message(test_server_fd);
+    char *result = get_message(test_server_fd, 100);
     
     // Should return NULL or empty string depending on implementation
     if (result) {
@@ -285,7 +285,7 @@ Test(network_integration, message_send_receive, .init = redirect_all_std)
     cr_assert_eq(send_result, 0);
     
     // Receive message
-    char *received = get_message(test_server_fd);
+    char *received = get_message(test_server_fd, 100);
     if (received) {
         cr_assert_str_eq(received, message);
         free(received);

@@ -17,6 +17,8 @@ int advance(int idx)
 /* Here you can add elesm in the buffer */
 void cb_write(buffer_t *cb, char c)
 {
+    if (!cb)
+        return;
     cb->data[cb->head] = c;
     cb->head = advance(cb->head);
     if (cb->full)

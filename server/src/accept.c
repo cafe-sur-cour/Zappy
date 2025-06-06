@@ -19,7 +19,7 @@ static char *check_team_name(zappy_t *zappy, int new_sockfd)
 
     if (write_message(new_sockfd, "WELCOME\n") == -1)
         return NULL;
-    message = get_message(new_sockfd);
+    message = get_message(new_sockfd, 100);
     if (!message) {
         error_message("Failed to read team name message from client.");
         close(new_sockfd);

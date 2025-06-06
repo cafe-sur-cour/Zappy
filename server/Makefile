@@ -24,6 +24,7 @@ SRC 		=	src/params.c					\
 				src/game/client.c				\
 				src/game/game.c					\
 				src/game/init_egg.c				\
+				src/game/player.c				\
 				src/free.c						\
 				src/algo.c						\
 				src/accept.c					\
@@ -39,7 +40,12 @@ SRC 		=	src/params.c					\
 				src/guiMessage/gui_miscellaneous_send.c		\
 				src/guiMessage/gui_send_boradcast.c			\
 				src/guiMessage/gui_send_death_player.c		\
-				src/guiMessage/gui_send_ressource.c
+				src/guiMessage/gui_send_ressource.c			\
+				src/receiveMessage/action_handler.c			\
+				src/receiveMessage/pollin_handler.c			\
+				src/receiveMessage/loop_thru_command.c		\
+				src/receiveMessage/queu_hanlder.c			\
+				src/aiMessage/forward.c
 
 OBJ 		= 	$(SRC:.c=.o)
 

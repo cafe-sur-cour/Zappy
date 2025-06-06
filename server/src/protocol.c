@@ -23,9 +23,6 @@ static void diplay_help(int port)
     printf("\033[1;29mServer listening on port: %d\033[0m\n\n", port);
 }
 
-/* Loop thru the player to see connection updates */
-// static void check_player(zappy_t *zappy)
-
 /* Loop thrue egg list to see updtes */
 static void check_eggs_status(zappy_t *zappy)
 {
@@ -36,10 +33,14 @@ static void check_eggs_status(zappy_t *zappy)
     current = zappy->game->map->currentEggs;
     while (current != NULL) {
         if (current->isHatched == true) {
+            send_egg_connect(zappy, current);
             send_egg_death(zappy, current);
             current = kil_egg_node(&zappy->game->map->currentEggs,
                 current->id);
+            send_entire_egg_list(zappy);
         }
+        if (current == NULL)
+            return;
         current = current->next;
     }
 }
@@ -56,17 +57,20 @@ static bool send_gui_message(zappy_t *zappy, bool tmp)
         tmp = true;
     }
     check_eggs_status(zappy);
+    check_player_status(zappy);
     return tmp;
 }
 
 int start_protocol(zappy_t *zappy)
 {
     bool temp = false;
+    int game_tick = 0;
+    int tick_duration_ms = 1000 / zappy->params->freq;
 
     setup_signal();
     diplay_help(zappy->params->port);
     while (*get_running_state()) {
-        if (poll(&zappy->network->pollserver, 1, 100) == -1
+        if (poll(&zappy->network->pollserver, 1, tick_duration_ms) == -1
             && *get_running_state()) {
             error_message("Poll failed.");
             return -1;
@@ -74,6 +78,8 @@ int start_protocol(zappy_t *zappy)
         if (zappy->network->pollserver.revents & POLLIN)
             accept_client(zappy);
         temp = send_gui_message(zappy, temp);
+        smart_poll_players(zappy);
+        game_tick++;
     }
     printf("\033[1;33mServer stopped.\033[0m\n");
     return 0;
