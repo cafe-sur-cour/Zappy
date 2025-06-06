@@ -152,6 +152,12 @@ static team_t *add_client_team_rest(zappy_t *server, team_t *save,
         free_player(new_player);
         return NULL;
     }
+    new_player->team = strdup(team_name);
+    if (!new_player->team) {
+        error_message("Failed to allocate memory for player team name.");
+        free_player(new_player);
+        return NULL;
+    }
     return server->game->teams;
 }
 

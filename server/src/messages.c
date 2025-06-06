@@ -25,8 +25,8 @@ void error_message(char const *message)
 {
     time_t now = time(NULL);
     struct tm *tm_info = localtime(&now);
-
     char time_str[26];
+
     strftime(time_str, 26, "%Y-%m-%d %H:%M:%S", tm_info);
     printf("\033[0;31m%s\033[0m\t\033[1;31m%s\033[0m\n", time_str, message);
 }

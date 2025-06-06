@@ -21,31 +21,39 @@ class App:
         self.port = config["port"]
         self.name = config["name"]
         self.ip = config["machine"]
-        self.childs = []
+        self.childs: list[int] = []
 
-    def forkProg(self):
-        pid = os.fork()
-
-        if (pid < 0):
-            return FAILURE
-
-        if (pid > 0):
-            self.childs.append(pid)
-
-        if (pid == 0):
-            player = Player(self.name, self.ip, self.port)
+    def __del__(self):
+        for pid in self.childs:
             try:
-                slots, x, y = player.communication.connectToServer()
-                if (slots > 0):
-                    self.forkProg()
-                player.setMapSize(x, y)
+                os.waitpid(pid, os.WNOHANG)
+            except ChildProcessError:
+                pass
+
+    def create_new_player(self) -> int:
+        pid: int = os.fork()
+        if pid < 0:
+            return -1
+        if pid == 0:
+            try:
+                p = Player(self.name, self.ip, self.port)
+                _, x, y = p.communication.connectToServer()
+                p.setMapSize(x, y)
+                p.startComThread()
+                p.loop()
             except CommunicationException:
                 exit(FAILURE)
-            player.loop()
-
-        return SUCCESS
+            exit(SUCCESS)
+        return pid
 
     def run(self):
-        result = self.forkProg()
-        # TODO: Maybe handle the childs in another methode
-        return result
+        print(f"Starting Zappy AI for team: {self.name}...")
+        player = Player(self.name, self.ip, self.port)
+        slots, x, y = player.communication.connectToServer()
+        player.setMapSize(x, y)
+        for _ in range(slots):
+            self.childs.append(self.create_new_player())
+        player.startComThread()
+        player.loop()
+        print(f"Zappy AI for team {self.name} has finished running.")
+        return SUCCESS
