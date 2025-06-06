@@ -182,6 +182,149 @@ class HUD {
         void updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos);
 
     private:
+        /**
+         * @brief Create the square container in the top-left corner
+         *
+         * @param squareSize Size of the square
+         * @param sideWidthPercent Width as percentage of screen width
+         *
+         * @return std::shared_ptr<Containers> The created container
+         */
+        std::shared_ptr<Containers> createSquareContainer(float squareSize, float sideWidthPercent);
+
+        /**
+         * @brief Create the side container for team information
+         *
+         * @param sideYStart Y coordinate start position
+         * @param sideWidth Width of the side container
+         * @param sideHeight Height of the side container
+         * @param sideWidthPercent Width as percentage of screen width
+         * @param bottomHeightPercent Height of bottom as percentage of screen height
+         *
+         * @return std::shared_ptr<Containers> The created container
+         */
+        std::shared_ptr<Containers> createSideContainer(
+            float sideYStart,
+            float sideWidth,
+            float sideHeight,
+            float sideWidthPercent,
+            float bottomHeightPercent);
+
+        /**
+         * @brief Create the bottom container
+         *
+         * @param screenWidth Width of the screen
+         * @param screenHeight Height of the screen
+         * @param bottomHeight Height of the bottom container
+         * @param bottomHeightPercent Height as percentage of screen height
+         *
+         * @return std::shared_ptr<Containers> The created container
+         */
+        std::shared_ptr<Containers> createBottomContainer(
+            int screenWidth,
+            int screenHeight,
+            float bottomHeight,
+            float bottomHeightPercent);
+
+        /**
+         * @brief Setup the scrollbar for the side container
+         *
+         * @param container The container to add scrollbar to
+         */
+        void setupSideScrollbar(std::shared_ptr<Containers> container);
+
+        /**
+         * @brief Record element positions for scrolling
+         *
+         * @param container The container with elements
+         * @param initialYPositions Map to store initial positions
+         * @param lastContainerHeight Last container height for comparison
+         */
+        void recordElementPositions(
+            std::shared_ptr<Containers> container,
+            std::unordered_map<std::string, float>& initialYPositions,
+            float& lastContainerHeight);
+
+        /**
+         * @brief Update elements positions based on scroll value
+         *
+         * @param container The container with elements
+         * @param initialYPositions Map with initial positions
+         * @param offset Scroll offset to apply
+         */
+        void updateElementPositions(
+            std::shared_ptr<Containers> container,
+            const std::unordered_map<std::string, float>& initialYPositions,
+            float offset);
+
+        /**
+         * @brief Calculate content height and scroll distance
+         *
+         * @param container The container
+         * @param initialYPositions Map with initial positions
+         *
+         * @return std::pair<float, float> First: content height, Second: team count
+         */
+        std::pair<float, float> calculateContentMetrics(
+            std::shared_ptr<Containers> container,
+            const std::unordered_map<std::string, float>& initialYPositions);
+
+        /**
+         * @brief Clear all team display elements from the container
+         *
+         * @param container Container to clear elements from
+         */
+        void clearTeamDisplayElements(std::shared_ptr<Containers> container);
+
+        /**
+         * @brief Get player numbers for a specific team
+         *
+         * @param teamName Team name to filter players
+         * @param players List of all players
+         *
+         * @return std::vector<int> List of player numbers belonging to the team
+         */
+        std::vector<int> getTeamPlayerNumbers(const std::string& teamName, const std::vector<zappy::structs::Player>& players);
+
+        /**
+         * @brief Create player list text representation
+         *
+         * @param playerNumbers List of player numbers
+         *
+         * @return std::string Formatted string representation of players
+         */
+        std::string createPlayerListText(const std::vector<int>& playerNumbers);
+
+        /**
+         * @brief Add player list text to the container
+         *
+         * @param container Container to add text to
+         * @param teamId Team identifier
+         * @param yPos Y position percentage
+         * @param playerNumbers List of player numbers
+         */
+        void addPlayerListText(std::shared_ptr<Containers> container, const std::string& teamId,
+                             float yPos, const std::vector<int>& playerNumbers);
+
+        /**
+         * @brief Configure scrollbar based on team count
+         *
+         * @param scrollbar Scrollbar to configure
+         * @param numTeams Number of teams
+         */
+        void configureScrollbar(std::shared_ptr<ScrollBar> scrollbar, float numTeams);
+
+        /**
+         * @brief Update scrollbar configuration based on content
+         *
+         * @param scrollbar Scrollbar to update
+         * @param yPos Current y position of content
+         * @param maxTeams Number of teams
+         * @param sideContainer Container reference
+         */
+        void updateScrollbarConfiguration(std::shared_ptr<ScrollBar> scrollbar, float yPos,
+                                        float maxTeams, std::shared_ptr<Containers> sideContainer);
+
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<RayLib> _raylib;
         std::shared_ptr<GameInfos> _gameInfos;
