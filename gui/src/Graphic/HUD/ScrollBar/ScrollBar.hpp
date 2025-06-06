@@ -131,6 +131,7 @@ class ScrollBar : public AUIElement {
         Color _handlePressedColor;
 
         bool _isHandleHovered;
+
         /**
          * @brief Calculate the bounds of the handle
          *
