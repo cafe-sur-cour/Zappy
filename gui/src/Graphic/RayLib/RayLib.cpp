@@ -458,9 +458,12 @@ void RayLib::drawModelEx(const std::string& id, Vector3 position, Vector3 rotati
             it->second.center.z * scale.z
         };
 
-        rotatedCenter.x = center.x * rotation.m0 + center.y * rotation.m4 + center.z * rotation.m8;
-        rotatedCenter.y = center.x * rotation.m1 + center.y * rotation.m5 + center.z * rotation.m9;
-        rotatedCenter.z = center.x * rotation.m2 + center.y * rotation.m6 + center.z * rotation.m10;
+        rotatedCenter.x = center.x * rotation.m0 + center.y *
+            rotation.m4 + center.z * rotation.m8;
+        rotatedCenter.y = center.x * rotation.m1 + center.y *
+            rotation.m5 + center.z * rotation.m9;
+        rotatedCenter.z = center.x * rotation.m2 + center.y *
+            rotation.m6 + center.z * rotation.m10;
 
         Vector3 finalPosition = {
             position.x - rotatedCenter.x,
@@ -498,9 +501,12 @@ void RayLib::drawModelWiresEx(const std::string& id, Vector3 position, Vector3 r
             it->second.center.z * scale.z
         };
 
-        rotatedCenter.x = center.x * rotation.m0 + center.y * rotation.m4 + center.z * rotation.m8;
-        rotatedCenter.y = center.x * rotation.m1 + center.y * rotation.m5 + center.z * rotation.m9;
-        rotatedCenter.z = center.x * rotation.m2 + center.y * rotation.m6 + center.z * rotation.m10;
+        rotatedCenter.x = center.x * rotation.m0 + center.y *
+            rotation.m4 + center.z * rotation.m8;
+        rotatedCenter.y = center.x * rotation.m1 + center.y *
+            rotation.m5 + center.z * rotation.m9;
+        rotatedCenter.z = center.x * rotation.m2 + center.y *
+            rotation.m6 + center.z * rotation.m10;
 
         Vector3 finalPosition = {
             position.x - rotatedCenter.x,
@@ -508,7 +514,8 @@ void RayLib::drawModelWiresEx(const std::string& id, Vector3 position, Vector3 r
             position.z - rotatedCenter.z
         };
 
-        DrawModelWiresEx(it->second.model, finalPosition, rotationAxis, rotationAngle, scale, tint);
+        DrawModelWiresEx(it->second.model, finalPosition, rotationAxis,
+            rotationAngle, scale, tint);
     }
 }
 
