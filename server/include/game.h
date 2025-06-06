@@ -14,8 +14,8 @@
 /* Definition of the directions */
 typedef enum direction_e {
     NORTH,
-    SOUTH,
     EAST,
+    SOUTH,
     WEST
 } direction_t;
 
@@ -37,6 +37,7 @@ typedef struct egg_s {
     int posY;
     char *teamName;  /* Name of the team that laid it */
     int idLayer;  /* Id of the player that layed it */
+    bool isHatched;
     struct egg_s *next;
 } egg_t;
 
@@ -67,6 +68,7 @@ typedef struct player_s {
     int posY;
     direction_t direction;
     inventory_t *inventory;
+    char *team;
     struct player_s *next;
 } player_t;
 

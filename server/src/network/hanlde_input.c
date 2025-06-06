@@ -9,25 +9,37 @@
 
 #include <unistd.h>
 #include <poll.h>
+#include <stdlib.h>
+
+static char *end_message(buffer_t *cb)
+{
+    int i = cb->tail;
+    char *message = malloc(sizeof(char) * (cb->head - cb->tail));
+
+    for (; i < cb->head - 1; i++)
+        message[i - cb->tail] = cb->data[i];
+    message[i - cb->tail] = '\0';
+    return message;
+}
 
 char *get_message(int fd)
 {
-    static buffer_t cb = {0};
+    static buffer_t cb = {.head = 0, .tail = 0, .full = 0};
     char c = 0;
     struct pollfd pollfd = {.fd = fd, .events = POLLIN};
 
+    cb.tail = cb.head;
     while (1) {
-        if (poll(&pollfd, 1, 100) == -1)
+        if (poll(&pollfd, 1, 1000) == -1)
             return NULL;
         if (!(pollfd.revents & POLLIN))
             return NULL;
         if (read(fd, &c, 1) <= 0)
             return NULL;
+        cb_write(&cb, c);
         if (c == '\n') {
-            cb_write(&cb, '\0');
             break;
         }
-        cb_write(&cb, c);
     }
-    return cb.data;
+    return end_message(&cb);
 }

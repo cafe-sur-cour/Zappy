@@ -79,8 +79,28 @@ static player_t *malloc_player(player_t *player)
     return player;
 }
 
+/* This loops thrue the eggs list to atribute a pos to the player */
+static player_t *set_player_pos(player_t *player, zappy_t *zappy)
+{
+    egg_t *current_egg = NULL;
+
+    if (zappy->game->map->currentEggs == NULL)
+        return player;
+    current_egg = zappy->game->map->currentEggs;
+    while (current_egg != NULL){
+        if (current_egg->isHatched == false) {
+            player->posX = current_egg->posX;
+            player->posY = current_egg->posY;
+            current_egg->isHatched = true;
+            break;
+        }
+        current_egg = current_egg->next;
+    }
+    return player;
+}
+
 /* This function initialize the current player structure */
-static player_t *init_player(int fd, tiles_t tile)
+static player_t *init_player(int fd, zappy_t *zappy)
 {
     player_t *player = malloc(sizeof(player_t));
 
@@ -93,12 +113,11 @@ static player_t *init_player(int fd, tiles_t tile)
         return NULL;
     player->network->fd = fd;
     player->level = 1;
-    player->posX = tile.x;
-    player->posY = tile.y;
     player->direction = rand() % 4;
     player->inventory = init_inventory();
     if (!player->inventory)
         return free_player(player);
+    player = set_player_pos(player, zappy);
     return player;
 }
 
@@ -133,25 +152,28 @@ static team_t *add_client_team_rest(zappy_t *server, team_t *save,
         free_player(new_player);
         return NULL;
     }
+    new_player->team = strdup(team_name);
+    if (!new_player->team) {
+        error_message("Failed to allocate memory for player team name.");
+        free_player(new_player);
+        return NULL;
+    }
     return server->game->teams;
 }
 
-/* This funcion adds one player to on of the team strcuturue */
 team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server)
 {
-    tiles_t *tiles = shuffle_fisher(server->game->map->width,
-        server->game->map->height);
-    player_t *new_player = init_player(fd, tiles[0]);
+    player_t *new_player = init_player(fd, server);
     team_t *save = server->game->teams;
     team_t *result = NULL;
 
-    free(tiles);
     if (!new_player) {
         close(fd);
         return NULL;
     }
-    if (add_client_team_rest(server, save, team_name, new_player) == NULL)
+    if (!add_client_team_rest(server, save, team_name, new_player)) {
         return NULL;
+    }
     result = server->game->teams;
     server->game->teams = save;
     return result;

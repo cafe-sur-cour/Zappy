@@ -12,15 +12,21 @@
 #include "zappy.h"
 #include "algo.h"
 
+static void redirect_all_std(void)
+{
+    cr_redirect_stdout();
+    cr_redirect_stderr();
+}
+
 // Test free_params with NULL
-Test(free_params, test_null_params)
+Test(free_params, test_null_params, .init = redirect_all_std)
 {
     void *result = free_params(NULL);
     cr_assert_null(result);
 }
 
 // Test free_params with valid params but no teams
-Test(free_params, test_params_no_teams)
+Test(free_params, test_params_no_teams, .init = redirect_all_std)
 {
     params_t *params = malloc(sizeof(params_t));
     params->teams = NULL;
@@ -31,7 +37,7 @@ Test(free_params, test_params_no_teams)
 }
 
 // Test free_params with valid params and teams
-Test(free_params, test_params_with_teams)
+Test(free_params, test_params_with_teams, .init = redirect_all_std)
 {
     params_t *params = malloc(sizeof(params_t));
     params->nb_team = 2;
@@ -44,218 +50,13 @@ Test(free_params, test_params_with_teams)
 }
 
 // Test free_server with NULL
-Test(free_server, test_null_server)
+Test(free_server, test_null_server, .init = redirect_all_std)
 {
     void *result = free_zappy(NULL);
     cr_assert_null(result);
 }
 
-// // Test free_server with minimal server
-// Test(free_server, test_minimal_server)
-// {
-//     zappy_t *server = malloc(sizeof(zappy_t));
-//     memset(server, 0, sizeof(zappy_t));
-//     server->params = NULL;
-//     server->game = NULL;
-//     server->network = NULL;
-//     server->graph = NULL;
-
-//     void *result = free_zappy(server);
-//     cr_assert_null(result);
-// }
-
-// // Test free_server with valid socket
-// Test(free_server, test_server_with_socket)
-// {
-//     zappy_t *server = malloc(sizeof(zappy_t));
-//     memset(server, 0, sizeof(zappy_t));
-//     server->params = NULL;
-//     server->game = NULL;
-//     server->network = NULL;
-//     server->graph = NULL;
-    
-//     void *result = free_zappy(server);
-//     cr_assert_null(result);
-// }
-
-// Test free_server with all components
-// Test(free_server, test_complete_server)
-// {
-//     zappy_t *server = malloc(sizeof(zappy_t));
-//     memset(server, 0, sizeof(zappy_t));
-    
-//     // Create params
-//     server->params = malloc(sizeof(params_t));
-//     memset(server->params, 0, sizeof(params_t));
-//     server->params->teams = NULL;
-//     server->params->nb_team = 0;
-    
-//     // Create game
-//     server->game = malloc(sizeof(game_t));
-//     memset(server->game, 0, sizeof(game_t));
-//     server->game->teams = NULL;
-//     server->game->map = malloc(sizeof(map_t));
-
-//     server->network = NULL;
-//     server->graph = NULL;
-
-
-//     void *result = free_zappy(server);
-//     cr_assert_null(result);
-// }
-
-// // Test game with teams
-// Test(free_server, test_server_with_teams)
-// {
-//     zappy_t *server = malloc(sizeof(zappy_t));
-//     memset(server, 0, sizeof(zappy_t));
-//     server->params = NULL;
-//     server->network = NULL;
-//     server->graph = NULL;
-    
-//     // Create game with teams
-//     server->game = malloc(sizeof(game_t));
-//     memset(server->game, 0, sizeof(game_t));
-//     server->game->map = NULL;
-
-//     server->game->teams = malloc(sizeof(team_t));
-//     memset(server->game->teams, 0, sizeof(team_t));
-//     server->game->teams->name = strdup("test_team");
-//     server->game->teams->players = NULL;
-//     server->game->teams->next = NULL;
-    
-//     void *result = free_zappy(server);
-//     cr_assert_null(result);
-// }
-
-// Test game with players
-// Test(free_server, test_server_with_players)
-// {
-//     zappy_t *server = malloc(sizeof(zappy_t));
-//     memset(server, 0, sizeof(zappy_t));
-//     server->params = NULL;
-//     server->network = NULL;
-//     server->graph = NULL;
-    
-//     // Create game with teams and players
-//     server->game = malloc(sizeof(game_t));
-//     memset(server->game, 0, sizeof(game_t));
-//     server->game->map = NULL;
-
-//     server->game->teams = malloc(sizeof(team_t));
-//     memset(server->game->teams, 0, sizeof(team_t));
-//     server->game->teams->name = strdup("test_team");
-//     server->game->teams->next = NULL;
-    
-//     // Create player
-//     server->game->teams->players = malloc(sizeof(player_t));
-//     memset(server->game->teams->players, 0, sizeof(player_t));
-//     server->game->teams->players->inventory = malloc(sizeof(inventory_t));
-//     memset(server->game->teams->players->inventory, 0, sizeof(inventory_t));
-//     server->game->teams->players->network = NULL;
-//     server->game->teams->players->next = NULL;
-    
-//     void *result = free_zappy(server);
-//     cr_assert_null(result);
-// }
-
-// // Test game with ressources
-// Test(free_server, test_server_with_ressources)
-// {
-//     zappy_t *server = malloc(sizeof(zappy_t));
-//     memset(server, 0, sizeof(zappy_t));
-//     server->params = NULL;
-//     server->network = NULL;
-//     server->graph = NULL;
-    
-//     // Create game with ressources
-//     server->game = malloc(sizeof(game_t));
-//     memset(server->game, 0, sizeof(game_t));
-//     server->game->teams = NULL;
-//     server->game->map = NULL;
-    
-//     void *result = free_zappy(server);
-//     cr_assert_null(result);
-// }
-
-// // Test multiple players in chain
-// Test(free_server, test_server_with_multiple_players)
-// {
-//     zappy_t *server = malloc(sizeof(zappy_t));
-//     memset(server, 0, sizeof(zappy_t));
-//     server->params = NULL;
-//     server->network = NULL;
-//     server->graph = NULL;
-    
-//     server->game = malloc(sizeof(game_t));
-//     memset(server->game, 0, sizeof(game_t));
-//     server->game->map = NULL;
-
-//     server->game->teams = malloc(sizeof(team_t));
-//     memset(server->game->teams, 0, sizeof(team_t));
-//     server->game->teams->name = strdup("test_team");
-//     server->game->teams->next = NULL;
-    
-//     // Create multiple players
-//     server->game->teams->players = malloc(sizeof(player_t));
-//     memset(server->game->teams->players, 0, sizeof(player_t));
-//     server->game->teams->players->inventory = NULL;
-//     server->game->teams->players->network = NULL;
-
-//     server->game->teams->players->next = malloc(sizeof(player_t));
-//     memset(server->game->teams->players->next, 0, sizeof(player_t));
-//     server->game->teams->players->next->inventory = malloc(sizeof(inventory_t));
-//     memset(server->game->teams->players->next->inventory, 0, sizeof(inventory_t));
-//     server->game->teams->players->next->network = NULL;
-//     server->game->teams->players->next->next = NULL;
-    
-//     void *result = free_zappy(server);
-//     cr_assert_null(result);
-// }
-
-// // Test multiple teams in chain
-// Test(free_server, test_server_with_multiple_teams)
-// {
-//     zappy_t *server = malloc(sizeof(zappy_t));
-//     memset(server, 0, sizeof(zappy_t));
-//     server->params = NULL;
-//     server->network = NULL;
-//     server->graph = NULL;
-    
-//     server->game = malloc(sizeof(game_t));
-//     memset(server->game, 0, sizeof(game_t));
-//     server->game->map = NULL;
-
-//     // Create multiple teams
-//     server->game->teams = malloc(sizeof(team_t));
-//     memset(server->game->teams, 0, sizeof(team_t));
-//     server->game->teams->name = strdup("team1");
-//     server->game->teams->players = NULL;
-//     server->game->teams->next = malloc(sizeof(team_t));
-//     memset(server->game->teams->next, 0, sizeof(team_t));
-//     server->game->teams->next->name = strdup("team2");
-//     server->game->teams->next->players = NULL;
-//     server->game->teams->next->next = NULL;
-    
-//     void *result = free_zappy(server);
-//     cr_assert_null(result);
-// }
-
-// // Test graph with NULL pollfd
-// Test(free_server, test_server_with_null_pollfd)
-// {
-//     zappy_t *server = malloc(sizeof(zappy_t));
-//     memset(server, 0, sizeof(zappy_t));
-//     server->params = NULL;
-//     server->network = NULL;
-//     server->game = NULL;
-//     server->graph = NULL;
-
-//     void *result = free_zappy(server);
-//     cr_assert_null(result);
-// }
-
-Test(free_functions, free_params_with_teams)
+Test(free_functions, free_params_with_teams, .init = redirect_all_std)
 {
     params_t *params = malloc(sizeof(params_t));
     params->teams = malloc(sizeof(char*) * 3);
@@ -269,14 +70,14 @@ Test(free_functions, free_params_with_teams)
     cr_assert_null(result);
 }
 
-Test(free_functions, free_params_null)
+Test(free_functions, free_params_null, .init = redirect_all_std)
 {
     void *result = free_params(NULL);
     
     cr_assert_null(result);
 }
 
-Test(free_functions, free_player_basic)
+Test(free_functions, free_player_basic, .init = redirect_all_std)
 {
     player_t *player = malloc(sizeof(player_t));
     player->id = 1;
@@ -295,14 +96,14 @@ Test(free_functions, free_player_basic)
     cr_assert_null(result);
 }
 
-Test(free_functions, free_player_null)
+Test(free_functions, free_player_null, .init = redirect_all_std)
 {
     void *result = free_player(NULL);
     
     cr_assert_null(result);
 }
 
-Test(free_functions, free_map_basic)
+Test(free_functions, free_map_basic, .init = redirect_all_std)
 {
     map_t *map = malloc(sizeof(map_t));
     map->width = 3;
@@ -317,24 +118,4 @@ Test(free_functions, free_map_basic)
     // Test passes if no segfault occurs
     cr_assert(true);
 }
-
-// Test(free_functions, free_zappy_complete)
-// {
-//     zappy_t *server = malloc(sizeof(zappy_t));
-//     memset(server, 0, sizeof(zappy_t));
-//     server->params = malloc(sizeof(params_t));
-//     memset(server->params, 0, sizeof(params_t));
-//     server->params->teams = NULL;
-//     server->params->nb_team = 0;
-//     server->game = malloc(sizeof(game_t));
-//     memset(server->game, 0, sizeof(game_t));
-//     server->game->teams = NULL;
-//     server->game->map = NULL;
-//     server->network = NULL;
-//     server->graph = NULL;
-    
-//     void *result = free_zappy(server);
-    
-//     cr_assert_null(result);
-// }
 

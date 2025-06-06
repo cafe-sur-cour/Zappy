@@ -75,7 +75,6 @@ void Map::drawPlayers(int x, int y)
         return;
 
     float cylinderHeight = 0.4f;
-    float cylinderRadius = 0.25f;
 
     for (size_t i = 0; i < playersOnTile.size(); ++i) {
         Vector3 position = {
@@ -85,10 +84,19 @@ void Map::drawPlayers(int x, int y)
         };
 
         Color teamColor = getTeamColor(playersOnTile[i]->teamName);
-        _raylib->drawCylinder(position, cylinderRadius, cylinderRadius,
-                             cylinderHeight, 12, teamColor);
-        _raylib->drawCylinderWires(position, cylinderRadius, cylinderRadius,
-                                  cylinderHeight, 12, BLACK);
+        float rotationAngle = 0.0f;
+        int direction = playersOnTile[i]->orientation - 1;
+
+        if (direction < 0) direction = 0;
+        switch (direction) {
+            case 0: rotationAngle = 180.0f; break;
+            case 1: rotationAngle = 90.0f; break;
+            case 2: rotationAngle = 0.0f; break;
+            case 3: rotationAngle = 270.0f; break;
+        }
+
+        _raylib->drawModelEx("player", position, {0.0f, 1.0f, 0.0f},
+            rotationAngle, {0.5f, 0.5f, 0.5f}, teamColor);
         drawOrientationArrow(position, playersOnTile[i]->orientation,
             cylinderHeight);
     }
