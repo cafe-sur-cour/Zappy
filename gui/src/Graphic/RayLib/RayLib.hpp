@@ -29,6 +29,9 @@ class RayLib {
         int getMonitorWidth(int monitor) const;
         int getMonitorHeight(int monitor) const;
         void waitTime(float seconds) const;
+        void setTargetFPS(int fps) const;
+        int getFPS() const;
+        float getFrameTime() const;
 
         // Collision methods
         bool checkCollisionPointRec(Vector2 point, Rectangle rec) const;
