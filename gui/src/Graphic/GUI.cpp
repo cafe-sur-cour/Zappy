@@ -245,5 +245,7 @@ void GUI::switchToPreviousPlayer()
 
 void GUI::initModels()
 {
-    _raylib->loadModel("player", "gui/assets/models/fallguys.glb", {0.0f, 0.0f, 2.5f});
+    if (!_raylib->loadModel("player", "gui/assets/models/fallguys.glb", {0.0f, 0.0f, 2.5f}));
+        std::cout << colors::T_RED << "[ERROR] Failed to load player model."
+                  << colors::RESET << std::endl;
 }

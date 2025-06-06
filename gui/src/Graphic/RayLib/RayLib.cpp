@@ -426,6 +426,8 @@ bool RayLib::loadModel(const std::string& id, const std::string& filepath, Vecto
 
     ModelData modelData;
     modelData.model = LoadModel(filepath.c_str());
+    if (!modelData.model.meshCount)
+        return false;
     modelData.center = center;
 
     _models[id] = modelData;
