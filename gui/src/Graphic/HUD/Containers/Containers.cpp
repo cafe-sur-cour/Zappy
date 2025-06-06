@@ -35,6 +35,13 @@ void Containers::draw()
     if (!_visible)
         return;
 
+    _raylib->beginScissorMode(
+        static_cast<int>(_bounds.x),
+        static_cast<int>(_bounds.y),
+        static_cast<int>(_bounds.width),
+        static_cast<int>(_bounds.height)
+    );
+
     if (_hasBackground) {
         if (_hasBackgroundTexture) {
             _raylib->drawTextureRec(_backgroundTexture,
@@ -47,7 +54,18 @@ void Containers::draw()
     }
 
     for (auto& pair : _elements) {
+        if (pair.first.find("scrollbar") != std::string::npos) {
+            continue;
+        }
         pair.second->draw();
+    }
+
+    _raylib->endScissorMode();
+
+    for (auto& pair : _elements) {
+        if (pair.first.find("scrollbar") != std::string::npos) {
+            pair.second->draw();
+        }
     }
 }
 
@@ -93,7 +111,6 @@ bool Containers::addElement(const std::string& id, std::shared_ptr<IUIElement> e
     Rectangle elemBounds = element->getBounds();
 
     auto button = std::dynamic_pointer_cast<Button>(element);
-    auto scrollbar = std::dynamic_pointer_cast<ScrollBar>(element);
     auto text = std::dynamic_pointer_cast<Text>(element);
 
     float xPercent = (elemBounds.x / _bounds.width) * 100.0f;
@@ -103,8 +120,6 @@ bool Containers::addElement(const std::string& id, std::shared_ptr<IUIElement> e
 
     if (button) {
         button->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
-    } else if (scrollbar) {
-        scrollbar->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
     } else if (text) {
         text->setRelativePosition(xPercent, yPercent, 0.0f, heightPercent);
     }
@@ -187,29 +202,6 @@ std::shared_ptr<Text> Containers::addText(
     return nullptr;
 }
 
-std::shared_ptr<ScrollBar> Containers::addScrollBar(
-    const std::string& id,
-    float x, float y,
-    float length, float thickness,
-    ScrollBarOrientation orientation,
-    std::function<void(float)> onValueChanged
-)
-{
-    auto scrollBar = std::make_shared<ScrollBar>(
-        _raylib,
-        x,
-        y,
-        length,
-        thickness,
-        orientation,
-        onValueChanged);
-
-    if (addElement(id, scrollBar))
-        return scrollBar;
-
-    return nullptr;
-}
-
 void Containers::clearElements()
 {
     _elements.clear();
@@ -225,7 +217,6 @@ void Containers::handleResize(int oldWidth, int oldHeight, int newWidth, int new
 
     for (auto& pair : _elements) {
         auto button = std::dynamic_pointer_cast<Button>(pair.second);
-        auto scrollbar = std::dynamic_pointer_cast<ScrollBar>(pair.second);
         auto text = std::dynamic_pointer_cast<Text>(pair.second);
 
         UIRelativePosition elemRelPos;
@@ -233,9 +224,6 @@ void Containers::handleResize(int oldWidth, int oldHeight, int newWidth, int new
 
         if (button) {
             elemRelPos = button->getRelativePosition();
-            hasRelativePos = true;
-        } else if (scrollbar) {
-            elemRelPos = scrollbar->getRelativePosition();
             hasRelativePos = true;
         } else if (text) {
             elemRelPos = text->getRelativePosition();
@@ -252,8 +240,6 @@ void Containers::handleResize(int oldWidth, int oldHeight, int newWidth, int new
 
             if (button) {
                 button->setSize(elemNewWidth, elemNewHeight);
-            } else if (scrollbar) {
-                scrollbar->setSize(elemNewWidth, elemNewHeight);
             } else if (text) {
                 text->setFontSize(elemNewHeight);
             }
@@ -274,8 +260,6 @@ void Containers::handleResize(int oldWidth, int oldHeight, int newWidth, int new
 
             if (button) {
                 button->setSize(elemNewWidth, elemNewHeight);
-            } else if (scrollbar) {
-                scrollbar->setSize(elemNewWidth, elemNewHeight);
             } else if (text) {
                 text->setFontSize(elemNewHeight);
             }
@@ -351,48 +335,6 @@ std::shared_ptr<Text> Containers::addTextPercent(
 
     if (addElement(id, textElement))
         return textElement;
-
-    return nullptr;
-}
-
-std::shared_ptr<ScrollBar> Containers::addScrollBarPercent(
-    const std::string& id,
-    float xPercent, float yPercent,
-    float lengthPercent, float thicknessPercent,
-    ScrollBarOrientation orientation,
-    std::function<void(float)> onValueChanged
-)
-{
-    float x = (_bounds.width * xPercent) / 100.0f;
-    float y = (_bounds.height * yPercent) / 100.0f;
-
-    float length, thickness;
-    if (orientation == ScrollBarOrientation::VERTICAL) {
-        length = (_bounds.height * lengthPercent) / 100.0f;
-        thickness = (_bounds.width * thicknessPercent) / 100.0f;
-    } else {
-        length = (_bounds.width * lengthPercent) / 100.0f;
-        thickness = (_bounds.height * thicknessPercent) / 100.0f;
-    }
-
-    auto scrollBar = std::make_shared<ScrollBar>(
-        _raylib,
-        x,
-        y,
-        length,
-        thickness,
-        orientation,
-        onValueChanged
-    );
-
-    if (orientation == ScrollBarOrientation::VERTICAL) {
-        scrollBar->setRelativePosition(xPercent, yPercent, thicknessPercent, lengthPercent);
-    } else {
-        scrollBar->setRelativePosition(xPercent, yPercent, lengthPercent, thicknessPercent);
-    }
-
-    if (addElement(id, scrollBar))
-        return scrollBar;
 
     return nullptr;
 }

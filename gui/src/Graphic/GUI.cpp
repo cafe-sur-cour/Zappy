@@ -25,7 +25,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _raylib->initCamera();
     _isRunning = _raylib->isWindowReady();
     _map = std::make_unique<Map>(_gameInfos, _raylib);
-    _hud = std::make_unique<HUD>(_raylib);
+    _hud = std::make_unique<HUD>(_raylib, _gameInfos);
 
     _cameraManager = std::make_unique<CameraManager>(_raylib);
     _cameraManager->setGameInfos(_gameInfos);
@@ -38,6 +38,8 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     };
     _cameraManager->setMapCenter(mapCenter);
     _cameraManager->setMapSize(mapSize.first, mapSize.second);
+
+    initModels();
 }
 
 GUI::~GUI()
@@ -74,6 +76,7 @@ void GUI::update()
     }
 
     updateCamera();
+    _hud->updateTeamPlayersDisplay(_gameInfos);
     _hud->update();
 }
 
@@ -240,4 +243,11 @@ void GUI::switchToPreviousPlayer()
     if (prevPlayerId == -1)
         prevPlayerId = players.back().number;
     _cameraManager->setPlayerId(prevPlayerId);
+}
+
+void GUI::initModels()
+{
+    if (!_raylib->loadModel("player", "gui/assets/models/fallguys.glb", {0.0f, 0.0f, 2.5f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load player model."
+                  << colors::RESET << std::endl;
 }

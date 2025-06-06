@@ -50,7 +50,7 @@ class Map {
         static constexpr float FOOD_HEIGHT = 0.3f;
         static constexpr float ROCK_HEIGHT = 0.3f;
         static constexpr float EGG_HEIGHT = 0.3f;
-        static constexpr float PLAYER_HEIGHT = 0.5f;
+        static constexpr float PLAYER_HEIGHT = 1.1f;
 
         void drawOrientationArrow(const Vector3 &position, int orientation, float playerHeight);
 };

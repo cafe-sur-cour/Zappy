@@ -9,6 +9,8 @@
 #define RAYLIB_HPP_
 
 #include <string>
+#include <map>
+#include <memory>
 #include "raylib.h"
 
 class RayLib {
@@ -26,6 +28,7 @@ class RayLib {
         bool isWindowReady() const;
         int getMonitorWidth(int monitor) const;
         int getMonitorHeight(int monitor) const;
+        void waitTime(float seconds) const;
 
         // Collision methods
         bool checkCollisionPointRec(Vector2 point, Rectangle rec) const;
@@ -49,6 +52,10 @@ class RayLib {
         int getScreenWidth() const;
         int getScreenHeight() const;
         float getMouseWheelMove() const;
+
+        // Scissor mode methods for clipping
+        void beginScissorMode(int x, int y, int width, int height);
+        void endScissorMode();
 
         // 3D Environment methods
         void begin3DMode();
@@ -81,6 +88,18 @@ class RayLib {
         void drawPlane(Vector3 position, Vector2 size, Color color);
         void drawLine3D(Vector3 startPos, Vector3 endPos, Color color);
 
+        // 3D Model methods
+        bool loadModel(const std::string& id, const std::string& filepath, Vector3 center = {0.0f, 0.0f, 0.0f});
+        void drawModel(const std::string& id, Vector3 position, float scale, Color tint = WHITE);
+        void drawModelEx(const std::string& id, Vector3 position, Vector3 rotationAxis,
+                         float rotationAngle, Vector3 scale, Color tint = WHITE);
+        void drawModelWires(const std::string& id, Vector3 position, float scale, Color tint = WHITE);
+        void drawModelWiresEx(const std::string& id, Vector3 position, Vector3 rotationAxis,
+                              float rotationAngle, Vector3 scale, Color tint = WHITE);
+        void unloadModel(const std::string& id);
+        void unloadAllModels();
+        bool modelExists(const std::string& id) const;
+
         // 2D Drawing methods
         void drawRectangleRec(Rectangle rec, Color color);
         void drawText(const std::string& text, float x, float y, float fontSize, Color color);
@@ -92,6 +111,14 @@ class RayLib {
         Camera3D _camera;
         Vector2 _previousMousePosition;
         bool _isCursorLocked;
+
+        struct ModelData {
+            Model model;
+            unsigned int animationCount;
+            Vector3 center;
+        };
+
+        std::map<std::string, ModelData> _models;
 };
 
 #endif /* !RAYLIB_HPP_ */

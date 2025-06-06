@@ -41,6 +41,8 @@ class GUI {
         void draw();
         bool playerExists(int playerId) const;
 
+        void initModels();
+
         bool _isRunning;
         std::shared_ptr<RayLib> _raylib;
         std::shared_ptr<GameInfos> _gameInfos;

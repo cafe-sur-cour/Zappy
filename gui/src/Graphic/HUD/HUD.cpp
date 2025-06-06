@@ -8,17 +8,21 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <unordered_map>
+#include <algorithm>
+#include <utility>
 #include "../../Utils/Constants.hpp"
 #include "HUD.hpp"
 
-HUD::HUD(std::shared_ptr<RayLib> raylib)
-    : _containers(), _raylib(raylib)
+HUD::HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos)
+    : _containers(), _raylib(raylib), _gameInfos(gameInfos)
 {
     initDefaultLayout(15.0f, 20.0f);
     initExitButton();
     initSettingsButton();
     initHelpButton();
     initCameraResetButton();
+    initTeamPlayersDisplay(_gameInfos);
 }
 
 HUD::~HUD()
@@ -38,6 +42,7 @@ void HUD::update()
     for (auto& pair : _containers) {
         pair.second->update();
     }
+    updateTeamPlayersDisplay(_gameInfos);
 }
 
 std::shared_ptr<Containers> HUD::addContainer(
@@ -110,41 +115,23 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
     float bottomHeight = (screenHeight * bottomHeightPercent) / 100.0f;
     float squareSize = sideWidth;
 
-    auto squareContainer = addContainer(
-        "square_container",
-        0, 0,
-        squareSize, squareSize,
-        {60, 60, 60, 220}
-    );
+    auto squareContainer = createSquareContainer(squareSize, sideWidthPercent);
 
-    if (squareContainer) {
-        squareContainer->setRelativePosition(0, 0, sideWidthPercent, sideWidthPercent);
-    }
+    float sideYStart = squareSize;
+    float sideHeight = screenHeight - squareSize - bottomHeight;
 
-    auto sideContainer = addContainer(
-        "side_container",
-        0, 0,
-        sideWidth, screenHeight,
-        {40, 40, 40, 200}
-    );
+    auto sideContainer = createSideContainer(
+                            sideYStart,
+                            sideWidth,
+                            sideHeight,
+                            sideWidthPercent,
+                            bottomHeightPercent);
 
-    if (sideContainer) {
-        sideContainer->setRelativePosition(0, 0, sideWidthPercent, 100.0f);
-    }
-
-    auto bottomContainer = addContainer(
-        "bottom_container",
-        0, screenHeight - bottomHeight,
-        screenWidth, bottomHeight,
-        {40, 40, 40, 200}
-    );
-
-    if (bottomContainer) {
-        bottomContainer->setRelativePosition(
-            0,
-            100.0f - bottomHeightPercent,
-            100.0f, bottomHeightPercent);
-    }
+    auto bottomContainer = createBottomContainer(
+                            screenWidth,
+                            screenHeight,
+                            bottomHeight,
+                            bottomHeightPercent);
 }
 
 std::shared_ptr<Containers> HUD::getSideContainer() const
@@ -252,71 +239,330 @@ void HUD::initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
     if (!sideContainer || !gameInfos)
         return;
 
-    for (int i = 0; i < 100; i++) {
-        std::string idBase = "team_display_" + std::to_string(i);
-        sideContainer->removeElement(idBase + "_title");
-
-        for (int j = 0; j < 50; j++) {
-            sideContainer->removeElement(idBase + "_player_" + std::to_string(j));
-        }
-    }
+    clearTeamDisplayElements(sideContainer);
 
     const std::vector<std::string> teams = gameInfos->getTeamNames();
     const std::vector<zappy::structs::Player> players = gameInfos->getPlayers();
 
-    float yPos = 15.0f;
+    float yPos = 5.0f;
 
-    for (size_t i = 0; i < teams.size(); i++) {
+    for (int i = static_cast<int>(teams.size()) - 1; i >= 0; i--) {
         std::string teamId = "team_display_" + std::to_string(i);
         const std::string& teamName = teams[i];
+
+        if (i < static_cast<int>(teams.size()) - 1) {
+            sideContainer->addTextPercent(
+                teamId + "_separator",
+                5.0f,
+                yPos - 0.5f,
+                std::string(90, '-'),
+                1.0f,
+                {120, 120, 120, 150}
+            );
+            yPos += 1.0f;
+        }
 
         sideContainer->addTextPercent(
             teamId + "_title",
             5.0f,
             yPos,
             "TEAM: " + teamName,
-            6.0f,
+            3.5f,
             {255, 255, 255, 255}
         );
 
-        yPos += 8.0f;
-
-        int playerCount = 0;
-        for (const auto& player : players) {
-            if (player.teamName == teamName) {
-                sideContainer->addTextPercent(
-                    teamId + "_player_" + std::to_string(playerCount),
-                    10.0f,
-                    yPos,
-                    "Player " + std::to_string(player.number) +
-                    " (Level " + std::to_string(player.level) + ")",
-                    5.0f,
-                    {200, 200, 200, 255}
-                );
-
-                yPos += 6.0f;
-                playerCount++;
-            }
-        }
-
-        if (playerCount == 0) {
-            sideContainer->addTextPercent(
-                teamId + "_player_0",
-                10.0f,
-                yPos,
-                "No players",
-                5.0f,
-                {150, 150, 150, 255}
-            );
-
-            yPos += 6.0f;
-        }
-
         yPos += 4.0f;
+
+        std::vector<int> teamPlayerNumbers = getTeamPlayerNumbers(teamName, players);
+        addPlayerListText(sideContainer, teamId, yPos, teamPlayerNumbers);
+
+        yPos += 3.0f;
+        yPos += 2.0f;
     }
 }
 
 void HUD::updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
 {
-    initTeamPlayersDisplay(gameInfos);
+    auto sideContainer = getSideContainer();
+    if (!sideContainer || !gameInfos)
+        return;
+
+    static std::vector<std::string> lastTeamNames;
+    const std::vector<std::string> currentTeamNames = gameInfos->getTeamNames();
+
+    if (lastTeamNames != currentTeamNames) {
+        lastTeamNames = currentTeamNames;
+        initTeamPlayersDisplay(gameInfos);
+        return;
+    }
+
+    const std::vector<zappy::structs::Player> players = gameInfos->getPlayers();
+
+    for (int i = static_cast<int>(currentTeamNames.size()) - 1; i >= 0; i--) {
+        std::string teamId = "team_display_" + std::to_string(i);
+        const std::string& teamName = currentTeamNames[i];
+
+        auto titleElem = std::dynamic_pointer_cast<Text>(
+            sideContainer->getElement(teamId + "_title"));
+
+        if (titleElem) {
+            float yPos = titleElem->getBounds().y - sideContainer->getBounds().y;
+            yPos = yPos / sideContainer->getBounds().height * 100.0f;
+            yPos += 4.0f;
+
+            for (int j = 0; j < 50; j++) {
+                sideContainer->removeElement(teamId + "_player_" + std::to_string(j));
+            }
+
+            std::vector<int> teamPlayerNumbers = getTeamPlayerNumbers(teamName, players);
+            addPlayerListText(sideContainer, teamId, yPos, teamPlayerNumbers);
+        }
+    }
+}
+
+void HUD::clearTeamDisplayElements(std::shared_ptr<Containers> container)
+{
+    if (!container)
+        return;
+
+    for (int i = 0; i < 100; i++) {
+        std::string idBase = "team_display_" + std::to_string(i);
+        container->removeElement(idBase + "_title");
+        container->removeElement(idBase + "_separator");
+        container->removeElement(idBase + "_stats");
+
+        for (int j = 0; j < 50; j++) {
+            container->removeElement(idBase + "_player_" + std::to_string(j));
+        }
+    }
+}
+
+std::vector<int> HUD::getTeamPlayerNumbers(
+    const std::string& teamName,
+    const std::vector<zappy::structs::Player>& players)
+{
+    std::vector<int> teamPlayerNumbers;
+    for (const auto& player : players) {
+        if (player.teamName == teamName)
+            teamPlayerNumbers.push_back(player.number);
+    }
+    return teamPlayerNumbers;
+}
+
+std::string HUD::createPlayerListText(const std::vector<int>& playerNumbers)
+{
+    if (playerNumbers.empty())
+        return "No players";
+
+    std::string playerList = "Players: ";
+    for (size_t j = 0; j < playerNumbers.size(); ++j) {
+        playerList += std::to_string(playerNumbers[j]);
+        if (j < playerNumbers.size() - 1)
+            playerList += ", ";
+    }
+    return playerList;
+}
+
+void HUD::addPlayerListText(
+    std::shared_ptr<Containers> container,
+    const std::string& teamId,
+    float yPos,
+    const std::vector<int>& playerNumbers)
+{
+    if (!container)
+        return;
+
+    std::string playerList = createPlayerListText(playerNumbers);
+
+    if (!playerNumbers.empty()) {
+        container->addTextPercent(
+            teamId + "_player_0",
+            10.0f,
+            yPos,
+            playerList,
+            2.2f,
+            {200, 200, 200, 255}
+        );
+    } else {
+        container->addTextPercent(
+            teamId + "_player_0",
+            10.0f,
+            yPos,
+            playerList,
+            2.0f,
+            {150, 150, 150, 200}
+        );
+    }
+}
+
+std::shared_ptr<Containers> HUD::createSquareContainer(
+    float squareSize,
+    float sideWidthPercent)
+{
+    auto squareContainer = addContainer(
+        "square_container",
+        0, 0,
+        squareSize, squareSize,
+        {60, 60, 60, 220}
+    );
+
+    if (squareContainer)
+        squareContainer->setRelativePosition(0, 0, sideWidthPercent, sideWidthPercent);
+
+    return squareContainer;
+}
+
+std::shared_ptr<Containers> HUD::createSideContainer(
+    float sideYStart,
+    float sideWidth,
+    float sideHeight,
+    float sideWidthPercent,
+    float bottomHeightPercent)
+{
+    auto sideContainer = addContainer(
+        "side_container",
+        0, sideYStart,
+        sideWidth, sideHeight,
+        {40, 40, 40, 200}
+    );
+
+    if (sideContainer) {
+        sideContainer->setRelativePosition(
+            0,
+            sideWidthPercent,
+            sideWidthPercent,
+            100.0f - sideWidthPercent - bottomHeightPercent);
+    }
+
+    return sideContainer;
+}
+
+std::shared_ptr<Containers> HUD::createBottomContainer(
+    int screenWidth,
+    int screenHeight,
+    float bottomHeight,
+    float bottomHeightPercent)
+{
+    auto bottomContainer = addContainer(
+        "bottom_container",
+        0, screenHeight - bottomHeight,
+        screenWidth, bottomHeight,
+        {40, 40, 40, 200}
+    );
+
+    if (bottomContainer) {
+        bottomContainer->setRelativePosition(
+            0,
+            100.0f - bottomHeightPercent,
+            100.0f, bottomHeightPercent);
+    }
+
+    return bottomContainer;
+}
+
+void HUD::recordElementPositions(
+    std::shared_ptr<Containers> container,
+    std::unordered_map<std::string, float>& initialYPositions,
+    float& lastContainerHeight)
+{
+    Rectangle containerBounds = container->getBounds();
+    float containerHeight = containerBounds.height;
+
+    initialYPositions.clear();
+    lastContainerHeight = containerHeight;
+
+    for (int i = 0; i < 100; i++) {
+        std::string idBase = "team_display_" + std::to_string(i);
+
+        auto separatorElem = container->getElement(idBase + "_separator");
+        if (separatorElem)
+            initialYPositions[idBase + "_separator"] = separatorElem->getBounds().y;
+
+        auto titleElem = container->getElement(idBase + "_title");
+        if (titleElem) {
+            initialYPositions[idBase + "_title"] = titleElem->getBounds().y;
+
+            auto statsElem = container->getElement(idBase + "_stats");
+            if (statsElem)
+                initialYPositions[idBase + "_stats"] = statsElem->getBounds().y;
+
+            for (int j = 0; j < 50; j++) {
+                std::string playerID = idBase + "_player_" + std::to_string(j);
+                auto playerElem = container->getElement(playerID);
+                if (playerElem)
+                    initialYPositions[playerID] = playerElem->getBounds().y;
+            }
+        }
+    }
+}
+
+std::pair<float, float> HUD::calculateContentMetrics(
+    std::shared_ptr<Containers> container,
+    const std::unordered_map<std::string, float>& initialYPositions)
+{
+    Rectangle containerBounds = container->getBounds();
+    float maxY = containerBounds.y;
+
+    for (const auto& pair : initialYPositions) {
+        auto element = container->getElement(pair.first);
+        if (element) {
+            Rectangle bounds = element->getBounds();
+            float elemBottom = bounds.y + bounds.height;
+            if (elemBottom > maxY) maxY = elemBottom;
+        }
+    }
+
+    float contentHeight = maxY - containerBounds.y;
+    float teamCount = 0;
+
+    for (int i = 0; i < 100; i++) {
+        if (container->getElement("team_display_" + std::to_string(i) + "_title"))
+            teamCount++;
+    }
+
+    float extraSpace = teamCount > 10 ? (teamCount - 10) * 20.0f : 100.0f;
+    contentHeight += extraSpace;
+
+    return {contentHeight, teamCount};
+}
+
+void HUD::updateElementPositions(
+    std::shared_ptr<Containers> container,
+    const std::unordered_map<std::string, float>& initialYPositions,
+    float offset)
+{
+    for (int i = 0; i < 100; i++) {
+        std::string idBase = "team_display_" + std::to_string(i);
+
+        auto separatorElem = container->getElement(idBase + "_separator");
+        if (separatorElem && initialYPositions.find(idBase + "_separator") !=
+            initialYPositions.end()) {
+            float initialY = initialYPositions.at(idBase + "_separator");
+            separatorElem->setPosition(separatorElem->getBounds().x, initialY + offset);
+        }
+
+        auto titleElem = container->getElement(idBase + "_title");
+        if (titleElem && initialYPositions.find(idBase + "_title") !=
+            initialYPositions.end()) {
+            float initialY = initialYPositions.at(idBase + "_title");
+            titleElem->setPosition(titleElem->getBounds().x, initialY + offset);
+
+            auto statsElem = container->getElement(idBase + "_stats");
+            if (statsElem && initialYPositions.find(idBase + "_stats") !=
+                initialYPositions.end()) {
+                float initialStatsY = initialYPositions.at(idBase + "_stats");
+                statsElem->setPosition(statsElem->getBounds().x, initialStatsY + offset);
+            }
+        }
+
+        for (int j = 0; j < 50; j++) {
+            std::string playerID = idBase + "_player_" + std::to_string(j);
+            auto playerElem = container->getElement(playerID);
+            if (playerElem && initialYPositions.find(playerID) !=
+                initialYPositions.end()) {
+                float initialY = initialYPositions.at(playerID);
+                playerElem->setPosition(playerElem->getBounds().x, initialY + offset);
+            }
+        }
+    }
 }
