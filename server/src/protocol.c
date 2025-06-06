@@ -64,11 +64,13 @@ static bool send_gui_message(zappy_t *zappy, bool tmp)
 int start_protocol(zappy_t *zappy)
 {
     bool temp = false;
+    int game_tick = 0;
+    int tick_duration_ms = 1000 / zappy->params->freq;
 
     setup_signal();
     diplay_help(zappy->params->port);
     while (*get_running_state()) {
-        if (poll(&zappy->network->pollserver, 1, 100) == -1
+        if (poll(&zappy->network->pollserver, 1, tick_duration_ms) == -1
             && *get_running_state()) {
             error_message("Poll failed.");
             return -1;
@@ -76,6 +78,8 @@ int start_protocol(zappy_t *zappy)
         if (zappy->network->pollserver.revents & POLLIN)
             accept_client(zappy);
         temp = send_gui_message(zappy, temp);
+        smart_poll_players(zappy);
+        game_tick++;
     }
     printf("\033[1;33mServer stopped.\033[0m\n");
     return 0;

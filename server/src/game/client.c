@@ -56,6 +56,7 @@ static inventory_t *init_inventory(void)
     inventory->nbMendiane = 0;
     inventory->nbPhiras = 0;
     inventory->nbThystame = 0;
+    inventory->nbFood = 10;
     return inventory;
 }
 
@@ -104,10 +105,8 @@ static player_t *init_player(int fd, zappy_t *zappy)
 {
     player_t *player = malloc(sizeof(player_t));
 
-    if (!player) {
-        error_message("Failed to allocate memory for new player.");
+    if (!player)
         return NULL;
-    }
     player = malloc_player(player);
     if (!player)
         return NULL;
@@ -115,6 +114,10 @@ static player_t *init_player(int fd, zappy_t *zappy)
     player->level = 1;
     player->direction = (direction_t)(rand() % 4 + 1);
     player->inventory = init_inventory();
+    player->pending_actions = init_action_queue();
+    player->last_action_time = 0;
+    player->is_busy = false;
+    player->remaining_cooldown = 0;
     if (!player->inventory)
         return free_player(player);
     player = set_player_pos(player, zappy);

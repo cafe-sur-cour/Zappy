@@ -49,6 +49,13 @@ typedef struct command_pf_s {
     bool (*checker)(const char *, const char *, params_t *);
 } command_pf_t;
 
+typedef struct {
+    char *command;
+    int base_time;
+    action_priority_t priority;
+    int (*handler)(player_t *, char *, zappy_t *);
+} command_info_t;
+
 /* messages.c */
 int helper(void);
 void error_message(const char *message);
@@ -130,5 +137,20 @@ egg_t *kil_egg_node(egg_t **head, int egg_id);
 
 /* AI messages */
 int forward_message(player_t *player, params_t *params);
+
+/* Pollin handler */
+void smart_poll_players(zappy_t *zappy);
+void execute_action(player_t *player, action_request_t *action,
+    zappy_t *zappy);
+void queue_action(player_t *player, char *command, zappy_t *zappy);
+int handle_forward(player_t *player, char *command, zappy_t *zappy);
+action_queue_t *init_action_queue(void);
+void free_action_queue(action_queue_t *queue);
+action_request_t *create_action_request(char *command, player_t *player);
+const command_info_t *find_command_info(char *command);
+action_request_t *dequeue_highest_priority_action(action_queue_t *queue);
+void free_action_request(action_request_t *action);
+void insert_action_by_priority(action_queue_t *queue,
+    action_request_t *action);
 
 #endif /* !ZAPPY_H_ */

@@ -23,7 +23,7 @@ void close_fd(int fd);
 /* Accept new connetion */
 int accept_connection(int server_fd);
 /* Handle Message input */
-char *get_message(int fd);
+char *get_message(int fd, int timeout);
 /* Hello */
 int write_message(int fd, const char *message);
 #endif /* !NETWORK_H_ */

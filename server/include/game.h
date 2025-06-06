@@ -7,9 +7,14 @@
 
 #include "buffer.h"
 #include <time.h>
+#include <pthread.h>
 
 #ifndef GAME_H_
     #define GAME_H_
+
+typedef struct action_request_s action_request_t;
+typedef struct action_queue_s action_queue_t;
+typedef struct player_s player_t;
 
 /* Definition of the directions */
 typedef enum direction_e {
@@ -29,6 +34,23 @@ typedef enum crystal_e {
     PHIRAS,
     THYSTAME
 } crystal_t;
+
+
+/* This enum defines the priority of the action in the queue */
+typedef enum action_priority_e {
+    PRIORITY_CRITICAL = 0,
+    PRIORITY_HIGH = 1,
+    PRIORITY_MEDIUM = 2,
+    PRIORITY_LOW = 3
+} action_priority_t;
+
+/* This strucuture allows use to define a 'queue' of the requests */
+typedef struct action_queue_s {
+    action_request_t *head;
+    action_request_t *tail;
+    int count;
+    pthread_mutex_t mutex;
+} action_queue_t;
 
 
 typedef struct egg_s {
@@ -69,8 +91,24 @@ typedef struct player_s {
     direction_t direction;
     inventory_t *inventory;
     char *team;
+    /* New aditions for the smart pollin */
+    action_queue_t *pending_actions;
+    time_t last_action_time;
+    bool is_busy;
+    int remaining_cooldown;
+
     struct player_s *next;
 } player_t;
+
+/* This structure define the request strut */
+typedef struct action_request_s {
+    char *command;
+    time_t timestamp;
+    int time_limit;  // in game ticks (7/f, 42/f, etc.)
+    action_priority_t priority;
+    player_t *player;
+    struct action_request_s *next;
+} action_request_t;
 
 /* Team Strcut */
 typedef struct team_s {

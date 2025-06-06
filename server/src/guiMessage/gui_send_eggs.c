@@ -26,7 +26,8 @@ void send_egg(zappy_t *zappy, egg_t *egg)
     snprintf(message, xLength, "enw #%d #%d %d %d %s\n",
         current->id, current->idLayer, current->posX, current->posY,
         current->teamName);
-    printf("Sending egg: %s", message);
+    if (zappy->params->is_debug == true)
+        printf("Sending egg: %s", message);
     write_message(zappy->graph->fd, message);
     free(message);
 }
