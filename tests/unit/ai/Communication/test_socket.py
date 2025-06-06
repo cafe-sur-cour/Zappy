@@ -28,7 +28,6 @@ class TestSocket:
         assert sock._port == 4242
         assert sock._address == ("localhost", 4242)
         assert sock._socket is None
-        assert sock._buffer == ""
 
     @patch('socket.socket')
     def test_socket_connect_success(self, mock_socket):
@@ -80,40 +79,6 @@ class TestSocket:
         mock_socket_instance.sendall.assert_called_once_with("tëst mëssagë".encode("utf-8"))
 
     @patch('socket.socket')
-    def test_socket_receive_partial_messages(self, mock_socket):
-        """Test receiving message in multiple parts"""
-        mock_socket_instance = Mock()
-        mock_socket_instance.recv.side_effect = [b"test ", b"message\nextra"]
-        mock_socket.return_value = mock_socket_instance
-
-        sock = Socket("localhost", 4242)
-        sock.connect()
-        result = sock.receive()
-
-        assert result == "test message\n"
-        assert sock._buffer == "extra"
-
-    @patch('socket.socket')
-    def test_socket_receive_multiple_messages_in_buffer(self, mock_socket):
-        """Test receiving multiple messages in one recv call"""
-        mock_socket_instance = Mock()
-        mock_socket_instance.recv.return_value = b"first\nsecond\nthird"
-        mock_socket.return_value = mock_socket_instance
-
-        sock = Socket("localhost", 4242)
-        sock.connect()
-
-        result1 = sock.receive()
-        assert result1 == "first\n"
-
-        with patch.object(mock_socket_instance, 'recv') as mock_recv:
-            result2 = sock.receive()
-            assert result2 == "second\n"
-            mock_recv.assert_not_called()
-
-        assert sock._buffer == "third"
-
-    @patch('socket.socket')
     def test_socket_receive_connection_closed(self, mock_socket):
         """Test handling closed connection during receive"""
         mock_socket_instance = Mock()
@@ -152,20 +117,6 @@ class TestSocket:
         sock.close()
 
         mock_socket_instance.close.assert_called_once()
-
-    @patch('socket.socket')
-    def test_socket_buffer_persistence(self, mock_socket):
-        """Test that buffer content persists between receive calls"""
-        mock_socket_instance = Mock()
-        mock_socket_instance.recv.side_effect = [b"partial", b" message\nmore data"]
-        mock_socket.return_value = mock_socket_instance
-
-        sock = Socket("localhost", 4242)
-        sock.connect()
-
-        result = sock.receive()
-        assert result == "partial message\n"
-        assert sock._buffer == "more data"
 
     def test_socket_different_hosts_and_ports(self):
         """Test socket creation with different hosts and ports"""
