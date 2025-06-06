@@ -28,6 +28,7 @@ class RayLib {
         bool isWindowReady() const;
         int getMonitorWidth(int monitor) const;
         int getMonitorHeight(int monitor) const;
+        void waitTime(float seconds) const;
 
         // Collision methods
         bool checkCollisionPointRec(Vector2 point, Rectangle rec) const;
@@ -51,6 +52,10 @@ class RayLib {
         int getScreenWidth() const;
         int getScreenHeight() const;
         float getMouseWheelMove() const;
+
+        // Scissor mode methods for clipping
+        void beginScissorMode(int x, int y, int width, int height);
+        void endScissorMode();
 
         // 3D Environment methods
         void begin3DMode();

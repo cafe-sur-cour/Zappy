@@ -81,6 +81,11 @@ int RayLib::getMonitorHeight(int monitor) const
     return GetMonitorHeight(monitor);
 }
 
+void RayLib::waitTime(float seconds) const
+{
+    WaitTime(seconds);
+}
+
 bool RayLib::isMouseButtonDown(int button) const
 {
     return IsMouseButtonDown(button);
@@ -419,6 +424,15 @@ Vector3 RayLib::vector3Add(Vector3 v1, Vector3 v2) const
     return Vector3Add(v1, v2);
 }
 
+void RayLib::beginScissorMode(int x, int y, int width, int height)
+{
+    BeginScissorMode(x, y, width, height);
+}
+
+void RayLib::endScissorMode()
+{
+    EndScissorMode();
+}
 bool RayLib::loadModel(const std::string& id, const std::string& filepath, Vector3 center)
 {
     if (_models.find(id) != _models.end())

@@ -103,6 +103,20 @@ class ScrollBar : public AUIElement {
          */
         void setSize(float width, float height) override;
 
+        /**
+         * @brief Set the size of the handle as a ratio of the scrollbar length
+         *
+         * @param handleSize Handle size ratio (between 0.0 and 1.0)
+         */
+        void setHandleSize(float handleSize);
+
+        /**
+         * @brief Get the current handle size ratio
+         *
+         * @return float Current handle size ratio (between 0.0 and 1.0)
+         */
+        float getHandleSize() const;
+
     private:
         std::shared_ptr<RayLib> _raylib;
         float _value;
@@ -117,6 +131,7 @@ class ScrollBar : public AUIElement {
         Color _handlePressedColor;
 
         bool _isHandleHovered;
+
         /**
          * @brief Calculate the bounds of the handle
          *
