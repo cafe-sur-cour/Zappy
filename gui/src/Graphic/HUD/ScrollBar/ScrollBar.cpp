@@ -161,8 +161,10 @@ float ScrollBar::calculateValueFromMousePosition(Vector2 mousePosition) const
         float handleHalfHeight = (_bounds.height * _handleSize) / 2.0f;
         mousePos = mousePosition.y - position - handleHalfHeight;
 
-        if (mousePos < 0) mousePos = 0;
-        if (mousePos > size) mousePos = size;
+        if (mousePos < 0)
+            mousePos = 0;
+        if (mousePos > size)
+            mousePos = size;
     } else {
         position = _bounds.x;
         size = _bounds.width - (_bounds.width * _handleSize);
