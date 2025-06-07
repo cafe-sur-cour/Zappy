@@ -13,19 +13,23 @@
 
 
 /* This function notify of an player connectiong to an egg EBO */
-void send_egg_connect(zappy_t *zappy, egg_t *currentEgg)
+int send_egg_connect(zappy_t *zappy, egg_t *currentEgg)
 {
     int xLength = int_str_len(currentEgg->id) + 7;
     char *message = malloc(sizeof(char) * xLength);
 
     if (message == NULL) {
         error_message("Memory allocation failed in send_egg_connect");
-        return;
+        return -1;
     }
     snprintf(message, xLength, "ebo #%d\n", currentEgg->id);
     if (zappy->params->is_debug == true) {
         printf("DEBUG: Sending egg connection message: %s", message);
     }
-    write_message(zappy->graph->fd, message);
+    if (write_message(zappy->graph->fd, message) == -1) {
+        free(message);
+        return -1;
+    }
     free(message);
+    return 0;
 }

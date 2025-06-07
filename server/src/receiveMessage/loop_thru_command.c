@@ -16,20 +16,19 @@
 /* This is the array of function pointer that holds all the cmds */
 static const command_info_t COMMANDS[] = {
     {"Forward", 7, PRIORITY_MEDIUM, &handle_forward},
+    {"Left", 7, PRIORITY_MEDIUM, &handle_left},
+    {"Right", 7, PRIORITY_MEDIUM, &handle_right},
+    {"Look", 7, PRIORITY_MEDIUM, &handle_look},
+    {"Inventory", 1, PRIORITY_HIGH, &handle_inventory},
+    {"Broadcast", 7, PRIORITY_MEDIUM, &handle_broadcast},
+    {"Connect_nbr", 1, PRIORITY_HIGH, &handle_connect_nbr},
+    {"Fork", 42, PRIORITY_LOW, &handle_fork},
+    {"Eject", 7, PRIORITY_MEDIUM, &handle_eject},
+    {"Take", 7, PRIORITY_MEDIUM, &handle_take},
+    {"Set", 7, PRIORITY_MEDIUM, &handle_set},
+    {"Incantation", 300, PRIORITY_LOW, &handle_incantation},
     {NULL, 0, 0, NULL}
 };
-
-// {"Right", 7, PRIORITY_MEDIUM, &handle_right},
-// {"Left", 7, PRIORITY_MEDIUM, &handle_left},
-// {"Look", 7, PRIORITY_MEDIUM, &handle_look},
-// {"Inventory", 1, PRIORITY_HIGH, &handle_inventory},
-// {"Broadcast", 7, PRIORITY_MEDIUM, &handle_broadcast},
-// {"Connect_nbr", 1, PRIORITY_HIGH, &handle_connect_nbr},
-// {"Fork", 42, PRIORITY_LOW, &handle_fork},
-// {"Eject", 7, PRIORITY_MEDIUM, &handle_eject},
-// {"Take", 7, PRIORITY_MEDIUM, &handle_take},
-// {"Set", 7, PRIORITY_MEDIUM, &handle_set},
-// {"Incantation", 300, PRIORITY_LOW, &handle_incantation},
 
 
 /* This function loops thru the cmds to find the correct func */

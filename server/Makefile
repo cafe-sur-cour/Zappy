@@ -45,7 +45,18 @@ SRC 		=	src/params.c					\
 				src/receiveMessage/pollin_handler.c			\
 				src/receiveMessage/loop_thru_command.c		\
 				src/receiveMessage/queu_hanlder.c			\
-				src/aiMessage/forward.c
+				src/aiMessage/forward.c						\
+				src/aiMessage/rigth.c						\
+				src/aiMessage/left.c						\
+				src/aiMessage/broadcast.c					\
+				src/aiMessage/connect.c						\
+				src/aiMessage/eject.c						\
+				src/aiMessage/incantation.c					\
+				src/aiMessage/inventory.c					\
+				src/aiMessage/setObject.c  					\
+				src/aiMessage/takeObject.c					\
+				src/aiMessage/fork.c						\
+				src/aiMessage/look.c
 
 OBJ 		= 	$(SRC:.c=.o)
 

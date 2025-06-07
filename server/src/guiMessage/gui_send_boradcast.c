@@ -13,7 +13,7 @@
 #include <string.h>
 
 /* This function sends the broadcast to one player PBC */
-void send_broadcast_to_player(zappy_t *zappy, player_t *player,
+int send_broadcast_to_player(zappy_t *zappy, player_t *player,
     const char *message)
 {
     int xLength = int_str_len(player->id) + strlen(message) + 8;
@@ -21,18 +21,22 @@ void send_broadcast_to_player(zappy_t *zappy, player_t *player,
 
     if (formatted_message == NULL) {
         error_message("Failed to allocate memory for broadcast message.");
-        return;
+        return -1;
     }
     snprintf(formatted_message, xLength, "pbc #%d %s\n", player->id, message);
     if (zappy->params->is_debug == true) {
         printf("Sending to GUI: %s", formatted_message);
     }
-    write_message(zappy->graph->fd, formatted_message);
+    if (write_message(zappy->graph->fd, formatted_message) == -1) {
+        free(formatted_message);
+        return -1;
+    }
     free(formatted_message);
+    return 0;
 }
 
 /* This loop send the message to all players */
-void send_broadcast_to_all(zappy_t *zappy, const char *message)
+int send_broadcast_to_all(zappy_t *zappy, const char *message)
 {
     team_t *currentTeam = NULL;
     player_t *currentPlayer = NULL;
@@ -41,9 +45,11 @@ void send_broadcast_to_all(zappy_t *zappy, const char *message)
         currentTeam = zappy->game->teams;
         currentPlayer = currentTeam->players;
         while (currentPlayer != NULL) {
-            send_broadcast_to_player(zappy, currentPlayer, message);
+            if (send_broadcast_to_player(zappy, currentPlayer, message) == -1)
+                return -1;
             currentPlayer = currentPlayer->next;
         }
         currentTeam = currentTeam->next;
     }
+    return 0;
 }

@@ -101,35 +101,35 @@ void *free_player(player_t *player);
 void free_map(map_t *map);
 
 /* Function to send info to the gui */
-void send_map_size(zappy_t *server);
-void send_entrie_map(zappy_t *server);
-void send_map_tile(inventory_t **tiles, zappy_t *server,
+int send_map_size(zappy_t *server);
+int send_entrie_map(zappy_t *server);
+int send_map_tile(inventory_t **tiles, zappy_t *server,
     int posX, int posY);
-void send_team_name(zappy_t *server);
-void send_egg(zappy_t *zappy, egg_t *egg);
-void send_entire_egg_list(zappy_t *zappy);
-void send_time_message(zappy_t *zappy);
-void send_egg_death(zappy_t *zappy, egg_t *egg);
-void send_egg_connect(zappy_t *zappy, egg_t *currentEgg);
-void send_player_connect(zappy_t *zappy, player_t *player);
-void send_player_pos(zappy_t *zappy, player_t *player);
-void send_player_level(zappy_t *zappy, player_t *player);
-void send_player_inventory(zappy_t *zappy, player_t *player);
-void send_player_expelled(zappy_t *zappy, player_t *player);
-void send_broadcast_to_all(zappy_t *zappy, const char *message);
-void send_broadcast_to_player(zappy_t *zappy, player_t *player,
+int send_team_name(zappy_t *server);
+int send_egg(zappy_t *zappy, egg_t *egg);
+int send_entire_egg_list(zappy_t *zappy);
+int send_time_message(zappy_t *zappy);
+int send_egg_death(zappy_t *zappy, egg_t *egg);
+int send_egg_connect(zappy_t *zappy, egg_t *currentEgg);
+int send_player_connect(zappy_t *zappy, player_t *player);
+int send_player_pos(zappy_t *zappy, player_t *player);
+int send_player_level(zappy_t *zappy, player_t *player);
+int send_player_inventory(zappy_t *zappy, player_t *player);
+int send_player_expelled(zappy_t *zappy, player_t *player);
+int send_broadcast_to_all(zappy_t *zappy, const char *message);
+int send_broadcast_to_player(zappy_t *zappy, player_t *player,
     const char *message);
-void send_player_laying_egg(zappy_t *zappy, player_t *player);
-void send_ressource_droped(zappy_t *zappy, player_t *player,
+int send_player_laying_egg(zappy_t *zappy, player_t *player);
+int send_ressource_droped(zappy_t *zappy, player_t *player,
     int ressourceType);
-void send_ressource_collected(zappy_t *zappy, player_t *player,
+int send_ressource_collected(zappy_t *zappy, player_t *player,
     int ressourceType);
-void send_player_death(zappy_t *zappy, player_t *player);
-void send_updated_time(zappy_t *zappy, int time);
-void send_end_game(zappy_t *zappy, const char *teamName);
-void send_str_message(zappy_t *zappy, const char *message);
-void send_unknown_command(zappy_t *zappy);
-void send_command_parameter(zappy_t *zappy);
+int send_player_death(zappy_t *zappy, player_t *player);
+int send_updated_time(zappy_t *zappy, int time);
+int send_end_game(zappy_t *zappy, const char *teamName);
+int send_str_message(zappy_t *zappy, const char *message);
+int send_unknown_command(zappy_t *zappy);
+int send_command_parameter(zappy_t *zappy);
 
 /* init_egg.c */
 void init_egg(zappy_t *zappy);
@@ -143,7 +143,6 @@ void smart_poll_players(zappy_t *zappy);
 void execute_action(player_t *player, action_request_t *action,
     zappy_t *zappy);
 void queue_action(player_t *player, char *command, zappy_t *zappy);
-int handle_forward(player_t *player, char *command, zappy_t *zappy);
 action_queue_t *init_action_queue(void);
 void free_action_queue(action_queue_t *queue);
 action_request_t *create_action_request(char *command, player_t *player);
@@ -152,5 +151,19 @@ action_request_t *dequeue_highest_priority_action(action_queue_t *queue);
 void free_action_request(action_request_t *action);
 void insert_action_by_priority(action_queue_t *queue,
     action_request_t *action);
+
+/* This is the definition of the array function of the commands */
+int handle_forward(player_t *player, char *command, zappy_t *zappy);
+int handle_left(player_t *player, char *command, zappy_t *zappy);
+int handle_right(player_t *player, char *command, zappy_t *zappy);
+int handle_connect_nbr(player_t *player, char *command, zappy_t *zappy);
+int handle_eject(player_t *player, char *command, zappy_t *zappy);
+int handle_fork(player_t *player, char *command, zappy_t *zappy);
+int handle_incantation(player_t *player, char *command, zappy_t *zappy);
+int handle_inventory(player_t *player, char *command, zappy_t *zappy);
+int handle_broadcast(player_t *player, char *command, zappy_t *zappy);
+int handle_look(player_t *player, char *command, zappy_t *zappy);
+int handle_set(player_t *player, char *command, zappy_t *zappy);
+int handle_take(player_t *player, char *command, zappy_t *zappy);
 
 #endif /* !ZAPPY_H_ */

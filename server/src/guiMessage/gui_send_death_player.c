@@ -12,19 +12,23 @@
 #include <stdio.h>
 
 /* This function sends the gui a player as died */
-void send_player_death(zappy_t *zappy, player_t *player)
+int send_player_death(zappy_t *zappy, player_t *player)
 {
     int xLength = int_str_len(player->id) + 7;
     char *message = malloc(sizeof(char) * xLength);
 
     if (message == NULL) {
         error_message("Failed to allocate memory for player death message.");
-        return;
+        return -1;
     }
     snprintf(message, xLength, "pdi #%d\n", player->id);
     if (zappy->params->is_debug == true) {
         printf("Sending to GUI: %s", message);
     }
-    write_message(zappy->graph->fd, message);
+    if (write_message(zappy->graph->fd, message) == -1) {
+        free(message);
+        return -1;
+    }
     free(message);
+    return 0;
 }
