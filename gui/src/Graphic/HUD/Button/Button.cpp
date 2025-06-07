@@ -60,8 +60,10 @@ void Button::update()
     bool wasPressed = _isPressed;
     _isPressed = _isHovered && _raylib->isMouseButtonDown(MOUSE_LEFT_BUTTON);
 
-    if (wasPressed && !_isPressed && _isHovered && _callback)
+    if (wasPressed && !_isPressed && _isHovered && _callback) {
+        _raylib->playSound("click", 0.75f);
         _callback();
+    }
 }
 
 void Button::setText(const std::string& text)
