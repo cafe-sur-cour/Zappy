@@ -108,6 +108,36 @@ class RayLib {
         void drawText(const std::string& text, float x, float y, float fontSize, Color color);
         float measureText(const std::string& text, float fontSize) const;
 
+        // Audio methods
+        void initAudioDevice();
+        void closeAudioDevice();
+        bool isAudioDeviceReady() const;
+
+        // Sound methods
+        bool loadSound(const std::string& id, const std::string& filepath);
+        void playSound(const std::string& id, float volume = 1.0f);
+        void stopSound(const std::string& id);
+        void pauseSound(const std::string& id);
+        void resumeSound(const std::string& id);
+        void setSoundVolume(const std::string& id, float volume);
+        bool isSoundPlaying(const std::string& id) const;
+        void unloadSound(const std::string& id);
+        void unloadAllSounds();
+
+        // Music methods
+        bool loadMusic(const std::string& id, const std::string& filepath);
+        void playMusic(const std::string& id, float volume = 1.0f);
+        void updateMusic(const std::string& id);
+        void updateAllMusics();
+        void stopMusic(const std::string& id);
+        void pauseMusic(const std::string& id);
+        void resumeMusic(const std::string& id);
+        void setMusicVolume(const std::string& id, float volume);
+        bool isMusicPlaying(const std::string& id) const;
+        void setMusicLooping(const std::string& id, bool loop);
+        void unloadMusic(const std::string& id);
+        void unloadAllMusics();
+
     protected:
     private:
         bool _isInitialized;
@@ -122,6 +152,8 @@ class RayLib {
         };
 
         std::map<std::string, ModelData> _models;
+        std::map<std::string, Sound> _sounds;
+        std::map<std::string, Music> _musics;
 };
 
 #endif /* !RAYLIB_HPP_ */
