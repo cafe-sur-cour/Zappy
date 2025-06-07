@@ -10,6 +10,7 @@
 #include <iostream>
 #include <algorithm>
 #include "GUI.hpp"
+#include "Audio/Audio.hpp"
 #include "../Utils/Constants.hpp"
 
 GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
@@ -27,6 +28,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _raylib->setTargetFPS(zappy::gui::FPS);
     _map = std::make_unique<Map>(_gameInfos, _raylib);
     _hud = std::make_unique<HUD>(_raylib, _gameInfos);
+    _audio = std::make_unique<Audio>(_raylib);
 
     _cameraManager = std::make_unique<CameraManager>(_raylib);
     _cameraManager->setGameInfos(_gameInfos);
@@ -75,6 +77,8 @@ void GUI::update()
         if (_raylib->isKeyReleased(KEY_LEFT))
             switchToPreviousPlayer();
     }
+
+    _audio->updateAllMusics();
 
     updateCamera();
     _hud->updateTeamPlayersDisplay(_gameInfos);
