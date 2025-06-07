@@ -24,6 +24,7 @@ SRC =	../../../gui/src/Client/Client.cpp \
 		../../../gui/src/Graphic/RayLib/RayLib.cpp \
 		../../../gui/src/Graphic/GUI.cpp \
 		../../../gui/src/Graphic/Map.cpp \
+		../../../gui/src/Graphic/Audio/Audio.cpp \
 		../../../gui/src/Graphic/HUD/Button/Button.cpp \
 		../../../gui/src/Graphic/HUD/Containers/Containers.cpp \
 		../../../gui/src/Graphic/HUD/Containers/AContainers.cpp \
