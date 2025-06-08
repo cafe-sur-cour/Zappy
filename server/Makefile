@@ -53,8 +53,8 @@ SRC 		=	src/params.c					\
 				src/aiMessage/eject.c						\
 				src/aiMessage/incantation.c					\
 				src/aiMessage/inventory.c					\
-				src/aiMessage/setObject.c  					\
-				src/aiMessage/takeObject.c					\
+				src/aiMessage/set_object.c  					\
+				src/aiMessage/take_object.c					\
 				src/aiMessage/fork.c						\
 				src/aiMessage/look.c
 

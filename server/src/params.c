@@ -65,6 +65,18 @@ static int count_names(int argc, char **argv, int start_pos)
     return count;
 }
 
+static bool check_frequency(const char *flag, int pos, char **argv,
+    params_t *params)
+{
+    for (int i = 0; CHECKERS[i].flag != NULL; i++) {
+        if (strcmp(CHECKERS[i].flag, flag) == 0) {
+            return CHECKERS[i].checker(
+                argv[pos], argv[pos + 1], params) == false;
+        }
+    }
+    return true;
+}
+
 static bool check_simple_flag(int argc, char **argv,
     const char *flag, params_t *params)
 {
@@ -73,9 +85,6 @@ static bool check_simple_flag(int argc, char **argv,
 
     if (pos == -1) {
         if (strcmp(flag, "-f") != 0) {
-            snprintf(error_msg, sizeof(error_msg),
-                "Missing or invalid %s flag.", flag);
-            error_message(error_msg);
             return true;
         }
         return false;
@@ -86,12 +95,8 @@ static bool check_simple_flag(int argc, char **argv,
         error_message(error_msg);
         return true;
     }
-    for (int i = 0; CHECKERS[i].flag != NULL; i++) {
-        if (strcmp(CHECKERS[i].flag, flag) == 0) {
-            return CHECKERS[i].checker(
-                argv[pos], argv[pos + 1], params) == false;
-        }
-    }
+    if (check_frequency(flag, pos, argv, params) == false)
+        return false;
     return true;
 }
 
@@ -122,11 +127,8 @@ static bool check_all_params(int argc, char **argv, bool is_ok,
     if (port_error || width_error || height_error ||
         names_error || client_error || freq_error)
         is_ok = false;
-    
-    // Set default frequency only if -f flag was not found
     if (find_flag(argc, argv, "-f") == -1)
         params->freq = 100;
-    
     return is_ok;
 }
 

@@ -35,6 +35,17 @@ int send_broadcast_to_player(zappy_t *zappy, player_t *player,
     return 0;
 }
 
+static int loop_thru_player(player_t *currentPlayer, zappy_t *zappy,
+    const char *message)
+{
+    while (currentPlayer != NULL) {
+        if (send_broadcast_to_player(zappy, currentPlayer, message) == -1)
+            return -1;
+        currentPlayer = currentPlayer->next;
+    }
+    return 0;
+}
+
 /* This loop send the message to all players */
 int send_broadcast_to_all(zappy_t *zappy, const char *message)
 {
@@ -44,11 +55,8 @@ int send_broadcast_to_all(zappy_t *zappy, const char *message)
     for (int i = 0; i < zappy->params->nb_team; i++) {
         currentTeam = zappy->game->teams;
         currentPlayer = currentTeam->players;
-        while (currentPlayer != NULL) {
-            if (send_broadcast_to_player(zappy, currentPlayer, message) == -1)
-                return -1;
-            currentPlayer = currentPlayer->next;
-        }
+        if (loop_thru_player(currentPlayer, zappy, message) == -1)
+            return -1;
         currentTeam = currentTeam->next;
     }
     return 0;

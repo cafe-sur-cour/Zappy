@@ -32,10 +32,8 @@ int send_player_inventory(zappy_t *zappy, player_t *player)
     int xLenght = inventory_message_length(player);
     char *message = malloc(sizeof(char) * xLenght);
 
-    if (message == NULL) {
-        error_message("Failed to allocate memory for player inventory.");
+    if (message == NULL)
         return -1;
-    }
     snprintf(message, xLenght, "pin #%d %d %d %d %d %d %d %d %d %d\n",
         player->id, player->posX, player->posY,
         player->inventory->nbFood, player->inventory->nbLinemate,
