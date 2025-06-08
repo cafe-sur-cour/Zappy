@@ -12,10 +12,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+
+/* This is the function that handle the mov in the array of function */
 int handle_look(player_t *player, char *command, zappy_t *zappy)
 {
     (void)command;
-    (void)player;
     (void)zappy;
+    (void)player;
     return 0;
 }
