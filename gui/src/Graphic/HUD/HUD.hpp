@@ -7,12 +7,15 @@
 
 #pragma once
 
+#include <vector>
+#include <unordered_map>
+#include <memory>
+#include <string>
+#include <utility>
 #include "Containers/Containers.hpp"
 #include "../RayLib/RayLib.hpp"
 #include "../../Game/GameInfos.hpp"
 #include "../Audio/Audio.hpp"
-#include <vector>
-#include <unordered_map>
 
 /**
  * @brief Main HUD class to manage all UI elements
@@ -114,7 +117,8 @@ class HUD {
          * @param sideWidthPercent Width of side container as percentage of screen width (default: 15%)
          * @param bottomHeightPercent Height of bottom container as percentage of screen height (default: 20%)
          */
-        void initDefaultLayout(float sideWidthPercent = 15.0f, float bottomHeightPercent = 20.0f);
+        void initDefaultLayout(float sideWidthPercent = 15.0f,
+            float bottomHeightPercent = 20.0f);
 
         /**
          * @brief Get the side container
@@ -192,7 +196,8 @@ class HUD {
          *
          * @return std::shared_ptr<Containers> The created container
          */
-        std::shared_ptr<Containers> createSquareContainer(float squareSize, float sideWidthPercent);
+        std::shared_ptr<Containers> createSquareContainer(float squareSize,
+            float sideWidthPercent);
 
         /**
          * @brief Create the side container for team information
@@ -279,7 +284,8 @@ class HUD {
          *
          * @return std::vector<int> List of player numbers belonging to the team
          */
-        std::vector<int> getTeamPlayerNumbers(const std::string& teamName, const std::vector<zappy::structs::Player>& players);
+        std::vector<int> getTeamPlayerNumbers(const std::string& teamName,
+            const std::vector<zappy::structs::Player>& players);
 
         /**
          * @brief Create player list text representation
@@ -298,7 +304,8 @@ class HUD {
          * @param yPos Y position percentage
          * @param playerNumbers List of player numbers
          */
-        void addPlayerListText(std::shared_ptr<Containers> container, const std::string& teamId,
+        void addPlayerListText(std::shared_ptr<Containers> container,
+                             const std::string& teamId,
                              float yPos, const std::vector<int>& playerNumbers);
 
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
