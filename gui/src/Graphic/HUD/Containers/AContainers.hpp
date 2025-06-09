@@ -7,10 +7,12 @@
 
 #pragma once
 
-#include "IContainers.hpp"
-#include "../../RayLib/RayLib.hpp"
 #include <string>
 #include <vector>
+#include <memory>
+
+#include "IContainers.hpp"
+#include "../../RayLib/RayLib.hpp"
 
 /**
  * @brief Structure to store relative positions and sizes as percentages
@@ -37,7 +39,8 @@ class AContainers : public IContainers {
          * @param width Container width
          * @param height Container height
          */
-        AContainers(std::shared_ptr<RayLib> raylib, float x, float y, float width, float height);
+        AContainers(std::shared_ptr<RayLib> raylib, float x, float y, float width,
+            float height);
 
         /**
          * @brief Destroy the AContainers object
@@ -59,7 +62,8 @@ class AContainers : public IContainers {
          * @param widthPercent Width as percentage of screen width (0-100)
          * @param heightPercent Height as percentage of screen height (0-100)
          */
-        void setRelativePosition(float xPercent, float yPercent, float widthPercent, float heightPercent);
+        void setRelativePosition(float xPercent, float yPercent, float widthPercent,
+            float heightPercent);
 
         /**
          * @brief Get the container's relative position
