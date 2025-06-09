@@ -41,7 +41,8 @@ class App:
                 p.setMapSize(x, y)
                 p.startComThread()
                 p.loop()
-            except CommunicationException:
+            except CommunicationException as e:
+                print(f"Failed to start player for team {self.name}: {e}")
                 exit(FAILURE)
             exit(SUCCESS)
         return pid
@@ -49,10 +50,16 @@ class App:
     def run(self):
         print(f"Starting Zappy AI for team: {self.name}...")
         player = Player(self.name, self.ip, self.port)
-        slots, x, y = player.communication.connectToServer()
+        slots, x, y = 0, 0, 0
+        try:
+            slots, x, y = player.communication.connectToServer()
+        except CommunicationException as e:
+            print(f"Failed to connect to server: {e}")
+            return FAILURE
         player.setMapSize(x, y)
         for _ in range(slots):
             self.childs.append(self.create_new_player())
+            print(f"Created player with PID: {self.childs[-1]}")
         player.startComThread()
         player.loop()
         print(f"Zappy AI for team {self.name} has finished running.")
