@@ -160,7 +160,7 @@ class Communication:
         with self.mutex:
             self.responseQueue.append(response)
 
-    def hasReponses(self) -> bool:
+    def hasResponses(self) -> bool:
         with self.mutex:
             return len(self.responseQueue) > 0
 
