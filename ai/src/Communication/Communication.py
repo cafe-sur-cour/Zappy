@@ -6,8 +6,6 @@
 ##
 
 import select
-import socket
-import os
 import threading
 from time import sleep
 
@@ -20,43 +18,41 @@ from src.Exceptions.Exceptions import (
 
 class Communication:
     def __init__(self, name: str, host: str, port: int):
-        self._request_queue: list[str] = []
-        self._pending_queue: list[str] = []
+        self.requestQueue: list[str] = []
+        self.pendingQueue: list[str] = []
+        self.responseQueue: list[str] = []
 
-        self._response_buffer: str = ""
+        self.responseBuffer: str = ""
 
-        self._message_queue: list[tuple[int, str]] = []
-        self._isDead: bool = False
-        self._lastInventory: dict[str, int] = {}
-        self._lastLook: list[dict[str, int]] = []
+        self.messageQueue: list[tuple[int, str]] = []
+        self.playerDead: bool = False
+        self.lastInventory: dict[str, int] = {}
+        self.lastLook: list[dict[str, int]] = []
 
-        self._name = name
-        self._host = host
-        self._port = port
+        self.name = name
+        self.host = host
+        self.port = port
 
-        self._socket = Socket(host, port)
+        self.socket = Socket(host, port)
 
         self.mutex = threading.Lock()
 
     def loop(self) -> None:
-        while not self._isDead:
+        while not self.playerDead:
             with self.mutex:
-                # Attention au surchargement
-                # de la quest trop de donnée peuvent mettre du temp
-                # s à traiter une donnée importante queue
-                if len(self._request_queue) > 0 and len(self._pending_queue) < 10:
-                    request = self._request_queue.pop(0)
-                    self._socket.send(request)
-                    self._pending_queue.append(request)
+                if len(self.requestQueue) > 0 and len(self.pendingQueue) < 10:
+                    request = self.requestQueue.pop(0)
+                    self.socket.send(request)
+                    self.pendingQueue.append(request)
                 else:
                     sleep(0.1)
             self.receive()
 
     def tryGetInventory(self, response: str) -> dict[str, int] | None:
-        if not response[:-1].startswith("[") or not response[:-1].endswith("]"):
+        if not response.startswith("[") or not response.endswith("]"):
             return None
 
-        items = response[:-1][1:-1].split(",")
+        items = response[1:-1].split(",")
         inventory = dict()
         for item in items:
             if not item:
@@ -75,11 +71,11 @@ class Communication:
         return inventory
 
     def tryGetLook(self, response: str) -> list[dict[str, int]] | None:
-        if not response[:-1].startswith("[") or not response[:-1].endswith("]"):
+        if not response.startswith("[") or not response.endswith("]"):
             return None
 
         look = []
-        items = response[:-1][1:-1].split(",")
+        items = response[1:-1].split(",")
         if not items or len(items) == 0:
             return None
         for item in items:
@@ -99,95 +95,109 @@ class Communication:
 
     def handleResponse(self, response: str) -> str:
         if response.startswith("dead"):
-            self._isDead = True
-            return ""
-        elif response.startswith("message "):
+            self.playerDead = True
+            return "dead"
+        if response.startswith("message "):
             parts = response.split(" ")
             number = int(parts[1].strip(","))
             data = parts[2]
-            self._message_queue.append((number, data))
+            self.messageQueue.append((number, data))
             return ""
         inventory = self.tryGetInventory(response)
         if inventory is not None:
-            self._lastInventory = inventory
-            return "inventory\n"
+            self.lastInventory = inventory
+            return "inventory"
         look = self.tryGetLook(response)
         if look is not None:
-            self._lastLook = look
-            return "look\n"
+            self.lastLook = look
+            return "look"
         return response
 
-    def receive_data(self) -> str:
+    def receiveData(self) -> str:
         with self.mutex:
-            if '\n' in self._response_buffer:
-                firstNewlineIndex = self._response_buffer.index('\n')
-                data = self._response_buffer[:firstNewlineIndex + 1]
-                self._response_buffer = self._response_buffer[firstNewlineIndex + 1:]
-                return self.handleResponse(data.strip())
-            r = self._socket.receive()
-            self._response_buffer += r
-            if '\n' in self._response_buffer:
-                firstNewlineIndex = self._response_buffer.index('\n')
-                data = self._response_buffer[:firstNewlineIndex + 1]
-                self._response_buffer = self._response_buffer[firstNewlineIndex + 1:]
-                return self.handleResponse(data.strip())
+            if '\n' not in self.responseBuffer:
+                r = self.socket.receive()
+                self.responseBuffer += r
+            firstNewlineIndex = self.responseBuffer.index('\n')
+            data = self.responseBuffer[:firstNewlineIndex + 1]
+            self.responseBuffer = self.responseBuffer[firstNewlineIndex + 1:]
+            return self.handleResponse(data.strip())
         return ""
 
     def receive(self) -> None:
         poller_object = select.poll()
-        poller_object.register(self._socket.get_fd(), select.POLLIN)
+        poller_object.register(self.socket.get_fd(), select.POLLIN)
         fd_vs_event = poller_object.poll(200)
 
         for fd, event in fd_vs_event:
-            if self.receive_data() != "":  # TODO: Move this ?
-                self._pending_queue.pop()
+            data = self.receiveData()
+            if data != "":
+                self.addResponse(data)
+                self.pendingQueue.pop()
+
+    def addResponse(self, response: str) -> None:
+        with self.mutex:
+            self.responseQueue.append(response)
+
+    def hasReponses(self) -> bool:
+        with self.mutex:
+            return len(self.responseQueue) > 0
 
     def getInventory(self) -> dict[str, int]:
         with self.mutex:
-            return self._lastInventory
+            return self.lastInventory
 
-    def getLook(self) -> list[str]:
+    def getLook(self) -> list[dict[str, int]]:
         with self.mutex:
-            return self._lastLook
+            return self.lastLook
 
-    def get_size_message_queue(self) -> int:
+    def lenMessageQueue(self) -> int:
         with self.mutex:
-            return len(self._message_queue)
+            return len(self.messageQueue)
 
-    def get_message_from_queue(self) -> tuple[int, str]:
+    def hasMessages(self) -> bool:
         with self.mutex:
-            if not self._message_queue:
+            return len(self.messageQueue) > 0
+
+    def getLastMessage(self) -> tuple[int, str]:
+        with self.mutex:
+            if not self.messageQueue:
                 return 0, ""
-            return self._message_queue.pop(0)
+            return self.messageQueue.pop(0)
 
-    def get_size_response_queue(self) -> int:
+    def lenResponseQueue(self) -> int:
         with self.mutex:
-            return len(self._response_buffer.split('\n'))
+            return len(self.responseBuffer.split('\n'))
 
-    def get_response_list(self) -> list[str]:
+    def getLastResponse(self) -> str:
         with self.mutex:
-            return self._response_buffer.split('\n')
+            return self.responseQueue.pop(0) if len(self.responseQueue) else ""
 
-    def is_dead(self) -> bool:
+    def playerIsDead(self) -> bool:
         with self.mutex:
-            return self._isDead
+            return self.playerDead
+
+    def hasPendingCommands(self) -> bool:
+        with self.mutex:
+            return len(self.pendingQueue) > 0
 
     def connectToServer(self):
-        self._socket.connect()
-        response = self.receive_data()
+        self.socket.connect()
+        response = self.receiveData()
 
         if response != "WELCOME":
             raise CommunicationInvalidResponseException(
                 f"Invalid response from server handshake: {response}"
             )
 
-        self._socket.send(f"{self._name}\n")
-        response = self.receive_data()
+        self.socket.send(f"{self.name}\n")
+        response = self.receiveData()
 
         if response == "ko":
             raise CommunicationHandshakeException(
-                f"Handshake failed: server return KO after sending: '{self._name}'"
+                f"Handshake failed: server return KO after sending: '{self.name}'"
             )
+
         slots = 0
         try:
             slots = int(response)
@@ -196,7 +206,7 @@ class Communication:
                 f"Invalid number of slots: {response}"
             )
 
-        response = self.receive_data()
+        response = self.receiveData()
 
         x = 0
         y = 0
@@ -215,7 +225,7 @@ class Communication:
 
     def sendCommand(self, message: str) -> None:
         with self.mutex:
-            self._request_queue.append(message)
+            self.requestQueue.append(message)
 
     def sendForward(self):
         self.sendCommand("Forward\n")
