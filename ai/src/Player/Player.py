@@ -160,7 +160,7 @@ class Player:
             self.look = self.communication.getLook()
 
         elif response.strip() == "ko":
-            print(f"Command '{self.roombaState["lastCommand"]}' failed")
+            print(f"Command '{self.roombaState['lastCommand']}' failed")
 
     def loop(self) -> None:
         while not self.communication.playerIsDead():
