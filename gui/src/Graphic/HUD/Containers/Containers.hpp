@@ -7,15 +7,18 @@
 
 #pragma once
 
+#include <vector>
+#include <functional>
+#include <unordered_map>
+#include <memory>
+#include <string>
+
 #include "AContainers.hpp"
 #include "../UIElement/IUIElement.hpp"
 #include "../Button/Button.hpp"
 #include "../Text/Text.hpp"
 #include "../../RayLib/RayLib.hpp"
 #include "../../Audio/Audio.hpp"
-#include <vector>
-#include <functional>
-#include <unordered_map>
 
 /**
  * @brief Container class for organizing UI elements
@@ -36,7 +39,9 @@ class Containers : public AContainers {
          * @param height Container height
          * @param backgroundColor Background color (default: semi-transparent dark gray)
          */
-        Containers(std::shared_ptr<RayLib> raylib, std::shared_ptr<Audio> audio, float x, float y, float width, float height, Color backgroundColor = {40, 40, 40, 200});
+        Containers(std::shared_ptr<RayLib> raylib, std::shared_ptr<Audio> audio,
+            float x, float y, float width, float height,
+            Color backgroundColor = {40, 40, 40, 200});
 
         /**
          * @brief Destroy the Container
