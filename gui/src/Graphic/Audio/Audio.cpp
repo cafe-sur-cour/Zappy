@@ -5,177 +5,97 @@
 ** Audio
 */
 
-#include <iostream>
-#include <string>
 #include "Audio.hpp"
-#include "../RayLib/RayLib.hpp"
-#include "../../Utils/Constants.hpp"
+#include <SFML/Audio.hpp>
+#include <iostream>
 
-Audio::Audio(std::shared_ptr<RayLib> raylib) : _raylib(raylib),
-    _isInitialized(false), _mainMusicId("main_theme")
+Audio::Audio()
 {
-    if (!_isInitialized) {
-        _raylib->initAudioDevice();
-        _isInitialized = true;
-    }
+    loadSound("main_theme", "gui/assets/sounds/main_theme.wav");
+    setSoundLooping("main_theme", true);
+    playSound("main_theme", 50.0f);
 
-    if (!_raylib->loadMusic(_mainMusicId, "gui/assets/sounds/main_theme.wav"))
-        std::cout << colors::T_RED << "[ERROR] Failed to load main music."
-                  << colors::RESET << std::endl;
-    if (!_raylib->loadSound("click", "gui/assets/sounds/click.wav"))
-        std::cout << colors::T_RED << "[ERROR] Failed to load click sound."
-                  << colors::RESET << std::endl;
-    playMainMusic(0.2f);
+    loadSound("click", "gui/assets/sounds/click.wav");
 }
 
 Audio::~Audio()
 {
-    if (_isInitialized) {
-        unloadAllSounds();
-        unloadAllMusics();
-        _raylib->closeAudioDevice();
-        _isInitialized = false;
+    for (auto& sound : _sounds) {
+        if (sound.second) {
+            sound.second->stop();
+        }
     }
 }
 
 bool Audio::loadSound(const std::string& id, const std::string& filepath)
 {
-    if (!_isInitialized) {
-        std::cerr << "Audio device not initialized" << std::endl;
+    if (_sounds.find(id) != _sounds.end()) {
+        std::cerr << "Sound with ID '" << id << "' already exists." << std::endl;
         return false;
     }
 
-    return _raylib->loadSound(id, filepath);
+    auto music = std::make_unique<sf::Music>();
+    if (!music->openFromFile(filepath)) {
+        std::cerr << "Failed to load sound from '" << filepath << "'" << std::endl;
+        return false;
+    }
+
+    _sounds[id] = std::move(music);
+    return true;
 }
 
 void Audio::playSound(const std::string& id, float volume)
 {
-    if (!_isInitialized)
+    auto it = _sounds.find(id);
+    if (it == _sounds.end()) {
+        std::cerr << "Sound with ID '" << id << "' not found." << std::endl;
         return;
-
-    _raylib->playSound(id, volume);
+    }
+    it->second->stop();
+    it->second->setVolume(volume);
+    it->second->play();
 }
 
 void Audio::stopSound(const std::string& id)
 {
-    if (!_isInitialized)
+    auto it = _sounds.find(id);
+    if (it == _sounds.end()) {
+        std::cerr << "Sound with ID '" << id << "' not found." << std::endl;
         return;
+    }
 
-    _raylib->stopSound(id);
+    it->second->stop();
 }
 
 bool Audio::isSoundPlaying(const std::string& id) const
 {
-    if (!_isInitialized)
+    auto it = _sounds.find(id);
+    if (it == _sounds.end()) {
+        std::cerr << "Sound with ID '" << id << "' not found." << std::endl;
         return false;
+    }
 
-    return _raylib->isSoundPlaying(id);
+    return it->second->getStatus() == sf::Music::Playing;
 }
 
-void Audio::unloadSound(const std::string& id)
+void Audio::setSoundLooping(const std::string& id, bool looping)
 {
-    if (!_isInitialized)
+    auto it = _sounds.find(id);
+    if (it == _sounds.end()) {
+        std::cerr << "Sound with ID '" << id << "' not found." << std::endl;
         return;
+    }
 
-    _raylib->unloadSound(id);
+    it->second->setLoop(looping);
 }
 
-void Audio::unloadAllSounds()
+void Audio::setSoundVolume(const std::string& id, float volume)
 {
-    if (!_isInitialized)
+    auto it = _sounds.find(id);
+    if (it == _sounds.end()) {
+        std::cerr << "Sound with ID '" << id << "' not found." << std::endl;
         return;
+    }
 
-    _raylib->unloadAllSounds();
-}
-
-bool Audio::loadMusic(const std::string& id, const std::string& filepath)
-{
-    if (!_isInitialized)
-        return false;
-
-    return _raylib->loadMusic(id, filepath);
-}
-
-void Audio::playMusic(const std::string& id, float volume)
-{
-    if (!_isInitialized)
-        return;
-
-    _raylib->playMusic(id, volume);
-}
-
-void Audio::updateMusicStream(const std::string& id)
-{
-    if (!_isInitialized)
-        return;
-
-    _raylib->updateMusic(id);
-}
-
-void Audio::updateAllMusics()
-{
-    if (!_isInitialized)
-        return;
-
-    _raylib->updateAllMusics();
-}
-
-void Audio::stopMusic(const std::string& id)
-{
-    if (!_isInitialized)
-        return;
-
-    _raylib->stopMusic(id);
-}
-
-void Audio::pauseMusic(const std::string& id)
-{
-    if (!_isInitialized)
-        return;
-
-    _raylib->pauseMusic(id);
-}
-
-void Audio::resumeMusic(const std::string& id)
-{
-    if (!_isInitialized)
-        return;
-
-    _raylib->resumeMusic(id);
-}
-
-bool Audio::isMusicPlaying(const std::string& id) const
-{
-    if (!_isInitialized)
-        return false;
-
-    return _raylib->isMusicPlaying(id);
-}
-
-void Audio::unloadMusic(const std::string& id)
-{
-    if (!_isInitialized)
-        return;
-    _raylib->unloadMusic(id);
-}
-
-void Audio::unloadAllMusics()
-{
-    if (!_isInitialized)
-        return;
-
-    _raylib->unloadAllMusics();
-}
-
-void Audio::playMainMusic(float volume)
-{
-    if (!_raylib->isMusicPlaying(_mainMusicId))
-        _raylib->setMusicLooping(_mainMusicId, true);
-
-    _raylib->playMusic(_mainMusicId, volume);
-}
-
-void Audio::stopMainMusic()
-{
-    stopMusic(_mainMusicId);
+    it->second->setVolume(volume);
 }
