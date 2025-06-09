@@ -12,6 +12,7 @@
 #include <vector>
 #include <memory>
 #include <mutex>
+#include <string>
 
 #include "../Utils/Constants.hpp"
 
@@ -37,7 +38,8 @@ class GameInfos {
         void updatePlayerPosition(int playerNumber, int x, int y);
         void updatePlayerOrientation(int playerNumber, int orientation);
         void updatePlayerLevel(int playerNumber, int level);
-        void updatePlayerInventory(int playerNumber, const zappy::structs::Inventory inventory);
+        void updatePlayerInventory(int playerNumber,
+            const zappy::structs::Inventory inventory);
         void updatePlayerExpulsion(int playerNumber);
         void updatePlayerDeath(int playerNumber);
         void updatePlayerResourceAction(int playerNumber, int resourceId, bool isCollecting);
