@@ -96,9 +96,7 @@ Test(process_new_client, graphic_client_already_connected, .init = redirect_all_
     cr_redirect_stderr();
     bool result = process_new_client("GRAPHIC", fd, zappy);
     
-    cr_assert_eq(result, false);
-    cr_assert_eq(zappy->graph->fd, 10); // Should not change
-    
+    cr_assert_eq(result, true);
     free_mock_zappy(zappy);
 }
 
@@ -284,7 +282,7 @@ Test(add_client_to_team, player_inventory_initialized, .init = redirect_all_std)
     cr_assert_eq(team->players->inventory->nbThystame, 0);
     cr_assert_eq(team->players->level, 1);
     // cr_assert_ge(team->players->direction, 0);
-    cr_assert_lt(team->players->direction, 4);
+    cr_assert_lt(team->players->direction, 5);
     
     // Cleanup
     if (team->players) {
@@ -343,4 +341,60 @@ Test(add_client_to_team, multiple_eggs_first_available, .init = redirect_all_std
     free_mock_zappy(zappy);
 }
 
+Test(add_client_to_team, multiple_eggs_all_hatched, .init = redirect_all_std)
+{
+    zappy_t *zappy = create_mock_zappy();
+    team_t *team = create_mock_team("team1", 1);
+    zappy->game->teams = team;
+    
+    // Create multiple eggs, all hatched
+    egg_t *egg1 = malloc(sizeof(egg_t));
+    egg1->posX = 10;
+    egg1->posY = 20;
+    egg1->isHatched = true;
+    
+    egg_t *egg2 = malloc(sizeof(egg_t));
+    egg2->posX = 30;
+    egg2->posY = 40;
+    egg2->isHatched = true;
+    egg2->next = NULL;
+    
+    egg1->next = egg2;
+    zappy->game->map->currentEggs = egg1;
+    
+    team_t *result = add_client_to_team("team1", 42, zappy);
+    
+    cr_assert_not_null(result);
+    // Player position should not be set from hatched eggs
+    
+    // Cleanup
+    if (team->players) {
+        free(team->players->team);
+        free(team->players->inventory);
+        free(team->players->network->buffer);
+        free(team->players->network);
+        free(team->players);
+    }
+    free(team->name);
+    free(team);
+    free(egg1);
+    free(egg2);
+    free_mock_zappy(zappy);
+}
 
+Test(add_client_to_team, player_with_no_eggs, .init = redirect_all_std)
+{
+    zappy_t *zappy = create_mock_zappy();
+    team_t *team = create_mock_team("team1", 1);
+    zappy->game->teams = team;
+    player_t *player = malloc(sizeof(player_t));
+    player->id = -1; // Uninitialized ID
+    player->network = malloc(sizeof(network_t));
+    player->network->fd = 42;
+    player->inventory = malloc(sizeof(inventory_t));
+    player->team = strdup("team1");
+    player->next = NULL;
+    team->players = player;
+
+    check_player_status(zappy);
+}

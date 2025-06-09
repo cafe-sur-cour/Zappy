@@ -27,42 +27,51 @@ static int inventory_message_length(player_t *player)
 }
 
 /* This send the player's inventory PIN */
-void send_player_inventory(zappy_t *zappy, player_t *player)
+int send_player_inventory(zappy_t *zappy, player_t *p)
 {
-    int xLenght = inventory_message_length(player);
+    int xLenght = inventory_message_length(p);
     char *message = malloc(sizeof(char) * xLenght);
+    graph_net_t *current = zappy->graph;
 
-    if (message == NULL) {
-        error_message("Failed to allocate memory for player inventory.");
-        return;
-    }
-    snprintf(message, xLenght, "pin #%d %d %d %d %d %d %d %d %d %d\n",
-        player->id, player->posX, player->posY,
-        player->inventory->nbFood, player->inventory->nbLinemate,
-        player->inventory->nbDeraumere, player->inventory->nbSibur,
-        player->inventory->nbMendiane, player->inventory->nbPhiras,
-        player->inventory->nbThystame);
-    if (zappy->params->is_debug == true) {
+    if (message == NULL)
+        return -1;
+    snprintf(message, xLenght, "pin #%d %d %d %d %d %d %d %d %d %d\n", p->id,
+        p->posX, p->posY, p->inventory->nbFood, p->inventory->nbLinemate,
+        p->inventory->nbDeraumere, p->inventory->nbSibur, p->inventory->
+        nbMendiane, p->inventory->nbPhiras, p->inventory->nbThystame);
+    if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", message);
+    while (current != NULL) {
+        if (write_message(current->fd, message) == -1) {
+            return -1;
+        }
+        current = current->next;
     }
-    write_message(zappy->graph->fd, message);
     free(message);
+    return 0;
 }
 
 /* This function sends the the expulsion message of a player to the gui PEX */
-void send_player_expelled(zappy_t *zappy, player_t *player)
+int send_player_expelled(zappy_t *zappy, player_t *player)
 {
     int xLenght = int_str_len(player->id) + 7;
     char *message = malloc(sizeof(char) * xLenght);
+    graph_net_t *current = zappy->graph;
 
     if (message == NULL) {
         error_message("Failed to allocate memory for player expulsion.");
-        return;
+        return -1;
     }
     snprintf(message, xLenght, "pex #%d\n", player->id);
-    if (zappy->params->is_debug == true) {
+    if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", message);
+    while (current != NULL) {
+        if (write_message(current->fd, message) == -1) {
+            free(message);
+            return -1;
+        }
+        current = current->next;
     }
-    write_message(zappy->graph->fd, message);
     free(message);
+    return 0;
 }

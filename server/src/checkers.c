@@ -23,6 +23,8 @@ bool check_port(char const *flag, char const *value, params_t *params)
         error_message("Invalid port flag.");
         return false;
     }
+    if (is_only_digits(value) == 0)
+        return false;
     port = atoi(value);
     if (port < 1024 || port > 65535) {
         error_message("Port must be between 1024 and 65535 (included).");
@@ -44,6 +46,8 @@ bool check_width(char const *flag, char const *value, params_t *params)
         error_message("Invalid width flag.");
         return false;
     }
+    if (is_only_digits(value) == 0)
+        return false;
     width = atoi(value);
     if (width <= 0) {
         error_message("Width must be a positive integer.");
@@ -65,6 +69,8 @@ bool check_height(char const *flag, char const *value, params_t *params)
         error_message("Invalid height flag.");
         return false;
     }
+    if (is_only_digits(value) == 0)
+        return false;
     height = atoi(value);
     if (height <= 0) {
         error_message("Height must be a positive integer.");
@@ -86,6 +92,8 @@ bool check_client(char const *flag, char const *value, params_t *params)
         error_message("Invalid client flag.");
         return false;
     }
+    if (is_only_digits(value) == 0)
+        return false;
     clients_nb = atoi(value);
     if (clients_nb <= 0) {
         error_message("Number of clients must be a positive integer.");
@@ -107,9 +115,11 @@ bool check_freq(char const *flag, char const *value, params_t *params)
         error_message("Invalid frequency flag.");
         return false;
     }
+    if (is_only_digits(value) == 0)
+        return false;
     freq = atoi(value);
-    if (freq <= 0 || freq > 200) {
-        error_message("Frequency must be 1 and 200 (included).");
+    if (freq <= 0 || freq > 1000) {
+        error_message("Frequency must be 1 and 1000 (included).");
         return false;
     }
     params->freq = freq;

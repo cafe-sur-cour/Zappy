@@ -65,24 +65,38 @@ static int count_names(int argc, char **argv, int start_pos)
     return count;
 }
 
-static bool check_simple_flag(int argc, char **argv,
-    const char *flag, params_t *params)
+static bool check_frequency(const char *flag, int pos, char **argv,
+    params_t *params)
 {
-    char error_msg[28];
-    int pos = find_flag(argc, argv, flag);
-
-    if (pos == -1 || pos + 1 >= argc) {
-        snprintf(error_msg, sizeof(error_msg),
-            "Missing or invalid %s flag.", flag);
-        error_message(error_msg);
-        return true;
-    }
     for (int i = 0; CHECKERS[i].flag != NULL; i++) {
         if (strcmp(CHECKERS[i].flag, flag) == 0) {
             return CHECKERS[i].checker(
                 argv[pos], argv[pos + 1], params) == false;
         }
     }
+    return true;
+}
+
+static bool check_simple_flag(int argc, char **argv,
+    const char *flag, params_t *params)
+{
+    char error_msg[28];
+    int pos = find_flag(argc, argv, flag);
+
+    if (pos == -1) {
+        if (strcmp(flag, "-f") != 0) {
+            return true;
+        }
+        return false;
+    }
+    if (pos + 1 >= argc) {
+        snprintf(error_msg, sizeof(error_msg),
+            "Missing or invalid %s flag.", flag);
+        error_message(error_msg);
+        return true;
+    }
+    if (check_frequency(flag, pos, argv, params) == false)
+        return false;
     return true;
 }
 
@@ -113,6 +127,8 @@ static bool check_all_params(int argc, char **argv, bool is_ok,
     if (port_error || width_error || height_error ||
         names_error || client_error || freq_error)
         is_ok = false;
+    if (find_flag(argc, argv, "-f") == -1)
+        params->freq = 100;
     return is_ok;
 }
 
@@ -140,15 +156,16 @@ params_t *check_args(int argc, char **argv)
     bool is_ok = true;
     params_t *params = malloc(sizeof(params_t));
 
-    if (!params) {
-        error_message("Memory allocation failed for params.");
+    if (!params)
         return NULL;
-    }
-    if (argc < 14) {
+    if (argc < 12) {
         helper();
         return NULL;
     }
     params->is_debug = false;
+    if (!validate_no_extra_args(argc, argv)) {
+        return free_params(params);
+    }
     if (!check_all_params(argc, argv, is_ok, params))
         return free_params(params);
     print_elem(params, argc, argv);

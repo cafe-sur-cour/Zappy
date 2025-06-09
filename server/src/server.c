@@ -12,18 +12,6 @@
 #include "network.h"
 #include "zappy.h"
 
-static graph_net_t *init_graph(void)
-{
-    graph_net_t *graph = malloc(sizeof(graph_net_t));
-
-    if (!graph) {
-        error_message("Failed to allocate memory for graph.");
-        exit(84);
-    }
-    graph->fd = -1;
-    return graph;
-}
-
 static void fill_elements(zappy_t *zappy)
 {
     zappy->network = malloc(sizeof(network_t));
@@ -31,7 +19,8 @@ static void fill_elements(zappy_t *zappy)
         error_message("Memory allocation failed for network.");
         exit(84);
     }
-    zappy->graph = init_graph();
+    zappy->graph = NULL;
+    zappy->graph = NULL;
     zappy->game = NULL;
     zappy->params = NULL;
 }

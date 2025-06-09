@@ -12,34 +12,49 @@
 #include <stdlib.h>
 
 /* THhis function sends the time unit message SGT */
-void send_time_message(zappy_t *zappy)
+int send_time_message(zappy_t *zappy)
 {
     int xLength = int_str_len(zappy->params->freq) + 6;
     char *message = malloc(xLength * sizeof(char));
+    graph_net_t *current = zappy->graph;
 
     if (message == NULL)
-        return;
+        return -1;
     snprintf(message, xLength, "sgt %d\n", zappy->params->freq);
     if (zappy->params->is_debug)
         printf("Sending time message: %s", message);
-    write_message(zappy->graph->fd, message);
+    while (current != NULL) {
+        if (write_message(current->fd, message) == -1) {
+            free(message);
+            return -1;
+        }
+        current = current->next;
+    }
     free(message);
+    return 0;
 }
 
 /* This function send the updated time after the gui upt */
-void send_updated_time(zappy_t *zappy, int time)
+int send_updated_time(zappy_t *zappy, int time)
 {
     int xLength = int_str_len(time) + 6;
     char *message = malloc(sizeof(char) * xLength);
+    graph_net_t *current = zappy->graph;
 
     if (message == NULL) {
         error_message("Failed to allocate memory for updated time message.");
-        return;
+        return -1;
     }
     snprintf(message, xLength, "sst %d\n", time);
-    if (zappy->params->is_debug) {
+    if (zappy->params->is_debug)
         printf("Sending updated time: %s", message);
+    while (current != NULL) {
+        if (write_message(current->fd, message) == -1) {
+            free(message);
+            return -1;
+        }
+        current = current->next;
     }
-    write_message(zappy->graph->fd, message);
     free(message);
+    return 0;
 }

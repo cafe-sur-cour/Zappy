@@ -6,6 +6,7 @@
 */
 
 #include "zappy.h"
+#include "network.h"
 
 static void move_top(player_t *player, int n)
 {
@@ -48,7 +49,17 @@ int forward_message(player_t *player, params_t *params)
             break;
         }
     }
-    if (write_message(player->fd, "ok\n") == 1)
+    return 0;
+}
+
+/* This is the function declared int the array to handle the cmds */
+int handle_forward(player_t *player, char *command, zappy_t *zappy)
+{
+    (void)command;
+    if (forward_message(player, zappy->params) == -1)
         return -1;
+    if (send_player_pos(zappy, player) == -1) {
+        return -1;
+    }
     return 0;
 }

@@ -21,20 +21,25 @@ TESTS 	    =   tests_params.c			\
 				tests_free.c			\
 				tests_guiMessage.c		\
 				tests_client.c			\
-				tests_network.c
+				tests_network.c			\
+				tests_aiMessage.c		\
+				tests_messaggeReception.c
 
 SRC 		=	../../../server/src/params.c					\
 				../../../server/src/messages.c					\
 				../../../server/src/checkers.c					\
 				../../../server/src/server.c					\
+				../../../server/src/game/player.c					\
 				../../../server/src/protocol.c					\
 				../../../server/src/game/client.c					\
 				../../../server/src/accept.c					\
 				../../../server/src/game/game.c						\
 				../../../server/src/game/init_egg.c					\
+				../../../server/src/game/graphic_client.c		\
 				../../../server/src/algo.c						\
 				../../../server/src/free.c						\
 				../../../server/src/signal.c					\
+				../../../server/src/params_checkers.c 			\
 				../../../server/src/network/accept_connection.c			\
 				../../../server/src/network/buffer.c			\
 				../../../server/src/network/close.c		\
@@ -53,7 +58,24 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/guiMessage/gui_miscellaneous_send.c		\
 				../../../server/src/guiMessage/gui_send_boradcast.c			\
 				../../../server/src/guiMessage/gui_send_death_player.c		\
-				../../../server/src/guiMessage/gui_send_ressource.c
+				../../../server/src/guiMessage/gui_send_ressource.c			\
+				../../../server/src/receiveMessage/action_handler.c			\
+				../../../server/src/receiveMessage/pollin_handler.c			\
+				../../../server/src/receiveMessage/loop_thru_command.c		\
+				../../../server/src/receiveMessage/queu_hanlder.c			\
+				../../../server/src/aiMessage/forward.c						\
+				../../../server/src/aiMessage/rigth.c						\
+				../../../server/src/aiMessage/left.c						\
+				../../../server/src/aiMessage/broadcast.c					\
+				../../../server/src/aiMessage/connect.c						\
+				../../../server/src/aiMessage/eject.c						\
+				../../../server/src/aiMessage/incantation.c					\
+				../../../server/src/aiMessage/inventory.c					\
+				../../../server/src/aiMessage/set_object.c  					\
+				../../../server/src/aiMessage/take_object.c					\
+				../../../server/src/aiMessage/fork.c						\
+				../../../server/src/aiMessage/look.c
+
 
 INCLUDES 	= 	-I./../../../server/include
 
