@@ -8,6 +8,8 @@
 #ifndef GUI_HPP_
 #define GUI_HPP_
 
+#include <memory>
+
 #include "RayLib/RayLib.hpp"
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
@@ -18,7 +20,7 @@
 
 class GUI {
     public:
-        GUI(std::shared_ptr<GameInfos> gameInfos);
+        explicit GUI(std::shared_ptr<GameInfos> gameInfos);
         ~GUI();
 
         void run();
