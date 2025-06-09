@@ -52,7 +52,8 @@ class Map {
         static constexpr float EGG_HEIGHT = 0.3f;
         static constexpr float PLAYER_HEIGHT = 1.1f;
 
-        void drawOrientationArrow(const Vector3 &position, int orientation, float playerHeight);
+        void drawOrientationArrow(const Vector3 &position, int orientation,
+            float playerHeight);
 };
 
 #endif /* !MAP_HPP_ */
