@@ -40,6 +40,7 @@ bool process_new_client(const char *team_name, int fd, zappy_t *zappy)
         send_entrie_map(zappy);
         send_team_name(zappy);
         send_entire_egg_list(zappy);
+        valid_message("New graphic client connected.");
         return true;
     }
     return valid_team_name(team_name, zappy);
@@ -150,10 +151,6 @@ static int check_team_capacity(zappy_t *server, const char *team_name,
 static team_t *add_client_team_rest(zappy_t *server, team_t *save,
     const char *team_name, player_t *new_player)
 {
-    if (strcmp(team_name, "GRAPHIC") == 0) {
-        free_player(new_player);
-        return NULL;
-    }
     if (check_team_capacity(server, team_name, new_player) == -1) {
         server->game->teams = save;
         free_player(new_player);

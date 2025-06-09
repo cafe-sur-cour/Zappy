@@ -60,6 +60,7 @@ typedef struct {
 /* messages.c */
 int helper(void);
 void error_message(const char *message);
+void valid_message(char const *message);
 
 /* checkers.c */
 bool check_port(char const *flag, char const *value, params_t *params);

@@ -55,7 +55,7 @@ static void disconnect_and_remove_client(zappy_t *zappy, int fd)
 {
     graph_net_t *removed = remove_graph_node(&zappy->graph, fd);
 
-    printf("Graphic client disconnected (fd: %d)\n", fd);
+    valid_message("Graphic client disconnected");
     close(fd);
     if (removed) {
         free(removed);

@@ -54,7 +54,6 @@ static void send_gui_message(zappy_t *zappy)
 
 int start_protocol(zappy_t *zappy)
 {
-    int game_tick = 0;
     int tick_duration_ms = 1000 / zappy->params->freq;
 
     setup_signal();
@@ -70,7 +69,6 @@ int start_protocol(zappy_t *zappy)
         send_gui_message(zappy);
         smart_poll_players(zappy);
         poll_graphic_clients(zappy);
-        game_tick++;
     }
     printf("\033[1;33mServer stopped.\033[0m\n");
     return 0;
