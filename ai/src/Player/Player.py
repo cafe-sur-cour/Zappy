@@ -60,11 +60,11 @@ class Player:
         self.y: int = 0
 
         self.roombaState: dict = {
-                "forwardCount": 0,
-                "targetForward": 10,
-                "phase": "forward",
-                "lastCommand": None
-            }
+            "forwardCount": 0,
+            "targetForward": 10,
+            "phase": "forward",
+            "lastCommand": None
+        }
 
     def __del__(self):
         self.communication.stopLoop()
@@ -115,11 +115,7 @@ class Player:
 
     def roombaAction(self) -> None:
         if self.roombaState["phase"] == "forward":
-            if (
-                self.roombaState["lastCommand"] == "left"
-                or self.roombaState["lastCommand"] == "forward"
-                or self.roombaState["lastCommand"] == None
-            ):
+            if self.roombaState["lastCommand"] in ("left", "forward", None):
                 self.communication.sendLook()
                 self.roombaState["lastCommand"] = "look"
 
