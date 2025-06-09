@@ -15,6 +15,7 @@ int write_map_message(int xLength, zappy_t *zappy,
     inventory_t **tiles, int *pos)
 {
     char *message = malloc(sizeof(char) * xLength);
+    graph_net_t *current = zappy->graph;
 
     if (message == NULL)
         return -1;
@@ -24,9 +25,12 @@ int write_map_message(int xLength, zappy_t *zappy,
         tiles[pos[0]][pos[1]].nbDeraumere, tiles[pos[0]][pos[1]].nbSibur,
         tiles[pos[0]][pos[1]].nbMendiane, tiles[pos[0]][pos[1]].nbPhiras,
         tiles[pos[0]][pos[1]].nbThystame);
-    if (write_message(zappy->graph->fd, message) == -1) {
-        free(message);
-        return -1;
+    while (current != NULL) {
+        if (write_message(current->fd, message) == -1) {
+            free(message);
+            return -1;
+        }
+        current = current->next;
     }
     free(message);
     return 0;
@@ -77,6 +81,16 @@ int send_entrie_map(zappy_t *zappy)
     return 0;
 }
 
+static void free_elems(char *message, char *x, char *y)
+{
+    if (message)
+        free(message);
+    if (x)
+        free(x);
+    if (y)
+        free(y);
+}
+
 /* Send  the msz message to the gui */
 int send_map_size(zappy_t *server)
 {
@@ -85,16 +99,16 @@ int send_map_size(zappy_t *server)
     char *message = malloc(sizeof(char) * xLenthth);
     char *x = my_itoa(server->game->map->width);
     char *y = my_itoa(server->game->map->height);
+    graph_net_t *current = server->graph;
 
     snprintf(message, xLenthth, "msz %s %s\n", x, y);
-    if (write_message(server->graph->fd, message) == -1) {
-        free(message);
-        free(x);
-        free(y);
-        return -1;
+    while (current != NULL) {
+        if (write_message(current->fd, message) == -1) {
+            free_elems(message, x, y);
+            return -1;
+        }
+        current = current->next;
     }
-    free(message);
-    free(x);
-    free(y);
+    free_elems(message, x, y);
     return 0;
 }

@@ -35,6 +35,7 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/accept.c					\
 				../../../server/src/game/game.c						\
 				../../../server/src/game/init_egg.c					\
+				../../../server/src/game/graphic_client.c		\
 				../../../server/src/algo.c						\
 				../../../server/src/free.c						\
 				../../../server/src/signal.c					\

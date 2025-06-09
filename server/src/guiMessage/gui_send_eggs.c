@@ -16,21 +16,22 @@
 int send_egg(zappy_t *zappy, egg_t *egg)
 {
     egg_t *current = egg;
-    int xLength = int_str_len(current->id) +
-        int_str_len(current->posX) + int_str_len(current->posY) +
-        int_str_len(current->idLayer) + 20;
+    int xLength = int_str_len(current->id) + int_str_len(current->posX) +
+        int_str_len(current->posY) + int_str_len(current->idLayer) + 20;
     char *message = malloc(sizeof(char) * xLength);
+    graph_net_t *currentGraph = zappy->graph;
 
     if (message == NULL)
         return -1;
-    snprintf(message, xLength, "enw #%d #%d %d %d %s\n",
-        current->id, current->idLayer, current->posX, current->posY,
-        current->teamName);
+    snprintf(message, xLength, "enw #%d #%d %d %d %s\n", current->id,
+        current->idLayer, current->posX, current->posY, current->teamName);
     if (zappy->params->is_debug == true)
         printf("Sending egg: %s", message);
-    if (write_message(zappy->graph->fd, message) == -1) {
-        free(message);
-        return -1;
+    while (currentGraph != NULL) {
+        if (write_message(currentGraph->fd, message) == -1) {
+            return -1;
+        }
+        currentGraph = currentGraph->next;
     }
     free(message);
     return 0;
@@ -54,18 +55,21 @@ int send_player_laying_egg(zappy_t *zappy, player_t *player)
 {
     int xLenght = int_str_len(player->id) + 7;
     char *message = malloc(sizeof(char) * xLenght);
+    graph_net_t *current = zappy->graph;
 
     if (message == NULL) {
         error_message("Failed to allocate memory for player laying egg.");
         return -1;
     }
     snprintf(message, xLenght, "pfk #%d\n", player->id);
-    if (zappy->params->is_debug == true) {
+    if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", message);
-    }
-    if (write_message(zappy->graph->fd, message) == -1) {
-        free(message);
-        return -1;
+    while (current != NULL) {
+        if (write_message(current->fd, message) == -1) {
+            free(message);
+            return -1;
+        }
+        current = current->next;
     }
     free(message);
     return 0;

@@ -16,15 +16,19 @@ int send_time_message(zappy_t *zappy)
 {
     int xLength = int_str_len(zappy->params->freq) + 6;
     char *message = malloc(xLength * sizeof(char));
+    graph_net_t *current = zappy->graph;
 
     if (message == NULL)
         return -1;
     snprintf(message, xLength, "sgt %d\n", zappy->params->freq);
     if (zappy->params->is_debug)
         printf("Sending time message: %s", message);
-    if (write_message(zappy->graph->fd, message) == -1) {
-        free(message);
-        return -1;
+    while (current != NULL) {
+        if (write_message(current->fd, message) == -1) {
+            free(message);
+            return -1;
+        }
+        current = current->next;
     }
     free(message);
     return 0;
@@ -35,6 +39,7 @@ int send_updated_time(zappy_t *zappy, int time)
 {
     int xLength = int_str_len(time) + 6;
     char *message = malloc(sizeof(char) * xLength);
+    graph_net_t *current = zappy->graph;
 
     if (message == NULL) {
         error_message("Failed to allocate memory for updated time message.");
@@ -43,9 +48,12 @@ int send_updated_time(zappy_t *zappy, int time)
     snprintf(message, xLength, "sst %d\n", time);
     if (zappy->params->is_debug)
         printf("Sending updated time: %s", message);
-    if (write_message(zappy->graph->fd, message) == -1) {
-        free(message);
-        return -1;
+    while (current != NULL) {
+        if (write_message(current->fd, message) == -1) {
+            free(message);
+            return -1;
+        }
+        current = current->next;
     }
     free(message);
     return 0;

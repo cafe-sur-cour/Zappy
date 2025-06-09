@@ -18,18 +18,21 @@ int send_broadcast_to_player(zappy_t *zappy, player_t *player,
 {
     int xLength = int_str_len(player->id) + strlen(message) + 8;
     char *formatted_message = malloc(sizeof(char) * xLength);
+    graph_net_t *current = zappy->graph;
 
     if (formatted_message == NULL) {
         error_message("Failed to allocate memory for broadcast message.");
         return -1;
     }
     snprintf(formatted_message, xLength, "pbc #%d %s\n", player->id, message);
-    if (zappy->params->is_debug == true) {
+    if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", formatted_message);
-    }
-    if (write_message(zappy->graph->fd, formatted_message) == -1) {
-        free(formatted_message);
-        return -1;
+    while (current != NULL) {
+        if (write_message(current->fd, formatted_message) == -1) {
+            free(formatted_message);
+            return -1;
+        }
+        current = current->next;
     }
     free(formatted_message);
     return 0;

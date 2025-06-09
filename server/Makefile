@@ -25,6 +25,7 @@ SRC 		=	src/params.c					\
 				src/game/game.c					\
 				src/game/init_egg.c				\
 				src/game/player.c				\
+				src/game/graphic_client.c		\
 				src/free.c						\
 				src/algo.c						\
 				src/accept.c					\
@@ -62,7 +63,7 @@ OBJ 		= 	$(SRC:.c=.o)
 
 INCLUDES 	= 	-I./include
 
-CFLAGS 		=	-Wall -Wextra -Werror -Wshadow
+CFLAGS 		=	-Wall -Wextra -Werror -Wshadow -g
 
 LIBS 		= -L./ -lmy -lnetwork
 

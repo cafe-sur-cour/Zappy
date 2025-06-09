@@ -17,12 +17,17 @@ static int create_buffer(const char *team_name, zappy_t *server)
 {
     int xLength = strlen(team_name) + 6;
     char *message = malloc(sizeof(char) * (xLength));
+    graph_net_t *current = server->graph;
 
     if (message == NULL) {
         return -1;
     }
     snprintf(message, xLength, "tna %s\n", team_name);
-    write_message(server->graph->fd, message);
+    while (current != NULL) {
+        if (write_message(current->fd, message) == -1)
+            return -1;
+        current = current->next;
+    }
     free(message);
     return 0;
 }

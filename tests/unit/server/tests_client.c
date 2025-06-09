@@ -96,9 +96,7 @@ Test(process_new_client, graphic_client_already_connected, .init = redirect_all_
     cr_redirect_stderr();
     bool result = process_new_client("GRAPHIC", fd, zappy);
     
-    cr_assert_eq(result, false);
-    cr_assert_eq(zappy->graph->fd, 10); // Should not change
-    
+    cr_assert_eq(result, true);
     free_mock_zappy(zappy);
 }
 

@@ -28,6 +28,7 @@ typedef struct params_s {
 /* Structure to handle the network side of the gui*/
 typedef struct graph_net_s {
     int fd;
+    bool mapSent;
     struct graph_net_s *next;
 } graph_net_t;
 
@@ -165,5 +166,10 @@ int handle_broadcast(player_t *player, char *command, zappy_t *zappy);
 int handle_look(player_t *player, char *command, zappy_t *zappy);
 int handle_set(player_t *player, char *command, zappy_t *zappy);
 int handle_take(player_t *player, char *command, zappy_t *zappy);
+
+/* graphic_clinet.c */
+graph_net_t *add_graph_node(graph_net_t **head, int fd);
+graph_net_t *remove_graph_node(graph_net_t **head, int fd);
+void poll_graphic_clients(zappy_t *zappy);
 
 #endif /* !ZAPPY_H_ */

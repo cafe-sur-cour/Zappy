@@ -31,11 +31,15 @@ static bool valid_team_name(const char *team_name, zappy_t *zappy)
 bool process_new_client(const char *team_name, int fd, zappy_t *zappy)
 {
     if (strcmp(team_name, "GRAPHIC") == 0) {
-        if (zappy->graph->fd != -1) {
-            error_message("A graphic client is already connected.");
+        if (add_graph_node(&zappy->graph, fd) == NULL) {
+            error_message("Failed to add graphic client to the list.");
             return false;
         }
-        zappy->graph->fd = fd;
+        send_map_size(zappy);
+        send_time_message(zappy);
+        send_entrie_map(zappy);
+        send_team_name(zappy);
+        send_entire_egg_list(zappy);
         return true;
     }
     return valid_team_name(team_name, zappy);
