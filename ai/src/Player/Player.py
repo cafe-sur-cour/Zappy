@@ -63,7 +63,6 @@ class Player:
                 "forwardCount": 0,
                 "targetForward": 10,
                 "phase": "forward",
-                "waitingForResponse": False,
                 "lastCommand": None
             }
 
@@ -115,9 +114,6 @@ class Player:
         return neededStones
 
     def roombaAction(self) -> None:
-        if self.roombaState["waitingForResponse"]:
-            return
-        
         if self.roombaState["phase"] == "forward":
             if (
                 self.roombaState["lastCommand"] == "left"
@@ -126,24 +122,22 @@ class Player:
             ):
                 self.communication.sendLook()
                 self.roombaState["lastCommand"] = "look"
-                self.roombaState["waitingForResponse"] = True
 
             elif self.roombaState["lastCommand"] == "look":
                 self.look = self.communication.getLook() or self.look
-                if "food" in self.look[0].keys():
-                    self.communication.sendTakeObject("food")
-                neededStones = self.getNeededStonesByPriority()
-                for stone in neededStones:
-                    if stone in self.look[0].keys():
-                        self.communication.sendTakeObject(stone)
+                if self.look:
+                    if "food" in self.look[0].keys():
+                        self.communication.sendTakeObject("food")
+                    neededStones = self.getNeededStonesByPriority()
+                    for stone in neededStones:
+                        if stone in self.look[0].keys():
+                            self.communication.sendTakeObject(stone)
                 self.roombaState["lastCommand"] = "getObjects"
-                self.roombaState["waitingForResponse"] = True
 
             elif self.roombaState["lastCommand"] == "getObjects":
                 if self.roombaState["forwardCount"] < self.roombaState["targetForward"]:
                     self.communication.sendForward()
                     self.roombaState["lastCommand"] = "forward"
-                    self.roombaState["waitingForResponse"] = True
                     self.roombaState["forwardCount"] += 1
 
                 else:
@@ -151,19 +145,16 @@ class Player:
                     self.roombaState["phase"] = "turn"
                     self.communication.sendRight()
                     self.roombaState["lastCommand"] = "right"
-                    self.roombaState["waitingForResponse"] = True
 
         elif self.roombaState["phase"] == "turn":
             if self.roombaState["lastCommand"] == "right":
                 self.communication.sendForward()
                 self.roombaState["lastCommand"] = "forward"
-                self.roombaState["waitingForResponse"] = True
 
             elif self.roombaState["lastCommand"] == "forward":
                 self.communication.sendLeft()
                 self.roombaState["lastCommand"] = "left"
                 self.roombaState["phase"] = "forward"
-                self.roombaState["waitingForResponse"] = True
 
     def handleCommandResponse(self, response: str) -> None:
         if response.strip() == "inventory":
@@ -174,9 +165,6 @@ class Player:
 
         elif response.strip() == "ko":
             print(f"Command '{self.roombaState["lastCommand"]}' failed")
-
-        if not self.communication.hasPendingCommands():
-            self.roombaState["waitingForResponse"] = False
 
     def loop(self) -> None:
         while not self.communication.playerIsDead():
