@@ -49,7 +49,7 @@ CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 LIBS = -L./src/Communication -lcommunication -lraylib -lGL -lm -lpthread \
-		-ldl -lrt -lX11
+		-ldl -lrt -lX11 -lsfml-audio
 
 COMM_LIB = src/Communication/libcommunication.a
 
