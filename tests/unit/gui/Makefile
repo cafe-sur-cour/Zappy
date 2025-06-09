@@ -48,7 +48,7 @@ INCLUDES = -I./include
 CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
-LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -lsfml-audio
 
 NAME = zappy_gui
 
