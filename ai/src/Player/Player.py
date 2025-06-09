@@ -169,7 +169,7 @@ class Player:
                 response = self.hash.unHashMessage(str(message[1][:-1]))
                 print(f"Message received from the server: {response}")
 
-            if self.communication.hasReponses():
+            if self.communication.hasResponses():
                 response = self.communication.getLastResponse()
                 if response.strip() == "dead":
                     break
