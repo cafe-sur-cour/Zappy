@@ -39,6 +39,7 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/algo.c						\
 				../../../server/src/free.c						\
 				../../../server/src/signal.c					\
+				../../../server/src/params_checkers.c 			\
 				../../../server/src/network/accept_connection.c			\
 				../../../server/src/network/buffer.c			\
 				../../../server/src/network/close.c		\
