@@ -37,6 +37,14 @@ class Communication:
 
         self.mutex = threading.Lock()
 
+    def __del__(self):
+        if self.socket:
+            self.socket.close()
+
+    def stopLoop(self) -> None:
+        with self.mutex:
+            self.playerDead = True
+
     def loop(self) -> None:
         while not self.playerDead:
             with self.mutex:
@@ -46,7 +54,11 @@ class Communication:
                     self.pendingQueue.append(request)
                 else:
                     sleep(0.1)
-            self.receive()
+            try:
+                self.receive()
+            except CommunicationInvalidResponseException as e:
+                print(f"Communication error: {e}")
+                self.playerDead = True
 
     def tryGetInventory(self, response: str) -> dict[str, int] | None:
         if not response.startswith("[") or not response.endswith("]"):
@@ -130,10 +142,19 @@ class Communication:
         fd_vs_event = poller_object.poll(200)
 
         for fd, event in fd_vs_event:
-            data = self.receiveData()
-            if data != "":
-                self.addResponse(data)
-                self.pendingQueue.pop()
+            if event & select.POLLHUP:
+                self.playerDead = True
+                return
+            if event & select.POLLERR:
+                raise CommunicationInvalidResponseException(
+                    "Error in communication with server"
+                )
+            if event & select.POLLIN:
+                data = self.receiveData()
+                if data:
+                    self.addResponse(data)
+                    if self.hasPendingCommands():
+                        self.pendingQueue.pop(0)
 
     def addResponse(self, response: str) -> None:
         with self.mutex:
