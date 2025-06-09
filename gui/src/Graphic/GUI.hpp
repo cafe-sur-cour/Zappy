@@ -49,7 +49,7 @@ class GUI {
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<Map> _map;
         std::unique_ptr<HUD> _hud;
-        std::unique_ptr<Audio> _audio;
+        std::shared_ptr<Audio> _audio;
         std::unique_ptr<CameraManager> _cameraManager;
 
         int _windowWidth;

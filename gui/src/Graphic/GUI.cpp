@@ -26,9 +26,9 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _raylib->initCamera();
     _isRunning = _raylib->isWindowReady();
     _raylib->setTargetFPS(zappy::gui::FPS);
+    _audio = std::make_shared<Audio>();
     _map = std::make_unique<Map>(_gameInfos, _raylib);
-    _hud = std::make_unique<HUD>(_raylib, _gameInfos);
-    _audio = std::make_unique<Audio>(_raylib);
+    _hud = std::make_unique<HUD>(_raylib, _gameInfos, _audio);
 
     _cameraManager = std::make_unique<CameraManager>(_raylib);
     _cameraManager->setGameInfos(_gameInfos);
@@ -77,8 +77,6 @@ void GUI::update()
         if (_raylib->isKeyReleased(KEY_LEFT))
             switchToPreviousPlayer();
     }
-
-    _audio->updateAllMusics();
 
     updateCamera();
     _hud->updateTeamPlayersDisplay(_gameInfos);

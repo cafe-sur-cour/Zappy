@@ -14,8 +14,9 @@
 #include "../../Utils/Constants.hpp"
 #include "HUD.hpp"
 
-HUD::HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos)
-    : _containers(), _raylib(raylib), _gameInfos(gameInfos)
+HUD::HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos,
+         std::shared_ptr<Audio> audio)
+    : _containers(), _raylib(raylib), _gameInfos(gameInfos), _audio(audio)
 {
     initDefaultLayout(15.0f, 20.0f);
     initExitButton();
@@ -57,6 +58,7 @@ std::shared_ptr<Containers> HUD::addContainer(
 
     auto container = std::make_shared<Containers>(
         _raylib,
+        _audio,
         x,
         y,
         width,

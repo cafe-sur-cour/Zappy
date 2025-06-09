@@ -10,6 +10,7 @@
 #include "Containers/Containers.hpp"
 #include "../RayLib/RayLib.hpp"
 #include "../../Game/GameInfos.hpp"
+#include "../Audio/Audio.hpp"
 #include <vector>
 #include <unordered_map>
 
@@ -26,7 +27,8 @@ class HUD {
          *
          * @param raylib Reference to the RayLib instance
          */
-        HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos);
+        HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos,
+            std::shared_ptr<Audio> audio);
 
         /**
          * @brief Destroy the HUD object
@@ -302,4 +304,5 @@ class HUD {
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<RayLib> _raylib;
         std::shared_ptr<GameInfos> _gameInfos;
+        std::shared_ptr<Audio> _audio;
 };

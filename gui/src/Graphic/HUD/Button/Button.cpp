@@ -11,6 +11,7 @@
 
 Button::Button(
     std::shared_ptr<RayLib> raylib,
+    std::shared_ptr<Audio> audio,
     float x, float y,
     float width, float height,
     const std::string& text,
@@ -24,7 +25,8 @@ Button::Button(
     _textColor({30, 30, 30, 255}),
     _isHovered(false),
     _isPressed(false),
-    _raylib(raylib)
+    _raylib(raylib),
+    _audio(audio)
 {
 }
 
@@ -61,7 +63,7 @@ void Button::update()
     _isPressed = _isHovered && _raylib->isMouseButtonDown(MOUSE_LEFT_BUTTON);
 
     if (wasPressed && !_isPressed && _isHovered && _callback) {
-        _raylib->playSound("click", 0.75f);
+        _audio->playSound("click", 100.0f);
         _callback();
     }
 }

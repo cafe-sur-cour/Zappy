@@ -9,6 +9,7 @@
 
 #include "../UIElement/AUIElement.hpp"
 #include "../../RayLib/RayLib.hpp"
+#include "../../Audio/Audio.hpp"
 #include <string>
 #include <functional>
 #include <memory>
@@ -32,6 +33,7 @@ class Button : public AUIElement {
          */
         Button(
             std::shared_ptr<RayLib> raylib,
+            std::shared_ptr<Audio> audio,
             float x, float y,
             float width, float height,
             const std::string& text,
@@ -110,4 +112,5 @@ class Button : public AUIElement {
         bool _isPressed;
 
         std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<Audio> _audio;
 };

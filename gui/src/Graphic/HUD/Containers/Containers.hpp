@@ -12,6 +12,7 @@
 #include "../Button/Button.hpp"
 #include "../Text/Text.hpp"
 #include "../../RayLib/RayLib.hpp"
+#include "../../Audio/Audio.hpp"
 #include <vector>
 #include <functional>
 #include <unordered_map>
@@ -28,13 +29,14 @@ class Containers : public AContainers {
          * @brief Construct a new Container
          *
          * @param raylib Reference to the RayLib instance
+         * @param audio Reference to the Audio instance
          * @param x X coordinate
          * @param y Y coordinate
          * @param width Container width
          * @param height Container height
          * @param backgroundColor Background color (default: semi-transparent dark gray)
          */
-        Containers(std::shared_ptr<RayLib> raylib, float x, float y, float width, float height, Color backgroundColor = {40, 40, 40, 200});
+        Containers(std::shared_ptr<RayLib> raylib, std::shared_ptr<Audio> audio, float x, float y, float width, float height, Color backgroundColor = {40, 40, 40, 200});
 
         /**
          * @brief Destroy the Container
@@ -267,6 +269,7 @@ class Containers : public AContainers {
 
     private:
         std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<Audio> _audio;
         Texture2D _backgroundTexture;
         bool _hasBackgroundTexture;
         std::unordered_map<std::string, std::shared_ptr<IUIElement>> _elements;
