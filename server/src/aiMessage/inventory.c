@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static int inventory_message(player_t *player, zappy_t *zappy)
+static int inventory_message(player_t *player)
 {
     int n = int_str_len(player->inventory->nbFood) +
         int_str_len(player->inventory->nbLinemate) +
@@ -40,7 +40,8 @@ static int inventory_message(player_t *player, zappy_t *zappy)
 int handle_inventory(player_t *player, char *command, zappy_t *zappy)
 {
     (void)command;
-    if (inventory_message(player, zappy) == -1)
+    (void)zappy;
+    if (inventory_message(player) == -1)
         return -1;
     if (send_player_inventory(zappy, player) == -1)
         return -1;
