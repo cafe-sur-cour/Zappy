@@ -96,7 +96,8 @@ void Map::drawPlayers(int x, int y)
         }
 
         _raylib->drawModelEx("player", position, {0.0f, 1.0f, 0.0f},
-            rotationAngle, {0.5f, 0.5f, 0.5f}, teamColor);
+            rotationAngle, {zappy::gui::PLAYER_SCALE, zappy::gui::PLAYER_SCALE,
+                zappy::gui::PLAYER_SCALE}, teamColor);
         drawOrientationArrow(position, playersOnTile[i]->orientation,
             cylinderHeight);
     }
