@@ -67,6 +67,13 @@ class Player:
                 "lastCommand": None
             }
 
+    def __del__(self):
+        self.communication.stopLoop()
+        if self._commThread.is_alive():
+            self._commThread.join()
+        if self.communication:
+            del self.communication
+
     def __str__(self):
         return (
             f"Player team: {self.teamName}, "
