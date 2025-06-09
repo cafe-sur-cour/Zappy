@@ -30,6 +30,7 @@ SRC 		=	src/params.c					\
 				src/algo.c						\
 				src/accept.c					\
 				src/signal.c					\
+				src/params_checkers.c 			\
 				src/guiMessage/gui_send_map_data.c	\
 				src/guiMessage/gui_send_team_name.c	\
 				src/guiMessage/gui_send_eggs.c		\

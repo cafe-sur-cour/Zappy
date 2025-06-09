@@ -156,15 +156,16 @@ params_t *check_args(int argc, char **argv)
     bool is_ok = true;
     params_t *params = malloc(sizeof(params_t));
 
-    if (!params) {
-        error_message("Memory allocation failed for params.");
+    if (!params)
         return NULL;
-    }
     if (argc < 12) {
         helper();
         return NULL;
     }
     params->is_debug = false;
+    if (!validate_no_extra_args(argc, argv)) {
+        return free_params(params);
+    }
     if (!check_all_params(argc, argv, is_ok, params))
         return free_params(params);
     print_elem(params, argc, argv);

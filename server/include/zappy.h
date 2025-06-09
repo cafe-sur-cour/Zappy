@@ -77,6 +77,9 @@ int *get_running_state(void);
 params_t *check_args(int argc, char **argv);
 void *free_params(params_t *params);
 
+/* params_cherckers.c */
+bool validate_no_extra_args(int argc, char **argv);
+
 /* server.c */
 zappy_t *init_server(int argc, char **argv);
 void *free_zappy(zappy_t *server);
