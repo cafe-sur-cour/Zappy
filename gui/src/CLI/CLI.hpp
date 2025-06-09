@@ -8,6 +8,7 @@
 #ifndef CLI_HPP_
 #define CLI_HPP_
 
+#include <string>
 #include "../Utils/Constants.hpp"
 
 class CLI {
