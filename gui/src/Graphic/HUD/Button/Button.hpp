@@ -7,12 +7,13 @@
 
 #pragma once
 
-#include "../UIElement/AUIElement.hpp"
-#include "../../RayLib/RayLib.hpp"
-#include "../../Audio/Audio.hpp"
 #include <string>
 #include <functional>
 #include <memory>
+
+#include "../UIElement/AUIElement.hpp"
+#include "../../RayLib/RayLib.hpp"
+#include "../../Audio/Audio.hpp"
 
 /**
  * @brief Button UI element
