@@ -56,7 +56,10 @@ int forward_message(player_t *player, params_t *params)
 int handle_forward(player_t *player, char *command, zappy_t *zappy)
 {
     (void)command;
-    forward_message(player, zappy->params);
-    send_player_pos(zappy, player);
+    if (forward_message(player, zappy->params) == -1)
+        return -1;
+    if (send_player_pos(zappy, player) == -1) {
+        return -1;
+    }
     return 0;
 }

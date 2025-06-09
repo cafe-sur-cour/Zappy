@@ -13,59 +13,84 @@
 #include <string.h>
 
 /* This function sends the end of game message */
-void send_end_game(zappy_t *zappy, const char *teamName)
+int send_end_game(zappy_t *zappy, const char *teamName)
 {
     int xLength = strlen(teamName) + 6;
     char *message = malloc(sizeof(char) * xLength);
+    graph_net_t *graph = zappy->graph;
 
     if (message == NULL) {
         error_message("Failed to allocate memory for end game message.");
-        return;
+        return -1;
     }
     snprintf(message, xLength, "seg %s\n", teamName);
-    if (zappy->params->is_debug) {
+    if (zappy->params->is_debug)
         printf("Sending end game message: %s", message);
+    while (graph != NULL) {
+        if (write_message(graph->fd, message) == -1) {
+            free(message);
+            return -1;
+        }
+        graph = graph->next;
     }
-    write_message(zappy->graph->fd, message);
     free(message);
+    return 0;
 }
 
 /* This sends a str Message from the server */
-void send_str_message(zappy_t *zappy, const char *message)
+int send_str_message(zappy_t *zappy, const char *message)
 {
     int xLength = strlen(message) + 6;
     char *formatted_message = malloc(sizeof(char) * xLength);
+    graph_net_t *current = zappy->graph;
 
     if (formatted_message == NULL) {
         error_message("Failed to allocate memory for string message.");
-        return;
+        return -1;
     }
     snprintf(formatted_message, xLength, "smg %s\n", message);
-    if (zappy->params->is_debug) {
+    if (zappy->params->is_debug)
         printf("Sending string message: %s", formatted_message);
+    while (current != NULL) {
+        if (write_message(current->fd, formatted_message) == -1) {
+            free(formatted_message);
+            return -1;
+        }
+        current = current->next;
     }
-    write_message(zappy->graph->fd, formatted_message);
     free(formatted_message);
+    return 0;
 }
 
 /* This function sends unkown message */
-void send_unknown_command(zappy_t *zappy)
+int send_unknown_command(zappy_t *zappy)
 {
     const char *message = "suc\n";
+    graph_net_t *current = zappy->graph;
 
-    if (zappy->params->is_debug) {
+    if (zappy->params->is_debug)
         printf("Sending unknown command message: %s", message);
+    while (current != NULL) {
+        if (write_message(current->fd, message) == -1)
+            return -1;
+        current = current->next;
     }
-    write_message(zappy->graph->fd, message);
+    return 0;
 }
 
 /* This send the command parameter */
-void send_command_parameter(zappy_t *zappy)
+int send_command_parameter(zappy_t *zappy)
 {
     const char *message = "sbp\n";
+    graph_net_t *current = zappy->graph;
 
-    if (zappy->params->is_debug) {
+    if (zappy->params->is_debug)
         printf("Sending command parameter message: %s", message);
+    while (current != NULL) {
+        if (write_message(current->fd, message) == -1) {
+            return -1;
+        }
+        current = current->next;
     }
-    write_message(zappy->graph->fd, message);
+    return 0;
 }

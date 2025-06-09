@@ -25,6 +25,7 @@ SRC 		=	src/params.c					\
 				src/game/game.c					\
 				src/game/init_egg.c				\
 				src/game/player.c				\
+				src/game/graphic_client.c		\
 				src/free.c						\
 				src/algo.c						\
 				src/accept.c					\
@@ -45,13 +46,24 @@ SRC 		=	src/params.c					\
 				src/receiveMessage/pollin_handler.c			\
 				src/receiveMessage/loop_thru_command.c		\
 				src/receiveMessage/queu_hanlder.c			\
-				src/aiMessage/forward.c
+				src/aiMessage/forward.c						\
+				src/aiMessage/rigth.c						\
+				src/aiMessage/left.c						\
+				src/aiMessage/broadcast.c					\
+				src/aiMessage/connect.c						\
+				src/aiMessage/eject.c						\
+				src/aiMessage/incantation.c					\
+				src/aiMessage/inventory.c					\
+				src/aiMessage/set_object.c  					\
+				src/aiMessage/take_object.c					\
+				src/aiMessage/fork.c						\
+				src/aiMessage/look.c
 
 OBJ 		= 	$(SRC:.c=.o)
 
 INCLUDES 	= 	-I./include
 
-CFLAGS 		=	-Wall -Wextra -Werror -Wshadow
+CFLAGS 		=	-Wall -Wextra -Werror -Wshadow -g
 
 LIBS 		= -L./ -lmy -lnetwork
 

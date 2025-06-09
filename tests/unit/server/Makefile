@@ -35,6 +35,7 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/accept.c					\
 				../../../server/src/game/game.c						\
 				../../../server/src/game/init_egg.c					\
+				../../../server/src/game/graphic_client.c		\
 				../../../server/src/algo.c						\
 				../../../server/src/free.c						\
 				../../../server/src/signal.c					\
@@ -61,7 +62,18 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/receiveMessage/pollin_handler.c			\
 				../../../server/src/receiveMessage/loop_thru_command.c		\
 				../../../server/src/receiveMessage/queu_hanlder.c			\
-				../../../server/src/aiMessage/forward.c
+				../../../server/src/aiMessage/forward.c						\
+				../../../server/src/aiMessage/rigth.c						\
+				../../../server/src/aiMessage/left.c						\
+				../../../server/src/aiMessage/broadcast.c					\
+				../../../server/src/aiMessage/connect.c						\
+				../../../server/src/aiMessage/eject.c						\
+				../../../server/src/aiMessage/incantation.c					\
+				../../../server/src/aiMessage/inventory.c					\
+				../../../server/src/aiMessage/set_object.c  					\
+				../../../server/src/aiMessage/take_object.c					\
+				../../../server/src/aiMessage/fork.c						\
+				../../../server/src/aiMessage/look.c
 
 
 INCLUDES 	= 	-I./../../../server/include
