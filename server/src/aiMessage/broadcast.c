@@ -34,25 +34,23 @@ static int get_orientation(int x, int y)
 {
     double angle = atan2(y, x) * 180.0 / 3.14159265358979323846;
 
-    if (x == 0 && y == 0)
-        return 0;
-
     if (angle >= -22.5 && angle < 22.5)
         return 3;
-    else if (angle >= 22.5 && angle < 67.5)
+    if (angle >= 22.5 && angle < 67.5)
         return 4;
-    else if (angle >= 67.5 && angle < 112.5)
+    if (angle >= 67.5 && angle < 112.5)
         return 5;
-    else if (angle >= 112.5 && angle < 157.5)
+    if (angle >= 112.5 && angle < 157.5)
         return 6;
-    else if ((angle >= 157.5 && angle <= 180.0) || (angle >= -180.0 && angle < -157.5))
+    if ((angle >= 157.5 && angle <= 180.0) || (angle >= -180.0 && angle < -157.5))
         return 7;
-    else if (angle >= -157.5 && angle < -112.5)
+    if (angle >= -157.5 && angle < -112.5)
         return 8;
-    else if (angle >= -112.5 && angle < -67.5)
+    if (angle >= -112.5 && angle < -67.5)
         return 1;
-    else if (angle >= -67.5 && angle < -22.5)
+    if (angle >= -67.5 && angle < -22.5)
         return 2;
+    return 0;
 }
 
 static int broadcast_text(player_t *source, player_t *dest, char *text)
