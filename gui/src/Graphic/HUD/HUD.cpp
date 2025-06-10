@@ -636,33 +636,33 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "player_info_title",
-        5.0f, 10.0f,
+        55.0f, 10.0f,
         "PLAYER INFORMATION",
-        6.0f,
+        8.0f,
         {255, 255, 255, 255}
     );
 
     bottomContainer->addTextPercent(
-        "player_info_id",
-        5.0f, 20.0f,
-        "ID: " + std::to_string(player.number),
-        4.5f,
-        {220, 220, 220, 255}
+        "player_info_separator",
+        55.0f, 17.0f,
+        std::string(70, '-'),
+        2.0f,
+        {150, 150, 150, 200}
     );
 
     bottomContainer->addTextPercent(
         "player_info_team",
-        5.0f, 27.0f,
+        55.0f, 30.0f,
         "Team: " + player.teamName,
-        4.5f,
+        7.0f,
         {220, 220, 220, 255}
     );
 
     bottomContainer->addTextPercent(
         "player_info_level",
-        5.0f, 34.0f,
+        55.0f, 50.0f,
         "Level: " + std::to_string(player.level),
-        4.5f,
+        7.0f,
         {220, 220, 220, 255}
     );
 
@@ -677,99 +677,99 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "player_info_position",
-        5.0f, 41.0f,
+        65.0f, 30.0f,
         "Position: [" + std::to_string(player.x) + ", " + std::to_string(player.y) + "]",
-        4.5f,
+        7.0f,
         {220, 220, 220, 255}
     );
 
     bottomContainer->addTextPercent(
         "player_info_orientation",
-        5.0f, 48.0f,
+        65.0f, 50.0f,
         "Orientation: " + orientationStr,
-        4.5f,
+        7.0f,
         {220, 220, 220, 255}
     );
 
     bottomContainer->addTextPercent(
         "inventory_title",
-        36.0f, 10.0f,
+        75.0f, 10.0f,
         "INVENTORY",
-        6.0f,
+        8.0f,
         {255, 255, 255, 255}
     );
 
     bottomContainer->addTextPercent(
         "inventory_separator",
-        36.0f, 18.0f,
-        std::string(45, '-'),
+        75.0f, 17.0f,
+        std::string(70, '-'),
         2.0f,
         {150, 150, 150, 200}
     );
 
     bottomContainer->addTextPercent(
         "inventory_food",
-        36.0f, 22.0f,
+        82.0f, 24.0f,
         "Food: " + std::to_string(player.inventory.food),
-        5.5f,
+        7.5f,
         {255, 215, 0, 255}
     );
 
-    float yPosCol1 = 32.0f;
-    float xPosCol1 = 25.0f;
+    float yPosCol1 = 34.0f;
+    float xPosCol1 = 75.0f;
 
     bottomContainer->addTextPercent(
         "inventory_linemate",
         xPosCol1, yPosCol1,
         "Linemate: " + std::to_string(player.inventory.linemate),
-        5.0f,
+        7.0f,
         {200, 200, 200, 255}
     );
-    yPosCol1 += 12.0f;
+    yPosCol1 += 13.0f;
 
     bottomContainer->addTextPercent(
         "inventory_deraumere",
         xPosCol1, yPosCol1,
         "Deraumere: " + std::to_string(player.inventory.deraumere),
-        5.0f,
+        7.0f,
         {65, 105, 225, 255}
     );
-    yPosCol1 += 12.0f;
+    yPosCol1 += 13.0f;
 
     bottomContainer->addTextPercent(
         "inventory_sibur",
         xPosCol1, yPosCol1,
         "Sibur: " + std::to_string(player.inventory.sibur),
-        5.0f,
+        7.0f,
         {50, 205, 50, 255}
     );
 
-    float yPosCol2 = 32.0f;
-    float xPosCol2 = 55.0f;
+    float yPosCol2 = 34.0f;
+    float xPosCol2 = 88.0f;
 
     bottomContainer->addTextPercent(
         "inventory_mendiane",
         xPosCol2, yPosCol2,
         "Mendiane: " + std::to_string(player.inventory.mendiane),
-        5.0f,
+        7.0f,
         {255, 165, 0, 255}
     );
-    yPosCol2 += 12.0f;
+    yPosCol2 += 13.0f;
 
     bottomContainer->addTextPercent(
         "inventory_phiras",
         xPosCol2, yPosCol2,
         "Phiras: " + std::to_string(player.inventory.phiras),
-        5.0f,
+        7.0f,
         {138, 43, 226, 255}
     );
-    yPosCol2 += 12.0f;
+    yPosCol2 += 13.0f;
 
     bottomContainer->addTextPercent(
         "inventory_thystame",
         xPosCol2, yPosCol2,
         "Thystame: " + std::to_string(player.inventory.thystame),
-        5.0f,
+        7.0f,
         {255, 20, 147, 255}
     );
 }
