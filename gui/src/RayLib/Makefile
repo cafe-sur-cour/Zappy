@@ -12,7 +12,8 @@ RED=\033[1;31m
 YELLOW=\033[1;33m
 NC=\033[0m
 
-SRC =	RayLib.cpp
+SRC =	RayLib.cpp	\
+		RaylibWindow.cpp	\
 
 OBJ = $(SRC:.cpp=.o)
 
