@@ -9,7 +9,7 @@
 #define GUI_HPP_
 
 #include <memory>
-
+#include "IGUI.hpp"
 #include "../RayLib/RayLib.hpp"
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
@@ -40,8 +40,9 @@ class GUI {
 
     private:
         void updateCamera();
-        void update();
-        void draw();
+        virtual void update();
+        virtual void draw();
+        virtual bool isRunning();
         bool playerExists(int playerId) const;
 
         void initModels();

@@ -52,10 +52,11 @@ GUI::~GUI()
 
 void GUI::run()
 {
-    if (!_isRunning)
+    if (!_isRunning) {
         return;
+    }
 
-    while (!_raylib->windowShouldClose()) {
+    while (!_isRunning) {
         update();
         draw();
     }
@@ -68,6 +69,8 @@ void GUI::updateCamera()
 
 void GUI::update()
 {
+    if (this->_raylib->windowShouldClose())
+        this->_isRunning = false;
     if (_raylib->isKeyReleased(KEY_TAB))
         switchCameraModeNext();
 
@@ -81,6 +84,11 @@ void GUI::update()
     updateCamera();
     _hud->updateTeamPlayersDisplay(_gameInfos);
     _hud->update();
+}
+
+bool GUI::isRunning()
+{
+    return this->_isRunning;
 }
 
 void GUI::draw()
