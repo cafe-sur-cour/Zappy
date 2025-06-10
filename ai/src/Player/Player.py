@@ -30,6 +30,8 @@ LVL_UPGRADES = {
 
 INVENTORY_REFRESH = 20
 
+NBR_STEP_BEFORE_REFRESH_BROADCAST_HELP = 10
+
 SURVIVAL_MIN_FOOD_LEVEL = 5
 
 
@@ -140,7 +142,8 @@ class Player:
             self.sendHelpRequest()
         elif currentFood < SURVIVAL_MIN_FOOD_LEVEL and self.isInSurvivalMode:
             if self.helpRequestCount < SURVIVAL_MIN_FOOD_LEVEL:
-                if self.roombaState["forwardCount"] % 10 == 0:
+                if (self.roombaState["forwardCount"] %
+                        NBR_STEP_BEFORE_REFRESH_BROADCAST_HELP == 0):
                     self.sendHelpRequest()
             else:
                 self.dropStonesForSurvival()
@@ -163,7 +166,7 @@ class Player:
 
     def canHelpTeammate(self) -> bool:
         currentFood = self.inventory.get("food", 0)
-        return currentFood > 6 and not self.isInSurvivalMode
+        return currentFood > (SURVIVAL_MIN_FOOD_LEVEL + 1) and not self.isInSurvivalMode
 
     def getDirectionFromSound(self, direction: int) -> str:
         if direction == 0:
@@ -197,7 +200,7 @@ class Player:
             return True
 
         if self.helpTargetDirection == 0:
-            if self.inventory.get("food", 0) > 6:
+            if self.inventory.get("food", 0) > (SURVIVAL_MIN_FOOD_LEVEL + 1):
                 print("Drop food for teammate")
                 self.communication.sendSetObject("food")
                 self.communication.sendBroadcast(self.hash.hashMessage("food_dropped"))
@@ -223,7 +226,7 @@ class Player:
             self.communication.sendRight()
             self.communication.sendForward()
         elif direction_str == "self":
-          return True
+            return True
         else:
             self.communication.sendForward()
 
