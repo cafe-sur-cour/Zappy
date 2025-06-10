@@ -124,14 +124,14 @@ class Player:
         currentFood = self.inventory.get("food", 0)
 
         if currentFood > self.lastFoodCheck and self.isInSurvivalMode:
-            print(f"Nourriture récupérée! ({currentFood}/10) - Sortie du mode survie")
+            print(f"Got food! ({currentFood}) - End of survival mode")
             self.isInSurvivalMode = False
             self.helpRequestCount = 0
             self.lastFoodCheck = currentFood
             return
 
         if currentFood < 5 and not self.isInSurvivalMode:
-            print(f"Mode survie Nourriture critique: {currentFood}/10")
+            print(f"Survival mode current food : {currentFood}")
             self.isInSurvivalMode = True
             self.sendHelpRequest()
         elif currentFood < 5 and self.isInSurvivalMode:
@@ -145,63 +145,60 @@ class Player:
     def sendHelpRequest(self) -> None:
         self.helpRequestCount += 1
         helpMessage = f"help:{self.helpRequestCount}"
-        self.communication.sendBroadcast(helpMessage)
+
+        self.communication.sendBroadcast(self.hash.hashMessage(helpMessage))
 
     def dropStonesForSurvival(self) -> None:
         dropPriority = ["thystame", "phiras", "mendiane", "sibur", "deraumere", "linemate"]
 
         for stone in dropPriority:
             if self.inventory.get(stone, 0) > 0:
-                print(f"Mode survie critique: drop de {stone}")
+                print(f"Survival mod critical: drop {stone}")
                 self.communication.sendSetObject(stone)
                 return
 
     def canHelpTeammate(self) -> bool:
-        """Vérifie si on peut aider un coéquipier (surplus de nourriture)"""
         currentFood = self.inventory.get("food", 0)
         return currentFood > 6 and not self.isInSurvivalMode
 
     def getDirectionFromSound(self, direction: int) -> str:
-        """Convertit la direction du son en actions de mouvement"""
         if direction == 0:
             return "self"
 
-        # Directions dans Zappy (selon la doc du protocole):
+        # Zappy directions (from documentation):
         direction_map = {
-            1: "forward",        # devant
-            2: "forward-right",  # devant-gauche
-            3: "right",          # gauche
-            4: "back-right",     # derrière-gauche
-            5: "back",           # derrière
-            6: "back-left",      # derrière-droite
-            7: "left",           # droite
-            8: "forward-left"    # devant-droite
+            1: "forward",        # Forward
+            2: "forward-right",  # Forward-Left
+            3: "right",          # Left
+            4: "back-right",     # Behind-Left
+            5: "back",           # Behind
+            6: "back-left",      # Behind-Right
+            7: "left",           # Right
+            8: "forward-left"    # Forward-Right
         }
         return direction_map.get(direction, "unknown")
 
     def startHelpingTeammate(self, direction: int) -> None:
-        """Commence à aider un coéquipier en détresse"""
         if not self.canHelpTeammate():
             return
 
-        print(f"Début de l'aide vers direction {direction}")
+        print(f"Starting help to this direction {direction}")
         self.isHelpingTeammate = True
         self.helpTargetDirection = direction
 
-        self.communication.sendBroadcast("coming_to_help")
+        self.communication.sendBroadcast(self.hash.hashMessage("coming_to_help"))
 
     def helpTeammateAction(self) -> bool:
-        """Actions spécifiques pour aider un coéquipier. Retourne True si terminé"""
         if not self.isHelpingTeammate:
             return True
 
         if self.helpTargetDirection == 0:
             if self.inventory.get("food", 0) > 6:
-                print("Drop de nourriture pour le coéquipier")
+                print("Drop food for teammate")
                 self.communication.sendSetObject("food")
-                self.communication.sendBroadcast("food_dropped")
+                self.communication.sendBroadcast(self.hash.hashMessage("food_dropped"))
             else:
-                print("Plus assez de nourriture pour aider")
+                print("Not engough food to help teammate")
 
             self.isHelpingTeammate = False
             self.helpTargetDirection = 0
@@ -281,7 +278,7 @@ class Player:
             newFood = self.inventory.get("food", 0)
 
             if newFood != oldFood:
-                print(f"Nourriture: {oldFood} -> {newFood}")
+                print(f"Food: {oldFood} -> {newFood}")
                 self.checkSurvivalStatus()
 
         if response.strip() == "look":
@@ -318,34 +315,32 @@ class Player:
                             if len(help_parts) >= 2 and help_parts[1]:
                                 help_number = help_parts[1]
                                 print(
-                                    f"Demande d'aide reçue de l'équipe: #{help_number}"
-                                    f"depuis direction {direction}")
-                                if direction != 0 and self.canHelpTeammate():
-                                    print(f"Démarrage de l'aide vers la direction {direction}")
+                                    f"Help receive from team: #{help_number}"
+                                    f"from direction {direction}")
+                                if self.canHelpTeammate():
+                                    print(f"Start helping to {direction}")
                                     self.startHelpingTeammate(direction)
-                                elif direction == 0:
-                                    print("C'est notre propre message d'aide")
                                 else:
                                     print(
-                                        f"Ne peut pas aider: "
-                                        f"{self.inventory.get('food', 0)} nourriture,"
-                                        f" mode survie: {self.isInSurvivalMode}")
+                                        f"I can't help: "
+                                        f"{self.inventory.get('food', 0)} food,"
+                                        f" survival mode: {self.isInSurvivalMode}")
                             else:
-                                print(f"Message d'aide mal formaté: {response}")
+                                print(f"Helping message error: {response}")
                         except Exception as e:
-                            print(f"Erreur lors du traitement du message d'aide: {e}")
+                            print(f"Error during message formating: {e}")
                     elif response == "coming_to_help":
                         if direction != 0:
                             print(
-                                f"Un coéquipier vient nous aider depuis la direction "
+                                f"A teammate is coming to help in the direction "
                                 f"{direction}")
                     elif response == "food_dropped":
                         if direction != 0:
                             print(
-                                f"Nourriture droppée par un coéquipier dans la direction "
+                                f"Food dropped by a teammate in the direction "
                                 f"{direction}")
                     else:
-                        print(f"Message non reconnu: {response}")
+                        print(f"Message error: {response}")
 
             if self.communication.hasResponses():
                 response = self.communication.getLastResponse()
