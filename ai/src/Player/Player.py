@@ -220,7 +220,6 @@ class Player:
             self.communication.sendLeft()
             self.communication.sendForward()
         elif direction_str in ["back", "back-right", "back-left"]:
-            # Faire demi-tour et avancer
             self.communication.sendRight()
             self.communication.sendRight()
             self.communication.sendForward()
