@@ -29,6 +29,7 @@ static void print_inventory_server(player_t *player, int len)
         player->inventory->nbMendiane, player->inventory->nbPhiras,
         player->inventory->nbThystame);
     valid_message(debug);
+    free(debug);
 }
 
 static int inventory_message(player_t *player)
