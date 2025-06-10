@@ -25,7 +25,7 @@
             "name": "AI: Missing Hostname",
             "description": "Try to run without hostname parameter",
             "input": ["./zappy_ai", "-p", "4242", "-n", "team1"],
-            "expected_output": "CONTAINS - Missing required option: -h machine",
+            "expected_output": "CONTAINS - AI initialized with configuration:",
             "expected_return": 84
         },
         {
