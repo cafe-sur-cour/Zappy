@@ -9,7 +9,7 @@ import os
 from threading import Thread
 from time import sleep
 
-from src.Hash.Hash import Hash
+from src.Broadcaster.Broadcaster import Broadcaster
 from src.Exceptions.Exceptions import (
     CommunicationException
 )
@@ -50,7 +50,7 @@ class Player:
         self.port: int = port
 
         self.level: int = 1
-        self.hash: Hash = Hash(name)
+        self.broadcaster: Broadcaster = Broadcaster(self.communication, name)
         self.inventory: dict[str, int] = {
             "food": 10,
             "linemate": 0,
@@ -135,7 +135,7 @@ class Player:
         self.helpRequestCount += 1
         helpMessage = f"help:{self.helpRequestCount}"
 
-        self.communication.sendBroadcast(self.hash.hashMessage(helpMessage))
+        self.broadcaster.broadcast(helpMessage)
 
     def dropStonesForSurvival(self) -> None:
         dropPriority = ["thystame", "phiras", "mendiane", "sibur", "deraumere", "linemate"]
@@ -196,10 +196,11 @@ class Player:
             return
 
         print(f"Starting help to this direction {direction}")
+
         self.isHelpingTeammate = True
         self.helpTargetDirection = direction
 
-        self.communication.sendBroadcast(self.hash.hashMessage("comingToHelp"))
+        self.broadcaster.broadcast("comingToHelp")
 
     def helpTeammateAction(self) -> bool:
         if not self.isHelpingTeammate:
@@ -209,7 +210,7 @@ class Player:
             if self.inventory.get("food", 0) > (SURVIVAL_MIN_FOOD_LEVEL + 1):
                 print("Drop food for teammate")
                 self.communication.sendSetObject("food")
-                self.communication.sendBroadcast(self.hash.hashMessage("foodDropped"))
+                self.broadcaster.broadcast("foodDropped")
             else:
                 print("Not enough food to help teammate")
 
@@ -363,19 +364,19 @@ class Player:
     def loop(self) -> None:
         while not self.communication.playerIsDead():
             if self.communication.hasMessages():
-                message = self.communication.getLastMessage()
-                direction = message[0]
-                raw_message = str(message[1])
-                raw_message = raw_message.strip()
-
+                data = self.communication.getLastMessage()
+                direction = data[0]
+                message = self.broadcaster.unHashMessage(data[1])
+                if not message:
+                    print("Received bad message, skipping...")
+                    continue
                 try:
-                    response = self.hash.unHashMessage(raw_message)
                     if (
-                        not self.handleHelpMessage(response, direction) and
-                        not self.handleComingHelpMessage(response, direction) and
-                        not self.handleFoodDroppedMessage(response, direction)
+                        not self.handleHelpMessage(message, direction) and
+                        not self.handleComingHelpMessage(message, direction) and
+                        not self.handleFoodDroppedMessage(message, direction)
                     ):
-                        print(f"Unrecognized message: {response}")
+                        print(f"Unrecognized message: {message}")
                 except Exception as e:
                     print(f"Error during message decryption: {e}")
 
