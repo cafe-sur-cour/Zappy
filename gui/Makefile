@@ -30,7 +30,8 @@ SRC =	src/Client/Client.cpp \
 		src/Graphic/HUD/Containers/AContainers.cpp \
 		src/Graphic/HUD/Text/Text.cpp \
 		src/Graphic/HUD/UIElement/AUIElement.cpp \
-		src/Graphic/HUD/HUD.cpp
+		src/Graphic/HUD/HUD.cpp	\
+		src/Graphic/HUD/Help/Help.cpp
 
 OBJ = $(SRC:.cpp=.o)
 
