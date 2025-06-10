@@ -14,7 +14,7 @@
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
 #include "HUD/HUD.hpp"
-#include "Audio/Audio.hpp"
+#include "Audio/IAudio.hpp"
 #include "../Utils/Constants.hpp"
 #include "Camera/CameraManager.hpp"
 
@@ -51,7 +51,7 @@ class GUI {
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<Map> _map;
         std::unique_ptr<HUD> _hud;
-        std::shared_ptr<Audio> _audio;
+        std::shared_ptr<IAudio> _audio;
         std::unique_ptr<CameraManager> _cameraManager;
 
         int _windowWidth;
