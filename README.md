@@ -1,91 +1,231 @@
-![ZAAAAAAPPPPPPPYYYYYYYYYYYYYYY](styleDoc/zappy.png)
+<div align="center">
 
-## Description
+# 🎮 ZAPPY
 
-The goal of this project is to create a network game where several teams confront each other on a tile map containing resources.
-The winning team is the first one where at least 6 players reach the maximum elevation.
+![Zappy Logo](styleDoc/zappy.png)
 
+**A multiplayer network strategy game where teams compete for supremacy!**
 
-## Documentation :
+[![License](https://img.shields.io/badge/License-EPITECH-blue?style=for-the-badge)](LICENSE)
+[![Languages](https://img.shields.io/badge/Languages-C%2B%2B%20%7C%20C%20%7C%20Python-orange?style=for-the-badge)](#)
 
-### Docusorus :
-    To start the docusarus documentation :
-    cd documentation/my-website
-    npx docusaurus start
+</div>
 
-    Si erreur dans le lancement comme ici :
+---
 
-    `npm error could not determine executable to run`
+## 🎯 About The Project
 
-    executer ça : `npm install --save-dev @docusaurus/types`
+Zappy is an exciting network-based strategy game where multiple teams compete on a tile-based map filled with resources. The objective is strategic: be the first team to get **at least 6 players** to reach the **maximum elevation level**.
 
+### ✨ Key Features
 
-### Doxygen :
-    The basic documentation fo the project is generated using the
-    doxygen, to run the doxygen executable, please make sure you
-    installed the pdf-latex librairie.
-    To generate the PDF you need move the my-zappy-doc, folder out of the repositorie
-    because the Unicode emojis used make the generation fails, then execute this :
-
-    ./generateDoc.sh
-
-    After that you can move back the folder in the documentation
-    folder.
-
-## Commit norm :
-
-[Gitmoji] : [Element / Module] : [MESSAGE]
-
-Gitmoji = The emoji approriate for the current modification.
-[Element / Module] = The elemenet you applied the modification.
-[MESSAGE] = A detail message of what you did.
-
-Gitmojies:
-
-    Code feature :
-        - :sparkles: (✨): Introduce new features
-        - :recycle: (♻️): Refactor / update code
-        - :bug: (🐛): Fix a bug
-        - :poop: (💩) : Remove Coding style or temporary fix
-        - :rotating_light: (🚨) : Fix Compiling Warning
-        - :fire: (🔥): Remove code or files
-
-    Test feature :
-        - :white_check_mark: (✅): Add, update, or pass tests
-
-    Architecture :
-        - :see_no_evil: (🙈): Add or update .gitignore files
-        - :construction_worker: (👷): Add or update CI build system
-        - :building_construction: (🏗️) : Make Architectural changes
-        - :memo: (📝) : Add or update documentation
-
-### Pull Request
-    - :tada: (🎉): This Gitmoji must be used for each PR created!
-    - :lipstick: (💄): This Gitmoji must be used for each PR merged!
-    - :rewind: (⏪️): This Gitmoji must be used for each revert done!
+- 🌐 **Multiplayer Network Game** - Real-time competition between teams
+- 🗺️ **Dynamic Tile Map** - Resource-rich environment for strategic gameplay  
+- 👥 **Team-Based Strategy** - Collaborate with teammates to achieve victory
+- 🎮 **Multiple Interfaces** - Server, GUI client, and AI bot components
+- 📊 **Real-time Visualization** - Watch the action unfold with the GUI
+- 🤖 **AI Integration** - Develop and deploy intelligent bots
 
 
-## Git-Cli :
+## 🏗️ Architecture
 
-- Changer message de commit, avant qu'il soit push :
-    ```bash
-    git commit --amend -m "New commit message"
-    ```
+The project consists of three main components:
 
-- Changer le message de commit, si il a deja été push :
-    ```bash
-    git commit --amend -m "New commit message"
-    git push --force
-    ```
+```
+📦 Zappy
+├── 🖥️  Server      - Core game engine and network management
+├── 🎮  GUI Client  - Real-time game visualization interface
+└── 🤖  AI Bot      - Intelligent automated players
+```
 
-- Un-add un ficher add par erreur qui est pas encore push:
-    ```bash
-    git restore --staged <file>
-    ```
+### 🛠️ Technologies Used
 
-- Un-add un fichier qui a été commit :
-    ```bash
-    git reset --soft HEAD~1
-    git restore --staged fichier-a-retirer.txt
-    git commit -m "Nouveau message de commit (sans le fichier)"
-    ```
+| Component | Language | Framework/Libraries |
+|-----------|----------|-------------------|
+| Server    | C        | Custom networking |
+| GUI       | C++      | Graphics libraries |
+| AI Bot    | Python   | Socket programming |
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+Before running Zappy, ensure you have:
+
+- **C/C++ Compiler** (gcc/g++)
+- **Python 3.x** 
+- **Make** build system
+- **PDF-LaTeX** (for documentation generation)
+
+### 🔧 Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd zappy
+   ```
+
+2. **Build all components**
+   ```bash
+   make
+   ```
+   This will compile:
+   - `zappy_server` - The game server
+   - `zappy_gui` - The graphical interface
+   - `zappy_ai` - The AI bot
+
+3. **Run the game**
+   
+   **Start the server:**
+   ```bash
+   ./zappy_server -p <port> -x <width> -y <height> -n <team1> <team2> ... -c <nb_clients> -f <freq>
+   ```
+   
+   **Launch the GUI:**
+   ```bash
+   ./zappy_gui -p <port> -h <hostname>
+   ```
+   
+   **Deploy AI team:**
+   ```bash
+   ./zappy_ai -p <port> -n <team_name> -h <hostname>
+   ```
+
+---
+
+## 📚 Documentation
+
+### 📖 Docusaurus Documentation
+
+Start the interactive documentation:
+
+```bash
+cd documentation/my-zappy-doc
+npx docusaurus start
+```
+
+> **💡 Troubleshooting:** If you encounter `npm error could not determine executable to run`, run:
+> ```bash
+> npm install --save-dev @docusaurus/types
+> ```
+
+### 📄 PDF Documentation (Doxygen)
+
+Generate comprehensive PDF documentation:
+
+> **⚠️ Important:** Move the `my-zappy-doc` folder out of the repository before generation due to Unicode emoji conflicts.
+
+```bash
+./generateDoc.sh
+```
+
+**Requirements:** Ensure `pdf-latex` library is installed on your system.
+
+---
+
+## 🤝 Contributing
+
+We follow a structured commit convention to maintain code quality and project organization.
+
+### 📝 Commit Convention
+
+**Format:** `[Gitmoji] : [Element/Module] : [MESSAGE]`
+
+- **Gitmoji**: Appropriate emoji for the modification type
+- **Element/Module**: The component you modified
+- **MESSAGE**: Detailed description of changes
+
+### 🎨 Gitmoji Reference
+
+#### 💻 Code Features
+| Emoji | Code | Usage |
+|-------|------|-------|
+| ✨ | `:sparkles:` | Introduce new features |
+| ♻️ | `:recycle:` | Refactor/update code |
+| 🐛 | `:bug:` | Fix a bug |
+| 💩 | `:poop:` | Remove coding style errors or temporary fix |
+| 🚨 | `:rotating_light:` | Fix compiling warnings |
+| 🔥 | `:fire:` | Remove code or files |
+
+#### 🧪 Testing
+| Emoji | Code | Usage |
+|-------|------|-------|
+| ✅ | `:white_check_mark:` | Add, update, or pass tests |
+
+#### 🏗️ Architecture
+| Emoji | Code | Usage |
+|-------|------|-------|
+| 🙈 | `:see_no_evil:` | Add or update .gitignore files |
+| 👷 | `:construction_worker:` | Add or update CI build system |
+| 🏗️ | `:building_construction:` | Make architectural changes |
+| 📝 | `:memo:` | Add or update documentation |
+
+#### 🔄 Pull Requests
+| Emoji | Code | Usage |
+|-------|------|-------|
+| 🎉 | `:tada:` | **Must be used for each PR created!** |
+| 💄 | `:lipstick:` | **Must be used for each PR merged!** |
+| ⏪️ | `:rewind:` | **Must be used for each revert done!** |
+
+---
+
+## 🛠️ Git Commands Reference
+
+### 🔄 Commit Management
+
+**Modify commit message (before push):**
+```bash
+git commit --amend -m "New commit message"
+```
+
+**Modify commit message (after push):**
+```bash
+git commit --amend -m "New commit message"
+git push --force
+```
+
+### 📂 File Management
+
+**Unstage accidentally added file (not yet pushed):**
+```bash
+git restore --staged <file>
+```
+
+**Remove file from commit (after commit):**
+```bash
+git reset --soft HEAD~1
+git restore --staged file-to-remove.txt
+git commit -m "New commit message (without the file)"
+```
+
+---
+
+## 🧪 Testing
+
+Run the comprehensive test suite:
+
+```bash
+# Unit tests
+make tests_run
+
+# Functional tests  
+cd tests/functional
+python3 Tester.py
+```
+
+**Coverage reports** are automatically generated in `coverage_report/`.
+
+---
+
+## 👥 Team
+
+**Project developed by EPITECH students**
+
+- [Eliott Tesnier](https://github.com/eliotttesnier)
+- [Albane Merian](https://github.com/albanemerian)
+- [Nolan Papa](https://github.com/Nolfews)
+- [Matisse Marsac](https://github.com/Matisse-M)
+- [Alban Roussée](https://github.com/albanrss)
+- [Noa Roussière](https://github.com/nduboi)
