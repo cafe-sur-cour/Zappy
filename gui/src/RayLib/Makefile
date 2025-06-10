@@ -17,6 +17,7 @@ SRC =	RayLib.cpp	\
 		RaylibInput.cpp	\
 		Raylib3dEnv.cpp	\
 		RaylibCamera.cpp	\
+		Raylib3dDrawing.cpp	\
 
 OBJ = $(SRC:.cpp=.o)
 
