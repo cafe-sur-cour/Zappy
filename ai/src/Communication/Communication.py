@@ -47,13 +47,13 @@ class Communication:
 
     def loop(self) -> None:
         while not self.playerDead:
-            with self.mutex:
-                if len(self.requestQueue) > 0 and len(self.pendingQueue) < 10:
+            if self.lenRequestQueue() > 0 and self.lenPendingQueue() < 10:
+                with self.mutex:
                     request = self.requestQueue.pop(0)
-                    self.socket.send(request)
                     self.pendingQueue.append(request)
-                else:
-                    sleep(0.1)
+                    self.socket.send(request)
+            else:
+                sleep(0.1)
             try:
                 self.receive()
             except CommunicationInvalidResponseException as e:
@@ -156,14 +156,6 @@ class Communication:
                     if self.hasPendingCommands():
                         self.pendingQueue.pop(0)
 
-    def addResponse(self, response: str) -> None:
-        with self.mutex:
-            self.responseQueue.append(response)
-
-    def hasResponses(self) -> bool:
-        with self.mutex:
-            return len(self.responseQueue) > 0
-
     def getInventory(self) -> dict[str, int]:
         with self.mutex:
             return self.lastInventory
@@ -188,19 +180,35 @@ class Communication:
 
     def lenResponseQueue(self) -> int:
         with self.mutex:
-            return len(self.responseBuffer.split('\n'))
+            return len(self.responseQueue)
+
+    def hasResponses(self) -> bool:
+        with self.mutex:
+            return len(self.responseQueue) > 0
+
+    def addResponse(self, response: str) -> None:
+        with self.mutex:
+            self.responseQueue.append(response)
 
     def getLastResponse(self) -> str:
         with self.mutex:
             return self.responseQueue.pop(0) if len(self.responseQueue) else ""
 
-    def playerIsDead(self) -> bool:
+    def lenPendingQueue(self) -> int:
         with self.mutex:
-            return self.playerDead
+            return len(self.pendingQueue)
 
     def hasPendingCommands(self) -> bool:
         with self.mutex:
             return len(self.pendingQueue) > 0
+
+    def lenRequestQueue(self) -> int:
+        with self.mutex:
+            return len(self.requestQueue)
+
+    def playerIsDead(self) -> bool:
+        with self.mutex:
+            return self.playerDead
 
     def connectToServer(self):
         self.socket.connect()
