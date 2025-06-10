@@ -20,7 +20,6 @@ SRC =	src/Client/Client.cpp \
 		src/Client/MsgHandler.cpp \
 		src/CLI/CLI.cpp \
 		src/Game/GameInfos.cpp \
-		src/Audio/Audio.cpp \
 		src/Graphic/GUI.cpp \
 		src/Graphic/Map.cpp \
 		src/Graphic/Camera/CameraManager.cpp \
@@ -48,11 +47,12 @@ CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 LIBS = -L./src/Communication -lcommunication -L./src/RayLib \
-		-lraylib_wrapper -lraylib -lGL -lm -lpthread \
-		-ldl -lrt -lX11 -lsfml-audio
+		-lraylib_wrapper -lraylib -L./src/Audio -laudio -lsfml-audio \
+		-lGL -lm -lpthread -ldl -lrt -lX11
 
 COMM_LIB = src/Communication/libcommunication.a
 RAYLIB_LIB = src/RayLib/libraylib_wrapper.a
+AUDIO_LIB = src/Audio/libaudio.a
 
 NAME = zappy_gui
 
@@ -62,7 +62,7 @@ CC = g++
 
 all: $(NAME)
 
-$(NAME): communication_lib raylib_lib $(OBJ) $(MAIN_OBJ)
+$(NAME): communication_lib raylib_lib audio_lib $(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
 	$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ Compilation completed successfully!$(NC)"
@@ -75,6 +75,10 @@ raylib_lib:
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Building RayLib wrapper library...$(NC)"
 	@make -C src/RayLib
 
+audio_lib:
+	@echo -e "$(BLUE)ᒥ🔧ᒧ Building Audio library...$(NC)"
+	@make -C src/Audio
+
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -83,6 +87,7 @@ clean:
 	@rm -rf $(MAIN_OBJ)
 	@make -C src/Communication clean
 	@make -C src/RayLib clean
+	@make -C src/Audio clean
 
 fclean: clean
 	@rm -rf $(NAME)
@@ -93,6 +98,7 @@ fclean: clean
 	@rm -rf *.gcov
 	@make -C src/Communication fclean
 	@make -C src/RayLib fclean
+	@make -C src/Audio fclean
 
 re: fclean all
 
@@ -107,7 +113,7 @@ coverage: tests_run
 		coverage_report/index.html &> /dev/null || echo "Please open \
 		coverage_report/index.html in your browser"
 
-tests_run: communication_lib $(SRC) $(TEST_SRC)
+tests_run: communication_lib audio_lib $(SRC) $(TEST_SRC)
 	@echo -e "$(BLUE)ᒥ🧪ᒧ Compiling Google Test unit tests...$(NC)"
 	$(CC) -o $(UNIT_TESTS) $(SRC) $(TEST_SRC) $(CFLAGS_COVERAGE) $(INCLUDES) \
 		$(LIBS) -lgtest -lgtest_main
@@ -115,4 +121,4 @@ tests_run: communication_lib $(SRC) $(TEST_SRC)
 	./$(UNIT_TESTS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ All tests completed!$(NC)"
 
-.PHONY: all clean fclean re communication_lib coverage tests_run
+.PHONY: all clean fclean re communication_lib raylib_lib audio_lib coverage tests_run
