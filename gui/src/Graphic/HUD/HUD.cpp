@@ -18,6 +18,7 @@ HUD::HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos,
          std::shared_ptr<IAudio> audio)
     : _containers(), _raylib(raylib), _gameInfos(gameInfos), _audio(audio)
 {
+    _help = std::make_shared<Help>(raylib, audio);
     initDefaultLayout(15.0f, 20.0f);
     initExitButton();
     initSettingsButton();
@@ -36,6 +37,10 @@ void HUD::draw()
     for (auto& pair : _containers) {
         pair.second->draw();
     }
+
+    if (_help && _help->isVisible()) {
+        _help->draw();
+    }
 }
 
 void HUD::update()
@@ -43,6 +48,11 @@ void HUD::update()
     for (auto& pair : _containers) {
         pair.second->update();
     }
+
+    if (_help) {
+        _help->update();
+    }
+
     updateTeamPlayersDisplay(_gameInfos);
 }
 
@@ -95,6 +105,10 @@ void HUD::handleResize(int oldWidth, int oldHeight, int newWidth, int newHeight)
 {
     for (auto& pair : _containers) {
         pair.second->handleResize(oldWidth, oldHeight, newWidth, newHeight);
+    }
+
+    if (_help) {
+        _help->handleResize(oldWidth, oldHeight, newWidth, newHeight);
     }
 }
 
@@ -204,8 +218,10 @@ void HUD::initHelpButton()
         15.0f, 50.0f,
         70.0f, 15.0f,
         "HELP",
-        []() {
-            // Placeholder for help functionality
+        [this]() {
+            if (_help && !_help->isVisible()) {
+                _help->show();
+            }
         },
         {60, 240, 60, 255},
         {100, 255, 100, 255},
