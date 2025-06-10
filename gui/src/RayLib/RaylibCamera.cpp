@@ -80,11 +80,11 @@ void RayLib::updateCameraFreeMode()
         _camera.position = Vector3Add(_camera.position, Vector3Scale(right, moveSpeed));
         _camera.target = Vector3Add(_camera.target, Vector3Scale(right, moveSpeed));
     }
-    if (IsKeyDown(KEY_SPACE)) {
+    if (IsKeyDown(KEY_SPACE) || isGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_TRIGGER)) {
         _camera.position.y += moveSpeed * 0.5;
         _camera.target.y += moveSpeed * 0.5;
     }
-    if (IsKeyDown(KEY_LEFT_CONTROL)) {
+    if (IsKeyDown(KEY_LEFT_CONTROL) || isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_TRIGGER)) {
         _camera.position.y -= moveSpeed * 0.5;
         _camera.target.y -= moveSpeed * 0.5;
     }

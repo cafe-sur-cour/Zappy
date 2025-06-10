@@ -124,26 +124,33 @@ void CameraManager::updateCameraTargetMode()
         if (_targetDistance > 100.0f) _targetDistance = 100.0f;
     }
 
+    bool isZoomingIn = _raylib->isGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_TRIGGER);
+    bool isZoomingOut = _raylib->isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_TRIGGER);
+    if (isZoomingIn) {
+        _targetDistance -= zappy::gui::CAMERA_SPEED * deltaTime;
+        if (_targetDistance < 5.0f) _targetDistance = 5.0f;
+    }
+    if (isZoomingOut) {
+        _targetDistance += zappy::gui::CAMERA_SPEED * deltaTime;
+        if (_targetDistance > 100.0f) _targetDistance = 100.0f;
+    }
+
     if (_raylib->isKeyDown(KEY_RIGHT))
         _targetAngleXZ += zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
 
     if (_raylib->isKeyDown(KEY_LEFT))
         _targetAngleXZ -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
-        
-    // Gamepad right stick controls for horizontal rotation
-    if (_raylib->isGamepadAvailable(0)) { // Assuming gamepad 0 is the main controller
+
+    if (_raylib->isGamepadAvailable(0)) {
         float rightStickX = _raylib->getGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_X);
         float rightStickY = _raylib->getGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_Y);
-        
-        // Apply deadzone to avoid drift
-        if (fabs(rightStickX) > zappy::gui::GAMEPAD_DEADZONE) {
+
+        if (fabs(rightStickX) > zappy::gui::GAMEPAD_DEADZONE)
             _targetAngleXZ += rightStickX * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
-        }
-        
-        // Apply deadzone to avoid drift
+
         if (fabs(rightStickY) > zappy::gui::GAMEPAD_DEADZONE) {
             _targetAngleY -= rightStickY * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
-            
+
             const float maxVerticalAngle = 1.5f;
             if (_targetAngleY > maxVerticalAngle) _targetAngleY = maxVerticalAngle;
             if (_targetAngleY < 0.1f) _targetAngleY = 0.1f;
@@ -292,15 +299,12 @@ void CameraManager::updateCameraPlayerMode()
 
     if (_raylib->isKeyDown(KEY_LEFT))
         _playerAngleXZ -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
-        
-    // Gamepad right stick controls for player camera
+
     if (_raylib->isGamepadAvailable(0)) {
         float rightStickX = _raylib->getGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_X);
-        
-        // Apply deadzone to avoid drift
-        if (fabs(rightStickX) > zappy::gui::GAMEPAD_DEADZONE) {
+
+        if (fabs(rightStickX) > zappy::gui::GAMEPAD_DEADZONE)
             _playerAngleXZ += rightStickX * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
-        }
     }
 
 
