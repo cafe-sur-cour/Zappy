@@ -8,6 +8,7 @@
 #include "RayLib.hpp"
 #include "raymath.h"
 #include "../Utils/Constants.hpp"
+#include "../Utils/GamepadConstants.hpp"
 
 void RayLib::initCamera()
 {
@@ -190,6 +191,59 @@ void RayLib::updateCameraFreeMode()
         Vector3 newUp = Vector3CrossProduct(rightVec, viewDir);
         if (newUp.y > 0.0f)
             _camera.target = Vector3Add(_camera.position, viewDir);
+    }
+
+    if (isGamepadAvailable(0)) {
+        float rightStickX = getGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_X);
+        float rightStickY = getGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_Y);
+
+        if (fabs(rightStickX) > zappy::gui::GAMEPAD_DEADZONE) {
+            Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+            float rotAngle = rightStickX * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
+
+            float cosRotAngle = cosf(rotAngle);
+            float sinRotAngle = sinf(rotAngle);
+            float newDirX = viewDir.x * cosRotAngle - viewDir.z * sinRotAngle;
+            float newDirZ = viewDir.x * sinRotAngle + viewDir.z * cosRotAngle;
+            viewDir.x = newDirX;
+            viewDir.z = newDirZ;
+
+            _camera.target = Vector3Add(_camera.position, viewDir);
+        }
+
+        if (fabs(rightStickY) > zappy::gui::GAMEPAD_DEADZONE) {
+            Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+            float rotAngle = -rightStickY * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
+
+            Vector3 rightVec = Vector3CrossProduct(viewDir, _camera.up);
+            rightVec = Vector3Normalize(rightVec);
+            viewDir = Vector3RotateByAxisAngle(viewDir, rightVec, rotAngle);
+
+            Vector3 newUp = Vector3CrossProduct(rightVec, viewDir);
+            if (newUp.y > 0.0f)
+                _camera.target = Vector3Add(_camera.position, viewDir);
+        }
+
+        float leftStickX = getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);
+        float leftStickY = getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+
+        Vector3 forward = Vector3Subtract(_camera.target, _camera.position);
+        forward = Vector3Normalize(forward);
+
+        Vector3 right = Vector3CrossProduct(forward, _camera.up);
+        right = Vector3Normalize(right);
+
+        if (fabs(leftStickY) > zappy::gui::GAMEPAD_DEADZONE) {
+            float moveAmount = -leftStickY * moveSpeed;
+            _camera.position = Vector3Add(_camera.position, Vector3Scale(forward, moveAmount));
+            _camera.target = Vector3Add(_camera.target, Vector3Scale(forward, moveAmount));
+        }
+
+        if (fabs(leftStickX) > zappy::gui::GAMEPAD_DEADZONE) {
+            float moveAmount = leftStickX * moveSpeed;
+            _camera.position = Vector3Add(_camera.position, Vector3Scale(right, moveAmount));
+            _camera.target = Vector3Add(_camera.target, Vector3Scale(right, moveAmount));
+        }
     }
 }
 
