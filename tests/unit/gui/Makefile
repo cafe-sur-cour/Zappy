@@ -23,7 +23,6 @@ SRC =	../../../gui/src/Client/Client.cpp \
 		../../../gui/src/Game/GameInfos.cpp \
 		../../../gui/src/Graphic/GUI.cpp \
 		../../../gui/src/Graphic/Map.cpp \
-		../../../gui/src/Audio/Audio.cpp \
 		../../../gui/src/Graphic/HUD/Button/Button.cpp \
 		../../../gui/src/Graphic/HUD/Containers/Containers.cpp \
 		../../../gui/src/Graphic/HUD/Containers/AContainers.cpp \
@@ -49,7 +48,8 @@ CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 LIBS = -L../../../gui/src/Communication -lcommunication \
 		-L../../../gui/src/RayLib -lraylib_wrapper -lraylib \
-		-lGL -lm -lpthread -ldl -lrt -lX11 -lsfml-audio
+		-L../../../gui/src/Audio -laudio -lsfml-audio \
+		-lGL -lm -lpthread -ldl -lrt -lX11
 
 NAME = zappy_gui
 
@@ -68,6 +68,7 @@ libs:
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Building libraries...$(NC)"
 	@make -C ../../../gui/src/Communication
 	@make -C ../../../gui/src/RayLib
+	@make -C ../../../gui/src/Audio
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
@@ -77,6 +78,7 @@ clean:
 	@rm -rf $(MAIN_OBJ)
 	@make -C ../../../gui/src/Communication clean
 	@make -C ../../../gui/src/RayLib clean
+	@make -C ../../../gui/src/Audio clean
 
 fclean: clean
 	@rm -rf $(NAME)
@@ -87,6 +89,7 @@ fclean: clean
 	@rm -rf *.gcov
 	@make -C ../../../gui/src/Communication fclean
 	@make -C ../../../gui/src/RayLib fclean
+	@make -C ../../../gui/src/Audio fclean
 
 re: fclean all
 
@@ -109,4 +112,4 @@ tests_run: libs $(SRC) $(TEST_SRC)
 	./$(UNIT_TESTS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ All tests completed!$(NC)"
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re libs
