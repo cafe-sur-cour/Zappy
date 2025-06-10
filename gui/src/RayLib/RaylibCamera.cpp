@@ -137,6 +137,60 @@ void RayLib::updateCameraFreeMode()
             setMousePosition(screenCenterX, screenCenterY);
         }
     }
+
+    if (IsKeyDown(KEY_RIGHT)) {
+        Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+        float rotAngle = zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+        float cosRotAngle = cosf(rotAngle);
+        float sinRotAngle = sinf(rotAngle);
+        float newDirX = viewDir.x * cosRotAngle - viewDir.z * sinRotAngle;
+        float newDirZ = viewDir.x * sinRotAngle + viewDir.z * cosRotAngle;
+        viewDir.x = newDirX;
+        viewDir.z = newDirZ;
+
+        _camera.target = Vector3Add(_camera.position, viewDir);
+    }
+
+    if (IsKeyDown(KEY_LEFT)) {
+        Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+        float rotAngle = -zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+        float cosRotAngle = cosf(rotAngle);
+        float sinRotAngle = sinf(rotAngle);
+        float newDirX = viewDir.x * cosRotAngle - viewDir.z * sinRotAngle;
+        float newDirZ = viewDir.x * sinRotAngle + viewDir.z * cosRotAngle;
+        viewDir.x = newDirX;
+        viewDir.z = newDirZ;
+
+        _camera.target = Vector3Add(_camera.position, viewDir);
+    }
+
+    if (IsKeyDown(KEY_UP)) {
+        Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+        float rotAngle = zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+        Vector3 rightVec = Vector3CrossProduct(viewDir, _camera.up);
+        rightVec = Vector3Normalize(rightVec);
+        viewDir = Vector3RotateByAxisAngle(viewDir, rightVec, rotAngle);
+
+        Vector3 newUp = Vector3CrossProduct(rightVec, viewDir);
+        if (newUp.y > 0.0f)
+            _camera.target = Vector3Add(_camera.position, viewDir);
+    }
+
+    if (IsKeyDown(KEY_DOWN)) {
+        Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+        float rotAngle = -zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+        Vector3 rightVec = Vector3CrossProduct(viewDir, _camera.up);
+        rightVec = Vector3Normalize(rightVec);
+        viewDir = Vector3RotateByAxisAngle(viewDir, rightVec, rotAngle);
+
+        Vector3 newUp = Vector3CrossProduct(rightVec, viewDir);
+        if (newUp.y > 0.0f)
+            _camera.target = Vector3Add(_camera.position, viewDir);
+    }
 }
 
 Camera3D RayLib::getCamera() const

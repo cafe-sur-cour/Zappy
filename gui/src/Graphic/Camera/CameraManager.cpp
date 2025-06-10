@@ -123,6 +123,22 @@ void CameraManager::updateCameraTargetMode()
         if (_targetDistance > 100.0f) _targetDistance = 100.0f;
     }
 
+    if (_raylib->isKeyDown(KEY_RIGHT))
+        _targetAngleXZ += zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+    if (_raylib->isKeyDown(KEY_LEFT))
+        _targetAngleXZ -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+    if (_raylib->isKeyDown(KEY_UP)) {
+        _targetAngleY += zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        if (_targetAngleY > 1.5f) _targetAngleY = 1.5f;
+    }
+
+    if (_raylib->isKeyDown(KEY_DOWN)) {
+        _targetAngleY -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        if (_targetAngleY < 0.1f) _targetAngleY = 0.1f;
+    }
+
     float posX = _mapCenter.x + _targetDistance * cosf(_targetAngleY) * cosf(_targetAngleXZ);
     float posY = _mapCenter.y + _targetDistance * sinf(_targetAngleY);
     float posZ = _mapCenter.z + _targetDistance * cosf(_targetAngleY) * sinf(_targetAngleXZ);
@@ -248,6 +264,14 @@ void CameraManager::updateCameraPlayerMode()
     }
 
     handlePlayerCameraMouseInput();
+
+    float deltaTime = _raylib->getFrameTime();
+    if (_raylib->isKeyDown(KEY_RIGHT))
+        _playerAngleXZ += zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+    if (_raylib->isKeyDown(KEY_LEFT))
+        _playerAngleXZ -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
 
     Vector3 playerPos = calculatePlayerPosition(*playerIt);
     Vector3 cameraPos = calculateCameraPosition(playerPos, _playerAngleXZ);
