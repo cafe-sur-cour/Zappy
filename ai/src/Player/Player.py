@@ -321,7 +321,7 @@ class Player:
                                 help_number = help_parts[1]
                                 print(
                                     f"Demande d'aide reçue de l'équipe: #{help_number}"
-                                    "depuis direction {direction}")
+                                    f"depuis direction {direction}")
                                 if direction != 0 and self.canHelpTeammate():
                                     print(f"Démarrage de l'aide vers la direction {direction}")
                                     self.startHelpingTeammate(direction)
