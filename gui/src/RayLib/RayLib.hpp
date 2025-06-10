@@ -116,11 +116,6 @@ class RayLib {
         void drawText(const std::string& text, float x, float y, float fontSize, Color color);
         float measureText(const std::string& text, float fontSize) const;
 
-        // Audio methods
-        void initAudioDevice();
-        void closeAudioDevice();
-        bool isAudioDeviceReady() const;
-
     private:
         bool _isInitialized;
         Camera3D _camera;

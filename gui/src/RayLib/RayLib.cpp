@@ -76,22 +76,3 @@ void RayLib::endScissorMode()
 {
     EndScissorMode();
 }
-
-void RayLib::initAudioDevice()
-{
-    InitAudioDevice();
-    if (!IsAudioDeviceReady()) {
-        std::cerr << "Failed to initialize audio device." << std::endl;
-        return;
-    }
-}
-
-void RayLib::closeAudioDevice()
-{
-    CloseAudioDevice();
-}
-
-bool RayLib::isAudioDeviceReady() const
-{
-    return IsAudioDeviceReady();
-}
