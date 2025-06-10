@@ -18,7 +18,7 @@ class CLI:
     def __init__(self):
         self.port = None
         self.name = None
-        self.machine = ""
+        self.machine = "127.0.0.1"
 
     def parse_args(self, args):
         if len(args) < 5:
@@ -26,7 +26,6 @@ class CLI:
 
         port_found = False
         name_found = False
-        machine_found = False
 
         i = 1
         while i < len(args):
@@ -43,12 +42,11 @@ class CLI:
                 i += 2
             elif args[i] == "-h":
                 self.machine = self.parse_machine(args[i + 1])
-                machine_found = True
                 i += 2
             else:
                 raise CLIInvalidArgumentException(f"Unknown option: {args[i]}")
 
-        self.validate_config(port_found, name_found, machine_found)
+        self.validate_config(port_found, name_found)
 
         return {"port": self.port, "name": self.name, "machine": self.machine}
 
@@ -93,12 +91,9 @@ class CLI:
 
         return machine_str
 
-    def validate_config(self, port_found, name_found, machine_found):
+    def validate_config(self, port_found, name_found):
         if not port_found:
             raise CLIMissingArgumentException("Missing required option: -p port")
 
         if not name_found:
             raise CLIMissingArgumentException("Missing required option: -n name")
-
-        if not machine_found:
-            raise CLIMissingArgumentException("Missing required option: -h machine")
