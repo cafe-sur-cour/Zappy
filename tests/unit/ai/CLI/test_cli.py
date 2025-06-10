@@ -145,7 +145,7 @@ class TestCLI:
         cli = CLI()
 
         with pytest.raises(CLIMissingArgumentException) as excinfo:
-            cli.validate_config(False, True, True)
+            cli.validate_config(False, True)
         assert "Missing required option: -p port" in str(excinfo.value)
 
     def test_validate_config_missing_name(self):
@@ -153,13 +153,5 @@ class TestCLI:
         cli = CLI()
 
         with pytest.raises(CLIMissingArgumentException) as excinfo:
-            cli.validate_config(True, False, True)
+            cli.validate_config(True, False)
         assert "Missing required option: -n name" in str(excinfo.value)
-
-    def test_validate_config_missing_machine(self):
-        """Test validating config with missing machine"""
-        cli = CLI()
-
-        with pytest.raises(CLIMissingArgumentException) as excinfo:
-            cli.validate_config(True, True, False)
-        assert "Missing required option: -h machine" in str(excinfo.value)
