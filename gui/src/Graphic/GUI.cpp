@@ -161,9 +161,11 @@ void GUI::switchCameraMode(zappy::gui::CameraMode mode)
         }
     }
 
-    if (mode == zappy::gui::CameraMode::PLAYER && _cameraMode != zappy::gui::CameraMode::PLAYER) {
+    if (mode == zappy::gui::CameraMode::PLAYER && _cameraMode !=
+        zappy::gui::CameraMode::PLAYER) {
         _hud->initPlayerInventoryDisplay(_cameraManager->getPlayerId());
-    } else if (mode != zappy::gui::CameraMode::PLAYER && _cameraMode == zappy::gui::CameraMode::PLAYER) {
+    } else if (mode != zappy::gui::CameraMode::PLAYER && _cameraMode ==
+        zappy::gui::CameraMode::PLAYER) {
         _hud->clearPlayerInventoryElements();
     }
 
