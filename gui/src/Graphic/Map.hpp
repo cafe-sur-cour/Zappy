@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <string>
 #include "../Game/GameInfos.hpp"
-#include "RayLib/RayLib.hpp"
+#include "../RayLib/RayLib.hpp"
 
 enum class DisplayPriority {
     TILE = 0,
