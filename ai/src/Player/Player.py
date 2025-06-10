@@ -193,7 +193,7 @@ class Player:
         self.isHelpingTeammate = True
         self.helpTargetDirection = direction
 
-        self.communication.sendBroadcast(self.hash.hashMessage("coming_to_help"))
+        self.communication.sendBroadcast(self.hash.hashMessage("comingToHelp"))
 
     def helpTeammateAction(self) -> bool:
         if not self.isHelpingTeammate:
@@ -203,7 +203,7 @@ class Player:
             if self.inventory.get("food", 0) > (SURVIVAL_MIN_FOOD_LEVEL + 1):
                 print("Drop food for teammate")
                 self.communication.sendSetObject("food")
-                self.communication.sendBroadcast(self.hash.hashMessage("food_dropped"))
+                self.communication.sendBroadcast(self.hash.hashMessage("foodDropped"))
             else:
                 print("Not enough food to help teammate")
 
@@ -313,8 +313,6 @@ class Player:
 
                 try:
                     response = self.hash.unHashMessage(raw_message)
-                    print(f"Message received from the server (decrypted): {response}")
-                except (ValueError, TypeError, Exception):
                     response = raw_message
                     if response.startswith("help:"):
                         try:
@@ -336,18 +334,20 @@ class Player:
                                 print(f"Helping message error: {response}")
                         except Exception as e:
                             print(f"Error during message formating: {e}")
-                    elif response == "coming_to_help":
+                    elif response == "comingToHelp":
                         if direction != 0:
                             print(
                                 f"A teammate is coming to help in the direction "
                                 f"{direction}")
-                    elif response == "food_dropped":
+                    elif response == "foodDropped":
                         if direction != 0:
                             print(
                                 f"Food dropped by a teammate in the direction "
                                 f"{direction}")
                     else:
                         print(f"Unrecognized message: {response}")
+                except Exception as e:
+                    print(f"Error during message decryption: {e}")
 
             if self.communication.hasResponses():
                 response = self.communication.getLastResponse()
