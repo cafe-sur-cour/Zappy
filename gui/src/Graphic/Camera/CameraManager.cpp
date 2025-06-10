@@ -10,6 +10,7 @@
 #include "CameraManager.hpp"
 #include "raylib.h"
 #include "raymath.h"
+#include "../../Utils/GamepadConstants.hpp"
 
 CameraManager::CameraManager(std::shared_ptr<RayLib> raylib) : _raylib(raylib),
     _mapCenter({ 0.0f, 0.0f, 0.0f }), _mapWidth(0), _mapHeight(0),
@@ -128,6 +129,26 @@ void CameraManager::updateCameraTargetMode()
 
     if (_raylib->isKeyDown(KEY_LEFT))
         _targetAngleXZ -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        
+    // Gamepad right stick controls for horizontal rotation
+    if (_raylib->isGamepadAvailable(0)) { // Assuming gamepad 0 is the main controller
+        float rightStickX = _raylib->getGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_X);
+        float rightStickY = _raylib->getGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_Y);
+        
+        // Apply deadzone to avoid drift
+        if (fabs(rightStickX) > zappy::gui::GAMEPAD_DEADZONE) {
+            _targetAngleXZ += rightStickX * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
+        }
+        
+        // Apply deadzone to avoid drift
+        if (fabs(rightStickY) > zappy::gui::GAMEPAD_DEADZONE) {
+            _targetAngleY -= rightStickY * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
+            
+            const float maxVerticalAngle = 1.5f;
+            if (_targetAngleY > maxVerticalAngle) _targetAngleY = maxVerticalAngle;
+            if (_targetAngleY < 0.1f) _targetAngleY = 0.1f;
+        }
+    }
 
     if (_raylib->isKeyDown(KEY_UP)) {
         _targetAngleY += zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
@@ -271,6 +292,16 @@ void CameraManager::updateCameraPlayerMode()
 
     if (_raylib->isKeyDown(KEY_LEFT))
         _playerAngleXZ -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        
+    // Gamepad right stick controls for player camera
+    if (_raylib->isGamepadAvailable(0)) {
+        float rightStickX = _raylib->getGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_X);
+        
+        // Apply deadzone to avoid drift
+        if (fabs(rightStickX) > zappy::gui::GAMEPAD_DEADZONE) {
+            _playerAngleXZ += rightStickX * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
+        }
+    }
 
 
     Vector3 playerPos = calculatePlayerPosition(*playerIt);

@@ -127,6 +127,8 @@ namespace zappy::gui {
     inline const float CAMERA_SPEED = 7.5f;
     inline const float CAMERA_SENSITIVITY = 0.001f;
     inline const float CAMERA_ROTATE_SPEED_KEY = 2.0f;
+    inline const float GAMEPAD_STICK_SENSITIVITY = 3.0f;
+    inline const float GAMEPAD_DEADZONE = 0.2f;  // Ignore small movements
 
     inline const float PLAYER_SCALE = 0.005f;
 
