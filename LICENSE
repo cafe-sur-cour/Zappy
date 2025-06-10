@@ -1,12 +1,12 @@
-
-/**
-
-Doxygen Awesome
-https://github.com/jothepro/doxygen-awesome-css
-
 MIT License
 
-Copyright (c) 2021 - 2023 jothepro
+Copyright (c) 2025 EPITECH Zappy Team
+- Eliott Tesnier (https://github.com/eliotttesnier)
+- Albane Merian (https://github.com/albanemerian)
+- Nolan Papa (https://github.com/Nolfews)
+- Matisse Marsac (https://github.com/Matisse-M)
+- Alban Roussée (https://github.com/albanrss)
+- Noa Roussière (https://github.com/nduboi)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,15 +26,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-*/
+---
 
-@media screen and (min-width: 768px) {
+EDUCATIONAL PROJECT NOTICE:
 
-    #MSearchBox {
-        width: calc(var(--side-nav-fixed-width) - calc(2 * var(--spacing-medium)) - var(--searchbar-height) - 1px);
-    }
+This project was developed as part of the EPITECH curriculum (Year 2, Year End Project).
+The project specifications and requirements are proprietary to EPITECH.
 
-    #MSearchField {
-        width: calc(var(--side-nav-fixed-width) - calc(2 * var(--spacing-medium)) - 66px - var(--searchbar-height));
-    }
-}
+While the source code is available under the MIT License above, this project
+is primarily intended for educational purposes and portfolio demonstration.
+
+For questions regarding the educational aspects of this project or EPITECH's
+curriculum, please contact EPITECH directly.
