@@ -6,20 +6,29 @@
 */
 
 #include "RayLib.hpp"
-
+#include "../Utils/GamepadConstants.hpp"
 
 bool RayLib::isMouseButtonDown(int button) const
 {
+    if (button == MOUSE_BUTTON_LEFT && isGamepadButtonDown(0, GAMEPAD_BUTTON_A))
+        return true;
+
     return IsMouseButtonDown(button);
 }
 
 bool RayLib::isMouseButtonPressed(int button) const
 {
+    if (button == MOUSE_BUTTON_LEFT && isGamepadButtonPressed(0, GAMEPAD_BUTTON_A))
+        return true;
+
     return IsMouseButtonPressed(button);
 }
 
 bool RayLib::isMouseButtonReleased(int button) const
 {
+    if (button == MOUSE_BUTTON_LEFT && IsGamepadButtonReleased(0, GAMEPAD_BUTTON_A))
+        return true;
+
     return IsMouseButtonReleased(button);
 }
 
