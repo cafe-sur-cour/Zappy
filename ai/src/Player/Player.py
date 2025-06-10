@@ -72,7 +72,6 @@ class Player:
 
         self.isHelpingTeammate: bool = False
         self.helpTargetDirection: int = 0
-        self.helpStepsRemaining: int = 0
 
     def __del__(self):
         self.communication.stopLoop()
@@ -188,7 +187,6 @@ class Player:
         print(f"Début de l'aide vers direction {direction}")
         self.isHelpingTeammate = True
         self.helpTargetDirection = direction
-        self.helpStepsRemaining = 10
 
         self.communication.sendBroadcast("coming_to_help")
 
@@ -197,7 +195,7 @@ class Player:
         if not self.isHelpingTeammate:
             return True
 
-        if self.helpStepsRemaining <= 0:
+        if self.helpTargetDirection == 0:
             if self.inventory.get("food", 0) > 6:
                 print("Drop de nourriture pour le coéquipier")
                 self.communication.sendSetObject("food")
@@ -223,10 +221,11 @@ class Player:
             self.communication.sendRight()
             self.communication.sendRight()
             self.communication.sendForward()
+        elif direction_str == "self":
+          return True
         else:
             self.communication.sendForward()
 
-        self.helpStepsRemaining -= 1
         return False
 
     def roombaAction(self) -> None:
