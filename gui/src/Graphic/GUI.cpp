@@ -74,9 +74,11 @@ void GUI::update()
         switchCameraModeNext();
 
     if (_cameraMode == zappy::gui::CameraMode::PLAYER) {
-        if (_raylib->isKeyReleased(KEY_UP))
+        if (_raylib->isKeyReleased(KEY_UP) ||
+            _raylib->isGamepadButtonReleased(0, GAMEPAD_BUTTON_UP))
             switchToNextPlayer();
-        if (_raylib->isKeyReleased(KEY_DOWN))
+        if (_raylib->isKeyReleased(KEY_DOWN) ||
+            _raylib->isGamepadButtonReleased(0, GAMEPAD_BUTTON_DOWN))
             switchToPreviousPlayer();
     }
 

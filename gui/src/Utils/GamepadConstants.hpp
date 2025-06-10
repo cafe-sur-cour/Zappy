@@ -18,7 +18,16 @@
 #endif
 
 #ifndef GAMEPAD_BUTTON_A
-    #define GAMEPAD_BUTTON_A          0
+    #define GAMEPAD_BUTTON_A          6
+    #define GAMEPAD_BUTTON_B          5
+    #define GAMEPAD_BUTTON_X          9
+    #define GAMEPAD_BUTTON_Y          8
+    #define GAMEPAD_BUTTON_START      17
+    #define GAMEPAD_BUTTON_SELECT     16
+    #define GAMEPAD_BUTTON_UP         1
+    #define GAMEPAD_BUTTON_RIGHT      2
+    #define GAMEPAD_BUTTON_DOWN       3
+    #define GAMEPAD_BUTTON_LEFT       4
     #define GAMEPAD_BUTTON_LEFT_SHOULDER  10
     #define GAMEPAD_BUTTON_RIGHT_SHOULDER 12
     #define GAMEPAD_BUTTON_LEFT_TRIGGER   13
