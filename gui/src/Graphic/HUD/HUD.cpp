@@ -361,23 +361,16 @@ void HUD::clearPlayerInventoryElements()
     if (!bottomContainer)
         return;
 
-    bottomContainer->removeElement("player_info_title");
-    bottomContainer->removeElement("player_info_id");
-    bottomContainer->removeElement("player_info_level");
-    bottomContainer->removeElement("player_info_team");
-    bottomContainer->removeElement("player_info_position");
-    bottomContainer->removeElement("player_info_orientation");
-    bottomContainer->removeElement("inventory_title");
-    bottomContainer->removeElement("inventory_separator");
+    std::vector<std::string> elementIds = {
+        "player_info_title", "player_info_id", "player_info_level", "player_info_team",
+        "player_info_position", "player_info_orientation", "inventory_title", "inventory_separator",
+        "inventory_food", "inventory_linemate", "inventory_deraumere", "inventory_sibur",
+        "inventory_mendiane", "inventory_phiras", "inventory_thystame"
+    };
 
-    // Remove all inventory items
-    bottomContainer->removeElement("inventory_food");
-    bottomContainer->removeElement("inventory_linemate");
-    bottomContainer->removeElement("inventory_deraumere");
-    bottomContainer->removeElement("inventory_sibur");
-    bottomContainer->removeElement("inventory_mendiane");
-    bottomContainer->removeElement("inventory_phiras");
-    bottomContainer->removeElement("inventory_thystame");
+    for (const auto& id : elementIds) {
+        bottomContainer->removeElement(id);
+    }
 }
 
 std::vector<int> HUD::getTeamPlayerNumbers(
