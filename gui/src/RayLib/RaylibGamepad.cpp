@@ -41,7 +41,7 @@ bool RayLib::isGamepadButtonReleased(int gamepad, int button) const
 float RayLib::getGamepadAxisMovement(int gamepad, int axis) const
 {
     if (!isGamepadAvailable(gamepad))
-        return false;
+        return 0.0f;
 
     return GetGamepadAxisMovement(gamepad, axis);
 }
