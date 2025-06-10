@@ -13,9 +13,36 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+static int inventory_message(player_t *player)
+{
+    int n = int_str_len(player->inventory->nbFood) + int_str_len(
+        player->inventory->nbLinemate) + int_str_len(
+        player->inventory->nbDeraumere) + int_str_len(
+        player->inventory->nbSibur) + int_str_len(player->inventory->nbMendiane
+        ) + int_str_len(player->inventory->nbPhiras) + int_str_len(
+        player->inventory->nbThystame);
+    char *message = malloc(sizeof(char) * (70 + n + 1));
+
+    snprintf(message, 70 + n + 1, "[food %d, linemate %d, deraumere %d, "
+        "sibur %d, mendiane %d, phiras %d, thystame %d]\n",
+        player->inventory->nbFood, player->inventory->nbLinemate,
+        player->inventory->nbDeraumere, player->inventory->nbSibur,
+        player->inventory->nbMendiane, player->inventory->nbPhiras,
+        player->inventory->nbThystame);
+    message[70 + n] = '\0';
+    if (write_message(player->network->fd, message) == -1)
+        return -1;
+    valid_message("Inventory sent.");
+    free(message);
+    return 0;
+}
+
 int handle_inventory(player_t *player, char *command, zappy_t *zappy)
 {
     (void)command;
+    (void)zappy;
+    if (inventory_message(player) == -1)
+        return -1;
     if (send_player_inventory(zappy, player) == -1)
         return -1;
     return 0;
