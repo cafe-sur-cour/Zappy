@@ -74,7 +74,9 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/aiMessage/set_object.c  					\
 				../../../server/src/aiMessage/take_object.c					\
 				../../../server/src/aiMessage/fork.c						\
-				../../../server/src/aiMessage/look.c
+				../../../server/src/aiMessage/look.c						\
+				../../../server/src/game/handle_crystal.c 		\
+				../../../server/src/game/handle_food.c          \
 
 
 INCLUDES 	= 	-I./../../../server/include
