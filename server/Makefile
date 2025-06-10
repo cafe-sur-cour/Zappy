@@ -66,7 +66,7 @@ INCLUDES 	= 	-I./include
 
 CFLAGS 		=	-Wall -Wextra -Werror -Wshadow -g
 
-LIBS 		= -L./ -lmy -lnetwork
+LIBS 		= -L./ -lmy -lnetwork -lm
 
 NAME 		= 	zappy_server
 
