@@ -48,7 +48,7 @@ SRC 		=	src/params.c					\
 				src/receiveMessage/loop_thru_command.c		\
 				src/receiveMessage/queu_hanlder.c			\
 				src/aiMessage/forward.c						\
-				src/aiMessage/rigth.c						\
+				src/aiMessage/right.c						\
 				src/aiMessage/left.c						\
 				src/aiMessage/broadcast.c					\
 				src/aiMessage/connect.c						\
