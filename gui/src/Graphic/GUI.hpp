@@ -14,7 +14,7 @@
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
 #include "HUD/HUD.hpp"
-#include "Audio/IAudio.hpp"
+#include "../Audio/IAudio.hpp"
 #include "../Utils/Constants.hpp"
 #include "Camera/CameraManager.hpp"
 

@@ -15,7 +15,7 @@
 #include "Containers/Containers.hpp"
 #include "../../RayLib/RayLib.hpp"
 #include "../../Game/GameInfos.hpp"
-#include "../Audio/IAudio.hpp"
+#include "../../Audio/IAudio.hpp"
 
 /**
  * @brief Main HUD class to manage all UI elements
