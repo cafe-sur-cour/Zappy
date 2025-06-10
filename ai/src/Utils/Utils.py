@@ -5,7 +5,7 @@
 ## Utils
 ##
 
-USAGE_STRING = "Usage: ./zappy_ai -p port -n name -h machine\n" \
+USAGE_STRING = "Usage: ./zappy_ai -p port -n name [-h machine]\n" \
                "option\t\tdescription\n" \
                "-p port\t\tport number\n" \
                "-n name\t\tname of the team\n" \
