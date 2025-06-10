@@ -56,6 +56,13 @@ class RayLib {
         int getScreenHeight() const;
         float getMouseWheelMove() const;
 
+        // Gamepad methods
+        bool isGamepadAvailable(int gamepad) const;
+        bool isGamepadButtonPressed(int gamepad, int button) const;
+        bool isGamepadButtonDown(int gamepad, int button) const;
+        bool isGamepadButtonReleased(int gamepad, int button) const;
+        float getGamepadAxisMovement(int gamepad, int axis) const;
+
         // Scissor mode methods for clipping
         void beginScissorMode(int x, int y, int width, int height);
         void endScissorMode();
