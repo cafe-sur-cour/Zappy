@@ -17,8 +17,8 @@
 #include "../UIElement/IUIElement.hpp"
 #include "../Button/Button.hpp"
 #include "../Text/Text.hpp"
-#include "../../RayLib/RayLib.hpp"
-#include "../../Audio/Audio.hpp"
+#include "../../../RayLib/RayLib.hpp"
+#include "../../../Audio/IAudio.hpp"
 
 /**
  * @brief Container class for organizing UI elements
@@ -39,7 +39,7 @@ class Containers : public AContainers {
          * @param height Container height
          * @param backgroundColor Background color (default: semi-transparent dark gray)
          */
-        Containers(std::shared_ptr<RayLib> raylib, std::shared_ptr<Audio> audio,
+        Containers(std::shared_ptr<RayLib> raylib, std::shared_ptr<IAudio> audio,
             float x, float y, float width, float height,
             Color backgroundColor = {40, 40, 40, 200});
 
@@ -274,7 +274,7 @@ class Containers : public AContainers {
 
     private:
         std::shared_ptr<RayLib> _raylib;
-        std::shared_ptr<Audio> _audio;
+        std::shared_ptr<IAudio> _audio;
         Texture2D _backgroundTexture;
         bool _hasBackgroundTexture;
         std::unordered_map<std::string, std::shared_ptr<IUIElement>> _elements;

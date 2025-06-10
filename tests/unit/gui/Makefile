@@ -21,17 +21,16 @@ SRC =	../../../gui/src/Client/Client.cpp \
 		../../../gui/src/CLI/CLI.cpp \
 		../../../gui/src/Communication/Communication.cpp \
 		../../../gui/src/Game/GameInfos.cpp \
-		../../../gui/src/Graphic/RayLib/RayLib.cpp \
 		../../../gui/src/Graphic/GUI.cpp \
 		../../../gui/src/Graphic/Map.cpp \
-		../../../gui/src/Graphic/Audio/Audio.cpp \
 		../../../gui/src/Graphic/HUD/Button/Button.cpp \
 		../../../gui/src/Graphic/HUD/Containers/Containers.cpp \
 		../../../gui/src/Graphic/HUD/Containers/AContainers.cpp \
 		../../../gui/src/Graphic/HUD/Text/Text.cpp \
 		../../../gui/src/Graphic/HUD/UIElement/AUIElement.cpp \
 		../../../gui/src/Graphic/HUD/HUD.cpp \
-		../../../gui/src/Graphic/Camera/CameraManager.cpp
+		../../../gui/src/Graphic/Camera/CameraManager.cpp \
+		../../../gui/src/Graphic/HUD/Help/Help.cpp
 
 OBJ = $(SRC:.cpp=.o)
 
@@ -43,12 +42,15 @@ TEST_SRC = main_test.cpp \
 
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
-INCLUDES = -I./include
+INCLUDES = -I./include -I../../../gui/include -I../../../gui/src
 
 CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
-LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 -lsfml-audio
+LIBS = -L../../../gui/src/Communication -lcommunication \
+		-L../../../gui/src/RayLib -lraylib_wrapper -lraylib \
+		-L../../../gui/src/Audio -laudio -lsfml-audio \
+		-lGL -lm -lpthread -ldl -lrt -lX11
 
 NAME = zappy_gui
 
@@ -58,10 +60,16 @@ CC = g++
 
 all: $(NAME)
 
-$(NAME): $(OBJ) $(MAIN_OBJ)
+$(NAME): libs $(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
 	$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ Compilation completed successfully!$(NC)"
+
+libs:
+	@echo -e "$(BLUE)ᒥ🔧ᒧ Building libraries...$(NC)"
+	@make -C ../../../gui/src/Communication
+	@make -C ../../../gui/src/RayLib
+	@make -C ../../../gui/src/Audio
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
@@ -69,6 +77,9 @@ $(NAME): $(OBJ) $(MAIN_OBJ)
 clean:
 	@rm -rf $(OBJ)
 	@rm -rf $(MAIN_OBJ)
+	@make -C ../../../gui/src/Communication clean
+	@make -C ../../../gui/src/RayLib clean
+	@make -C ../../../gui/src/Audio clean
 
 fclean: clean
 	@rm -rf $(NAME)
@@ -77,6 +88,9 @@ fclean: clean
 	@rm -rf *.gcda
 	@rm -rf *.gcno
 	@rm -rf *.gcov
+	@make -C ../../../gui/src/Communication fclean
+	@make -C ../../../gui/src/RayLib fclean
+	@make -C ../../../gui/src/Audio fclean
 
 re: fclean all
 
@@ -91,7 +105,7 @@ coverage: tests_run
 		coverage_report/index.html &> /dev/null || echo "Please open \
 		coverage_report/index.html in your browser"
 
-tests_run: $(SRC) $(TEST_SRC)
+tests_run: libs $(SRC) $(TEST_SRC)
 	@echo -e "$(BLUE)ᒥ🧪ᒧ Compiling Google Test unit tests...$(NC)"
 	$(CC) -o $(UNIT_TESTS) $(SRC) $(TEST_SRC) $(CFLAGS_COVERAGE) $(INCLUDES) \
 		$(LIBS) -lgtest -lgtest_main
@@ -99,4 +113,4 @@ tests_run: $(SRC) $(TEST_SRC)
 	./$(UNIT_TESTS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ All tests completed!$(NC)"
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re libs

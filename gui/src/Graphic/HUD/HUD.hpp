@@ -13,9 +13,10 @@
 #include <string>
 #include <utility>
 #include "Containers/Containers.hpp"
-#include "../RayLib/RayLib.hpp"
+#include "../../RayLib/RayLib.hpp"
 #include "../../Game/GameInfos.hpp"
-#include "../Audio/Audio.hpp"
+#include "../../Audio/IAudio.hpp"
+#include "Help/Help.hpp"
 
 /**
  * @brief Main HUD class to manage all UI elements
@@ -31,7 +32,7 @@ class HUD {
          * @param raylib Reference to the RayLib instance
          */
         HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos,
-            std::shared_ptr<Audio> audio);
+            std::shared_ptr<IAudio> audio);
 
         /**
          * @brief Destroy the HUD object
@@ -311,5 +312,6 @@ class HUD {
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<RayLib> _raylib;
         std::shared_ptr<GameInfos> _gameInfos;
-        std::shared_ptr<Audio> _audio;
+        std::shared_ptr<IAudio> _audio;
+        std::shared_ptr<Help> _help;
 };

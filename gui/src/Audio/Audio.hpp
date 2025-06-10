@@ -12,8 +12,9 @@
 #include <map>
 #include <memory>
 #include <SFML/Audio.hpp>
+#include "IAudio.hpp"
 
-class Audio {
+class Audio : public IAudio {
     public:
         Audio();
         ~Audio();

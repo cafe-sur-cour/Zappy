@@ -10,8 +10,9 @@
 #include <iostream>
 #include <algorithm>
 #include "GUI.hpp"
-#include "Audio/Audio.hpp"
+#include "../Audio/Audio.hpp"
 #include "../Utils/Constants.hpp"
+#include "../Utils/GamepadConstants.hpp"
 
 GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _gameInfos(gameInfos)
@@ -68,13 +69,16 @@ void GUI::updateCamera()
 
 void GUI::update()
 {
-    if (_raylib->isKeyReleased(KEY_TAB))
+    if (_raylib->isKeyReleased(KEY_TAB) ||
+        _raylib->isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_SHOULDER))
         switchCameraModeNext();
 
     if (_cameraMode == zappy::gui::CameraMode::PLAYER) {
-        if (_raylib->isKeyReleased(KEY_RIGHT))
+        if (_raylib->isKeyReleased(KEY_UP) ||
+            _raylib->isGamepadButtonReleased(0, GAMEPAD_BUTTON_UP))
             switchToNextPlayer();
-        if (_raylib->isKeyReleased(KEY_LEFT))
+        if (_raylib->isKeyReleased(KEY_DOWN) ||
+            _raylib->isGamepadButtonReleased(0, GAMEPAD_BUTTON_DOWN))
             switchToPreviousPlayer();
     }
 
