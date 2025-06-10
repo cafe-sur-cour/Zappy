@@ -9,7 +9,8 @@
 
 SRC		=	my_itoa.c					\
 			my_int_str_length.c			\
-			my_unsignedlen.c
+			my_unsignedlen.c			\
+			is_only_digit.c				\
 
 OBJ 	= 	$(SRC:.c=.o)
 

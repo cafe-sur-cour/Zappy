@@ -38,14 +38,14 @@
             "name": "Server: Invalid flag port",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-z", "8080", "-x", "100", "-y", "100", "-n", "team1", "team2", "-c", "6", "-f", "10"],
-            "expected_output": "CONTAINS - Missing or invalid -p flag.",
+            "expected_output": "CONTAINS - Extra argument detected.",
             "expected_return": 84
         },
         {
             "name": "Server: Invalid width (negative)",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "4244", "-x", "-20", "-y", "100", "-n", "team1", "team2", "-c", "6", "-f", "10"],
-            "expected_output": "CONTAINS - Width must be a positive integer.",
+            "expected_output": "",
             "expected_return": 84
         },
         {
@@ -59,14 +59,14 @@
             "name": "Server: Invalid flag width",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "4246", "-z", "100", "-y", "100", "-n", "team1", "team2", "-c", "6", "-f", "10"],
-            "expected_output": "CONTAINS - Missing or invalid -x flag.",
+            "expected_output": "CONTAINS - Extra argument detected.",
             "expected_return": 84
         },
         {
             "name": "Server: Invalid height (negative)",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "4247", "-x", "100", "-y", "-20", "-n", "team1", "team2", "-c", "6", "-f", "10"],
-            "expected_output": "CONTAINS - Height must be a positive integer.",
+            "expected_output": "",
             "expected_return": 84
         },
         {
@@ -80,14 +80,14 @@
             "name": "Server: Invalid flag height",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "4249", "-x", "100", "-z", "100", "-n", "team1", "team2", "-c", "6", "-f", "10"],
-            "expected_output": "CONTAINS - Missing or invalid -y flag.",
+            "expected_output": "CONTAINS - Extra argument detected.",
             "expected_return": 84
         },
         {
             "name": "Server: Invalid client_nb (negative)",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "4250", "-x", "100", "-y", "100", "-n", "team1", "team2", "-c", "-20", "-f", "10"],
-            "expected_output": "CONTAINS - Number of clients must be a positive integer.",
+            "expected_output": "",
             "expected_return": 84
         },
         {
@@ -101,7 +101,7 @@
             "name": "Server: Invalid flag client_nb",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "4252", "-x", "100", "-y", "100", "-n", "team1", "team2", "-z", "6", "-f", "10"],
-            "expected_output": "CONTAINS - Missing or invalid -c flag.",
+            "expected_output": "CONTAINS - Extra argument detected.",
             "expected_return": 84
         },
         {

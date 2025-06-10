@@ -10,6 +10,7 @@
 
 int int_str_len(int value);
 char *my_itoa(unsigned int nb);
+int is_only_digits(const char *str);
 int my_unsignedlen(unsigned int nb);
 
 #endif /* !MY_H_ */
