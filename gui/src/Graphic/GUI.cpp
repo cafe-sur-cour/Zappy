@@ -10,7 +10,7 @@
 #include <iostream>
 #include <algorithm>
 #include "GUI.hpp"
-#include "Audio/Audio.hpp"
+#include "../Audio/Audio.hpp"
 #include "../Utils/Constants.hpp"
 
 GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),

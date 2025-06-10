@@ -13,9 +13,9 @@
 #include <string>
 #include <utility>
 #include "Containers/Containers.hpp"
-#include "../RayLib/RayLib.hpp"
+#include "../../RayLib/RayLib.hpp"
 #include "../../Game/GameInfos.hpp"
-#include "../Audio/Audio.hpp"
+#include "../../Audio/IAudio.hpp"
 #include "Help/Help.hpp"
 
 /**
@@ -32,7 +32,7 @@ class HUD {
          * @param raylib Reference to the RayLib instance
          */
         HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos,
-            std::shared_ptr<Audio> audio);
+            std::shared_ptr<IAudio> audio);
 
         /**
          * @brief Destroy the HUD object

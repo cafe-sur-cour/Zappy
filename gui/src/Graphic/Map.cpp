@@ -12,7 +12,7 @@
 #include <vector>
 #include <string>
 
-#include "RayLib/RayLib.hpp"
+#include "../RayLib/RayLib.hpp"
 #include "Map.hpp"
 
 Map::Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<RayLib> raylib)

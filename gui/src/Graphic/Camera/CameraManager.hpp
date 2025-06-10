@@ -9,7 +9,7 @@
 #define CAMERA_MANAGER_HPP_
 
 #include <memory>
-#include "../RayLib/RayLib.hpp"
+#include "../../RayLib/RayLib.hpp"
 #include "../../Utils/Constants.hpp"
 #include "../../Game/GameInfos.hpp"
 #include "../Map.hpp"
