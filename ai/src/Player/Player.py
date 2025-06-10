@@ -16,7 +16,6 @@ from src.Exceptions.Exceptions import (
 from src.Communication.Communication import Communication
 from src.Utils.Utils import SUCCESS, FAILURE
 
-MIN_FOOD = 10
 
 LVL_UPGRADES = {
     1: {"linemate": 1, "deraumere": 1, "sibur": 0, "mendiane": 0, "phiras": 0, "thystame": 0},
