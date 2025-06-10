@@ -17,6 +17,7 @@ SRC =	RayLib.cpp	\
 		RaylibInput.cpp	\
 		Raylib3dEnv.cpp	\
 		RaylibCamera.cpp	\
+		RaylibGamepad.cpp \
 		Raylib3dDrawing.cpp	\
 		Raylib3dModel.cpp	\
 

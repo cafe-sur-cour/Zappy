@@ -8,6 +8,7 @@
 #include "RayLib.hpp"
 #include "raymath.h"
 #include "../Utils/Constants.hpp"
+#include "../Utils/GamepadConstants.hpp"
 
 void RayLib::initCamera()
 {
@@ -79,11 +80,11 @@ void RayLib::updateCameraFreeMode()
         _camera.position = Vector3Add(_camera.position, Vector3Scale(right, moveSpeed));
         _camera.target = Vector3Add(_camera.target, Vector3Scale(right, moveSpeed));
     }
-    if (IsKeyDown(KEY_SPACE)) {
+    if (IsKeyDown(KEY_SPACE) || isGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_TRIGGER)) {
         _camera.position.y += moveSpeed * 0.5;
         _camera.target.y += moveSpeed * 0.5;
     }
-    if (IsKeyDown(KEY_LEFT_CONTROL)) {
+    if (IsKeyDown(KEY_LEFT_CONTROL) || isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_TRIGGER)) {
         _camera.position.y -= moveSpeed * 0.5;
         _camera.target.y -= moveSpeed * 0.5;
     }
@@ -135,6 +136,113 @@ void RayLib::updateCameraFreeMode()
             int screenCenterX = getScreenWidth() / 2;
             int screenCenterY = getScreenHeight() / 2;
             setMousePosition(screenCenterX, screenCenterY);
+        }
+    }
+
+    if (IsKeyDown(KEY_RIGHT)) {
+        Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+        float rotAngle = zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+        float cosRotAngle = cosf(rotAngle);
+        float sinRotAngle = sinf(rotAngle);
+        float newDirX = viewDir.x * cosRotAngle - viewDir.z * sinRotAngle;
+        float newDirZ = viewDir.x * sinRotAngle + viewDir.z * cosRotAngle;
+        viewDir.x = newDirX;
+        viewDir.z = newDirZ;
+
+        _camera.target = Vector3Add(_camera.position, viewDir);
+    }
+
+    if (IsKeyDown(KEY_LEFT)) {
+        Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+        float rotAngle = -zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+        float cosRotAngle = cosf(rotAngle);
+        float sinRotAngle = sinf(rotAngle);
+        float newDirX = viewDir.x * cosRotAngle - viewDir.z * sinRotAngle;
+        float newDirZ = viewDir.x * sinRotAngle + viewDir.z * cosRotAngle;
+        viewDir.x = newDirX;
+        viewDir.z = newDirZ;
+
+        _camera.target = Vector3Add(_camera.position, viewDir);
+    }
+
+    if (IsKeyDown(KEY_UP)) {
+        Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+        float rotAngle = zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+        Vector3 rightVec = Vector3CrossProduct(viewDir, _camera.up);
+        rightVec = Vector3Normalize(rightVec);
+        viewDir = Vector3RotateByAxisAngle(viewDir, rightVec, rotAngle);
+
+        Vector3 newUp = Vector3CrossProduct(rightVec, viewDir);
+        if (newUp.y > 0.0f)
+            _camera.target = Vector3Add(_camera.position, viewDir);
+    }
+
+    if (IsKeyDown(KEY_DOWN)) {
+        Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+        float rotAngle = -zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+        Vector3 rightVec = Vector3CrossProduct(viewDir, _camera.up);
+        rightVec = Vector3Normalize(rightVec);
+        viewDir = Vector3RotateByAxisAngle(viewDir, rightVec, rotAngle);
+
+        Vector3 newUp = Vector3CrossProduct(rightVec, viewDir);
+        if (newUp.y > 0.0f)
+            _camera.target = Vector3Add(_camera.position, viewDir);
+    }
+
+    if (isGamepadAvailable(0)) {
+        float rightStickX = getGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_X);
+        float rightStickY = getGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_Y);
+
+        if (fabs(rightStickX) > zappy::gui::GAMEPAD_DEADZONE) {
+            Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+            float rotAngle = rightStickX * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
+
+            float cosRotAngle = cosf(rotAngle);
+            float sinRotAngle = sinf(rotAngle);
+            float newDirX = viewDir.x * cosRotAngle - viewDir.z * sinRotAngle;
+            float newDirZ = viewDir.x * sinRotAngle + viewDir.z * cosRotAngle;
+            viewDir.x = newDirX;
+            viewDir.z = newDirZ;
+
+            _camera.target = Vector3Add(_camera.position, viewDir);
+        }
+
+        if (fabs(rightStickY) > zappy::gui::GAMEPAD_DEADZONE) {
+            Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
+            float rotAngle = -rightStickY * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
+
+            Vector3 rightVec = Vector3CrossProduct(viewDir, _camera.up);
+            rightVec = Vector3Normalize(rightVec);
+            viewDir = Vector3RotateByAxisAngle(viewDir, rightVec, rotAngle);
+
+            Vector3 newUp = Vector3CrossProduct(rightVec, viewDir);
+            if (newUp.y > 0.0f)
+                _camera.target = Vector3Add(_camera.position, viewDir);
+        }
+
+        float leftStickX = getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);
+        float leftStickY = getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+
+        Vector3 forward = Vector3Subtract(_camera.target, _camera.position);
+        forward = Vector3Normalize(forward);
+
+        Vector3 right = Vector3CrossProduct(forward, _camera.up);
+        right = Vector3Normalize(right);
+
+        if (fabs(leftStickY) > zappy::gui::GAMEPAD_DEADZONE) {
+            float moveAmount = -leftStickY * moveSpeed;
+            _camera.position = Vector3Add(_camera.position, Vector3Scale(forward, moveAmount));
+            _camera.target = Vector3Add(_camera.target, Vector3Scale(forward, moveAmount));
+        }
+
+        if (fabs(leftStickX) > zappy::gui::GAMEPAD_DEADZONE) {
+            float moveAmount = leftStickX * moveSpeed;
+            _camera.position = Vector3Add(_camera.position, Vector3Scale(right, moveAmount));
+            _camera.target = Vector3Add(_camera.target, Vector3Scale(right, moveAmount));
         }
     }
 }

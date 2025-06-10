@@ -10,6 +10,7 @@
 #include "CameraManager.hpp"
 #include "raylib.h"
 #include "raymath.h"
+#include "../../Utils/GamepadConstants.hpp"
 
 CameraManager::CameraManager(std::shared_ptr<RayLib> raylib) : _raylib(raylib),
     _mapCenter({ 0.0f, 0.0f, 0.0f }), _mapWidth(0), _mapHeight(0),
@@ -121,6 +122,49 @@ void CameraManager::updateCameraTargetMode()
 
         if (_targetDistance < 5.0f) _targetDistance = 5.0f;
         if (_targetDistance > 100.0f) _targetDistance = 100.0f;
+    }
+
+    bool isZoomingIn = _raylib->isGamepadButtonDown(0, GAMEPAD_BUTTON_RIGHT_TRIGGER);
+    bool isZoomingOut = _raylib->isGamepadButtonDown(0, GAMEPAD_BUTTON_LEFT_TRIGGER);
+    if (isZoomingIn) {
+        _targetDistance -= zappy::gui::CAMERA_SPEED * deltaTime;
+        if (_targetDistance < 5.0f) _targetDistance = 5.0f;
+    }
+    if (isZoomingOut) {
+        _targetDistance += zappy::gui::CAMERA_SPEED * deltaTime;
+        if (_targetDistance > 100.0f) _targetDistance = 100.0f;
+    }
+
+    if (_raylib->isKeyDown(KEY_RIGHT))
+        _targetAngleXZ += zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+    if (_raylib->isKeyDown(KEY_LEFT))
+        _targetAngleXZ -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+    if (_raylib->isGamepadAvailable(0)) {
+        float rightStickX = _raylib->getGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_X);
+        float rightStickY = _raylib->getGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_Y);
+
+        if (fabs(rightStickX) > zappy::gui::GAMEPAD_DEADZONE)
+            _targetAngleXZ += rightStickX * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
+
+        if (fabs(rightStickY) > zappy::gui::GAMEPAD_DEADZONE) {
+            _targetAngleY -= rightStickY * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
+
+            const float maxVerticalAngle = 1.5f;
+            if (_targetAngleY > maxVerticalAngle) _targetAngleY = maxVerticalAngle;
+            if (_targetAngleY < 0.1f) _targetAngleY = 0.1f;
+        }
+    }
+
+    if (_raylib->isKeyDown(KEY_UP)) {
+        _targetAngleY += zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        if (_targetAngleY > 1.5f) _targetAngleY = 1.5f;
+    }
+
+    if (_raylib->isKeyDown(KEY_DOWN)) {
+        _targetAngleY -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        if (_targetAngleY < 0.1f) _targetAngleY = 0.1f;
     }
 
     float posX = _mapCenter.x + _targetDistance * cosf(_targetAngleY) * cosf(_targetAngleXZ);
@@ -248,6 +292,21 @@ void CameraManager::updateCameraPlayerMode()
     }
 
     handlePlayerCameraMouseInput();
+
+    float deltaTime = _raylib->getFrameTime();
+    if (_raylib->isKeyDown(KEY_RIGHT))
+        _playerAngleXZ += zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+    if (_raylib->isKeyDown(KEY_LEFT))
+        _playerAngleXZ -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+
+    if (_raylib->isGamepadAvailable(0)) {
+        float rightStickX = _raylib->getGamepadAxisMovement(0, GAMEPAD_AXIS_RIGHT_X);
+
+        if (fabs(rightStickX) > zappy::gui::GAMEPAD_DEADZONE)
+            _playerAngleXZ += rightStickX * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
+    }
+
 
     Vector3 playerPos = calculatePlayerPosition(*playerIt);
     Vector3 cameraPos = calculateCameraPosition(playerPos, _playerAngleXZ);
