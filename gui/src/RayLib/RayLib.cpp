@@ -33,16 +33,6 @@ RayLib::~RayLib()
     unloadAllModels();
 }
 
-void RayLib::begin3DMode()
-{
-    BeginMode3D(_camera);
-}
-
-void RayLib::end3DMode()
-{
-    EndMode3D();
-}
-
 void RayLib::initCamera()
 {
     _camera.position = (Vector3){ 0.0f, 30.0f, 30.0f };
@@ -265,26 +255,6 @@ void RayLib::unloadTexture(Texture2D texture)
 bool RayLib::checkCollisionPointRec(Vector2 point, Rectangle rec) const
 {
     return CheckCollisionPointRec(point, rec);
-}
-
-float RayLib::vector3Distance(Vector3 v1, Vector3 v2) const
-{
-    return Vector3Distance(v1, v2);
-}
-
-Vector3 RayLib::vector3Normalize(Vector3 v) const
-{
-    return Vector3Normalize(v);
-}
-
-Vector3 RayLib::vector3Subtract(Vector3 v1, Vector3 v2) const
-{
-    return Vector3Subtract(v1, v2);
-}
-
-Vector3 RayLib::vector3Add(Vector3 v1, Vector3 v2) const
-{
-    return Vector3Add(v1, v2);
 }
 
 void RayLib::beginScissorMode(int x, int y, int width, int height)

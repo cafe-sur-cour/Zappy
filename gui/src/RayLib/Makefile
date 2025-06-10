@@ -15,6 +15,7 @@ NC=\033[0m
 SRC =	RayLib.cpp	\
 		RaylibWindow.cpp	\
 		RaylibInput.cpp	\
+		Raylib3dEnv.cpp	\
 
 OBJ = $(SRC:.cpp=.o)
 
