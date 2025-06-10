@@ -72,6 +72,11 @@ class Player:
             "lastCommand": None
         }
 
+        self.stepCount: int = 0
+
+        self.needToCheckSurvival: bool = False
+        self.foodLevels: tuple[int, int] = (10, 10)
+
         self.helpRequestCount: int = 0
         self.isInSurvivalMode: bool = False
         self.lastFoodCheck: int = 10
@@ -126,6 +131,21 @@ class Player:
         neededStones = [stone for quantity, stone in neededStones if quantity > 0]
         return neededStones
 
+    def sendHelpRequest(self) -> None:
+        self.helpRequestCount += 1
+        helpMessage = f"help:{self.helpRequestCount}"
+
+        self.communication.sendBroadcast(self.hash.hashMessage(helpMessage))
+
+    def dropStonesForSurvival(self) -> None:
+        dropPriority = ["thystame", "phiras", "mendiane", "sibur", "deraumere", "linemate"]
+
+        for stone in dropPriority:
+            if self.inventory.get(stone, 0) > 0:
+                print(f"Survival mod critical: drop {stone}")
+                self.communication.sendSetObject(stone)
+                return
+
     def checkSurvivalStatus(self) -> None:
         currentFood = self.inventory.get("food", 0)
 
@@ -142,27 +162,14 @@ class Player:
             self.sendHelpRequest()
         elif currentFood < SURVIVAL_MIN_FOOD_LEVEL and self.isInSurvivalMode:
             if self.helpRequestCount < SURVIVAL_MIN_FOOD_LEVEL:
-                if (self.roombaState["forwardCount"] %
-                        NBR_STEP_BEFORE_REFRESH_BROADCAST_HELP == 0):
+                if (
+                    self.roombaState["forwardCount"] %
+                    NBR_STEP_BEFORE_REFRESH_BROADCAST_HELP == 0
+                ):
                     self.sendHelpRequest()
             else:
                 self.dropStonesForSurvival()
         self.lastFoodCheck = currentFood
-
-    def sendHelpRequest(self) -> None:
-        self.helpRequestCount += 1
-        helpMessage = f"help:{self.helpRequestCount}"
-
-        self.communication.sendBroadcast(self.hash.hashMessage(helpMessage))
-
-    def dropStonesForSurvival(self) -> None:
-        dropPriority = ["thystame", "phiras", "mendiane", "sibur", "deraumere", "linemate"]
-
-        for stone in dropPriority:
-            if self.inventory.get(stone, 0) > 0:
-                print(f"Survival mod critical: drop {stone}")
-                self.communication.sendSetObject(stone)
-                return
 
     def canHelpTeammate(self) -> bool:
         currentFood = self.inventory.get("food", 0)
@@ -172,16 +179,15 @@ class Player:
         if direction == 0:
             return "self"
 
-        # Zappy directions (from documentation):
         direction_map = {
-            1: "forward",        # Forward
-            2: "forwardRight",  # ForwardLeft
-            3: "right",          # Left
-            4: "backRight",     # BehindLeft
-            5: "back",           # Behind
-            6: "backLeft",      # BehindRight
-            7: "left",           # Right
-            8: "forwardLeft"    # ForwardRight
+            1: "forward",
+            2: "forwardLeft",
+            3: "left",
+            4: "backLeft",
+            5: "back",
+            6: "backRight",
+            7: "right",
+            8: "forwardRight"
         }
         return direction_map.get(direction, "unknown")
 
@@ -233,7 +239,17 @@ class Player:
         return False
 
     def roombaAction(self) -> None:
-        self.checkSurvivalStatus()
+        if self.needToCheckSurvival:
+            print(f"Food: {self.foodLevels[0]} -> {self.foodLevels[1]}")
+            self.checkSurvivalStatus()
+            self.needToCheckSurvival = False
+            return
+
+        if self.stepCount % INVENTORY_REFRESH == 0:
+            self.communication.sendInventory()
+            return
+
+        self.stepCount += 1
 
         if self.isHelpingTeammate:
             if self.helpTeammateAction():
@@ -284,9 +300,9 @@ class Player:
             self.inventory = self.communication.getInventory()
             newFood = self.inventory.get("food", 0)
 
-            if newFood != oldFood:
-                print(f"Food: {oldFood} -> {newFood}")
-                self.checkSurvivalStatus()
+            self.needToCheckSurvival = newFood != oldFood
+
+            self.foodLevels = (oldFood, newFood)
 
         if response.strip() == "look":
             self.look = self.communication.getLook()
@@ -306,7 +322,8 @@ class Player:
                     help_number = help_parts[1]
                     print(
                         f"Help receive from team: #{help_number}"
-                        f"from direction {direction}")
+                        f"from direction {direction}"
+                    )
                     if self.canHelpTeammate():
                         print(f"Start helping to {direction}")
                         self.startHelpingTeammate(direction)
@@ -314,7 +331,8 @@ class Player:
                         print(
                             f"I can't help: "
                             f"{self.inventory.get('food', 0)} food,"
-                            f" survival mode: {self.isInSurvivalMode}")
+                            f" survival mode: {self.isInSurvivalMode}"
+                        )
                 else:
                     print(f"Helping message error: {response}")
             except Exception as e:
@@ -327,7 +345,8 @@ class Player:
             if direction != 0:
                 print(
                     f"A teammate is coming to help in the direction "
-                    f"{direction}")
+                    f"{direction}"
+                )
             return True
         return False
 
@@ -336,17 +355,13 @@ class Player:
             if direction != 0:
                 print(
                     f"Food dropped by a teammate in the direction "
-                    f"{direction}")
+                    f"{direction}"
+                )
             return True
         return False
 
     def loop(self) -> None:
-        self.communication.sendInventory()
-        stepCount = 0
-
         while not self.communication.playerIsDead():
-            stepCount += 1
-
             if self.communication.hasMessages():
                 message = self.communication.getLastMessage()
                 direction = message[0]
@@ -355,10 +370,11 @@ class Player:
 
                 try:
                     response = self.hash.unHashMessage(raw_message)
-                    response = raw_message
-                    if (not self.handleHelpMessage(response, direction) and not
-                            self.handleComingHelpMessage(response, direction) and not
-                            self.handleFoodDroppedMessage(response, direction)):
+                    if (
+                        not self.handleHelpMessage(response, direction) and
+                        not self.handleComingHelpMessage(response, direction) and
+                        not self.handleFoodDroppedMessage(response, direction)
+                    ):
                         print(f"Unrecognized message: {response}")
                 except Exception as e:
                     print(f"Error during message decryption: {e}")
@@ -371,6 +387,5 @@ class Player:
 
             if not self.communication.hasPendingCommands():
                 self.roombaAction()
-            if stepCount % INVENTORY_REFRESH == 0:
-                self.communication.sendInventory()
+
             sleep(0.1)
