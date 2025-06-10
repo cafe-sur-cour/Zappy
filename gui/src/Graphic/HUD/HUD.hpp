@@ -312,6 +312,6 @@ class HUD {
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<RayLib> _raylib;
         std::shared_ptr<GameInfos> _gameInfos;
-        std::shared_ptr<Audio> _audio;
+        std::shared_ptr<IAudio> _audio;
         std::shared_ptr<Help> _help;
 };
