@@ -20,7 +20,7 @@ SRC =	src/Client/Client.cpp \
 		src/Client/MsgHandler.cpp \
 		src/CLI/CLI.cpp \
 		src/Game/GameInfos.cpp \
-		src/Graphic/RayLib/RayLib.cpp \
+		src/RayLib/RayLib.cpp \
 		src/Graphic/GUI.cpp \
 		src/Graphic/Map.cpp \
 		src/Graphic/Audio/Audio.cpp \
