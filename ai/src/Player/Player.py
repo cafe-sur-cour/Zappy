@@ -9,14 +9,13 @@ import os
 from threading import Thread
 from time import sleep
 
-from src.Hash.Hash import Hash
+from src.Broadcaster.Broadcaster import Broadcaster
 from src.Exceptions.Exceptions import (
     CommunicationException
 )
 from src.Communication.Communication import Communication
 from src.Utils.Utils import SUCCESS, FAILURE
 
-MIN_FOOD = 10
 
 LVL_UPGRADES = {
     1: {"linemate": 1, "deraumere": 1, "sibur": 0, "mendiane": 0, "phiras": 0, "thystame": 0},
@@ -27,12 +26,6 @@ LVL_UPGRADES = {
     6: {"linemate": 1, "deraumere": 2, "sibur": 3, "mendiane": 0, "phiras": 1, "thystame": 0},
     7: {"linemate": 2, "deraumere": 2, "sibur": 2, "mendiane": 2, "phiras": 2, "thystame": 1},
 }
-
-INVENTORY_REFRESH = 20
-
-NBR_STEP_BEFORE_REFRESH_BROADCAST_HELP = 10
-
-SURVIVAL_MIN_FOOD_LEVEL = 5
 
 
 class Player:
@@ -50,7 +43,7 @@ class Player:
         self.port: int = port
 
         self.level: int = 1
-        self.hash: Hash = Hash(name)
+        self.broadcaster: Broadcaster = Broadcaster(self.communication, name)
         self.inventory: dict[str, int] = {
             "food": 10,
             "linemate": 0,
@@ -71,13 +64,6 @@ class Player:
             "phase": "forward",
             "lastCommand": None
         }
-
-        self.helpRequestCount: int = 0
-        self.isInSurvivalMode: bool = False
-        self.lastFoodCheck: int = 10
-
-        self.isHelpingTeammate: bool = False
-        self.helpTargetDirection: int = 0
 
     def __del__(self):
         self.communication.stopLoop()
@@ -126,35 +112,6 @@ class Player:
         neededStones = [stone for quantity, stone in neededStones if quantity > 0]
         return neededStones
 
-    def checkSurvivalStatus(self) -> None:
-        currentFood = self.inventory.get("food", 0)
-
-        if currentFood > self.lastFoodCheck and self.isInSurvivalMode:
-            print(f"Got food! ({currentFood}) - End of survival mode")
-            self.isInSurvivalMode = False
-            self.helpRequestCount = 0
-            self.lastFoodCheck = currentFood
-            return
-
-        if currentFood < SURVIVAL_MIN_FOOD_LEVEL and not self.isInSurvivalMode:
-            print(f"Survival mode current food : {currentFood}")
-            self.isInSurvivalMode = True
-            self.sendHelpRequest()
-        elif currentFood < SURVIVAL_MIN_FOOD_LEVEL and self.isInSurvivalMode:
-            if self.helpRequestCount < SURVIVAL_MIN_FOOD_LEVEL:
-                if (self.roombaState["forwardCount"] %
-                        NBR_STEP_BEFORE_REFRESH_BROADCAST_HELP == 0):
-                    self.sendHelpRequest()
-            else:
-                self.dropStonesForSurvival()
-        self.lastFoodCheck = currentFood
-
-    def sendHelpRequest(self) -> None:
-        self.helpRequestCount += 1
-        helpMessage = f"help:{self.helpRequestCount}"
-
-        self.communication.sendBroadcast(self.hash.hashMessage(helpMessage))
-
     def dropStonesForSurvival(self) -> None:
         dropPriority = ["thystame", "phiras", "mendiane", "sibur", "deraumere", "linemate"]
 
@@ -164,81 +121,23 @@ class Player:
                 self.communication.sendSetObject(stone)
                 return
 
-    def canHelpTeammate(self) -> bool:
-        currentFood = self.inventory.get("food", 0)
-        return currentFood > (SURVIVAL_MIN_FOOD_LEVEL + 1) and not self.isInSurvivalMode
-
     def getDirectionFromSound(self, direction: int) -> str:
         if direction == 0:
             return "self"
 
-        # Zappy directions (from documentation):
         direction_map = {
-            1: "forward",        # Forward
-            2: "forwardRight",  # ForwardLeft
-            3: "right",          # Left
-            4: "backRight",     # BehindLeft
-            5: "back",           # Behind
-            6: "backLeft",      # BehindRight
-            7: "left",           # Right
-            8: "forwardLeft"    # ForwardRight
+            1: "forward",
+            2: "forwardLeft",
+            3: "left",
+            4: "backLeft",
+            5: "back",
+            6: "backRight",
+            7: "right",
+            8: "forwardRight"
         }
         return direction_map.get(direction, "unknown")
 
-    def startHelpingTeammate(self, direction: int) -> None:
-        if not self.canHelpTeammate():
-            return
-
-        print(f"Starting help to this direction {direction}")
-        self.isHelpingTeammate = True
-        self.helpTargetDirection = direction
-
-        self.communication.sendBroadcast(self.hash.hashMessage("comingToHelp"))
-
-    def helpTeammateAction(self) -> bool:
-        if not self.isHelpingTeammate:
-            return True
-
-        if self.helpTargetDirection == 0:
-            if self.inventory.get("food", 0) > (SURVIVAL_MIN_FOOD_LEVEL + 1):
-                print("Drop food for teammate")
-                self.communication.sendSetObject("food")
-                self.communication.sendBroadcast(self.hash.hashMessage("foodDropped"))
-            else:
-                print("Not enough food to help teammate")
-
-            self.isHelpingTeammate = False
-            self.helpTargetDirection = 0
-            return True
-
-        direction_str = self.getDirectionFromSound(self.helpTargetDirection)
-
-        if direction_str in ["forward", "forwardRight", "forwardLeft"]:
-            self.communication.sendForward()
-        elif direction_str == "right":
-            self.communication.sendRight()
-            self.communication.sendForward()
-        elif direction_str == "left":
-            self.communication.sendLeft()
-            self.communication.sendForward()
-        elif direction_str in ["back", "backRight", "backLeft"]:
-            self.communication.sendRight()
-            self.communication.sendRight()
-            self.communication.sendForward()
-        elif direction_str == "self":
-            return True
-        else:
-            self.communication.sendForward()
-
-        return False
-
     def roombaAction(self) -> None:
-        self.checkSurvivalStatus()
-
-        if self.isHelpingTeammate:
-            if self.helpTeammateAction():
-                return
-
         if self.roombaState["phase"] == "forward":
             if self.roombaState["lastCommand"] in ("left", "forward", None):
                 self.communication.sendLook()
@@ -249,14 +148,13 @@ class Player:
                 if self.look:
                     if "food" in self.look[0].keys():
                         self.communication.sendTakeObject("food")
-                    if not self.isInSurvivalMode or self.helpRequestCount < 3:
-                        neededStones = self.getNeededStonesByPriority()
-                        for stone in neededStones:
-                            if stone in self.look[0].keys():
-                                self.communication.sendTakeObject(stone)
-                self.roombaState["lastCommand"] = "getObjects"
+                    neededStones = self.getNeededStonesByPriority()
+                    for stone in neededStones:
+                        if stone in self.look[0].keys():
+                            self.communication.sendTakeObject(stone)
+                self.roombaState["lastCommand"] = "take"
 
-            elif self.roombaState["lastCommand"] == "getObjects":
+            elif self.roombaState["lastCommand"] == "take":
                 if self.roombaState["forwardCount"] < self.roombaState["targetForward"]:
                     self.communication.sendForward()
                     self.roombaState["lastCommand"] = "forward"
@@ -278,90 +176,41 @@ class Player:
                 self.roombaState["lastCommand"] = "left"
                 self.roombaState["phase"] = "forward"
 
+    def handleResponseInventory(self) -> None:
+        self.inventory = self.communication.getInventory() or self.inventory
+
+    def handleResponseLook(self) -> None:
+        self.look = self.communication.getLook() or self.look
+
+    def handleResponseKO(self) -> None:
+        print(f"Command '{self.roombaState['lastCommand']}' failed")
+
+    def handleResponseOK(self) -> None:
+        print(f"Command '{self.roombaState['lastCommand']}' succeeded")
+
     def handleCommandResponse(self, response: str) -> None:
-        if response.strip() == "inventory":
-            oldFood = self.inventory.get("food", 0)
-            self.inventory = self.communication.getInventory()
-            newFood = self.inventory.get("food", 0)
-
-            if newFood != oldFood:
-                print(f"Food: {oldFood} -> {newFood}")
-                self.checkSurvivalStatus()
-
-        if response.strip() == "look":
-            self.look = self.communication.getLook()
-
-        elif response.strip() == "ko":
-            print(f"Command '{self.roombaState['lastCommand']}' failed")
-
-        elif response.strip() == "ok":
-            if self.roombaState['lastCommand'] in ["getObjects"]:
-                self.communication.sendInventory()
-
-    def handleHelpMessage(self, response: str, direction: int) -> bool:
-        if response.startswith("help:"):
-            try:
-                help_parts = response.split(":")
-                if len(help_parts) >= 2 and help_parts[1]:
-                    help_number = help_parts[1]
-                    print(
-                        f"Help receive from team: #{help_number}"
-                        f"from direction {direction}")
-                    if self.canHelpTeammate():
-                        print(f"Start helping to {direction}")
-                        self.startHelpingTeammate(direction)
-                    else:
-                        print(
-                            f"I can't help: "
-                            f"{self.inventory.get('food', 0)} food,"
-                            f" survival mode: {self.isInSurvivalMode}")
-                else:
-                    print(f"Helping message error: {response}")
-            except Exception as e:
-                print(f"Error during message formating: {e}")
-            return True
-        return False
-
-    def handleComingHelpMessage(self, response: str, direction: int) -> bool:
-        if response == "comingToHelp":
-            if direction != 0:
-                print(
-                    f"A teammate is coming to help in the direction "
-                    f"{direction}")
-            return True
-        return False
-
-    def handleFoodDroppedMessage(self, response: str, direction: int) -> None:
-        if response == "foodDropped":
-            if direction != 0:
-                print(
-                    f"Food dropped by a teammate in the direction "
-                    f"{direction}")
-            return True
-        return False
+        switcher = {
+            "inventory": self.handleResponseInventory,
+            "look": self.handleResponseLook,
+            "ko": self.handleResponseKO,
+            "ok": self.handleResponseOK,
+        }
+        handler = switcher.get(response.strip(), None)
+        if handler:
+            handler()
+        else:
+            print(f"Unknown response: {response.strip()}")
 
     def loop(self) -> None:
-        self.communication.sendInventory()
-        stepCount = 0
-
         while not self.communication.playerIsDead():
-            stepCount += 1
-
             if self.communication.hasMessages():
-                message = self.communication.getLastMessage()
-                direction = message[0]
-                raw_message = str(message[1])
-                raw_message = raw_message.strip()
-
-                try:
-                    response = self.hash.unHashMessage(raw_message)
-                    response = raw_message
-                    if (not self.handleHelpMessage(response, direction) and not
-                            self.handleComingHelpMessage(response, direction) and not
-                            self.handleFoodDroppedMessage(response, direction)):
-                        print(f"Unrecognized message: {response}")
-                except Exception as e:
-                    print(f"Error during message decryption: {e}")
+                data = self.communication.getLastMessage()
+                direction = data[0]
+                message = self.broadcaster.revealMessage(data[1])
+                if not message:
+                    print("Received bad message, skipping...")
+                    continue
+                print(f"Received message: {message}")
 
             if self.communication.hasResponses():
                 response = self.communication.getLastResponse()
@@ -371,6 +220,5 @@ class Player:
 
             if not self.communication.hasPendingCommands():
                 self.roombaAction()
-            if stepCount % INVENTORY_REFRESH == 0:
-                self.communication.sendInventory()
+
             sleep(0.1)
