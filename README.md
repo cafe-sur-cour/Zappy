@@ -2,7 +2,7 @@
 
 # 🎮 ZAPPY
 
-![Zappy Logo](styleDoc/zappy.png)
+![Zappy Logo](assets/zappy.png)
 
 **A multiplayer network strategy game where teams compete for supremacy!**
 
