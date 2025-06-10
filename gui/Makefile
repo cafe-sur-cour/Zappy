@@ -20,9 +20,9 @@ SRC =	src/Client/Client.cpp \
 		src/Client/MsgHandler.cpp \
 		src/CLI/CLI.cpp \
 		src/Game/GameInfos.cpp \
+		src/Audio/Audio.cpp \
 		src/Graphic/GUI.cpp \
 		src/Graphic/Map.cpp \
-		src/Graphic/Audio/Audio.cpp \
 		src/Graphic/Camera/CameraManager.cpp \
 		src/Graphic/HUD/Button/Button.cpp \
 		src/Graphic/HUD/Containers/Containers.cpp \
