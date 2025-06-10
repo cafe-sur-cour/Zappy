@@ -175,13 +175,13 @@ class Player:
         # Zappy directions (from documentation):
         direction_map = {
             1: "forward",        # Forward
-            2: "forward-right",  # Forward-Left
+            2: "forwardRight",  # ForwardLeft
             3: "right",          # Left
-            4: "back-right",     # Behind-Left
+            4: "backRight",     # BehindLeft
             5: "back",           # Behind
-            6: "back-left",      # Behind-Right
+            6: "backLeft",      # BehindRight
             7: "left",           # Right
-            8: "forward-left"    # Forward-Right
+            8: "forwardLeft"    # ForwardRight
         }
         return direction_map.get(direction, "unknown")
 
@@ -205,7 +205,7 @@ class Player:
                 self.communication.sendSetObject("food")
                 self.communication.sendBroadcast(self.hash.hashMessage("food_dropped"))
             else:
-                print("Not engough food to help teammate")
+                print("Not enough food to help teammate")
 
             self.isHelpingTeammate = False
             self.helpTargetDirection = 0
@@ -213,7 +213,7 @@ class Player:
 
         direction_str = self.getDirectionFromSound(self.helpTargetDirection)
 
-        if direction_str in ["forward", "forward-right", "forward-left"]:
+        if direction_str in ["forward", "forwardRight", "forwardLeft"]:
             self.communication.sendForward()
         elif direction_str == "right":
             self.communication.sendRight()
@@ -221,7 +221,7 @@ class Player:
         elif direction_str == "left":
             self.communication.sendLeft()
             self.communication.sendForward()
-        elif direction_str in ["back", "back-right", "back-left"]:
+        elif direction_str in ["back", "backRight", "backLeft"]:
             self.communication.sendRight()
             self.communication.sendRight()
             self.communication.sendForward()
@@ -347,7 +347,7 @@ class Player:
                                 f"Food dropped by a teammate in the direction "
                                 f"{direction}")
                     else:
-                        print(f"Message error: {response}")
+                        print(f"Unrecognized message: {response}")
 
             if self.communication.hasResponses():
                 response = self.communication.getLastResponse()
