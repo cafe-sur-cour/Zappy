@@ -21,7 +21,7 @@ SRC =	../../../gui/src/Client/Client.cpp \
 		../../../gui/src/CLI/CLI.cpp \
 		../../../gui/src/Communication/Communication.cpp \
 		../../../gui/src/Game/GameInfos.cpp \
-		../../../gui/src/Graphic/RayLib/RayLib.cpp \
+		../../../gui/src/RayLib/RayLib.cpp \
 		../../../gui/src/Graphic/GUI.cpp \
 		../../../gui/src/Graphic/Map.cpp \
 		../../../gui/src/Graphic/Audio/Audio.cpp \
