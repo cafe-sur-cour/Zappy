@@ -10,7 +10,7 @@
 
 #include <memory>
 
-#include "RayLib/RayLib.hpp"
+#include "../RayLib/RayLib.hpp"
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
 #include "HUD/HUD.hpp"
