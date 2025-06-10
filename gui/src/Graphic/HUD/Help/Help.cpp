@@ -9,8 +9,8 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-
-Help::Help(std::shared_ptr<RayLib> raylib, std::shared_ptr<Audio> audio)
+#include "../../../Utils/Constants.hpp"
+Help::Help(std::shared_ptr<RayLib> raylib, std::shared_ptr<IAudio> audio)
     : _raylib(raylib), _audio(audio), _helpContainer(nullptr), _visible(false)
 {
     initHelpContainer();
@@ -84,7 +84,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_title",
         5.0f, 2.0f,
-        "HELP",
+        zappy::constants::HELP_TITLE,
         6.0f,
         {255, 255, 255, 255}
     );
@@ -117,7 +117,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_section1_title",
         5.0f, yPos,
-        "Game Overview",
+        zappy::constants::HELP_SECTION_1,
         3.5f,
         {230, 230, 120, 255}
     );
@@ -126,9 +126,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_section1_content",
         7.0f, yPos,
-        "Zappy is a game where AI-controlled players compete to collect resources\n"
-        "and level up on a dynamically changing map. The GUI allows you to visualize\n"
-        "the game state, players, and resources in real-time.",
+        zappy::constants::HELP_SECTION_1_CONTENT,
         2.5f,
         {220, 220, 220, 255}
     );
@@ -137,7 +135,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_section2_title",
         5.0f, yPos,
-        "Controls",
+        zappy::constants::HELP_SECTION_2,
         3.5f,
         {230, 230, 120, 255}
     );
@@ -146,22 +144,16 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_section2_content",
         7.0f, yPos,
-        "Camera Movement:\n"
-        "  - WASD: Move camera\n"
-        "  - Right mouse button + drag: Rotate camera\n\n"
-        "Interface:\n"
-        "  - Click on players to see their stats\n"
-        "  - Use the RESET CAMERA button to return to default view\n"
-        "  - Use the Settings button to adjust game settings",
+        zappy::constants::HELP_SECTION_2_CONTENT,
         2.5f,
         {220, 220, 220, 255}
     );
-    yPos += 25.0f;
+    yPos += 28.0f;
 
     _helpContainer->addTextPercent(
         "help_section3_title",
         5.0f, yPos,
-        "Teams & Players",
+        zappy::constants::HELP_SECTION_3,
         3.5f,
         {230, 230, 120, 255}
     );
@@ -170,9 +162,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_section3_content",
         7.0f, yPos,
-        "The left panel shows all teams and their player IDs.\n"
-        "Players have different levels based on collected resources.\n"
-        "The team that first gets a player to level 8 wins the game.",
+        zappy::constants::HELP_SECTION_3_CONTENT,
         2.5f,
         {220, 220, 220, 255}
     );
@@ -181,7 +171,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_section4_title",
         5.0f, yPos,
-        "Resources",
+        zappy::constants::HELP_SECTION_4,
         3.5f,
         {230, 230, 120, 255}
     );
@@ -190,8 +180,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_section4_content",
         7.0f, yPos,
-        "Resources on the map are represented by different colored objects.\n"
-        "Players collect these resources to perform rituals and level up.",
+        zappy::constants::HELP_SECTION_4_CONTENT,
         2.5f,
         {220, 220, 220, 255}
     );
