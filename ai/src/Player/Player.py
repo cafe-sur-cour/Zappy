@@ -11,7 +11,8 @@ from time import sleep
 
 from src.Broadcaster.Broadcaster import Broadcaster
 from src.Exceptions.Exceptions import (
-    CommunicationException
+    CommunicationException,
+    SocketException
 )
 from src.Communication.Communication import Communication
 from src.Utils.Utils import SUCCESS, FAILURE
@@ -41,6 +42,7 @@ class Player:
         self.teamName: str = name
         self.ip: str = ip
         self.port: int = port
+        self.is_child_process = False
 
         self.level: int = 1
         self.broadcaster: Broadcaster = Broadcaster(self.communication, name)
@@ -66,11 +68,12 @@ class Player:
         }
 
     def __del__(self):
-        self.communication.stopLoop()
-        if self._commThread.is_alive():
-            self._commThread.join()
-        if self.communication:
-            del self.communication
+        try:
+            self.communication.stopLoop()
+            if self._commThread.is_alive():
+                self._commThread.join(timeout=1.0)
+        except Exception:
+            pass
 
     def __str__(self):
         return (
@@ -183,42 +186,46 @@ class Player:
         self.look = self.communication.getLook() or self.look
 
     def handleResponseKO(self) -> None:
-        print(f"Command '{self.roombaState['lastCommand']}' failed")
-
-    def handleResponseOK(self) -> None:
-        print(f"Command '{self.roombaState['lastCommand']}' succeeded")
+        if not self.is_child_process:
+            print(f"Command '{self.roombaState['lastCommand']}' failed")
 
     def handleCommandResponse(self, response: str) -> None:
         switcher = {
             "inventory": self.handleResponseInventory,
             "look": self.handleResponseLook,
             "ko": self.handleResponseKO,
-            "ok": self.handleResponseOK,
         }
         handler = switcher.get(response.strip(), None)
         if handler:
             handler()
-        else:
+        elif not self.is_child_process:
             print(f"Unknown response: {response.strip()}")
 
     def loop(self) -> None:
-        while not self.communication.playerIsDead():
-            if self.communication.hasMessages():
-                data = self.communication.getLastMessage()
-                direction = data[0]
-                message = self.broadcaster.revealMessage(data[1])
-                if not message:
-                    print("Received bad message, skipping...")
-                    continue
-                print(f"Received message: {message}")
+        try:
+            while not self.communication.playerIsDead():
+                if self.communication.hasMessages():
+                    data = self.communication.getLastMessage()
+                    direction = data[0]
+                    message = self.broadcaster.revealMessage(data[1])
+                    if message and not self.is_child_process:
+                        print(f"Received message: {message}")
 
-            if self.communication.hasResponses():
-                response = self.communication.getLastResponse()
-                if response.strip() == "dead":
-                    break
-                self.handleCommandResponse(response)
+                if self.communication.hasResponses():
+                    response = self.communication.getLastResponse()
+                    if response.strip() == "dead":
+                        break
+                    self.handleCommandResponse(response)
 
-            if not self.communication.hasPendingCommands():
-                self.roombaAction()
+                if not self.communication.hasPendingCommands():
+                    self.roombaAction()
 
-            sleep(0.1)
+                sleep(0.1)
+        except (CommunicationException, SocketException):
+            pass
+        except KeyboardInterrupt:
+            pass
+        except Exception:
+            pass
+        finally:
+            self.communication.stopLoop()
