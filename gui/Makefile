@@ -20,7 +20,6 @@ SRC =	src/Client/Client.cpp \
 		src/Client/MsgHandler.cpp \
 		src/CLI/CLI.cpp \
 		src/Game/GameInfos.cpp \
-		src/RayLib/RayLib.cpp \
 		src/Graphic/GUI.cpp \
 		src/Graphic/Map.cpp \
 		src/Graphic/Audio/Audio.cpp \
@@ -48,10 +47,12 @@ INCLUDES = -I./include -I./src
 CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
-LIBS = -L./src/Communication -lcommunication -lraylib -lGL -lm -lpthread \
+LIBS = -L./src/Communication -lcommunication -L./src/RayLib \
+		-lraylib_wrapper -lraylib -lGL -lm -lpthread \
 		-ldl -lrt -lX11 -lsfml-audio
 
 COMM_LIB = src/Communication/libcommunication.a
+RAYLIB_LIB = src/RayLib/libraylib_wrapper.a
 
 NAME = zappy_gui
 
@@ -61,7 +62,7 @@ CC = g++
 
 all: $(NAME)
 
-$(NAME): communication_lib $(OBJ) $(MAIN_OBJ)
+$(NAME): communication_lib raylib_lib $(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
 	$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ Compilation completed successfully!$(NC)"
@@ -70,6 +71,10 @@ communication_lib:
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Building Communication library...$(NC)"
 	@make -C src/Communication
 
+raylib_lib:
+	@echo -e "$(BLUE)ᒥ🔧ᒧ Building RayLib wrapper library...$(NC)"
+	@make -C src/RayLib
+
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
@@ -77,6 +82,7 @@ clean:
 	@rm -rf $(OBJ)
 	@rm -rf $(MAIN_OBJ)
 	@make -C src/Communication clean
+	@make -C src/RayLib clean
 
 fclean: clean
 	@rm -rf $(NAME)
@@ -86,6 +92,7 @@ fclean: clean
 	@rm -rf *.gcno
 	@rm -rf *.gcov
 	@make -C src/Communication fclean
+	@make -C src/RayLib fclean
 
 re: fclean all
 
