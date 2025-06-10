@@ -65,6 +65,10 @@ class Player:
             "phase": "forward",
             "lastCommand": None
         }
+        
+        self.helpRequestCount: int = 0
+        self.isInSurvivalMode: bool = False
+        self.lastFoodCheck: int = 10
 
     def __del__(self):
         self.communication.stopLoop()
@@ -113,7 +117,48 @@ class Player:
         neededStones = [stone for quantity, stone in neededStones if quantity > 0]
         return neededStones
 
+    def checkSurvivalStatus(self) -> None:
+        currentFood = self.inventory.get("food", 0)
+        
+        if currentFood > self.lastFoodCheck and self.isInSurvivalMode:
+            print(f"Nourriture récupérée! ({currentFood}/10) - Sortie du mode survie")
+            self.isInSurvivalMode = False
+            self.helpRequestCount = 0
+            self.lastFoodCheck = currentFood
+            return
+            
+        if currentFood < 5 and not self.isInSurvivalMode:
+            print(f"Mode survie activé! Nourriture critique: {currentFood}/10")
+            self.isInSurvivalMode = True
+            self.sendHelpRequest()
+        
+        elif currentFood < 5 and self.isInSurvivalMode:
+            if self.helpRequestCount < 5:
+                if self.roombaState["forwardCount"] % 10 == 0:
+                    self.sendHelpRequest()
+            else:
+                self.dropStonesForSurvival()
+        
+        self.lastFoodCheck = currentFood
+
+    def sendHelpRequest(self) -> None:
+        self.helpRequestCount += 1
+        helpMessage = f"help:{self.helpRequestCount}"
+        print(f"Envoi demande d'aide #{self.helpRequestCount}: {helpMessage}")
+        self.communication.sendBroadcast(helpMessage)
+
+    def dropStonesForSurvival(self) -> None:
+        dropPriority = ["thystame", "phiras", "mendiane", "sibur", "deraumere", "linemate"]
+        
+        for stone in dropPriority:
+            if self.inventory.get(stone, 0) > 0:
+                print(f"Mode survie critique: drop de {stone}")
+                self.communication.sendSetObject(stone)
+                return
+
     def roombaAction(self) -> None:
+        self.checkSurvivalStatus()
+        
         if self.roombaState["phase"] == "forward":
             if self.roombaState["lastCommand"] in ("left", "forward", None):
                 self.communication.sendLook()
@@ -124,10 +169,14 @@ class Player:
                 if self.look:
                     if "food" in self.look[0].keys():
                         self.communication.sendTakeObject("food")
-                    neededStones = self.getNeededStonesByPriority()
-                    for stone in neededStones:
-                        if stone in self.look[0].keys():
-                            self.communication.sendTakeObject(stone)
+                        if self.isInSurvivalMode:
+                            print("Nourriture trouvée! Récupération prioritaire.")
+
+                    if not self.isInSurvivalMode or self.helpRequestCount < 3:
+                        neededStones = self.getNeededStonesByPriority()
+                        for stone in neededStones:
+                            if stone in self.look[0].keys():
+                                self.communication.sendTakeObject(stone)
                 self.roombaState["lastCommand"] = "getObjects"
 
             elif self.roombaState["lastCommand"] == "getObjects":
@@ -154,20 +203,54 @@ class Player:
 
     def handleCommandResponse(self, response: str) -> None:
         if response.strip() == "inventory":
+            oldFood = self.inventory.get("food", 0)
             self.inventory = self.communication.getInventory()
+            newFood = self.inventory.get("food", 0)
+
+            if newFood != oldFood:
+                print(f"Nourriture: {oldFood} -> {newFood}")
+                self.checkSurvivalStatus()
 
         if response.strip() == "look":
             self.look = self.communication.getLook()
 
         elif response.strip() == "ko":
             print(f"Command '{self.roombaState['lastCommand']}' failed")
+            
+        elif response.strip() == "ok":
+            if self.roombaState['lastCommand'] in ["getObjects"]:
+                self.communication.sendInventory()
 
     def loop(self) -> None:
+        self.communication.sendInventory()
+        stepCount = 0
+        
         while not self.communication.playerIsDead():
+            stepCount += 1
+            
             if self.communication.hasMessages():
                 message = self.communication.getLastMessage()
-                response = self.hash.unHashMessage(str(message[1][:-1]))
-                print(f"Message received from the server: {response}")
+                raw_message = str(message[1])
+                raw_message = raw_message.strip()
+                try:
+                    response = self.hash.unHashMessage(raw_message)
+                    print(f"Message received from the server (decrypted): {response}")
+                except (ValueError, TypeError, Exception):
+                    response = raw_message
+                    print(f"Message received from the server (clear): {response}")
+                    if response.startswith("help:"):
+                        try:
+                            help_parts = response.split(":")
+                            if len(help_parts) >= 2 and help_parts[1]:
+                                help_number = help_parts[1]
+                                print(f"Demande d'aide reçue de l'équipe: #{help_number}")
+                                # TODO(Noa): Gérer la demande d'aide ici
+                            else:
+                                print(f"Message d'aide mal formaté: {response}")
+                        except Exception as e:
+                            print(f"Erreur lors du traitement du message d'aide: {e}")
+                    else:
+                        print(f"Message non reconnu: {response}")
 
             if self.communication.hasResponses():
                 response = self.communication.getLastResponse()
@@ -177,5 +260,6 @@ class Player:
 
             if not self.communication.hasPendingCommands():
                 self.roombaAction()
-
+            if stepCount % 20 == 0:
+                self.communication.sendInventory()
             sleep(0.1)
