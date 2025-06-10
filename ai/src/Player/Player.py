@@ -65,10 +65,14 @@ class Player:
             "phase": "forward",
             "lastCommand": None
         }
-        
+
         self.helpRequestCount: int = 0
         self.isInSurvivalMode: bool = False
         self.lastFoodCheck: int = 10
+
+        self.isHelpingTeammate: bool = False
+        self.helpTargetDirection: int = 0
+        self.helpStepsRemaining: int = 0
 
     def __del__(self):
         self.communication.stopLoop()
@@ -119,46 +123,120 @@ class Player:
 
     def checkSurvivalStatus(self) -> None:
         currentFood = self.inventory.get("food", 0)
-        
+
         if currentFood > self.lastFoodCheck and self.isInSurvivalMode:
             print(f"Nourriture récupérée! ({currentFood}/10) - Sortie du mode survie")
             self.isInSurvivalMode = False
             self.helpRequestCount = 0
             self.lastFoodCheck = currentFood
             return
-            
+
         if currentFood < 5 and not self.isInSurvivalMode:
-            print(f"Mode survie activé! Nourriture critique: {currentFood}/10")
+            print(f"Mode survie Nourriture critique: {currentFood}/10")
             self.isInSurvivalMode = True
             self.sendHelpRequest()
-        
         elif currentFood < 5 and self.isInSurvivalMode:
             if self.helpRequestCount < 5:
                 if self.roombaState["forwardCount"] % 10 == 0:
                     self.sendHelpRequest()
             else:
                 self.dropStonesForSurvival()
-        
         self.lastFoodCheck = currentFood
 
     def sendHelpRequest(self) -> None:
         self.helpRequestCount += 1
         helpMessage = f"help:{self.helpRequestCount}"
-        print(f"Envoi demande d'aide #{self.helpRequestCount}: {helpMessage}")
         self.communication.sendBroadcast(helpMessage)
 
     def dropStonesForSurvival(self) -> None:
         dropPriority = ["thystame", "phiras", "mendiane", "sibur", "deraumere", "linemate"]
-        
+
         for stone in dropPriority:
             if self.inventory.get(stone, 0) > 0:
                 print(f"Mode survie critique: drop de {stone}")
                 self.communication.sendSetObject(stone)
                 return
 
+    def canHelpTeammate(self) -> bool:
+        """Vérifie si on peut aider un coéquipier (surplus de nourriture)"""
+        currentFood = self.inventory.get("food", 0)
+        return currentFood > 6 and not self.isInSurvivalMode
+
+    def getDirectionFromSound(self, direction: int) -> str:
+        """Convertit la direction du son en actions de mouvement"""
+        if direction == 0:
+            return "self"
+
+        # Directions dans Zappy (selon la doc du protocole):
+        direction_map = {
+            1: "forward",        # devant
+            2: "forward-right",  # devant-gauche
+            3: "right",          # gauche
+            4: "back-right",     # derrière-gauche
+            5: "back",           # derrière
+            6: "back-left",      # derrière-droite
+            7: "left",           # droite
+            8: "forward-left"    # devant-droite
+        }
+        return direction_map.get(direction, "unknown")
+
+    def startHelpingTeammate(self, direction: int) -> None:
+        """Commence à aider un coéquipier en détresse"""
+        if not self.canHelpTeammate():
+            return
+
+        print(f"Début de l'aide vers direction {direction}")
+        self.isHelpingTeammate = True
+        self.helpTargetDirection = direction
+        self.helpStepsRemaining = 10
+
+        self.communication.sendBroadcast("coming_to_help")
+
+    def helpTeammateAction(self) -> bool:
+        """Actions spécifiques pour aider un coéquipier. Retourne True si terminé"""
+        if not self.isHelpingTeammate:
+            return True
+
+        if self.helpStepsRemaining <= 0:
+            if self.inventory.get("food", 0) > 6:
+                print("Drop de nourriture pour le coéquipier")
+                self.communication.sendSetObject("food")
+                self.communication.sendBroadcast("food_dropped")
+            else:
+                print("Plus assez de nourriture pour aider")
+
+            self.isHelpingTeammate = False
+            self.helpTargetDirection = 0
+            return True
+
+        direction_str = self.getDirectionFromSound(self.helpTargetDirection)
+
+        if direction_str in ["forward", "forward-right", "forward-left"]:
+            self.communication.sendForward()
+        elif direction_str == "right":
+            self.communication.sendRight()
+            self.communication.sendForward()
+        elif direction_str == "left":
+            self.communication.sendLeft()
+            self.communication.sendForward()
+        elif direction_str in ["back", "back-right", "back-left"]:
+            # Faire demi-tour et avancer
+            self.communication.sendRight()
+            self.communication.sendRight()
+            self.communication.sendForward()
+        else:
+            self.communication.sendForward()
+
+        self.helpStepsRemaining -= 1
+        return False
+
     def roombaAction(self) -> None:
         self.checkSurvivalStatus()
-        
+
+        if self.isHelpingTeammate:
+            if self.helpTeammateAction():
+                return
+
         if self.roombaState["phase"] == "forward":
             if self.roombaState["lastCommand"] in ("left", "forward", None):
                 self.communication.sendLook()
@@ -169,9 +247,6 @@ class Player:
                 if self.look:
                     if "food" in self.look[0].keys():
                         self.communication.sendTakeObject("food")
-                        if self.isInSurvivalMode:
-                            print("Nourriture trouvée! Récupération prioritaire.")
-
                     if not self.isInSurvivalMode or self.helpRequestCount < 3:
                         neededStones = self.getNeededStonesByPriority()
                         for stone in neededStones:
@@ -216,7 +291,7 @@ class Player:
 
         elif response.strip() == "ko":
             print(f"Command '{self.roombaState['lastCommand']}' failed")
-            
+
         elif response.strip() == "ok":
             if self.roombaState['lastCommand'] in ["getObjects"]:
                 self.communication.sendInventory()
@@ -224,31 +299,53 @@ class Player:
     def loop(self) -> None:
         self.communication.sendInventory()
         stepCount = 0
-        
+
         while not self.communication.playerIsDead():
             stepCount += 1
-            
+
             if self.communication.hasMessages():
                 message = self.communication.getLastMessage()
+                direction = message[0]
                 raw_message = str(message[1])
                 raw_message = raw_message.strip()
+
                 try:
                     response = self.hash.unHashMessage(raw_message)
                     print(f"Message received from the server (decrypted): {response}")
                 except (ValueError, TypeError, Exception):
                     response = raw_message
-                    print(f"Message received from the server (clear): {response}")
                     if response.startswith("help:"):
                         try:
                             help_parts = response.split(":")
                             if len(help_parts) >= 2 and help_parts[1]:
                                 help_number = help_parts[1]
-                                print(f"Demande d'aide reçue de l'équipe: #{help_number}")
-                                # TODO(Noa): Gérer la demande d'aide ici
+                                print(
+                                    f"Demande d'aide reçue de l'équipe: #{help_number}"
+                                    "depuis direction {direction}")
+                                if direction != 0 and self.canHelpTeammate():
+                                    print(f"Démarrage de l'aide vers la direction {direction}")
+                                    self.startHelpingTeammate(direction)
+                                elif direction == 0:
+                                    print("C'est notre propre message d'aide")
+                                else:
+                                    print(
+                                        f"Ne peut pas aider: "
+                                        f"{self.inventory.get('food', 0)} nourriture,"
+                                        f" mode survie: {self.isInSurvivalMode}")
                             else:
                                 print(f"Message d'aide mal formaté: {response}")
                         except Exception as e:
                             print(f"Erreur lors du traitement du message d'aide: {e}")
+                    elif response == "coming_to_help":
+                        if direction != 0:
+                            print(
+                                f"Un coéquipier vient nous aider depuis la direction "
+                                f"{direction}")
+                    elif response == "food_dropped":
+                        if direction != 0:
+                            print(
+                                f"Nourriture droppée par un coéquipier dans la direction "
+                                f"{direction}")
                     else:
                         print(f"Message non reconnu: {response}")
 
