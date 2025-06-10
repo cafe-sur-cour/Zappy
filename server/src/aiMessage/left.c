@@ -17,15 +17,22 @@ int left_message(player_t *player)
 {
     direction_t direction = player->direction;
 
-    if (direction == NORTH)
+    if (direction == NORTH) {
         player->direction = EAST;
-    if (direction == EAST)
+        return 0;
+    }
+    if (direction == EAST) {
         player->direction = SOUTH;
-    if (direction == SOUTH)
+        return 0;
+    }
+    if (direction == SOUTH) {
         player->direction = WEST;
-    if (direction == WEST)
+        return 0;
+    }
+    if (direction == WEST) {
         player->direction = NORTH;
-    else
+        return 0;
+    } else
         return -1;
     return 0;
 }

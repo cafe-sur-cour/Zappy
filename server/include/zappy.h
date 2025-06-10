@@ -13,6 +13,13 @@
 #ifndef ZAPPY_H_
     #define ZAPPY_H_
 
+/* items handler */
+typedef struct {
+    char *name;
+    void (*add_func)(inventory_t *);
+} item_handler_t;
+
+
 /* Cli parameter of the server */
 typedef struct params_s {
     int port;
@@ -176,4 +183,13 @@ graph_net_t *add_graph_node(graph_net_t **head, int fd);
 graph_net_t *remove_graph_node(graph_net_t **head, int fd);
 void poll_graphic_clients(zappy_t *zappy);
 
+
+/* Element hander.c */
+void add_food(inventory_t *inventory);
+void add_linemate(inventory_t *inventory);
+void add_deraumere(inventory_t *inventory);
+void add_sibur(inventory_t *inventory);
+void add_mendiane(inventory_t *inventory);
+void add_phiras(inventory_t *inventory);
+void add_thystame(inventory_t *inventory);
 #endif /* !ZAPPY_H_ */
