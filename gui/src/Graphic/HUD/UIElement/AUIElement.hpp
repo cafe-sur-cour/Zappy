@@ -7,9 +7,9 @@
 
 #pragma once
 
+#include <memory>
 #include "IUIElement.hpp"
 #include "../../RayLib/RayLib.hpp"
-#include <memory>
 
 /**
  * @brief Structure to store relative positions and sizes as percentages
@@ -36,7 +36,8 @@ class AUIElement : public IUIElement {
          * @param width Element width
          * @param height Element height
          */
-        AUIElement(std::shared_ptr<RayLib> raylib,float x, float y, float width, float height);
+        AUIElement(std::shared_ptr<RayLib> raylib, float x, float y, float width,
+            float height);
 
         /**
          * @brief Destroy the AUIElement object
@@ -66,7 +67,8 @@ class AUIElement : public IUIElement {
          * @param widthPercent Width as percentage of container width (0-100)
          * @param heightPercent Height as percentage of container height (0-100)
          */
-        void setRelativePosition(float xPercent, float yPercent, float widthPercent, float heightPercent);
+        void setRelativePosition(float xPercent, float yPercent, float widthPercent,
+            float heightPercent);
 
         /**
          * @brief Get the relative position

@@ -22,7 +22,7 @@ namespace Exceptions {
                           "CLI Parsing Error: " + message +
                           colors::RESET) {}
 
-            virtual const char *what() const noexcept override {
+            const char *what() const noexcept override {
                 return _message.c_str();
             }
 
@@ -69,7 +69,7 @@ namespace Exceptions {
                           "Network Error: " + message +
                           colors::RESET) {}
 
-            virtual const char *what() const noexcept override {
+            const char *what() const noexcept override {
                 return _message.c_str();
             }
 

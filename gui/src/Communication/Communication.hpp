@@ -8,13 +8,6 @@
 #ifndef COMMUNICATION_HPP_
 #define COMMUNICATION_HPP_
 
-#include <thread>
-#include <mutex>
-#include <atomic>
-#include <condition_variable>
-#include <queue>
-#include <string>
-#include <vector>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -22,6 +15,13 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <netdb.h>
+#include <thread>
+#include <mutex>
+#include <atomic>
+#include <condition_variable>
+#include <queue>
+#include <string>
+#include <vector>
 
 #include "../Utils/Constants.hpp"
 #include "../Exceptions/Exceptions.hpp"
@@ -29,7 +29,7 @@
 
 class Communication : public ICommunication {
     public:
-        Communication(zappy::structs::Config config);
+        explicit Communication(zappy::structs::Config config);
         ~Communication();
 
         void sendMessage(const std::string &message) override;

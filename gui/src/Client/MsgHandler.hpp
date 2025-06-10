@@ -8,10 +8,6 @@
 #ifndef MSGHANDLER_HPP_
 #define MSGHANDLER_HPP_
 
-#include "../Game/GameInfos.hpp"
-#include "../Communication/ICommunication.hpp"
-#include "../Utils/Constants.hpp"
-
 #include <memory>
 #include <map>
 #include <functional>
@@ -22,9 +18,14 @@
 #include <condition_variable>
 #include <string>
 
+#include "../Game/GameInfos.hpp"
+#include "../Communication/ICommunication.hpp"
+#include "../Utils/Constants.hpp"
+
 class MsgHandler {
     public:
-        MsgHandler(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<ICommunication> communication);
+        MsgHandler(std::shared_ptr<GameInfos> gameInfos,
+            std::shared_ptr<ICommunication> communication);
         ~MsgHandler();
 
         void start();

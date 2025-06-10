@@ -10,6 +10,7 @@
 #include <iostream>
 #include <algorithm>
 #include "GUI.hpp"
+#include "Audio/Audio.hpp"
 #include "../Utils/Constants.hpp"
 
 GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
@@ -25,8 +26,9 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _raylib->initCamera();
     _isRunning = _raylib->isWindowReady();
     _raylib->setTargetFPS(zappy::gui::FPS);
+    _audio = std::make_shared<Audio>();
     _map = std::make_unique<Map>(_gameInfos, _raylib);
-    _hud = std::make_unique<HUD>(_raylib, _gameInfos);
+    _hud = std::make_unique<HUD>(_raylib, _gameInfos, _audio);
 
     _cameraManager = std::make_unique<CameraManager>(_raylib);
     _cameraManager->setGameInfos(_gameInfos);
@@ -248,7 +250,7 @@ void GUI::switchToPreviousPlayer()
 
 void GUI::initModels()
 {
-    if (!_raylib->loadModel("player", "gui/assets/models/fallguys.glb", {0.0f, 0.0f, 2.5f}))
+    if (!_raylib->loadModel("player", "gui/assets/models/fallguys.glb", {0.0f, 0.0f, 475.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load player model."
                   << colors::RESET << std::endl;
 }

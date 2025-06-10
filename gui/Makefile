@@ -23,6 +23,7 @@ SRC =	src/Client/Client.cpp \
 		src/Graphic/RayLib/RayLib.cpp \
 		src/Graphic/GUI.cpp \
 		src/Graphic/Map.cpp \
+		src/Graphic/Audio/Audio.cpp \
 		src/Graphic/Camera/CameraManager.cpp \
 		src/Graphic/HUD/Button/Button.cpp \
 		src/Graphic/HUD/Containers/Containers.cpp \
@@ -48,7 +49,7 @@ CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 LIBS = -L./src/Communication -lcommunication -lraylib -lGL -lm -lpthread \
-		-ldl -lrt -lX11
+		-ldl -lrt -lX11 -lsfml-audio
 
 COMM_LIB = src/Communication/libcommunication.a
 

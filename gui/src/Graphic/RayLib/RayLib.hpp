@@ -82,21 +82,29 @@ class RayLib {
         // 3D Drawing methods
         void drawGrid(int slices, float spacing);
         void drawCube(Vector3 position, float width, float height, float length, Color color);
-        void drawCubeWires(Vector3 position, float width, float height, float length, Color color);
+        void drawCubeWires(Vector3 position, float width, float height, float length,
+            Color color);
         void drawSphere(Vector3 position, float radius, Color color);
-        void drawSphereWires(Vector3 position, float radius, int rings, int slices, Color color);
-        void drawCylinder(Vector3 position, float radiusTop, float radiusBottom, float height, int slices, Color color);
-        void drawCylinderWires(Vector3 position, float radiusTop, float radiusBottom, float height, int slices, Color color);
-        void drawCylinderEx(Vector3 startPos, Vector3 endPos, float startRadius, float endRadius, int sides, Color color);
+        void drawSphereWires(Vector3 position, float radius, int rings, int slices,
+            Color color);
+        void drawCylinder(Vector3 position, float radiusTop, float radiusBottom,
+            float height, int slices, Color color);
+        void drawCylinderWires(Vector3 position, float radiusTop, float radiusBottom,
+            float height, int slices, Color color);
+        void drawCylinderEx(Vector3 startPos, Vector3 endPos, float startRadius,
+            float endRadius, int sides, Color color);
         void drawPlane(Vector3 position, Vector2 size, Color color);
         void drawLine3D(Vector3 startPos, Vector3 endPos, Color color);
 
         // 3D Model methods
-        bool loadModel(const std::string& id, const std::string& filepath, Vector3 center = {0.0f, 0.0f, 0.0f});
-        void drawModel(const std::string& id, Vector3 position, float scale, Color tint = WHITE);
+        bool loadModel(const std::string& id, const std::string& filepath,
+            Vector3 center = {0.0f, 0.0f, 0.0f});
+        void drawModel(const std::string& id, Vector3 position, float scale,
+            Color tint = WHITE);
         void drawModelEx(const std::string& id, Vector3 position, Vector3 rotationAxis,
                          float rotationAngle, Vector3 scale, Color tint = WHITE);
-        void drawModelWires(const std::string& id, Vector3 position, float scale, Color tint = WHITE);
+        void drawModelWires(const std::string& id, Vector3 position, float scale,
+            Color tint = WHITE);
         void drawModelWiresEx(const std::string& id, Vector3 position, Vector3 rotationAxis,
                               float rotationAngle, Vector3 scale, Color tint = WHITE);
         void unloadModel(const std::string& id);
@@ -108,7 +116,11 @@ class RayLib {
         void drawText(const std::string& text, float x, float y, float fontSize, Color color);
         float measureText(const std::string& text, float fontSize) const;
 
-    protected:
+        // Audio methods
+        void initAudioDevice();
+        void closeAudioDevice();
+        bool isAudioDeviceReady() const;
+
     private:
         bool _isInitialized;
         Camera3D _camera;
@@ -122,6 +134,8 @@ class RayLib {
         };
 
         std::map<std::string, ModelData> _models;
+        std::map<std::string, Sound> _sounds;
+        std::map<std::string, Music> _musics;
 };
 
 #endif /* !RAYLIB_HPP_ */

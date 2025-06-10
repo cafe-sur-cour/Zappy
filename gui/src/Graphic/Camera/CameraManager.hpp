@@ -16,7 +16,7 @@
 
 class CameraManager {
     public:
-        CameraManager(std::shared_ptr<RayLib> raylib);
+        explicit CameraManager(std::shared_ptr<RayLib> raylib);
         ~CameraManager();
 
         void updateCamera(zappy::gui::CameraMode mode);

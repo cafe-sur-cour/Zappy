@@ -11,6 +11,7 @@
 
 Containers::Containers(
     std::shared_ptr<RayLib> raylib,
+    std::shared_ptr<Audio> audio,
     float x,
     float y,
     float width,
@@ -18,6 +19,7 @@ Containers::Containers(
     Color backgroundColor)
     : AContainers(raylib, x, y, width, height),
       _raylib(raylib),
+      _audio(audio),
       _hasBackgroundTexture(false),
       _elements()
 {
@@ -157,7 +159,8 @@ std::shared_ptr<Button> Containers::addButton(
     std::function<void()> callback
 )
 {
-    auto button = std::make_shared<Button>(_raylib, x, y, width, height, text, callback);
+    auto button = std::make_shared<Button>(_raylib, _audio, x, y, width,
+        height, text, callback);
 
     if (addElement(id, button))
         return button;
@@ -177,7 +180,8 @@ std::shared_ptr<Button> Containers::addButton(
     Color textColor
 )
 {
-    auto button = std::make_shared<Button>(_raylib, x, y, width, height, text, callback);
+    auto button = std::make_shared<Button>(_raylib, _audio, x, y, width, height,
+        text, callback);
     button->setColors(normalColor, hoverColor, pressedColor, textColor);
 
     if (addElement(id, button))
@@ -280,7 +284,8 @@ std::shared_ptr<Button> Containers::addButtonPercent(
     float width = (_bounds.width * widthPercent) / 100.0f;
     float height = (_bounds.height * heightPercent) / 100.0f;
 
-    auto button = std::make_shared<Button>(_raylib, x, y, width, height, text, callback);
+    auto button = std::make_shared<Button>(_raylib, _audio, x, y, width, height,
+        text, callback);
 
     button->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
 

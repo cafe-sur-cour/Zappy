@@ -8,16 +8,19 @@
 #ifndef GUI_HPP_
 #define GUI_HPP_
 
+#include <memory>
+
 #include "RayLib/RayLib.hpp"
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
 #include "HUD/HUD.hpp"
+#include "Audio/Audio.hpp"
 #include "../Utils/Constants.hpp"
 #include "Camera/CameraManager.hpp"
 
 class GUI {
     public:
-        GUI(std::shared_ptr<GameInfos> gameInfos);
+        explicit GUI(std::shared_ptr<GameInfos> gameInfos);
         ~GUI();
 
         void run();
@@ -48,6 +51,7 @@ class GUI {
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<Map> _map;
         std::unique_ptr<HUD> _hud;
+        std::shared_ptr<Audio> _audio;
         std::unique_ptr<CameraManager> _cameraManager;
 
         int _windowWidth;

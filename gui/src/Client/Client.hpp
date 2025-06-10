@@ -8,13 +8,13 @@
 #ifndef CLIENT_HPP_
 #define CLIENT_HPP_
 
+#include <memory>
+
 #include "../Utils/Constants.hpp"
 #include "../Communication/ICommunication.hpp"
 #include "../Game/GameInfos.hpp"
 #include "../Graphic/GUI.hpp"
 #include "MsgHandler.hpp"
-
-#include <memory>
 
 class Client {
     public:

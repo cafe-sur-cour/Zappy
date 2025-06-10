@@ -12,6 +12,7 @@
 #include <string>
 #include <cmath>
 #include <vector>
+#include <iostream>
 #include "../../Utils/Constants.hpp"
 #include "RayLib.hpp"
 #include "raylib.h"
@@ -450,6 +451,26 @@ void RayLib::endScissorMode()
 {
     EndScissorMode();
 }
+
+void RayLib::initAudioDevice()
+{
+    InitAudioDevice();
+    if (!IsAudioDeviceReady()) {
+        std::cerr << "Failed to initialize audio device." << std::endl;
+        return;
+    }
+}
+
+void RayLib::closeAudioDevice()
+{
+    CloseAudioDevice();
+}
+
+bool RayLib::isAudioDeviceReady() const
+{
+    return IsAudioDeviceReady();
+}
+
 bool RayLib::loadModel(const std::string& id, const std::string& filepath, Vector3 center)
 {
     if (_models.find(id) != _models.end())
