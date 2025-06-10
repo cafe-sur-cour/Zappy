@@ -15,7 +15,7 @@
 #include "HUD.hpp"
 
 HUD::HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos,
-         std::shared_ptr<Audio> audio)
+         std::shared_ptr<IAudio> audio)
     : _containers(), _raylib(raylib), _gameInfos(gameInfos), _audio(audio)
 {
     initDefaultLayout(15.0f, 20.0f);

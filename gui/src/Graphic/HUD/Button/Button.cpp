@@ -11,7 +11,7 @@
 
 Button::Button(
     std::shared_ptr<RayLib> raylib,
-    std::shared_ptr<Audio> audio,
+    std::shared_ptr<IAudio> audio,
     float x, float y,
     float width, float height,
     const std::string& text,
