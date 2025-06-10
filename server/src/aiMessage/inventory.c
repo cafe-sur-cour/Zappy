@@ -15,16 +15,15 @@
 
 static int inventory_message(player_t *player)
 {
-    int n = int_str_len(player->inventory->nbFood) +
-        int_str_len(player->inventory->nbLinemate) +
-        int_str_len(player->inventory->nbDeraumere) +
-        int_str_len(player->inventory->nbSibur) +
-        int_str_len(player->inventory->nbMendiane) +
-        int_str_len(player->inventory->nbPhiras) +
-        int_str_len(player->inventory->nbThystame);
+    int n = int_str_len(player->inventory->nbFood) + int_str_len(
+        player->inventory->nbLinemate) + int_str_len(
+        player->inventory->nbDeraumere) + int_str_len(
+        player->inventory->nbSibur) + int_str_len(player->inventory->nbMendiane
+        ) + int_str_len(player->inventory->nbPhiras) + int_str_len(
+        player->inventory->nbThystame);
     char *message = malloc(sizeof(char) * (70 + n + 1));
 
-    snprintf(message, sizeof(message), "[food %d, linemate %d, deraumere %d, "
+    snprintf(message, 70 + n + 1, "[food %d, linemate %d, deraumere %d, "
         "sibur %d, mendiane %d, phiras %d, thystame %d]\n",
         player->inventory->nbFood, player->inventory->nbLinemate,
         player->inventory->nbDeraumere, player->inventory->nbSibur,
@@ -33,6 +32,7 @@ static int inventory_message(player_t *player)
     message[70 + n] = '\0';
     if (write_message(player->network->fd, message) == -1)
         return -1;
+    valid_message("Inventory sent.");
     free(message);
     return 0;
 }
