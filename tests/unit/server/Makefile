@@ -81,7 +81,7 @@ INCLUDES 	= 	-I./../../../server/include
 
 CFLAGS 		=	-Wall -Wextra -Werror
 
-LIBS 		=	-L. -lmy -lnetwork
+LIBS 		=	-L. -lmy -lnetwork -lm
 
 CC 			= 	gcc
 
