@@ -7,9 +7,12 @@
 
 #include "Help.hpp"
 #include <iostream>
+#include <memory>
+#include <string>
 #include <vector>
 #include <fstream>
 #include "../../../Utils/Constants.hpp"
+
 Help::Help(std::shared_ptr<RayLib> raylib, std::shared_ptr<IAudio> audio)
     : _raylib(raylib), _audio(audio), _helpContainer(nullptr), _visible(false)
 {
