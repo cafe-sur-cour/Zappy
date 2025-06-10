@@ -10,6 +10,7 @@
 
 #include <string>
 #include <vector>
+#include "HelpText.hpp"
 
 namespace zappy::constants {
 
