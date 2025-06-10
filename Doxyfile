@@ -8,4 +8,4 @@ MARKDOWN_SUPPORT       = YES
 EXTRACT_PRIVATE        = YES
 SHOW_FILES             = YES
 SHOW_NAMESPACES        = YES
-PROJECT_LOGO           = styleDoc/zappy.png
+PROJECT_LOGO           = assets/zappy.png
