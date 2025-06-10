@@ -298,6 +298,48 @@ class Player:
             if self.roombaState['lastCommand'] in ["getObjects"]:
                 self.communication.sendInventory()
 
+    def handleHelpMessage(self, response: str, direction: int) -> bool:
+        if response.startswith("help:"):
+            try:
+                help_parts = response.split(":")
+                if len(help_parts) >= 2 and help_parts[1]:
+                    help_number = help_parts[1]
+                    print(
+                        f"Help receive from team: #{help_number}"
+                        f"from direction {direction}")
+                    if self.canHelpTeammate():
+                        print(f"Start helping to {direction}")
+                        self.startHelpingTeammate(direction)
+                    else:
+                        print(
+                            f"I can't help: "
+                            f"{self.inventory.get('food', 0)} food,"
+                            f" survival mode: {self.isInSurvivalMode}")
+                else:
+                    print(f"Helping message error: {response}")
+            except Exception as e:
+                print(f"Error during message formating: {e}")
+            return True
+        return False
+
+    def handleComingHelpMessage(self, response: str, direction: int) -> bool:
+        if response == "comingToHelp":
+            if direction != 0:
+                print(
+                    f"A teammate is coming to help in the direction "
+                    f"{direction}")
+            return True
+        return False
+
+    def handleFoodDroppedMessage(self, response: str, direction: int) -> None:
+        if response == "foodDropped":
+            if direction != 0:
+                print(
+                    f"Food dropped by a teammate in the direction "
+                    f"{direction}")
+            return True
+        return False
+
     def loop(self) -> None:
         self.communication.sendInventory()
         stepCount = 0
@@ -314,37 +356,9 @@ class Player:
                 try:
                     response = self.hash.unHashMessage(raw_message)
                     response = raw_message
-                    if response.startswith("help:"):
-                        try:
-                            help_parts = response.split(":")
-                            if len(help_parts) >= 2 and help_parts[1]:
-                                help_number = help_parts[1]
-                                print(
-                                    f"Help receive from team: #{help_number}"
-                                    f"from direction {direction}")
-                                if self.canHelpTeammate():
-                                    print(f"Start helping to {direction}")
-                                    self.startHelpingTeammate(direction)
-                                else:
-                                    print(
-                                        f"I can't help: "
-                                        f"{self.inventory.get('food', 0)} food,"
-                                        f" survival mode: {self.isInSurvivalMode}")
-                            else:
-                                print(f"Helping message error: {response}")
-                        except Exception as e:
-                            print(f"Error during message formating: {e}")
-                    elif response == "comingToHelp":
-                        if direction != 0:
-                            print(
-                                f"A teammate is coming to help in the direction "
-                                f"{direction}")
-                    elif response == "foodDropped":
-                        if direction != 0:
-                            print(
-                                f"Food dropped by a teammate in the direction "
-                                f"{direction}")
-                    else:
+                    if (not self.handleHelpMessage(response, direction) and not
+                            self.handleComingHelpMessage(response, direction) and not
+                            self.handleFoodDroppedMessage(response, direction)):
                         print(f"Unrecognized message: {response}")
                 except Exception as e:
                     print(f"Error during message decryption: {e}")
