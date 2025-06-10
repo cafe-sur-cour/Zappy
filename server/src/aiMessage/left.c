@@ -12,30 +12,49 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+static void print_left_server(player_t *player)
+{
+    int len = int_str_len(player->id) + 22;
+    char *debug = calloc(len + 1, sizeof(char));
 
-int left_message(player_t *player)
+    if (!debug) {
+        error_message("Memory allocation failed for left debug print.");
+        return;
+    }
+    snprintf(debug, len + 1, "Player (%d) turned left.",
+        player->id);
+    valid_message(debug);
+    free(debug);
+}
+
+static void left_message(player_t *player)
 {
     direction_t direction = player->direction;
 
-    if (direction == NORTH)
+    if (direction == NORTH) {
         player->direction = EAST;
-    if (direction == EAST)
+        return;
+    }
+    if (direction == EAST) {
         player->direction = SOUTH;
-    if (direction == SOUTH)
+        return;
+    }
+    if (direction == SOUTH) {
         player->direction = WEST;
-    if (direction == WEST)
+        return;
+    }
+    if (direction == WEST) {
         player->direction = NORTH;
-    else
-        return -1;
-    return 0;
+        return;
+    }
 }
 
 /* This function is defined in the array of funcion pointers */
 int handle_left(player_t *player, char *command, zappy_t *zappy)
 {
     (void)command;
-    if (left_message(player) == -1)
-        return -1;
+    left_message(player);
+    print_left_server(player);
     if (send_player_pos(zappy, player) == -1)
         return -1;
     return 0;
