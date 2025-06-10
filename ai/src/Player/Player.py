@@ -28,6 +28,10 @@ LVL_UPGRADES = {
     7: {"linemate": 2, "deraumere": 2, "sibur": 2, "mendiane": 2, "phiras": 2, "thystame": 1},
 }
 
+INVENTORY_REFRESH = 20
+
+SURVIVAL_MIN_FOOD_LEVEL = 5
+
 
 class Player:
     def __init__(self, name: str, ip: str, port: int = 4242) -> None:
@@ -130,12 +134,12 @@ class Player:
             self.lastFoodCheck = currentFood
             return
 
-        if currentFood < 5 and not self.isInSurvivalMode:
+        if currentFood < SURVIVAL_MIN_FOOD_LEVEL and not self.isInSurvivalMode:
             print(f"Survival mode current food : {currentFood}")
             self.isInSurvivalMode = True
             self.sendHelpRequest()
-        elif currentFood < 5 and self.isInSurvivalMode:
-            if self.helpRequestCount < 5:
+        elif currentFood < SURVIVAL_MIN_FOOD_LEVEL and self.isInSurvivalMode:
+            if self.helpRequestCount < SURVIVAL_MIN_FOOD_LEVEL:
                 if self.roombaState["forwardCount"] % 10 == 0:
                     self.sendHelpRequest()
             else:
@@ -350,6 +354,6 @@ class Player:
 
             if not self.communication.hasPendingCommands():
                 self.roombaAction()
-            if stepCount % 20 == 0:
+            if stepCount % INVENTORY_REFRESH == 0:
                 self.communication.sendInventory()
             sleep(0.1)
