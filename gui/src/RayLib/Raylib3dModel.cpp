@@ -5,6 +5,7 @@
 ** Raylib3dModel
 */
 
+#include <string>
 #include "RayLib.hpp"
 #include "raymath.h"
 

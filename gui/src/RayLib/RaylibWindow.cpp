@@ -5,6 +5,7 @@
 ** WindowMethods
 */
 
+#include <string>
 #include "RayLib.hpp"
 
 void RayLib::initWindow(int width, int height, const std::string &title)
