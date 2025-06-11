@@ -103,6 +103,7 @@ void check_player_status(zappy_t *zappy);
 /* init_map.c */
 void init_game(zappy_t *server);
 
+
 /* accept.c */
 int accept_client(zappy_t *server);
 
@@ -142,9 +143,13 @@ int send_end_game(zappy_t *zappy, const char *teamName);
 int send_str_message(zappy_t *zappy, const char *message);
 int send_unknown_command(zappy_t *zappy);
 int send_command_parameter(zappy_t *zappy);
+int send_start_incantation(zappy_t *zappy, player_t *player, int *player_list,
+    int nb_player);
+int send_end_incantation(zappy_t *zappy, player_t *player, char *result);
 
 /* init_egg.c */
 void init_egg(zappy_t *zappy);
+egg_t *add_egg_node(int id, int *pos, char *team_name, int id_layer);
 egg_t *kil_egg_node(egg_t **head, int egg_id);
 
 /* AI messages */
@@ -167,14 +172,26 @@ void insert_action_by_priority(action_queue_t *queue,
 
 /* This is the definition of the array function of the commands */
 int handle_forward(player_t *player, char *command, zappy_t *zappy);
+
 int handle_left(player_t *player, char *command, zappy_t *zappy);
 int left_message(player_t *player);
+int print_left_server(player_t *player);
+
 int handle_right(player_t *player, char *command, zappy_t *zappy);
+int print_right_server(player_t *player);
+int right_message(player_t *player);
+
 int handle_connect_nbr(player_t *player, char *command, zappy_t *zappy);
 int handle_eject(player_t *player, char *command, zappy_t *zappy);
+
 int handle_fork(player_t *player, char *command, zappy_t *zappy);
+int print_look_server(player_t *player);
+
 int handle_incantation(player_t *player, char *command, zappy_t *zappy);
 int handle_inventory(player_t *player, char *command, zappy_t *zappy);
+int inventory_message(player_t *player);
+int print_inventory_server(player_t *player, int len);
+
 int handle_broadcast(player_t *player, char *command, zappy_t *zappy);
 int handle_look(player_t *player, char *command, zappy_t *zappy);
 int handle_set(player_t *player, char *command, zappy_t *zappy);

@@ -101,6 +101,8 @@ int send_map_size(zappy_t *server)
     char *y = my_itoa(server->game->map->height);
     graph_net_t *current = server->graph;
 
+    if (message == NULL || x == NULL || y == NULL)
+        return -1;
     snprintf(message, xLenthth, "msz %s %s\n", x, y);
     while (current != NULL) {
         if (write_message(current->fd, message) == -1) {

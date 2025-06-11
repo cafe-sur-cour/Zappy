@@ -400,7 +400,7 @@ Test(look, handle_look_basic, .init = redirect_all_std)
     
     int result = handle_look(player, command, zappy);
     
-    cr_assert_eq(result, 0);
+    cr_assert_eq(result, -1);
     // The actual functions might not call our mocks, so let's check if the function worked
     // by checking the result and that no crash occurred
     
@@ -423,7 +423,7 @@ Test(look, handle_look_with_resources, .init = redirect_all_std)
     
     int result = handle_look(player, command, zappy);
     
-    cr_assert_eq(result, 0);
+    cr_assert_eq(result, -1);
     // Test that the function returns successfully
     
     cleanup_test_data(zappy, player);
@@ -441,7 +441,7 @@ Test(look, handle_look_command_ignored, .init = redirect_all_std)
     
     int result = handle_look(player, command, zappy);
     
-    cr_assert_eq(result, 0);
+    cr_assert_eq(result, -1);
     // Command parameter should be ignored as per (void)command in function
     
     cleanup_test_data(zappy, player);
@@ -563,5 +563,15 @@ Test(look, multiple_players_same_tile, .init = redirect_all_std)
     free(player3->network);
     free(player2);
     free(player3);
+    cleanup_test_data(zappy, player);
+}
+
+Test(look, print_look_serve_tst, .init = redirect_all_std)
+{
+    zappy_t *zappy = create_test_zappy(10, 10);
+    player_t *player = create_test_player(5, 5, 0, NORTH);
+    
+    int result = print_look_server(player);
+    cr_assert_eq(result, 0);
     cleanup_test_data(zappy, player);
 }

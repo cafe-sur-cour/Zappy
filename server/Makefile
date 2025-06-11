@@ -46,6 +46,8 @@ SRC 		=	src/params.c					\
 				src/guiMessage/gui_send_boradcast.c			\
 				src/guiMessage/gui_send_death_player.c		\
 				src/guiMessage/gui_send_ressource.c			\
+				src/guiMessage/gui_send_start_incantation.c \
+				src/guiMessage/gui_send_end_incantation.c	\
 				src/receiveMessage/action_handler.c			\
 				src/receiveMessage/pollin_handler.c			\
 				src/receiveMessage/loop_thru_command.c		\
@@ -67,7 +69,7 @@ OBJ 		= 	$(SRC:.c=.o)
 
 INCLUDES 	= 	-I./include
 
-CFLAGS 		=	-Wall -Wextra -Werror -Wshadow -g
+CFLAGS 		=	-Wall -Wextra -Werror -Wshadow
 
 LIBS 		= -L./ -lmy -lnetwork -lm
 

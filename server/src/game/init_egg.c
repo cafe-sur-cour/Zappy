@@ -98,7 +98,7 @@ void init_egg(zappy_t *zappy)
         zappy->game->map->height);
     int *pos = malloc(sizeof(int) * 2);
 
-    if (!pos) {
+    if (!pos || tiles == NULL) {
         error_message("Failed to allocate memory for egg position.");
         exit(84);
     }

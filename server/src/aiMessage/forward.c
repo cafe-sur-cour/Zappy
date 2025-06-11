@@ -39,7 +39,7 @@ static void move_right(player_t *player, int n)
         player->posX = 0;
 }
 
-static void print_forward_server(player_t *player)
+static int print_forward_server(player_t *player)
 {
     int len = int_str_len(player->id) + int_str_len(player->posX) +
         int_str_len(player->posY) + 33;
@@ -47,12 +47,13 @@ static void print_forward_server(player_t *player)
 
     if (!debug) {
         error_message("Memory allocation failed for forward debug print.");
-        return;
+        return -1;
     }
     snprintf(debug, len + 1, "Player (%d) moved to position (%d, %d).",
         player->id, player->posX, player->posY);
     valid_message(debug);
     free(debug);
+    return 0;
 }
 
 int forward_message(player_t *player, params_t *params)
@@ -65,8 +66,7 @@ int forward_message(player_t *player, params_t *params)
     for (int i = 0; i < 4; i++) {
         if (direction == directions[i]) {
             move_functions[i](player, params->y);
-            print_forward_server(player);
-            break;
+            return print_forward_server(player);
         }
     }
     return 0;
