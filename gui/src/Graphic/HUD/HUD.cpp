@@ -355,6 +355,25 @@ void HUD::clearTeamDisplayElements(std::shared_ptr<Containers> container)
     }
 }
 
+void HUD::clearPlayerInventoryElements()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    std::vector<std::string> elementIds = {
+        "player_info_title", "player_info_id", "player_info_level", "player_info_team",
+        "player_info_position", "player_info_orientation", "inventory_title",
+        "inventory_separator",
+        "inventory_food", "inventory_linemate", "inventory_deraumere", "inventory_sibur",
+        "inventory_mendiane", "inventory_phiras", "inventory_thystame"
+    };
+
+    for (const auto& id : elementIds) {
+        bottomContainer->removeElement(id);
+    }
+}
+
 std::vector<int> HUD::getTeamPlayerNumbers(
     const std::string& teamName,
     const std::vector<zappy::structs::Player>& players)
@@ -582,5 +601,263 @@ void HUD::updateElementPositions(
                 playerElem->setPosition(playerElem->getBounds().x, initialY + offset);
             }
         }
+    }
+}
+
+zappy::structs::Player HUD::getPlayerById(int playerId) const
+{
+    const auto& players = _gameInfos->getPlayers();
+
+    for (const auto& player : players) {
+        if (player.number == playerId)
+            return player;
+    }
+
+    return zappy::structs::Player();
+}
+
+void HUD::initPlayerInventoryDisplay(int playerId)
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    clearPlayerInventoryElements();
+
+    const zappy::structs::Player player = getPlayerById(playerId);
+    if (player.number <= 0)
+        return;
+
+    bottomContainer->addTextPercent(
+        "player_info_title",
+        55.0f, 10.0f,
+        "PLAYER INFORMATION",
+        8.0f,
+        {255, 255, 255, 255}
+    );
+
+    bottomContainer->addTextPercent(
+        "player_info_separator",
+        55.0f, 17.0f,
+        std::string(70, '-'),
+        2.0f,
+        {150, 150, 150, 200}
+    );
+
+    bottomContainer->addTextPercent(
+        "player_info_team",
+        55.0f, 30.0f,
+        "Team: " + player.teamName,
+        7.0f,
+        {220, 220, 220, 255}
+    );
+
+    bottomContainer->addTextPercent(
+        "player_info_level",
+        55.0f, 50.0f,
+        "Level: " + std::to_string(player.level),
+        7.0f,
+        {220, 220, 220, 255}
+    );
+
+    std::string orientationStr;
+    switch (player.orientation) {
+        case 1: orientationStr = "North"; break;
+        case 2: orientationStr = "East"; break;
+        case 3: orientationStr = "South"; break;
+        case 4: orientationStr = "West"; break;
+        default: orientationStr = "Unknown";
+    }
+
+    bottomContainer->addTextPercent(
+        "player_info_position",
+        65.0f, 30.0f,
+        "Position: [" + std::to_string(player.x) + ", " + std::to_string(player.y) + "]",
+        7.0f,
+        {220, 220, 220, 255}
+    );
+
+    bottomContainer->addTextPercent(
+        "player_info_orientation",
+        65.0f, 50.0f,
+        "Orientation: " + orientationStr,
+        7.0f,
+        {220, 220, 220, 255}
+    );
+
+    bottomContainer->addTextPercent(
+        "inventory_title",
+        75.0f, 10.0f,
+        "INVENTORY",
+        8.0f,
+        {255, 255, 255, 255}
+    );
+
+    bottomContainer->addTextPercent(
+        "inventory_separator",
+        75.0f, 17.0f,
+        std::string(70, '-'),
+        2.0f,
+        {150, 150, 150, 200}
+    );
+
+    bottomContainer->addTextPercent(
+        "inventory_food",
+        82.0f, 24.0f,
+        "Food: " + std::to_string(player.inventory.food),
+        7.5f,
+        {255, 215, 0, 255}
+    );
+
+    float yPosCol1 = 34.0f;
+    float xPosCol1 = 75.0f;
+
+    bottomContainer->addTextPercent(
+        "inventory_linemate",
+        xPosCol1, yPosCol1,
+        "Linemate: " + std::to_string(player.inventory.linemate),
+        7.0f,
+        {200, 200, 200, 255}
+    );
+    yPosCol1 += 13.0f;
+
+    bottomContainer->addTextPercent(
+        "inventory_deraumere",
+        xPosCol1, yPosCol1,
+        "Deraumere: " + std::to_string(player.inventory.deraumere),
+        7.0f,
+        {65, 105, 225, 255}
+    );
+    yPosCol1 += 13.0f;
+
+    bottomContainer->addTextPercent(
+        "inventory_sibur",
+        xPosCol1, yPosCol1,
+        "Sibur: " + std::to_string(player.inventory.sibur),
+        7.0f,
+        {50, 205, 50, 255}
+    );
+
+    float yPosCol2 = 34.0f;
+    float xPosCol2 = 88.0f;
+
+    bottomContainer->addTextPercent(
+        "inventory_mendiane",
+        xPosCol2, yPosCol2,
+        "Mendiane: " + std::to_string(player.inventory.mendiane),
+        7.0f,
+        {255, 165, 0, 255}
+    );
+    yPosCol2 += 13.0f;
+
+    bottomContainer->addTextPercent(
+        "inventory_phiras",
+        xPosCol2, yPosCol2,
+        "Phiras: " + std::to_string(player.inventory.phiras),
+        7.0f,
+        {138, 43, 226, 255}
+    );
+    yPosCol2 += 13.0f;
+
+    bottomContainer->addTextPercent(
+        "inventory_thystame",
+        xPosCol2, yPosCol2,
+        "Thystame: " + std::to_string(player.inventory.thystame),
+        7.0f,
+        {255, 20, 147, 255}
+    );
+}
+
+void HUD::updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode cameraMode)
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    if (cameraMode != zappy::gui::CameraMode::PLAYER) {
+        clearPlayerInventoryElements();
+        return;
+    }
+
+    const zappy::structs::Player player = getPlayerById(playerId);
+    if (player.number <= 0) {
+        clearPlayerInventoryElements();
+        return;
+    }
+
+    auto titleElem = bottomContainer->getElement("player_info_title");
+    if (!titleElem) {
+        initPlayerInventoryDisplay(playerId);
+        return;
+    }
+
+    auto levelElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("player_info_level"));
+    if (levelElem) {
+        levelElem->setText("Level: " + std::to_string(player.level));
+    }
+
+    auto posElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("player_info_position"));
+    if (posElem) {
+        posElem->setText("Position: [" + std::to_string(player.x) + ", " +
+                         std::to_string(player.y) + "]");
+    }
+
+    std::string orientationStr;
+    switch (player.orientation) {
+        case 1: orientationStr = "North"; break;
+        case 2: orientationStr = "East"; break;
+        case 3: orientationStr = "South"; break;
+        case 4: orientationStr = "West"; break;
+        default: orientationStr = "Unknown";
+    }
+
+    auto orientationElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("player_info_orientation"));
+    if (orientationElem) {
+        orientationElem->setText("Orientation: " + orientationStr);
+    }
+
+    auto foodElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("inventory_food"));
+    if (foodElem) {
+        foodElem->setText("Food: " + std::to_string(player.inventory.food));
+    }
+
+    auto linemateElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("inventory_linemate"));
+    if (linemateElem) {
+        linemateElem->setText("Linemate: " + std::to_string(player.inventory.linemate));
+    }
+
+    auto deraumereElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("inventory_deraumere"));
+    if (deraumereElem) {
+        deraumereElem->setText("Deraumere: " + std::to_string(player.inventory.deraumere));
+    }
+
+    auto siburElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("inventory_sibur"));
+    if (siburElem) {
+        siburElem->setText("Sibur: " + std::to_string(player.inventory.sibur));
+    }
+
+    auto mendianeElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("inventory_mendiane"));
+    if (mendianeElem) {
+        mendianeElem->setText("Mendiane: " + std::to_string(player.inventory.mendiane));
+    }
+
+    auto phirasElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("inventory_phiras"));
+    if (phirasElem) {
+        phirasElem->setText("Phiras: " + std::to_string(player.inventory.phiras));
+    }
+
+    auto thystameElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("inventory_thystame"));
+    if (thystameElem) {
+        thystameElem->setText("Thystame: " + std::to_string(player.inventory.thystame));
     }
 }

@@ -16,6 +16,7 @@
 #include "../../RayLib/RayLib.hpp"
 #include "../../Game/GameInfos.hpp"
 #include "../../Audio/IAudio.hpp"
+#include "../../Utils/Constants.hpp"
 #include "Help/Help.hpp"
 
 /**
@@ -187,6 +188,34 @@ class HUD {
          * @param gameInfos The game information containing teams and players
          */
         void updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos);
+
+        /**
+         * @brief Initialize the player inventory display in the bottom container
+         *
+         * @param playerId The ID of the player whose inventory should be displayed
+         */
+        void initPlayerInventoryDisplay(int playerId);
+
+        /**
+         * @brief Update the player inventory display in the bottom container
+         *
+         * @param playerId The ID of the player whose inventory should be displayed
+         * @param cameraMode The current camera mode to check if we're in player view
+         */
+        void updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode cameraMode);
+
+        /**
+         * @brief Clear the player inventory elements from the bottom container
+         */
+        void clearPlayerInventoryElements();
+
+        /**
+         * @brief Get a player by ID from the GameInfos
+         *
+         * @param playerId The ID of the player to get
+         * @return zappy::structs::Player The player object, or a default player if not found
+         */
+        zappy::structs::Player getPlayerById(int playerId) const;
 
     private:
         /**
