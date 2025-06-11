@@ -46,7 +46,11 @@ class App:
             return
 
         if len(self.childs) > 0:
-            print(f"{Colors.YELLOW}Terminating {len(self.childs)} AI child processes...{Colors.RESET}")
+            print(
+                f"{Colors.YELLOW}"
+                f"Terminating {len(self.childs)} AI child processes..."
+                f"{Colors.RESET}"
+            )
 
         for pid in self.childs:
             try:
@@ -80,7 +84,11 @@ class App:
         num_children = len(self.childs)
         self.childs.clear()
         if force_killed:
-            print(f"{Colors.RED}Force killed {len(force_killed)} AI child processes{Colors.RESET}")
+            print(
+                f"{Colors.RED}"
+                f"Force killed {len(force_killed)} AI child processes"
+                f"{Colors.RESET}"
+            )
         if num_children > 0:
             print(f"{Colors.GREEN}All AI processes terminated.{Colors.RESET}")
 
