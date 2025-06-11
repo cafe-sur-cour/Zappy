@@ -363,7 +363,8 @@ void HUD::clearPlayerInventoryElements()
 
     std::vector<std::string> elementIds = {
         "player_info_title", "player_info_id", "player_info_level", "player_info_team",
-        "player_info_position", "player_info_orientation", "inventory_title", "inventory_separator",
+        "player_info_position", "player_info_orientation", "inventory_title",
+        "inventory_separator",
         "inventory_food", "inventory_linemate", "inventory_deraumere", "inventory_sibur",
         "inventory_mendiane", "inventory_phiras", "inventory_thystame"
     };
