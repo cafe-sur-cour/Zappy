@@ -5,7 +5,6 @@
 ** tests_setObj
 */
 
-
 #include <criterion/criterion.h>
 #include <criterion/redirect.h>
 #include <string.h>
@@ -13,6 +12,7 @@
 #include <unistd.h>
 #include "zappy.h"
 #include "network.h"
+#include "fake_malloc.h"
 
 
 static void redirect_all_std(void)
@@ -215,6 +215,26 @@ Test(set_object, handle_set_food_success, .init = redirect_all_std)
     
     handle_set(player, command, zappy);
 
+    cleanup_test_data(zappy, player);
+}
+
+// Test malloc failure in handle_set
+Test(set_object, handle_set_malloc_failure, .init = redirect_all_std)
+{
+    zappy_t *zappy = create_test_zappy(10, 10);
+    player_t *player = create_test_player(5, 5);
+    char command[] = "set food";
+    
+    // Enable malloc failure after 0 calls (immediate failure)
+    enable_malloc_failure(0);
+    
+    int result = handle_set(player, command, zappy);
+    
+    // Function should handle malloc failure gracefully
+    cr_assert_eq(result, -1);
+    
+    // Disable malloc failure for cleanup
+    disable_malloc_failure();
     cleanup_test_data(zappy, player);
 }
 
