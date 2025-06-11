@@ -306,8 +306,7 @@ class Player:
                     self.incantationPhase = "needMorePlayers"
 
     def handleResponseKO(self) -> None:
-        if not self.is_child_process:
-            self.logger.error(f"Command '{self.roombaState['lastCommand']}' failed")
+        self.logger.error(f"Command '{self.roombaState['lastCommand']}' failed")
         if self.canIncant and self.incantationPhase == "startedIncantation":
             self.incantationPhase = "checkNbPlayers"
             self.canIncant = False
@@ -340,8 +339,8 @@ class Player:
             "look": self.handleResponseLook,
             "ko": self.handleResponseKO,
             "ok": self.handleResponseOK,
-            "elevation underway": self.handleResponseElevationUnderway,
-            "current level: ": self.handleResponseCurrentLevel,
+            "Elevation underway": self.handleResponseElevationUnderway,
+            "Current level: ": self.handleResponseCurrentLevel,
         }
         for key in switcher.keys():
             if response.startswith(key):
@@ -354,8 +353,7 @@ class Player:
         handler = switcher.get(response.strip(), None)
         if handler:
             handler()
-        elif not self.is_child_process:
-            self.logger.error(f"Unknown response: {response.strip()}")
+        self.logger.error(f"Unknown response: {response.strip()}")
 
     def loop(self) -> None:
         try:
