@@ -56,7 +56,7 @@ void AContainers::setSize(float width, float height)
     _relativePos.heightPercent = (height / screenHeight) * 100.0f;
 }
 
-Rectangle AContainers::getBounds() const
+FloatRect AContainers::getBounds() const
 {
     return _bounds;
 }

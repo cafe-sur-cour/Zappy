@@ -13,7 +13,6 @@
 #include <string>
 #include <utility>
 #include "Containers/Containers.hpp"
-#include "../../RayLib/RayLib.hpp"
 #include "../../Game/GameInfos.hpp"
 #include "../../Audio/IAudio.hpp"
 #include "Help/Help.hpp"
@@ -307,8 +306,8 @@ class HUD {
          * @param playerNumbers List of player numbers
          */
         void addPlayerListText(std::shared_ptr<Containers> container,
-                             const std::string& teamId,
-                             float yPos, const std::vector<int>& playerNumbers);
+                            const std::string& teamId,
+                            float yPos, const std::vector<int>& playerNumbers);
 
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<IDisplay> _display;

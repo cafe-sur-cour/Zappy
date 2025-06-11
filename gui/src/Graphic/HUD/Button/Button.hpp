@@ -86,10 +86,10 @@ class Button : public AUIElement {
          * @param textColor Text color
          */
         void setColors(
-            Color normal,
-            Color hover,
-            Color pressed,
-            Color textColor
+            Color32 normal,
+            Color32 hover,
+            Color32 pressed,
+            Color32 textColor
         );
 
         /**
@@ -104,10 +104,10 @@ class Button : public AUIElement {
         std::string _text;
         std::function<void()> _callback;
 
-        Color _normalColor;
-        Color _hoverColor;
-        Color _pressedColor;
-        Color _textColor;
+        Color32 _normalColor;
+        Color32 _hoverColor;
+        Color32 _pressedColor;
+        Color32 _textColor;
 
         bool _isHovered;
         bool _isPressed;

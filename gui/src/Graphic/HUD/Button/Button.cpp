@@ -35,7 +35,7 @@ void Button::draw()
     if (!_visible)
         return;
 
-    Color currentColor = _normalColor;
+    Color32 currentColor = _normalColor;
     if (_isPressed)
         currentColor = _pressedColor;
     else if (_isHovered)
@@ -56,11 +56,11 @@ void Button::update()
     if (!_visible)
         return;
 
-    Vector2 mousePoint = this->_display->getMousePosition();
+    Vector2f mousePoint = this->_display->getMousePosition();
     _isHovered = contains(mousePoint.x, mousePoint.y);
 
     bool wasPressed = _isPressed;
-    _isPressed = _isHovered && this->_display->isMouseButtonDown(MOUSE_LEFT_BUTTON);
+    _isPressed = _isHovered && this->_display->isMouseButtonDown(this->_display->getKeyId(MOUSE_LEFT));
 
     if (wasPressed && !_isPressed && _isHovered && _callback) {
         _audio->playSound("click", 100.0f);
@@ -84,10 +84,10 @@ void Button::setCallback(std::function<void()> callback)
 }
 
 void Button::setColors(
-    Color normal,
-    Color hover,
-    Color pressed,
-    Color textColor
+    Color32 normal,
+    Color32 hover,
+    Color32 pressed,
+    Color32 textColor
 )
 {
     _normalColor = normal;

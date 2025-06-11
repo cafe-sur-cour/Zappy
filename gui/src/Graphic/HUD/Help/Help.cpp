@@ -77,7 +77,7 @@ void Help::initHelpContainer()
         _audio,
         x, y,
         width, height,
-        Color{50, 50, 50, 240}
+        Color32{50, 50, 50, 240}
     );
 
     _helpContainer->setRelativePosition(

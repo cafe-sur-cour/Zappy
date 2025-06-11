@@ -9,7 +9,6 @@
 #define CAMERA_MANAGER_HPP_
 
 #include <memory>
-#include "../../RayLib/RayLib.hpp"
 #include "../../Utils/Constants.hpp"
 #include "../../Game/GameInfos.hpp"
 #include "../Map.hpp"
@@ -24,10 +23,9 @@ class CameraManager {
         void updateCameraTargetMode();
         void updateCameraPlayerMode();
 
-        void setMapCenter(const Vector3& center);
+        void setMapCenter(const Vector3f &center);
         void setMapSize(int width, int height);
 
-        float getCurrentCameraDistance() const;
         void setTargetDistance(float distance);
         void initTargetPositionFromCurrentCamera();
 
@@ -40,7 +38,7 @@ class CameraManager {
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<Map> _map;
-        Vector3 _mapCenter;
+        Vector3f _mapCenter;
         int _mapWidth;
         int _mapHeight;
 
@@ -54,8 +52,8 @@ class CameraManager {
         bool _isPlayerViewDragging;
 
         void handlePlayerCameraMouseInput();
-        Vector3 calculatePlayerPosition(const zappy::structs::Player& player);
-        Vector3 calculateCameraPosition(const Vector3& playerPos, float angleXZ);
+        Vector3f calculatePlayerPosition(const zappy::structs::Player& player);
+        Vector3f calculateCameraPosition(const Vector3f& playerPos, float angleXZ);
 };
 
 #endif /* !CAMERA_MANAGER_HPP_ */

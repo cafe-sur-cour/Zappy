@@ -41,12 +41,12 @@ class Containers : public AContainers {
          */
         Containers(std::shared_ptr<IDisplay> display, std::shared_ptr<IAudio> audio,
             float x, float y, float width, float height,
-            Color backgroundColor = {40, 40, 40, 200});
+            Color32 backgroundColor = {40, 40, 40, 200});
 
         /**
          * @brief Destroy the Container
          */
-        ~Containers() override;
+        ~Containers() override = default;
 
         /**
          * @brief Draw the container and its contents
@@ -63,29 +63,7 @@ class Containers : public AContainers {
          *
          * @param color New background color
          */
-        void setBackgroundColor(Color color);
-
-        /**
-         * @brief Set whether to draw the background
-         *
-         * @param hasBackground True to draw background, false otherwise
-         */
-        void setHasBackground(bool hasBackground);
-
-        /**
-         * @brief Set background texture for the container
-         *
-         * @param texture Texture to use as background
-         */
-        void setBackgroundTexture(Texture2D texture);
-
-        /**
-         * @brief Check if the container has a background texture
-         *
-         * @return true If the container has a background texture
-         * @return false Otherwise
-         */
-        bool hasBackgroundTexture() const;
+        void setBackgroundColor(Color32 color);
 
         /**
          * @brief Add a UI element to the container
@@ -161,10 +139,10 @@ class Containers : public AContainers {
             float width, float height,
             const std::string& text,
             std::function<void()> callback,
-            Color normalColor,
-            Color hoverColor,
-            Color pressedColor,
-            Color textColor
+            Color32 normalColor,
+            Color32 hoverColor,
+            Color32 pressedColor,
+            Color32 textColor
         );
 
         /**
@@ -184,7 +162,7 @@ class Containers : public AContainers {
             float x, float y,
             const std::string& text,
             float fontSize = 20.0f,
-            Color color = BLACK
+            Color32 color = BLACK
         );
 
         /**
@@ -246,10 +224,10 @@ class Containers : public AContainers {
             float widthPercent, float heightPercent,
             const std::string& text,
             std::function<void()> callback,
-            Color normalColor,
-            Color hoverColor,
-            Color pressedColor,
-            Color textColor
+            Color32 normalColor,
+            Color32 hoverColor,
+            Color32 pressedColor,
+            Color32 textColor
         );
 
         /**
@@ -269,12 +247,10 @@ class Containers : public AContainers {
             float xPercent, float yPercent,
             const std::string& text,
             float fontSizePercent = 5.0f,
-            Color color = BLACK
+            Color32 color = BLACK
         );
 
     private:
         std::shared_ptr<IAudio> _audio;
-        Texture2D _backgroundTexture;
-        bool _hasBackgroundTexture;
         std::unordered_map<std::string, std::shared_ptr<IUIElement>> _elements;
 };

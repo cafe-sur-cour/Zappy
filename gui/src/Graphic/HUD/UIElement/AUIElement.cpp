@@ -28,7 +28,7 @@ void AUIElement::setPosition(float x, float y)
     _bounds.y = y;
 }
 
-Rectangle AUIElement::getBounds() const
+FloatRect AUIElement::getBounds() const
 {
     return _bounds;
 }

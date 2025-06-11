@@ -14,7 +14,7 @@ Text::Text(
     float x, float y,
     const std::string& text,
     float fontSize,
-    Color color
+    Color32 color
 ) : AUIElement(display, x, y, display->measureText(text, fontSize), fontSize),
     _text(text),
     _fontSize(fontSize),
@@ -62,12 +62,12 @@ float Text::getFontSize() const
     return _fontSize;
 }
 
-void Text::setColor(Color color)
+void Text::setColor(Color32 color)
 {
     _color = color;
 }
 
-Color Text::getColor() const
+Color32 Text::getColor() const
 {
     return _color;
 }

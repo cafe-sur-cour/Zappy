@@ -53,7 +53,7 @@ class IContainers {
          *
          * @return Rectangle Containing position and size
          */
-        virtual Rectangle getBounds() const = 0;
+        virtual FloatRect getBounds() const = 0;
 
         /**
          * @brief Check if a point is within the container

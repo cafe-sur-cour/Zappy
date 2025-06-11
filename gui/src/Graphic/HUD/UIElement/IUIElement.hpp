@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "../../../RayLib/RayLib.hpp"
-
 /**
  * @brief Interface for all UI elements
  *

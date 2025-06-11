@@ -46,7 +46,7 @@ class AUIElement : public IUIElement {
 
         // IUIElement implementation
         void setPosition(float x, float y) override;
-        Rectangle getBounds() const override;
+        FloatRect getBounds() const override;
         bool contains(float x, float y) const override;
         void setVisible(bool visible) override;
         bool isVisible() const override;
@@ -79,7 +79,7 @@ class AUIElement : public IUIElement {
 
     protected:
         std::shared_ptr<IDisplay> _display;
-        Rectangle _bounds;
+        FloatRect _bounds;
         UIRelativePosition _relativePos;
         bool _visible;
 };

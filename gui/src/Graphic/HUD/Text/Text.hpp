@@ -11,7 +11,6 @@
 #include <string>
 
 #include "../UIElement/AUIElement.hpp"
-#include "../../../RayLib/RayLib.hpp"
 #include "../../IDisplay.hpp"
 
 /**
@@ -35,7 +34,7 @@ class Text : public AUIElement {
             float x, float y,
             const std::string& text,
             float fontSize = 20.0f,
-            Color color = BLACK
+            Color32 color = BLACK
         );
 
         /**
@@ -86,14 +85,14 @@ class Text : public AUIElement {
          *
          * @param color New text color
          */
-        void setColor(Color color);
+        void setColor(Color32 color);
 
         /**
          * @brief Get the text color
          *
          * @return Color Text color
          */
-        Color getColor() const;
+        Color32 getColor() const;
 
         /**
          * @brief Set the size of the text element
@@ -107,6 +106,6 @@ class Text : public AUIElement {
     private:
         std::string _text;
         float _fontSize;
-        Color _color;
+        Color32 _color;
         std::shared_ptr<IDisplay> _display;
 };

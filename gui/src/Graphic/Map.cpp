@@ -23,7 +23,7 @@ Map::~Map()
 {
 }
 
-Color Map::getTeamColor(const std::string &teamName)
+Color32 Map::getTeamColor(const std::string &teamName)
 {
     if (_teamColors.find(teamName) == _teamColors.end()) {
         unsigned int seed = static_cast<unsigned int>(time(nullptr));
@@ -52,7 +52,7 @@ void Map::draw()
 
 void Map::drawTile(int x, int y, const zappy::structs::Tile &tile)
 {
-    Vector3 position = {static_cast<float>(x), 0.0f, static_cast<float>(y)};
+    Vector3f position = {static_cast<float>(x), 0.0f, static_cast<float>(y)};
 
     (void)tile;
     this->_display->drawCube(position, 0.9f, 0.2f, 0.9f, LIGHTGRAY);
@@ -76,13 +76,13 @@ void Map::drawPlayers(int x, int y)
     float cylinderHeight = 0.4f;
 
     for (size_t i = 0; i < playersOnTile.size(); ++i) {
-        Vector3 position = {
+        Vector3f position = {
             static_cast<float>(x),
             getOffset(DisplayPriority::PLAYER, x, y, i),
             static_cast<float>(y)
         };
 
-        Color teamColor = getTeamColor(playersOnTile[i]->teamName);
+        Color32 teamColor = getTeamColor(playersOnTile[i]->teamName);
         float rotationAngle = 0.0f;
         int direction = playersOnTile[i]->orientation - 1;
 
@@ -102,16 +102,16 @@ void Map::drawPlayers(int x, int y)
     }
 }
 
-void Map::drawOrientationArrow(const Vector3 &position, int orientation, float playerHeight)
+void Map::drawOrientationArrow(const Vector3f &position, int orientation, float playerHeight)
 {
     float arrowLength = 0.35f;
     float arrowWidth = 0.15f;
     float arrowHeadSize = 0.2f;
 
-    Vector3 arrowPos = position;
+    Vector3f arrowPos = position;
     arrowPos.y += playerHeight / 2 + 0.15f;
-    Vector3 start = arrowPos;
-    Vector3 end = arrowPos;
+    Vector3f start = arrowPos;
+    Vector3f end = arrowPos;
 
     int direction = orientation - 1;
     if (direction < 0) direction = 0;
@@ -124,8 +124,8 @@ void Map::drawOrientationArrow(const Vector3 &position, int orientation, float p
     }
     this->_display->drawCylinderEx(start, end, 0.05f, 0.05f, 8, RED);
 
-    Vector3 coneStart = end;
-    Vector3 coneEnd;
+    Vector3f coneStart = end;
+    Vector3f coneEnd;
 
     switch (direction) {
         case 0: coneEnd = {end.x, end.y, end.z - arrowHeadSize}; break;
@@ -150,13 +150,13 @@ void Map::drawEggs(int x, int y)
     float eggRadius = 0.2f;
 
     for (size_t i = 0; i < eggsOnTile.size(); ++i) {
-        Vector3 position = {
+        Vector3f position = {
             static_cast<float>(x),
             getOffset(DisplayPriority::EGG, x, y, i),
             static_cast<float>(y)
         };
 
-        Color teamColor = getTeamColor(eggsOnTile[i]->teamName);
+        Color32 teamColor = getTeamColor(eggsOnTile[i]->teamName);
         this->_display->drawSphere(position, eggRadius, teamColor);
         this->_display->drawSphereWires(position, eggRadius, 8, 8, BLACK);
     }
@@ -167,11 +167,11 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
     if (tile.food <= 0)
         return;
 
-    Color foodColor = BROWN;
+    Color32 foodColor = BROWN;
     float foodSize = 0.25f;
 
     for (int i = 0; i < tile.food; ++i) {
-        Vector3 position = {
+        Vector3f position = {
             static_cast<float>(x),
             getOffset(DisplayPriority::FOOD, x, y, static_cast<size_t>(i)),
             static_cast<float>(y)
@@ -188,12 +188,12 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
         tile.mendiane <= 0 && tile.phiras <= 0 && tile.thystame <= 0)
         return;
 
-    Color rockColor = BLUE;
+    Color32 rockColor = BLUE;
     float foodSize = 0.25f;
 
     for (int i = 0; i < tile.linemate + tile.deraumere + tile.sibur + tile.mendiane +
             tile.phiras + tile.thystame; ++i) {
-        Vector3 position = {
+        Vector3f position = {
             static_cast<float>(x),
             getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(i)),
             static_cast<float>(y)
@@ -283,8 +283,8 @@ float Map::getOffset(DisplayPriority priority, int x, int y, size_t stackIndex)
             for (const auto& tile : tiles) {
                 if (tile.x == x && tile.y == y &&
                     (tile.linemate > 0 || tile.deraumere > 0 ||
-                     tile.sibur > 0 || tile.mendiane > 0 ||
-                     tile.phiras > 0 || tile.thystame > 0)) {
+                        tile.sibur > 0 || tile.mendiane > 0 ||
+                        tile.phiras > 0 || tile.thystame > 0)) {
                     rockCount++;
                 }
             }

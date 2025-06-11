@@ -24,7 +24,7 @@ class Help {
         /**
          * @brief Construct a new Help object
          *
-         * @param raylib Reference to the RayLib instance
+         * @param display Reference to the IDisplay instance
          * @param audio Reference to the audio system
          */
         Help(std::shared_ptr<IDisplay> display, std::shared_ptr<IAudio> audio);

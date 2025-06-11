@@ -11,11 +11,8 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
-#include "../../RayLib/RayLib.hpp"
 #include "../Game/GameInfos.hpp"
 #include "../IDisplay.hpp"
-
-//TODO(noa) : Retier le raylib, faire attention au couleurs
 
 enum class DisplayPriority {
     TILE = 0,
@@ -36,14 +33,14 @@ class Map {
         void drawFood(int x, int y, const zappy::structs::Tile &tile);
         void drawPlayers(int x, int y);
         void drawEggs(int x, int y);
-        Color getTeamColor(const std::string &teamName);
+        Color32 getTeamColor(const std::string &teamName);
 
         float getOffset(DisplayPriority priority, int x, int y, size_t stackIndex = 0);
 
     private:
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<IDisplay> _display;
-        std::unordered_map<std::string, Color> _teamColors;
+        std::unordered_map<std::string, Color32> _teamColors;
 
         static constexpr float BASE_HEIGHT_TILE = 0.0f;
         static constexpr float BASE_HEIGHT_FOOD = 0.2f;
@@ -55,7 +52,7 @@ class Map {
         static constexpr float EGG_HEIGHT = 0.3f;
         static constexpr float PLAYER_HEIGHT = 1.1f;
 
-        void drawOrientationArrow(const Vector3 &position, int orientation,
+        void drawOrientationArrow(const Vector3f &position, int orientation,
             float playerHeight);
 };
 

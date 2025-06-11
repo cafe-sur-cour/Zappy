@@ -12,7 +12,6 @@
 #include <memory>
 
 #include "IContainers.hpp"
-#include "../../../RayLib/RayLib.hpp"
 
 /**
  * @brief Structure to store relative positions and sizes as percentages
@@ -49,7 +48,7 @@ class AContainers : public IContainers {
 
         void setPosition(float x, float y) override;
         void setSize(float width, float height) override;
-        Rectangle getBounds() const override;
+        FloatRect getBounds() const override;
         bool contains(float x, float y) const override;
         void setVisible(bool visible) override;
         bool isVisible() const override;
@@ -79,9 +78,9 @@ class AContainers : public IContainers {
 
     protected:
         std::shared_ptr<IDisplay> _display;
-        Rectangle _bounds;
+        FloatRect _bounds;
         RelativePosition _relativePos;
-        Color _backgroundColor;
+        Color32 _backgroundColor;
         bool _visible;
         bool _hasBackground;
 };
