@@ -227,9 +227,9 @@ Vector3 CameraManager::calculatePlayerPosition(const zappy::structs::Player& pla
         const float totalHeight = basePlayerHeight + playerHeight;
 
         return {
-            static_cast<float>(player.x),
+            static_cast<float>(player.x * zappy::gui::POSITION_MULTIPLIER),
             totalHeight,
-            static_cast<float>(player.y)
+            static_cast<float>(player.y * zappy::gui::POSITION_MULTIPLIER)
         };
     }
 
@@ -255,9 +255,9 @@ Vector3 CameraManager::calculatePlayerPosition(const zappy::structs::Player& pla
     float targetHeight = playerHeightOffset + playerEntityHeight / 2.0f;
 
     return {
-        static_cast<float>(playerX),
+        static_cast<float>(playerX * zappy::gui::POSITION_MULTIPLIER),
         targetHeight,
-        static_cast<float>(playerY)
+        static_cast<float>(playerY * zappy::gui::POSITION_MULTIPLIER)
     };
 }
 
@@ -317,7 +317,11 @@ void CameraManager::updateCameraPlayerMode()
 
 void CameraManager::setMapCenter(const Vector3& center)
 {
-    _mapCenter = center;
+    _mapCenter = Vector3{
+        center.x * zappy::gui::POSITION_MULTIPLIER,
+        center.y,
+        center.z * zappy::gui::POSITION_MULTIPLIER
+    };
 }
 
 void CameraManager::setMapSize(int width, int height)
