@@ -104,7 +104,7 @@ typedef struct player_s {
 typedef struct action_request_s {
     char *command;
     time_t timestamp;
-    int time_limit;  // in game ticks (7/f, 42/f, etc.)
+    float time_limit;  // in game ticks (7/f, 42/f, etc.)
     action_priority_t priority;
     player_t *player;
     struct action_request_s *next;

@@ -28,6 +28,7 @@ SRC 		=	src/params.c					\
 				src/game/graphic_client.c		\
 				src/game/handle_crystal.c 		\
 				src/game/handle_food.c          \
+				src/game/handle_remove.c 		\
 				src/free.c						\
 				src/algo.c						\
 				src/accept.c					\
@@ -45,12 +46,14 @@ SRC 		=	src/params.c					\
 				src/guiMessage/gui_send_boradcast.c			\
 				src/guiMessage/gui_send_death_player.c		\
 				src/guiMessage/gui_send_ressource.c			\
+				src/guiMessage/gui_send_start_incantation.c \
+				src/guiMessage/gui_send_end_incantation.c	\
 				src/receiveMessage/action_handler.c			\
 				src/receiveMessage/pollin_handler.c			\
 				src/receiveMessage/loop_thru_command.c		\
 				src/receiveMessage/queu_hanlder.c			\
 				src/aiMessage/forward.c						\
-				src/aiMessage/rigth.c						\
+				src/aiMessage/right.c						\
 				src/aiMessage/left.c						\
 				src/aiMessage/broadcast.c					\
 				src/aiMessage/connect.c						\
@@ -66,9 +69,9 @@ OBJ 		= 	$(SRC:.c=.o)
 
 INCLUDES 	= 	-I./include
 
-CFLAGS 		=	-Wall -Wextra -Werror -Wshadow -g
+CFLAGS 		=	-Wall -Wextra -Werror -Wshadow
 
-LIBS 		= -L./ -lmy -lnetwork
+LIBS 		= -L./ -lmy -lnetwork -lm
 
 NAME 		= 	zappy_server
 

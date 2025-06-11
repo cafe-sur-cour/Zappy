@@ -51,12 +51,12 @@ static void process_player_actions(player_t *player, zappy_t *zappy)
 static int calculate_poll_timeout(player_t *player)
 {
     if (player->is_busy) {
-        return 100;
+        return 90;
     }
     if (player->pending_actions && player->pending_actions->count > 0) {
         return 20;
     }
-    return 50;
+    return 40;
 }
 
 /* This function "polls" the message and the queue it */

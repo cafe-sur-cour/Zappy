@@ -14,7 +14,8 @@
 #include <string.h>
 
 /* This function creates the "queue" of action for the current player */
-action_request_t *create_action_request(char *command, player_t *player)
+action_request_t *create_action_request(char *command, player_t *player,
+    int frequency)
 {
     action_request_t *action = malloc(sizeof(action_request_t));
     const command_info_t *cmd_info = NULL;
@@ -28,10 +29,10 @@ action_request_t *create_action_request(char *command, player_t *player)
     cmd_info = find_command_info(command);
     if (cmd_info) {
         action->priority = cmd_info->priority;
-        action->time_limit = cmd_info->base_time;
+        action->time_limit = cmd_info->base_time / frequency;
     } else {
         action->priority = PRIORITY_LOW;
-        action->time_limit = 7;
+        action->time_limit = 7 / frequency;
     }
     return action;
 }

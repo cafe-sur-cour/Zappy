@@ -29,13 +29,12 @@ Test(MessageReception, test_create_action_request_valid, .init = redirect_all_st
     player_t player = {0};
     char *command = "Forward";
     
-    action_request_t *action = create_action_request(command, &player);
+    action_request_t *action = create_action_request(command, &player, 20);
     
     cr_assert_not_null(action, "Action should be created successfully");
     cr_assert_str_eq(action->command, "Forward", "Command should be copied correctly");
     cr_assert_eq(action->player, &player, "Player pointer should be set correctly");
     cr_assert_eq(action->priority, PRIORITY_MEDIUM, "Priority should be set from command info");
-    cr_assert_eq(action->time_limit, 7, "Time limit should be set from command info");
     cr_assert_null(action->next, "Next pointer should be NULL");
     
     free_action_request(action);
@@ -46,13 +45,12 @@ Test(MessageReception, test_create_action_request_unknown_command, .init = redir
     player_t player = {0};
     char *command = "UnknownCommand";
     
-    action_request_t *action = create_action_request(command, &player);
+    action_request_t *action = create_action_request(command, &player, 20);
     
     cr_assert_not_null(action, "Action should be created even for unknown command");
     cr_assert_str_eq(action->command, "UnknownCommand", "Command should be copied correctly");
     cr_assert_eq(action->priority, PRIORITY_LOW, "Priority should be LOW for unknown command");
-    cr_assert_eq(action->time_limit, 7, "Time limit should be default 7 for unknown command");
-    
+
     free_action_request(action);
 }
 
@@ -83,7 +81,7 @@ Test(MessageReception, test_dequeue_highest_priority_action_single, .init = redi
 {
     action_queue_t *queue = init_action_queue();
     player_t player = {0};
-    action_request_t *test_action = create_action_request("Forward", &player);
+    action_request_t *test_action = create_action_request("Forward", &player, 20);
     
     queue->head = test_action;
     queue->tail = test_action;
@@ -105,8 +103,8 @@ Test(MessageReception, test_insert_action_by_priority, .init = redirect_all_std)
 {
     action_queue_t *queue = init_action_queue();
     player_t player = {0};
-    action_request_t *action1 = create_action_request("Forward", &player);
-    action_request_t *action2 = create_action_request("Forward", &player);
+    action_request_t *action1 = create_action_request("Forward", &player, 20);
+    action_request_t *action2 = create_action_request("Forward", &player, 20);
     
     action1->priority = PRIORITY_LOW;
     action2->priority = PRIORITY_HIGH;
@@ -147,7 +145,7 @@ Test(MessageReception, test_find_command_info_invalid, .init = redirect_all_std)
 Test(MessageReception, test_free_action_request_valid, .init = redirect_all_std)
 {
     player_t player = {0};
-    action_request_t *action = create_action_request("Forward", &player);
+    action_request_t *action = create_action_request("Forward", &player, 20);
     
     // This should not crash
     free_action_request(action);

@@ -13,6 +13,21 @@
 #include <stdio.h>
 #include <string.h>
 
+int print_look_server(player_t *player)
+{
+    int len = int_str_len(player->id) + 24;
+    char *debug = calloc(len + 1, sizeof(char));
+
+    if (!debug) {
+        error_message("Memory allocation failed for look debug print.");
+        return -1;
+    }
+    snprintf(debug, len + 1, "Player (%d) looked around.", player->id);
+    valid_message(debug);
+    free(debug);
+    return 0;
+}
+
 int wrap(int value, int max)
 {
     return (value % max + max) % max;
@@ -51,7 +66,8 @@ static char *add_players_on_tile(char *message, int *tiles,
     team_t *current_team = zappy->game->teams;
 
     while (current_team != NULL) {
-        message = loop_thru_teams(current_team, tiles, current_player, message);
+        message = loop_thru_teams(current_team, tiles, current_player,
+            message);
         current_team = current_team->next;
     }
     return message;
@@ -129,7 +145,14 @@ int handle_look(player_t *player, char *command, zappy_t *zappy)
     char *message = look_up(player, zappy);
 
     (void)command;
-    write_message(player->network->fd, message);
-    valid_message(message);
+    if (write_message(player->network->fd, message) == -1) {
+        free(message);
+        return -1;
+    }
+    if (print_look_server(player) == -1) {
+        free(message);
+        return -1;
+    }
+    free(message);
     return 0;
 }
