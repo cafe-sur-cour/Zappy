@@ -24,7 +24,9 @@ TESTS 	    =   tests_params.c			\
 				tests_network.c			\
 				tests_aiMessage.c		\
 				tests_messaggeReception.c	\
-				tests_handler_elem.c
+				tests_handler_elem.c		\
+				tests_look.c				\
+				test_right.c
 
 SRC 		=	../../../server/src/params.c					\
 				../../../server/src/messages.c					\
