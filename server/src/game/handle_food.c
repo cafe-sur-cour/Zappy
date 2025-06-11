@@ -34,3 +34,10 @@ void add_sibur(inventory_t *inventory)
         inventory->nbSibur++;
     }
 }
+
+void rm_deraumere(inventory_t *inventory)
+{
+    if (inventory && inventory->nbDeraumere > 0) {
+        inventory->nbDeraumere--;
+    }
+}

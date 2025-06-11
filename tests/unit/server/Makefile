@@ -23,7 +23,15 @@ TESTS 	    =   tests_params.c			\
 				tests_client.c			\
 				tests_network.c			\
 				tests_aiMessage.c		\
-				tests_messaggeReception.c
+				tests_messaggeReception.c	\
+				tests_handler_elem.c		\
+				tests_look.c				\
+				tests_right.c				\
+				tests_left.c				\
+				tests_inventory.c			\
+				tests_setObj.c				\
+				tests_get_objects.c			\
+				tests_connect.c
 
 SRC 		=	../../../server/src/params.c					\
 				../../../server/src/messages.c					\
@@ -36,6 +44,7 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/game/game.c						\
 				../../../server/src/game/init_egg.c					\
 				../../../server/src/game/graphic_client.c		\
+				../../../server/src/game/handle_remove.c 		\
 				../../../server/src/algo.c						\
 				../../../server/src/free.c						\
 				../../../server/src/signal.c					\

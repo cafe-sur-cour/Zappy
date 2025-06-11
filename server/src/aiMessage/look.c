@@ -51,7 +51,8 @@ static char *add_players_on_tile(char *message, int *tiles,
     team_t *current_team = zappy->game->teams;
 
     while (current_team != NULL) {
-        message = loop_thru_teams(current_team, tiles, current_player, message);
+        message = loop_thru_teams(current_team, tiles, current_player,
+            message);
         current_team = current_team->next;
     }
     return message;
