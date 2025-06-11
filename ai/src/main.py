@@ -45,6 +45,10 @@ def main():
         print(f"{Colors.YELLOW}{USAGE_STRING}{Colors.RESET}")
         return FAILURE
 
+    except KeyboardInterrupt:
+        print(f"\n{Colors.YELLOW}Received keyboard interrupt, shutting down...{Colors.RESET}")
+        return SUCCESS
+
     except Exception as e:
         print(f"{Colors.RED}An unexpected error occurred: {e}{Colors.RESET}")
         return FAILURE

@@ -13,6 +13,7 @@ from .Socket import Socket
 from src.Exceptions.Exceptions import (
     CommunicationHandshakeException,
     CommunicationInvalidResponseException,
+    SocketException,
 )
 
 
@@ -38,8 +39,12 @@ class Communication:
         self.mutex = threading.Lock()
 
     def __del__(self):
-        if self.socket:
-            self.socket.close()
+        try:
+            self.stopLoop()
+            if self.socket:
+                self.socket.close()
+        except Exception:
+            pass
 
     def stopLoop(self) -> None:
         with self.mutex:
@@ -47,18 +52,23 @@ class Communication:
 
     def loop(self) -> None:
         while not self.playerDead:
-            if self.lenRequestQueue() > 0 and self.lenPendingQueue() < 10:
-                with self.mutex:
-                    request = self.requestQueue.pop(0)
-                    self.pendingQueue.append(request)
-                    self.socket.send(request)
-            else:
-                sleep(0.1)
             try:
+                if self.lenRequestQueue() > 0 and self.lenPendingQueue() < 10:
+                    with self.mutex:
+                        request = self.requestQueue.pop(0)
+                        self.pendingQueue.append(request)
+                        self.socket.send(request)
+                else:
+                    sleep(0.1)
                 self.receive()
-            except CommunicationInvalidResponseException as e:
-                print(f"Communication error: {e}")
-                self.playerDead = True
+            except SocketException:
+                with self.mutex:
+                    self.playerDead = True
+                break
+            except CommunicationInvalidResponseException:
+                with self.mutex:
+                    self.playerDead = True
+                break
 
     def tryGetInventory(self, response: str) -> dict[str, int] | None:
         if not response.startswith("[") or not response.endswith("]"):
@@ -126,35 +136,51 @@ class Communication:
         return response
 
     def receiveData(self) -> str:
-        with self.mutex:
-            if '\n' not in self.responseBuffer:
-                r = self.socket.receive()
-                self.responseBuffer += r
-            firstNewlineIndex = self.responseBuffer.index('\n')
-            data = self.responseBuffer[:firstNewlineIndex + 1]
-            self.responseBuffer = self.responseBuffer[firstNewlineIndex + 1:]
-            return self.handleResponse(data.strip())
-        return ""
+        try:
+            with self.mutex:
+                if '\n' not in self.responseBuffer:
+                    r = self.socket.receive()
+                    self.responseBuffer += r
+                firstNewlineIndex = self.responseBuffer.index('\n')
+                data = self.responseBuffer[:firstNewlineIndex + 1]
+                self.responseBuffer = self.responseBuffer[firstNewlineIndex + 1:]
+                return self.handleResponse(data.strip())
+        except SocketException:
+            raise
+        except Exception:
+            return ""
 
     def receive(self) -> None:
-        poller_object = select.poll()
-        poller_object.register(self.socket.get_fd(), select.POLLIN)
-        fd_vs_event = poller_object.poll(200)
+        try:
+            poller_object = select.poll()
+            poller_object.register(self.socket.get_fd(), select.POLLIN)
+            fd_vs_event = poller_object.poll(200)
 
-        for fd, event in fd_vs_event:
-            if event & select.POLLHUP:
+            for fd, event in fd_vs_event:
+                if event & select.POLLHUP:
+                    print("Server disconnected (POLLHUP)")
+                    with self.mutex:
+                        self.playerDead = True
+                    return
+                if event & select.POLLERR:
+                    print("Communication error (POLLERR)")
+                    with self.mutex:
+                        self.playerDead = True
+                    raise CommunicationInvalidResponseException(
+                        "Error in communication with server"
+                    )
+                if event & select.POLLIN:
+                    data = self.receiveData()
+                    if data:
+                        self.addResponse(data)
+                        if self.hasPendingCommands():
+                            self.pendingQueue.pop(0)
+        except SocketException:
+            raise
+        except Exception as e:
+            print(f"Unexpected error in receive: {e}")
+            with self.mutex:
                 self.playerDead = True
-                return
-            if event & select.POLLERR:
-                raise CommunicationInvalidResponseException(
-                    "Error in communication with server"
-                )
-            if event & select.POLLIN:
-                data = self.receiveData()
-                if data:
-                    self.addResponse(data)
-                    if self.hasPendingCommands():
-                        self.pendingQueue.pop(0)
 
     def getInventory(self) -> dict[str, int]:
         with self.mutex:
