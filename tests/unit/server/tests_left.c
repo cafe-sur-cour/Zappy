@@ -20,8 +20,7 @@ static void redirect_all_std(void)
     cr_redirect_stderr();
 }
 
-// Function declarations
-int left_message(player_t *player);
+
 int handle_left(player_t *player, char *command, zappy_t *zappy);
 int send_player_pos(zappy_t *zappy, player_t *player);
 

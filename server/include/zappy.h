@@ -168,6 +168,7 @@ void insert_action_by_priority(action_queue_t *queue,
 /* This is the definition of the array function of the commands */
 int handle_forward(player_t *player, char *command, zappy_t *zappy);
 int handle_left(player_t *player, char *command, zappy_t *zappy);
+int left_message(player_t *player);
 int handle_right(player_t *player, char *command, zappy_t *zappy);
 int handle_connect_nbr(player_t *player, char *command, zappy_t *zappy);
 int handle_eject(player_t *player, char *command, zappy_t *zappy);

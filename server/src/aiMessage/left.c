@@ -27,33 +27,35 @@ static void print_left_server(player_t *player)
     free(debug);
 }
 
-static void left_message(player_t *player)
+int left_message(player_t *player)
 {
     direction_t direction = player->direction;
 
     if (direction == NORTH) {
         player->direction = EAST;
-        return;
+        return 0;
     }
     if (direction == EAST) {
         player->direction = SOUTH;
-        return;
+        return 0;
     }
     if (direction == SOUTH) {
         player->direction = WEST;
-        return;
+        return 0;
     }
     if (direction == WEST) {
         player->direction = NORTH;
-        return;
+        return 0;
     }
+    return -1;
 }
 
 /* This function is defined in the array of funcion pointers */
 int handle_left(player_t *player, char *command, zappy_t *zappy)
 {
     (void)command;
-    left_message(player);
+    if (left_message(player) == -1)
+        return -1;
     print_left_server(player);
     if (send_player_pos(zappy, player) == -1)
         return -1;
