@@ -96,6 +96,8 @@ static void distribute_resources(zappy_t *server)
     int tile_index = 0;
     int *pos = NULL;
 
+    if (shuffled_tiles == NULL)
+        exit(84);
     for (int i = 0; i < 7; i++)
         resources_count[i] = (int)(mapValue * density[i]);
     for (int type = 0; type < 7; type++) {

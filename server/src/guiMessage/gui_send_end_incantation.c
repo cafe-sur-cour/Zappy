@@ -17,7 +17,7 @@
 int send_end_incantation(zappy_t *zappy, player_t *player, char *result)
 {
     int xLength = int_str_len(player->posX) + int_str_len(player->posY)
-        + 9;
+        + 10;
     char *message = malloc(sizeof(char) * xLength);
     graph_net_t *current = zappy->graph;
 
