@@ -35,8 +35,8 @@ static const command_info_t COMMANDS[] = {
 const command_info_t *find_command_info(char *command)
 {
     for (int i = 0; COMMANDS[i].command != NULL; i++) {
-        if (strncmp(COMMANDS[i].command, command,
-            strlen(COMMANDS[i].command)) == 0) {
+        if (strncmp(
+            COMMANDS[i].command, command, strlen(COMMANDS[i].command)) == 0) {
             return &COMMANDS[i];
         }
     }
