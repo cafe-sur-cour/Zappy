@@ -16,6 +16,7 @@ from src.Exceptions.Exceptions import (
 )
 from src.Communication.Communication import Communication
 from src.Utils.Utils import SUCCESS, FAILURE
+from src.Logger.Logger import Logger
 
 
 LVL_UPGRADES = {
@@ -36,6 +37,8 @@ class Player:
             target=self.communication.loop,
             name=f"CommunicationThread-{name}"
         )
+
+        self.logger = Logger()
 
         self.childs: list[int] = []
 
@@ -127,7 +130,7 @@ class Player:
 
         for stone in dropPriority:
             if self.inventory.get(stone, 0) > 0:
-                print(f"Survival mod critical: drop {stone}")
+                self.logger.info(f"Survival mod critical: drop {stone}")
                 self.communication.sendSetObject(stone)
                 return
 
@@ -194,7 +197,7 @@ class Player:
 
     def handleResponseKO(self) -> None:
         if not self.is_child_process:
-            print(f"Command '{self.roombaState['lastCommand']}' failed")
+            self.logger.error(f"Command '{self.roombaState['lastCommand']}' failed")
 
     def handleResponseOK(self) -> None:
         return
@@ -210,7 +213,7 @@ class Player:
         if handler:
             handler()
         elif not self.is_child_process:
-            print(f"Unknown response: {response.strip()}")
+            self.logger.error(f"Unknown response: {response.strip()}")
 
     def loop(self) -> None:
         try:
@@ -220,7 +223,7 @@ class Player:
                     direction = data[0]
                     message = self.broadcaster.revealMessage(data[1])
                     if message and not self.is_child_process:
-                        print(f"Received message: {message}")
+                        self.logger.display(f"Received message: {message}")
 
                 if self.communication.hasResponses():
                     response = self.communication.getLastResponse()
