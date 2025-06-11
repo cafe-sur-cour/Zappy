@@ -26,7 +26,8 @@ TESTS 	    =   tests_params.c			\
 				tests_messaggeReception.c	\
 				tests_handler_elem.c		\
 				tests_look.c				\
-				test_right.c
+				test_right.c				\
+				tests_left.c
 
 SRC 		=	../../../server/src/params.c					\
 				../../../server/src/messages.c					\
