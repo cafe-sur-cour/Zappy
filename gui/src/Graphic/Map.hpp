@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <vector>
 #include <string>
 #include "../Game/GameInfos.hpp"
 #include "../RayLib/RayLib.hpp"
