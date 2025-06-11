@@ -234,7 +234,7 @@ void HUD::initHelpButton()
 void HUD::initCameraResetButton()
 {
     auto squareContainer = getSquareContainer();
-    if (!squareContainer || !_raylib)
+    if (!squareContainer)
         return;
 
     squareContainer->addButtonPercent(
