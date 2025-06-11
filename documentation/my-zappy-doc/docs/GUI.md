@@ -1,2 +1,2 @@
-# GUI Zappy explenation
+# The Zappy - GUI
 
