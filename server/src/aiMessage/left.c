@@ -33,22 +33,20 @@ static void left_message(player_t *player)
 
     if (direction == NORTH) {
         player->direction = EAST;
-        return 0;
+        return;
     }
     if (direction == EAST) {
         player->direction = SOUTH;
-        return 0;
+        return;
     }
     if (direction == SOUTH) {
         player->direction = WEST;
-        return 0;
+        return;
     }
     if (direction == WEST) {
         player->direction = NORTH;
-        return 0;
-    } else
-        return -1;
-    return 0;
+        return;
+    }
 }
 
 /* This function is defined in the array of funcion pointers */

@@ -42,14 +42,14 @@ static void move_right(player_t *player, int n)
 static void print_forward_server(player_t *player)
 {
     int len = int_str_len(player->id) + int_str_len(player->posX) +
-        int_str_len(player->posY) + 32;
+        int_str_len(player->posY) + 33;
     char *debug = calloc(len + 1, sizeof(char));
 
     if (!debug) {
         error_message("Memory allocation failed for forward debug print.");
         return;
     }
-    snprintf(debug, len + 1, "Player (%d) moved to position (%d, %d)",
+    snprintf(debug, len + 1, "Player (%d) moved to position (%d, %d).",
         player->id, player->posX, player->posY);
     valid_message(debug);
     free(debug);
