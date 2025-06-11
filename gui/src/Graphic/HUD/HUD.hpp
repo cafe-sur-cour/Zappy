@@ -12,9 +12,11 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <functional>
 #include "Containers/Containers.hpp"
 #include "../../Game/GameInfos.hpp"
 #include "../../Audio/IAudio.hpp"
+#include "../../Utils/Constants.hpp"
 #include "Help/Help.hpp"
 #include "../IDisplay.hpp"
 
@@ -30,9 +32,13 @@ class HUD {
          * @brief Construct a new HUD object
          *
          * @param raylib Reference to the RayLib instance
+         * @param gameInfos Reference to game information
+         * @param audio Reference to audio system
+         * @param resetCameraFunc Optional callback function to reset camera mode
          */
         HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
-            std::shared_ptr<IAudio> audio);
+            std::shared_ptr<IAudio> audio,
+            std::function<void()> resetCameraFunc = nullptr);
 
         /**
          * @brief Destroy the HUD object
@@ -188,6 +194,41 @@ class HUD {
          */
         void updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos);
 
+        /**
+         * @brief Initialize the player inventory display in the bottom container
+         *
+         * @param playerId The ID of the player whose inventory should be displayed
+         */
+        void initPlayerInventoryDisplay(int playerId);
+
+        /**
+         * @brief Update the player inventory display in the bottom container
+         *
+         * @param playerId The ID of the player whose inventory should be displayed
+         * @param cameraMode The current camera mode to check if we're in player view
+         */
+        void updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode cameraMode);
+
+        /**
+         * @brief Clear the player inventory elements from the bottom container
+         */
+        void clearPlayerInventoryElements();
+
+        /**
+         * @brief Get a player by ID from the GameInfos
+         *
+         * @param playerId The ID of the player to get
+         * @return zappy::structs::Player The player object, or a default player if not found
+         */
+        zappy::structs::Player getPlayerById(int playerId) const;
+
+        /**
+         * @brief Set a callback function to reset the camera
+         *
+         * @param resetFunc Function to call when camera reset is requested
+         */
+        void setResetCameraCallback(std::function<void()> resetFunc);
+
     private:
         /**
          * @brief Create the square container in the top-left corner
@@ -314,4 +355,5 @@ class HUD {
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<IAudio> _audio;
         std::shared_ptr<Help> _help;
+        std::function<void()> _resetCameraFunc;
 };

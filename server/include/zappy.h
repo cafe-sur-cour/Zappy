@@ -13,6 +13,13 @@
 #ifndef ZAPPY_H_
     #define ZAPPY_H_
 
+/* items handler */
+typedef struct {
+    char *name;
+    void (*add_func)(inventory_t *);
+} item_handler_t;
+
+
 /* Cli parameter of the server */
 typedef struct params_s {
     int port;
@@ -52,7 +59,7 @@ typedef struct command_pf_s {
 
 typedef struct {
     char *command;
-    int base_time;
+    float base_time;
     action_priority_t priority;
     int (*handler)(player_t *, char *, zappy_t *);
 } command_info_t;
@@ -150,7 +157,8 @@ void execute_action(player_t *player, action_request_t *action,
 void queue_action(player_t *player, char *command, zappy_t *zappy);
 action_queue_t *init_action_queue(void);
 void free_action_queue(action_queue_t *queue);
-action_request_t *create_action_request(char *command, player_t *player);
+action_request_t *create_action_request(char *command, player_t *player,
+    int frequency);
 const command_info_t *find_command_info(char *command);
 action_request_t *dequeue_highest_priority_action(action_queue_t *queue);
 void free_action_request(action_request_t *action);
@@ -160,6 +168,7 @@ void insert_action_by_priority(action_queue_t *queue,
 /* This is the definition of the array function of the commands */
 int handle_forward(player_t *player, char *command, zappy_t *zappy);
 int handle_left(player_t *player, char *command, zappy_t *zappy);
+int left_message(player_t *player);
 int handle_right(player_t *player, char *command, zappy_t *zappy);
 int handle_connect_nbr(player_t *player, char *command, zappy_t *zappy);
 int handle_eject(player_t *player, char *command, zappy_t *zappy);
@@ -176,4 +185,21 @@ graph_net_t *add_graph_node(graph_net_t **head, int fd);
 graph_net_t *remove_graph_node(graph_net_t **head, int fd);
 void poll_graphic_clients(zappy_t *zappy);
 
+
+/* Element hander.c */
+void add_food(inventory_t *inventory);
+void add_linemate(inventory_t *inventory);
+void add_deraumere(inventory_t *inventory);
+void add_sibur(inventory_t *inventory);
+void add_mendiane(inventory_t *inventory);
+void add_phiras(inventory_t *inventory);
+void add_thystame(inventory_t *inventory);
+
+void rm_food(inventory_t *inventory);
+void rm_linemate(inventory_t *inventory);
+void rm_deraumere(inventory_t *inventory);
+void rm_sibur(inventory_t *inventory);
+void rm_mendiane(inventory_t *inventory);
+void rm_phiras(inventory_t *inventory);
+void rm_thystame(inventory_t *inventory);
 #endif /* !ZAPPY_H_ */

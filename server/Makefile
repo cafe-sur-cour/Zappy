@@ -26,6 +26,9 @@ SRC 		=	src/params.c					\
 				src/game/init_egg.c				\
 				src/game/player.c				\
 				src/game/graphic_client.c		\
+				src/game/handle_crystal.c 		\
+				src/game/handle_food.c          \
+				src/game/handle_remove.c 		\
 				src/free.c						\
 				src/algo.c						\
 				src/accept.c					\
@@ -48,7 +51,7 @@ SRC 		=	src/params.c					\
 				src/receiveMessage/loop_thru_command.c		\
 				src/receiveMessage/queu_hanlder.c			\
 				src/aiMessage/forward.c						\
-				src/aiMessage/rigth.c						\
+				src/aiMessage/right.c						\
 				src/aiMessage/left.c						\
 				src/aiMessage/broadcast.c					\
 				src/aiMessage/connect.c						\
@@ -66,7 +69,7 @@ INCLUDES 	= 	-I./include
 
 CFLAGS 		=	-Wall -Wextra -Werror -Wshadow -g
 
-LIBS 		= -L./ -lmy -lnetwork
+LIBS 		= -L./ -lmy -lnetwork -lm
 
 NAME 		= 	zappy_server
 

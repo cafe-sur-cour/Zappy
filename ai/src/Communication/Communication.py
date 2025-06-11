@@ -13,7 +13,9 @@ from .Socket import Socket
 from src.Exceptions.Exceptions import (
     CommunicationHandshakeException,
     CommunicationInvalidResponseException,
+    SocketException,
 )
+from src.Logger.Logger import Logger
 
 
 class Communication:
@@ -37,9 +39,15 @@ class Communication:
 
         self.mutex = threading.Lock()
 
+        self.logger = Logger()
+
     def __del__(self):
-        if self.socket:
-            self.socket.close()
+        try:
+            self.stopLoop()
+            if self.socket:
+                self.socket.close()
+        except Exception:
+            pass
 
     def stopLoop(self) -> None:
         with self.mutex:
@@ -47,18 +55,23 @@ class Communication:
 
     def loop(self) -> None:
         while not self.playerDead:
-            with self.mutex:
-                if len(self.requestQueue) > 0 and len(self.pendingQueue) < 10:
-                    request = self.requestQueue.pop(0)
-                    self.socket.send(request)
-                    self.pendingQueue.append(request)
+            try:
+                if self.lenRequestQueue() > 0 and self.lenPendingQueue() < 10:
+                    with self.mutex:
+                        request = self.requestQueue.pop(0)
+                        self.pendingQueue.append(request)
+                        self.socket.send(request)
                 else:
                     sleep(0.1)
-            try:
                 self.receive()
-            except CommunicationInvalidResponseException as e:
-                print(f"Communication error: {e}")
-                self.playerDead = True
+            except SocketException:
+                with self.mutex:
+                    self.playerDead = True
+                break
+            except CommunicationInvalidResponseException:
+                with self.mutex:
+                    self.playerDead = True
+                break
 
     def tryGetInventory(self, response: str) -> dict[str, int] | None:
         if not response.startswith("[") or not response.endswith("]"):
@@ -126,43 +139,51 @@ class Communication:
         return response
 
     def receiveData(self) -> str:
-        with self.mutex:
-            if '\n' not in self.responseBuffer:
-                r = self.socket.receive()
-                self.responseBuffer += r
-            firstNewlineIndex = self.responseBuffer.index('\n')
-            data = self.responseBuffer[:firstNewlineIndex + 1]
-            self.responseBuffer = self.responseBuffer[firstNewlineIndex + 1:]
-            return self.handleResponse(data.strip())
-        return ""
+        try:
+            with self.mutex:
+                if '\n' not in self.responseBuffer:
+                    r = self.socket.receive()
+                    self.responseBuffer += r
+                firstNewlineIndex = self.responseBuffer.index('\n')
+                data = self.responseBuffer[:firstNewlineIndex + 1]
+                self.responseBuffer = self.responseBuffer[firstNewlineIndex + 1:]
+                return self.handleResponse(data.strip())
+        except SocketException:
+            raise
+        except Exception:
+            return ""
 
     def receive(self) -> None:
-        poller_object = select.poll()
-        poller_object.register(self.socket.get_fd(), select.POLLIN)
-        fd_vs_event = poller_object.poll(200)
+        try:
+            poller_object = select.poll()
+            poller_object.register(self.socket.get_fd(), select.POLLIN)
+            fd_vs_event = poller_object.poll(200)
 
-        for fd, event in fd_vs_event:
-            if event & select.POLLHUP:
+            for fd, event in fd_vs_event:
+                if event & select.POLLHUP:
+                    self.logger.error("Server disconnected (POLLHUP)")
+                    with self.mutex:
+                        self.playerDead = True
+                    return
+                if event & select.POLLERR:
+                    self.logger.error("Communication error (POLLERR)")
+                    with self.mutex:
+                        self.playerDead = True
+                    raise CommunicationInvalidResponseException(
+                        "Error in communication with server"
+                    )
+                if event & select.POLLIN:
+                    data = self.receiveData()
+                    if data:
+                        self.addResponse(data)
+                        if self.hasPendingCommands():
+                            self.pendingQueue.pop(0)
+        except SocketException:
+            raise
+        except Exception as e:
+            self.logger.error(f"Unexpected error in receive: {e}")
+            with self.mutex:
                 self.playerDead = True
-                return
-            if event & select.POLLERR:
-                raise CommunicationInvalidResponseException(
-                    "Error in communication with server"
-                )
-            if event & select.POLLIN:
-                data = self.receiveData()
-                if data:
-                    self.addResponse(data)
-                    if self.hasPendingCommands():
-                        self.pendingQueue.pop(0)
-
-    def addResponse(self, response: str) -> None:
-        with self.mutex:
-            self.responseQueue.append(response)
-
-    def hasResponses(self) -> bool:
-        with self.mutex:
-            return len(self.responseQueue) > 0
 
     def getInventory(self) -> dict[str, int]:
         with self.mutex:
@@ -188,19 +209,35 @@ class Communication:
 
     def lenResponseQueue(self) -> int:
         with self.mutex:
-            return len(self.responseBuffer.split('\n'))
+            return len(self.responseQueue)
+
+    def hasResponses(self) -> bool:
+        with self.mutex:
+            return len(self.responseQueue) > 0
+
+    def addResponse(self, response: str) -> None:
+        with self.mutex:
+            self.responseQueue.append(response)
 
     def getLastResponse(self) -> str:
         with self.mutex:
             return self.responseQueue.pop(0) if len(self.responseQueue) else ""
 
-    def playerIsDead(self) -> bool:
+    def lenPendingQueue(self) -> int:
         with self.mutex:
-            return self.playerDead
+            return len(self.pendingQueue)
 
     def hasPendingCommands(self) -> bool:
         with self.mutex:
             return len(self.pendingQueue) > 0
+
+    def lenRequestQueue(self) -> int:
+        with self.mutex:
+            return len(self.requestQueue)
+
+    def playerIsDead(self) -> bool:
+        with self.mutex:
+            return self.playerDead
 
     def connectToServer(self):
         self.socket.connect()

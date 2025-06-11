@@ -30,13 +30,29 @@ class Socket:
         return self._socket.fileno()
 
     def send(self, content: str):
-        self._socket.sendall(content.encode("utf-8"))
+        try:
+            self._socket.sendall(content.encode("utf-8"))
+        except (ConnectionResetError, ConnectionAbortedError, BrokenPipeError) as e:
+            raise SocketException(f"Socket connection lost while sending: {e}")
+        except socket.error as e:
+            raise SocketException(f"Socket send error: {e}")
 
     def receive(self) -> str:
-        data = self._socket.recv(BUFFER_SIZE)
-        if not data:
-            raise SocketException("Socket connection closed by the server")
-        return data.decode("utf-8")
+        try:
+            data = self._socket.recv(BUFFER_SIZE)
+            if not data:
+                raise SocketException("Socket connection closed by the server")
+            return data.decode("utf-8")
+        except (ConnectionResetError, ConnectionAbortedError, BrokenPipeError) as e:
+            raise SocketException(f"Socket connection lost: {e}")
+        except socket.error as e:
+            raise SocketException(f"Socket error: {e}")
 
     def close(self):
-        self._socket.close()
+        if self._socket:
+            try:
+                self._socket.close()
+            except Exception:
+                pass
+            finally:
+                self._socket = None

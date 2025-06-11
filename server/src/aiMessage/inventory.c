@@ -13,6 +13,25 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+static void print_inventory_server(player_t *player, int len)
+{
+    int n = len + int_str_len(player->id);
+    char *debug = calloc(n + 91 + 1, sizeof(char));
+
+    if (!debug) {
+        error_message("Memory allocation failed for inventory debug print.");
+        return;
+    }
+    snprintf(debug, 90 + n + 1, "Player (%d) inventory: [food %d, linemate %d, "
+        "deraumere %d, sibur %d, mendiane %d, phiras %d, thystame %d].",
+        player->id, player->inventory->nbFood, player->inventory->nbLinemate,
+        player->inventory->nbDeraumere, player->inventory->nbSibur,
+        player->inventory->nbMendiane, player->inventory->nbPhiras,
+        player->inventory->nbThystame);
+    valid_message(debug);
+    free(debug);
+}
+
 static int inventory_message(player_t *player)
 {
     int n = int_str_len(player->inventory->nbFood) + int_str_len(
@@ -21,7 +40,7 @@ static int inventory_message(player_t *player)
         player->inventory->nbSibur) + int_str_len(player->inventory->nbMendiane
         ) + int_str_len(player->inventory->nbPhiras) + int_str_len(
         player->inventory->nbThystame);
-    char *message = malloc(sizeof(char) * (70 + n + 1));
+    char *message = calloc(70 + n + 1, sizeof(char));
 
     snprintf(message, 70 + n + 1, "[food %d, linemate %d, deraumere %d, "
         "sibur %d, mendiane %d, phiras %d, thystame %d]\n",
@@ -29,10 +48,9 @@ static int inventory_message(player_t *player)
         player->inventory->nbDeraumere, player->inventory->nbSibur,
         player->inventory->nbMendiane, player->inventory->nbPhiras,
         player->inventory->nbThystame);
-    message[70 + n] = '\0';
     if (write_message(player->network->fd, message) == -1)
         return -1;
-    valid_message("Inventory sent.");
+    print_inventory_server(player, n);
     free(message);
     return 0;
 }

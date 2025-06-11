@@ -30,7 +30,10 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     this->_display->setTargetFPS(zappy::gui::FPS);
     this->_audio = std::make_shared<Audio>();
     this->_map = std::make_unique<Map>(_gameInfos, this->_display);
-    this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio);
+    this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio,
+        [this]() {
+            this->switchCameraMode(zappy::gui::CameraMode::FREE);
+        });
 
     _cameraManager = std::make_unique<CameraManager>(this->_display);
     _cameraManager->setGameInfos(_gameInfos);
@@ -87,6 +90,7 @@ void GUI::update()
 
     updateCamera();
     _hud->updateTeamPlayersDisplay(_gameInfos);
+    _hud->updatePlayerInventoryDisplay(_cameraManager->getPlayerId(), _cameraMode);
     _hud->update();
 }
 
@@ -168,6 +172,14 @@ void GUI::switchCameraMode(zappy::gui::CameraMode mode)
         }
     }
 
+    if (mode == zappy::gui::CameraMode::PLAYER && _cameraMode !=
+        zappy::gui::CameraMode::PLAYER) {
+        _hud->initPlayerInventoryDisplay(_cameraManager->getPlayerId());
+    } else if (mode != zappy::gui::CameraMode::PLAYER && _cameraMode ==
+        zappy::gui::CameraMode::PLAYER) {
+        _hud->clearPlayerInventoryElements();
+    }
+
     _cameraMode = mode;
 }
 
@@ -183,6 +195,9 @@ void GUI::switchCameraModeNext()
 void GUI::setPlayerToFollow(int playerId)
 {
     _cameraManager->setPlayerId(playerId);
+    if (_cameraMode == zappy::gui::CameraMode::PLAYER) {
+        _hud->initPlayerInventoryDisplay(playerId);
+    }
 }
 
 int GUI::getPlayerToFollow() const
@@ -262,7 +277,7 @@ void GUI::switchToPreviousPlayer()
 
 void GUI::initModels()
 {
-    if (!this->_display->loadModel("player", "gui/assets/models/fallguys.glb", {0.0f, 0.0f, 475.0f}))
+    if (!this->_display->loadModel("player", "gui/assets/models/fall_guy.glb", {0.0f, -75.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load player model."
                   << colors::RESET << std::endl;
 }
