@@ -7,9 +7,11 @@
 
 #include "../IDisplay.hpp"
 #include "Raylib.hpp"
+#include <memory>
 
 extern "C" {
-    IDisplay *create() {
-        return new Raylib();
+    __attribute__((visibility("default")))
+    std::shared_ptr<IDisplay> create() {
+        return std::make_shared<Raylib>();
     }
 }

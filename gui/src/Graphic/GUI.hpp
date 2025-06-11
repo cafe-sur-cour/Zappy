@@ -8,7 +8,6 @@
 #ifndef GUI_HPP_
 #define GUI_HPP_
 
-#include <memory>
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
 #include "HUD/HUD.hpp"
@@ -16,6 +15,8 @@
 #include "../Utils/Constants.hpp"
 #include "Camera/CameraManager.hpp"
 #include "../IDisplay.hpp"
+#include "../DLLoader/DLLoader.hpp"
+#include <memory>
 
 class GUI {
     public:
@@ -47,6 +48,7 @@ class GUI {
         void initModels();
 
         bool _isRunning;
+        DLLoader<std::shared_ptr<IDisplay>> _dlLoader;
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<Map> _map;

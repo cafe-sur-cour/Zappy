@@ -18,7 +18,7 @@
 #include "../Button/Button.hpp"
 #include "../Text/Text.hpp"
 #include "../../../Audio/IAudio.hpp"
-#include "../../IDisplay.hpp"
+#include "../../../IDisplay.hpp"
 
 /**
  * @brief Container class for organizing UI elements
@@ -162,7 +162,7 @@ class Containers : public AContainers {
             float x, float y,
             const std::string& text,
             float fontSize = 20.0f,
-            Color32 color = BLACK
+            Color32 color = CBLACK
         );
 
         /**
@@ -247,7 +247,7 @@ class Containers : public AContainers {
             float xPercent, float yPercent,
             const std::string& text,
             float fontSizePercent = 5.0f,
-            Color32 color = BLACK
+            Color32 color = CBLACK
         );
 
     private:

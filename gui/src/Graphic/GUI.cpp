@@ -17,12 +17,20 @@
 GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _gameInfos(gameInfos)
 {
-    this->_display = std::make_shared<RayLib>();
+    this->_dlLoader = DLLoader<std::shared_ptr<IDisplay>>();
+    this->_dlLoader.Open("./lib/libZappyRayLib.so");
+    if (!this->_dlLoader.getHandler()) {
+        std::cerr << "Failed to open library: " << dlerror() << std::endl;
+        exit(84);
+    }
+    using CreateFunc = std::shared_ptr<IDisplay>(*)();
+    CreateFunc create = reinterpret_cast<CreateFunc>(this->_dlLoader.Symbol("create"));
+    this->_display = create();
 
     _cameraMode = zappy::gui::CameraMode::FREE;
     auto monitorSize = this->_display->getMonitorSize();
-    this->_windowWidth = monitorSize.first;
-    this->_windowHeight = monitorSize.second;
+    this->_windowWidth = monitorSize.x;
+    this->_windowHeight = monitorSize.y;
 
     this->_display->initWindow(this->_windowWidth, this->_windowHeight, zappy::gui::WINDOW_TITLE);
     this->_display->initCamera();
@@ -40,7 +48,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _cameraManager->setMapInstance(std::shared_ptr<Map>(_map.get(), [](Map*){}));
     const auto& mapSize = _gameInfos->getMapSize();
 
-    Vector3 mapCenter = {
+    Vector3f mapCenter = {
         static_cast<float>(mapSize.first - 1) / 2.0f, 0.0f,
         static_cast<float>(mapSize.second - 1) / 2.0f
     };
@@ -75,15 +83,15 @@ void GUI::updateCamera()
 void GUI::update()
 {
     this->_isRunning = this->_display->isOpen();
-    if (this->_display->isKeyReleased(KEY_TAB) ||
+    if (this->_display->isKeyReleased(this->_display->getKeyId(TAB)) ||
         this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_LEFT_SHOULDER)))
         switchCameraModeNext();
 
     if (_cameraMode == zappy::gui::CameraMode::PLAYER) {
-        if (this->_display->isKeyReleased(KEY_UP) ||
+        if (this->_display->isKeyReleased(this->_display->getKeyId(UP)) ||
             this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_UP)))
             switchToNextPlayer();
-        if (this->_display->isKeyReleased(KEY_DOWN) ||
+        if (this->_display->isKeyReleased(this->_display->getKeyId(DOWN)) ||
             this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_DOWN)))
             switchToPreviousPlayer();
     }
@@ -105,7 +113,7 @@ void GUI::draw()
         return;
 
     this->_display->beginDrawing();
-    this->_display->clearBackground(RAYWHITE);
+    this->_display->clearBackground(CRAYWHITE);
 
     this->_display->begin3DMode();
     _map->draw();
@@ -126,23 +134,25 @@ int GUI::getWindowHeight() const
 }
 void GUI::setWindowWidth(int width)
 {
-    if (width <= 0 || width > this->_display->getMonitorWidth(0))
+    if (width <= 0 || width > this->_display->getMonitorSize().x)
         return;
 
     _windowWidth = width;
+    auto screenSize = this->_display->getScreenSize();
     this->_display->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
-    _hud->handleResize(this->_display->getScreenWidth(), this->_display->getScreenHeight(),
+    _hud->handleResize(screenSize.x, screenSize.y,
         _windowWidth, _windowHeight);
 }
 
 void GUI::setWindowHeight(int height)
 {
-    if (height <= 0 || height > this->_display->getMonitorHeight(0))
+    if (height <= 0 || height > this->_display->getMonitorSize().y)
         return;
 
     _windowHeight = height;
+    auto screenSize = this->_display->getScreenSize();
     this->_display->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
-    _hud->handleResize(this->_display->getScreenWidth(), this->_display->getScreenHeight(),
+    _hud->handleResize(screenSize.x, screenSize.y,
         _windowWidth, _windowHeight);
 }
 
@@ -152,7 +162,7 @@ void GUI::switchCameraMode(zappy::gui::CameraMode mode)
         _cameraMode != zappy::gui::CameraMode::TARGETED) {
         const auto& mapSize = _gameInfos->getMapSize();
 
-        Vector3 mapCenter = {
+        Vector3f mapCenter = {
             static_cast<float>(mapSize.first - 1) / 2.0f, 0.0f,
             static_cast<float>(mapSize.second - 1) / 2.0f
         };

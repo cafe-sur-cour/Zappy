@@ -61,7 +61,7 @@ std::shared_ptr<Containers> HUD::addContainer(
     const std::string& id,
     float x, float y,
     float width, float height,
-    Color backgroundColor
+    Color32 backgroundColor
 )
 {
     if (_containers.find(id) != _containers.end())
@@ -125,9 +125,9 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
     if (bottomHeightPercent <= 0.0f)
         bottomHeightPercent = 20.0f;
 
-    std::pair<int, int> screenSize = this->_display->getScreenSize();
-    int screenHeight = screenSize.second;
-    int screenWidth = screenSize.first;
+    auto screenSize = this->_display->getScreenSize();
+    int screenHeight = screenSize.x;
+    int screenWidth = screenSize.y;
 
     float sideWidth = (screenWidth * sideWidthPercent) / 100.0f;
     float bottomHeight = (screenHeight * bottomHeightPercent) / 100.0f;
@@ -244,7 +244,7 @@ void HUD::initCameraResetButton()
         70.0f, 15.0f,
         "RESET CAMERA",
         [this]() {
-            _raylib->initCamera();
+            this->_display->initCamera();
 
             if (_resetCameraFunc) {
                 _resetCameraFunc();
@@ -511,7 +511,7 @@ void HUD::recordElementPositions(
     std::unordered_map<std::string, float>& initialYPositions,
     float& lastContainerHeight)
 {
-    Rectangle containerBounds = container->getBounds();
+    FloatRect containerBounds = container->getBounds();
     float containerHeight = containerBounds.height;
 
     initialYPositions.clear();
@@ -546,13 +546,13 @@ std::pair<float, float> HUD::calculateContentMetrics(
     std::shared_ptr<Containers> container,
     const std::unordered_map<std::string, float>& initialYPositions)
 {
-    Rectangle containerBounds = container->getBounds();
+    FloatRect containerBounds = container->getBounds();
     float maxY = containerBounds.y;
 
     for (const auto& pair : initialYPositions) {
         auto element = container->getElement(pair.first);
         if (element) {
-            Rectangle bounds = element->getBounds();
+            FloatRect bounds = element->getBounds();
             float elemBottom = bounds.y + bounds.height;
             if (elemBottom > maxY) maxY = elemBottom;
         }

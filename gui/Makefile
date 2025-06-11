@@ -44,16 +44,17 @@ TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
 INCLUDES = -I./include -I./src
 
-CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror
+CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror -L./src/DLLoader/ -lDLoader
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
-LIBS = -L./src/Communication -lcommunication -L./src/RayLib \
-		-lraylib_wrapper -lraylib -L./src/Audio -laudio -lsfml-audio \
+LIBS = -L./src/Communication -lcommunication \
+		-L./src/Audio -laudio -L./src/DLLoader/ -lDLoader -lsfml-audio \
 		-lGL -lm -lpthread -ldl -lrt -lX11
 
 COMM_LIB = src/Communication/libcommunication.a
-RAYLIB_LIB = src/RayLib/libraylib_wrapper.a
+RAYLIB_LIB = src/RayLib/libZappyRayLib.so
 AUDIO_LIB = src/Audio/libaudio.a
+DLoader_LIB = src/DllLoader/libDLoader.a
 
 NAME = zappy_gui
 
@@ -63,7 +64,7 @@ CC = g++
 
 all: $(NAME)
 
-$(NAME): communication_lib raylib_lib audio_lib $(OBJ) $(MAIN_OBJ)
+$(NAME): communication_lib raylib_lib audio_lib dlloader_lib $(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
 	$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ Compilation completed successfully!$(NC)"
@@ -75,6 +76,13 @@ communication_lib:
 raylib_lib:
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Building RayLib wrapper library...$(NC)"
 	@make -C src/RayLib
+	@echo -e "$(GREEN)ᒥ✅ᒧ Library $(RAYLIB_LIB) created successfully!$(NC)"
+	@mkdir -p ./lib
+	@cp $(RAYLIB_LIB) ./lib/
+
+dlloader_lib:
+	@echo -e "$(BLUE)ᒥ🔧ᒧ Building DLLoader library...$(NC)"
+	@make -C src/DLLoader
 
 audio_lib:
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Building Audio library...$(NC)"
@@ -89,10 +97,12 @@ clean:
 	@make -C src/Communication clean
 	@make -C src/RayLib clean
 	@make -C src/Audio clean
+	@make -C src/DLLoader clean
 
 fclean: clean
 	@rm -rf $(NAME)
 	@rm -rf $(UNIT_TESTS)
+	@rm -rf ./lib
 	@rm -rf coverage_report/
 	@rm -rf *.gcda
 	@rm -rf *.gcno
@@ -100,6 +110,7 @@ fclean: clean
 	@make -C src/Communication fclean
 	@make -C src/RayLib fclean
 	@make -C src/Audio fclean
+	@make -C src/DLLoader fclean
 
 re: fclean all
 

@@ -9,7 +9,6 @@
 
 #include <memory>
 #include "IUIElement.hpp"
-#include "../../IDisplay.hpp"
 
 /**
  * @brief Structure to store relative positions and sizes as percentages

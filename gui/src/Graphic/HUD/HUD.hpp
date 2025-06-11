@@ -18,7 +18,7 @@
 #include "../../Audio/IAudio.hpp"
 #include "../../Utils/Constants.hpp"
 #include "Help/Help.hpp"
-#include "../IDisplay.hpp"
+#include "../../IDisplay.hpp"
 
 /**
  * @brief Main HUD class to manage all UI elements
@@ -71,7 +71,7 @@ class HUD {
             const std::string& id,
             float x, float y,
             float width, float height,
-            Color backgroundColor = {40, 40, 40, 200}
+            Color32 backgroundColor = {40, 40, 40, 200}
         );
 
         /**

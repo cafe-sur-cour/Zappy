@@ -63,9 +63,9 @@ void Help::initHelpContainer()
     if (!_display)
         return;
 
-    std::pair<int, int> screenSize = this->_display->getScreenSize();
-    int screenWidth = screenSize.first;
-    int screenHeight = screenSize.second;
+    Vector2i screenSize = this->_display->getScreenSize();
+    int screenWidth = screenSize.x;
+    int screenHeight = screenSize.y;
 
     float width = screenWidth * 0.50f;
     float height = screenHeight * 0.30f;

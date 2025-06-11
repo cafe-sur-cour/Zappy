@@ -55,8 +55,8 @@ void Map::drawTile(int x, int y, const zappy::structs::Tile &tile)
     Vector3f position = {static_cast<float>(x), 0.0f, static_cast<float>(y)};
 
     (void)tile;
-    this->_display->drawCube(position, 0.9f, 0.2f, 0.9f, LIGHTGRAY);
-    this->_display->drawCubeWires(position, 0.9f, 0.2f, 0.9f, BLACK);
+    this->_display->drawCube(position, 0.9f, 0.2f, 0.9f, CLIGHTGRAY);
+    this->_display->drawCubeWires(position, 0.9f, 0.2f, 0.9f, CBLACK);
 }
 
 void Map::drawPlayers(int x, int y)
@@ -122,7 +122,7 @@ void Map::drawOrientationArrow(const Vector3f &position, int orientation, float 
         case 2: end.z += arrowLength; break;
         case 3: end.x -= arrowLength; break;
     }
-    this->_display->drawCylinderEx(start, end, 0.05f, 0.05f, 8, RED);
+    this->_display->drawCylinderEx(start, end, 0.05f, 0.05f, 8, CRED);
 
     Vector3f coneStart = end;
     Vector3f coneEnd;
@@ -133,7 +133,7 @@ void Map::drawOrientationArrow(const Vector3f &position, int orientation, float 
         case 2: coneEnd = {end.x, end.y, end.z + arrowHeadSize}; break;
         case 3: coneEnd = {end.x - arrowHeadSize, end.y, end.z}; break;
     }
-    this->_display->drawCylinderEx(coneStart, coneEnd, arrowWidth, 0.0f, 8, RED);
+    this->_display->drawCylinderEx(coneStart, coneEnd, arrowWidth, 0.0f, 8, CRED);
 }
 
 void Map::drawEggs(int x, int y)
@@ -158,7 +158,7 @@ void Map::drawEggs(int x, int y)
 
         Color32 teamColor = getTeamColor(eggsOnTile[i]->teamName);
         this->_display->drawSphere(position, eggRadius, teamColor);
-        this->_display->drawSphereWires(position, eggRadius, 8, 8, BLACK);
+        this->_display->drawSphereWires(position, eggRadius, 8, 8, CBLACK);
     }
 }
 
@@ -167,7 +167,7 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
     if (tile.food <= 0)
         return;
 
-    Color32 foodColor = BROWN;
+    Color32 foodColor = CBROWN;
     float foodSize = 0.25f;
 
     for (int i = 0; i < tile.food; ++i) {
@@ -178,7 +178,7 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
         };
 
         this->_display->drawCube(position, foodSize, foodSize, foodSize, foodColor);
-        this->_display->drawCubeWires(position, foodSize, foodSize, foodSize, BLACK);
+        this->_display->drawCubeWires(position, foodSize, foodSize, foodSize, CBLACK);
     }
 }
 
@@ -188,7 +188,7 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
         tile.mendiane <= 0 && tile.phiras <= 0 && tile.thystame <= 0)
         return;
 
-    Color32 rockColor = BLUE;
+    Color32 rockColor = CBLUE;
     float foodSize = 0.25f;
 
     for (int i = 0; i < tile.linemate + tile.deraumere + tile.sibur + tile.mendiane +
@@ -200,7 +200,7 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
         };
 
         this->_display->drawCube(position, foodSize, foodSize, foodSize, rockColor);
-        this->_display->drawCubeWires(position, foodSize, foodSize, foodSize, BLACK);
+        this->_display->drawCubeWires(position, foodSize, foodSize, foodSize, CBLACK);
     }
 }
 

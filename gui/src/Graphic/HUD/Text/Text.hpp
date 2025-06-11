@@ -11,7 +11,7 @@
 #include <string>
 
 #include "../UIElement/AUIElement.hpp"
-#include "../../IDisplay.hpp"
+#include "../../../IDisplay.hpp"
 
 /**
  * @brief Text UI element
@@ -34,7 +34,7 @@ class Text : public AUIElement {
             float x, float y,
             const std::string& text,
             float fontSize = 20.0f,
-            Color32 color = BLACK
+            Color32 color = CBLACK
         );
 
         /**

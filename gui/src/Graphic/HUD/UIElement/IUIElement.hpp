@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "../../../IDisplay.hpp"
+
 /**
  * @brief Interface for all UI elements
  *
@@ -47,7 +49,7 @@ class IUIElement {
          *
          * @return Rectangle The bounds of the element
          */
-        virtual Rectangle getBounds() const = 0;
+        virtual FloatRect getBounds() const = 0;
 
         /**
          * @brief Check if the UI element contains a point

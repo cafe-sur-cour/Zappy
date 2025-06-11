@@ -66,13 +66,13 @@ typedef struct IntRect {
 } IntRect;
 
 #define COLOR(r, g, b) Color32{ r, g, b, 255 }
-#define LIGHTGRAY COLOR(200, 200, 200)
-#define BLACK COLOR(0, 0, 0)
-#define RED COLOR(230, 41, 55)
-#define BROWN COLOR(127, 106, 79)
-#define BLUE COLOR(0, 121, 241)
-#define WHITE COLOR(255, 255, 255)
-#define RAYWHITE COLOR(245, 245, 245)
+#define CLIGHTGRAY COLOR(200, 200, 200)
+#define CBLACK COLOR(0, 0, 0)
+#define CRED COLOR(230, 41, 55)
+#define CBROWN COLOR(127, 106, 79)
+#define CBLUE COLOR(0, 121, 241)
+#define CWHITE COLOR(255, 255, 255)
+#define CRAYWHITE COLOR(245, 245, 245)
 
 class IDisplay {
     public:
@@ -81,6 +81,7 @@ class IDisplay {
 
         virtual void initWindow(int width, int height, std::string) = 0;
         virtual void initCamera() = 0;
+
         virtual bool isWindowReady() = 0;
         virtual void setTargetFPS(unsigned int FPS) = 0;
 
@@ -104,7 +105,7 @@ class IDisplay {
         virtual bool isMouseButtonPressed(int key) = 0;
 
         virtual Vector2f getMousePosition() = 0;
-        virtual void setMousePosition(Vector2i) = 0;
+        virtual void setMousePosition(Vector2f) = 0;
 
         virtual float getMouseWheelMove() = 0;
 
@@ -116,8 +117,8 @@ class IDisplay {
 
         virtual Vector2f getMouseDelta() = 0;
 
-        virtual float vector3DDistanceFromCamera(Vector3f target) = 0; // this->_display->getCamera(); this->_display->vector3Distance(camera.position, _mapCenter)
-        virtual Vector3f vector3SubtractFromCamera(Vector3f target) = 0; // this->_display->vector3SubtractFromCamera(camera.position, _mapCenter);
+        virtual float vector3DDistanceFromCamera(Vector3f target) = 0;
+        virtual Vector3f vector3SubtractFromCamera(Vector3f target) = 0;
 
         virtual Vector3f vector3Normalize(Vector3f) = 0;
 
@@ -133,8 +134,17 @@ class IDisplay {
 
         virtual bool checkCollisionPointRec(Vector2f point, FloatRect rec) = 0;
 
+        virtual void beginDrawing() = 0;
+        virtual void endDrawing() = 0;
+        virtual void clearBackground(Color32) = 0;
+
+        virtual void begin3DMode() = 0;
+        virtual void end3DMode() = 0;
+
         virtual void endScissorMode() = 0;
         virtual void beginScissorMode(IntRect) = 0;
+
+        virtual bool loadModel(const std::string& id, const std::string& filepath, Vector3f center = {0.0f, 0.0f, 0.0f}) = 0;
 
         virtual void drawCube(Vector3f position, float width, float height, float length, Color32 color) = 0;
         virtual void drawCubeWires(Vector3f position, float width, float height, float length, Color32 color) = 0;
@@ -150,10 +160,10 @@ class IDisplay {
 
         virtual void drawLine3D(Vector3f startPos, Vector3f endPos, Color32 color) = 0;
 
-        virtual void drawModelEx(const std::string& id, Vector3f position, Vector3f rotationAxis, float rotationAngle, Vector3f scale, Color32 tint = WHITE) = 0;
+        virtual void drawModelEx(const std::string& id, Vector3f position, Vector3f rotationAxis, float rotationAngle, Vector3f scale, Color32 tint = CWHITE) = 0;
 
         virtual void drawText(const std::string& text, float x, float y, float fontSize, Color32 color) = 0;
-        
+
         virtual void drawRectangleRec(FloatRect rec, Color32 color) = 0;
         ~IDisplay() = default;
 };

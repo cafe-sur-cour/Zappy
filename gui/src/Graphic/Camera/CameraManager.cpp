@@ -79,7 +79,7 @@ void CameraManager::updateCameraTargetMode()
         int screenCenterX = screenSize.x / 2;
         int screenCenterY = screenSize.y / 2;
 
-        this->_display->setMousePosition({screenCenterX, screenCenterY});
+        this->_display->setMousePosition({static_cast<float>(screenCenterX), static_cast<float>(screenCenterY)});
         this->_display->disableCursor();
     }
 
@@ -103,7 +103,7 @@ void CameraManager::updateCameraTargetMode()
             Vector2i screenSize = this->_display->getScreenSize();
             int screenCenterX = screenSize.x / 2;
             int screenCenterY = screenSize.y / 2;
-            this->_display->setMousePosition({screenCenterX, screenCenterY});
+            this->_display->setMousePosition({static_cast<float>(screenCenterX), static_cast<float>(screenCenterY)});
         }
     }
 
@@ -191,7 +191,7 @@ void CameraManager::handlePlayerCameraMouseInput()
 
     if (this->_display->isMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
         _isPlayerViewDragging = true;
-        this->_display->setMousePosition({screenCenterX, screenCenterY});
+        this->_display->setMousePosition({static_cast<float>(screenCenterX), static_cast<float>(screenCenterY)});
         this->_display->disableCursor();
     }
 
@@ -205,7 +205,7 @@ void CameraManager::handlePlayerCameraMouseInput()
         const float rotationSensitivity = zappy::gui::CAMERA_SENSITIVITY;
 
         _playerAngleXZ += mouseDelta.x * rotationSensitivity;
-        this->_display->setMousePosition({screenCenterX, screenCenterY});
+        this->_display->setMousePosition({static_cast<float>(screenCenterX), static_cast<float>(screenCenterY)});
     }
 }
 
