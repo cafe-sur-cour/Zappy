@@ -69,7 +69,7 @@ void GUI::run()
         return;
     }
 
-    while (!_isRunning) {
+    while (_isRunning) {
         update();
         draw();
     }

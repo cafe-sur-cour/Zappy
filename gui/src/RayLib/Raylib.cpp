@@ -328,7 +328,7 @@ void Raylib::endDrawing()
 
 void Raylib::clearBackground(Color32 color)
 {
-    return this->clearBackground({color.r, color.g, color.b, color.a});
+    return this->_raylib->clearBackground({color.r, color.g, color.b, color.a});
 }
 
 bool Raylib::loadModel(const std::string& id, const std::string& filepath, Vector3f center)
