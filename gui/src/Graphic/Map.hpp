@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <unordered_map>
+#include <vector>
 #include <string>
 #include "../Game/GameInfos.hpp"
 #include "../RayLib/RayLib.hpp"
@@ -41,6 +42,8 @@ class Map {
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<RayLib> _raylib;
         std::unordered_map<std::string, Color> _teamColors;
+        std::vector<Color> _colors;
+        int _colorIndex = 0;
 
         static constexpr float BASE_HEIGHT_TILE = 0.0f;
         static constexpr float BASE_HEIGHT_FOOD = 0.2f;

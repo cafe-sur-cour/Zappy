@@ -272,4 +272,16 @@ void GUI::initModels()
     if (!_raylib->loadModel("player", "gui/assets/models/fall_guy.glb", {0.0f, -75.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load player model."
                   << colors::RESET << std::endl;
+
+    if (!_raylib->loadModel("platform", "gui/assets/models/tile.glb", {0.0f, 0.25f, 0.0f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load platform model."
+                  << colors::RESET << std::endl;
+
+    if (!_raylib->loadModel("food", "gui/assets/models/apple.glb", {0.0f, 0.0f, 0.0f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load food model."
+                  << colors::RESET << std::endl;
+
+    if (!_raylib->loadModel("rock", "gui/assets/models/rock.glb", {0.0f, 0.0f, 0.0f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load rock model."
+                  << colors::RESET << std::endl;
 }

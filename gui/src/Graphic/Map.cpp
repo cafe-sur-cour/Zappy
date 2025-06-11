@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <vector>
 #include <string>
+#include <cmath>
 
 #include "../RayLib/RayLib.hpp"
 #include "Map.hpp"
@@ -18,6 +19,7 @@
 Map::Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<RayLib> raylib)
     : _gameInfos(std::move(gameInfos)), _raylib(raylib)
 {
+    _colors = {BLUE, YELLOW, PURPLE, ORANGE, PINK, MAROON, RED, GREEN};
 }
 
 Map::~Map()
@@ -26,14 +28,12 @@ Map::~Map()
 
 Color Map::getTeamColor(const std::string &teamName)
 {
+    if (teamName.empty())
+        return WHITE;
+
     if (_teamColors.find(teamName) == _teamColors.end()) {
-        unsigned int seed = static_cast<unsigned int>(time(nullptr));
-        _teamColors[teamName] = {
-            static_cast<unsigned char>(rand_r(&seed) % 200 + 55),
-            static_cast<unsigned char>(rand_r(&seed) % 200 + 55),
-            static_cast<unsigned char>(rand_r(&seed) % 200 + 55),
-            255
-        };
+        _teamColors[teamName] = _colors[_colorIndex];
+        _colorIndex = (_colorIndex + 1) % _colors.size();
     }
     return _teamColors[teamName];
 }
@@ -53,11 +53,21 @@ void Map::draw()
 
 void Map::drawTile(int x, int y, const zappy::structs::Tile &tile)
 {
-    Vector3 position = {static_cast<float>(x), 0.0f, static_cast<float>(y)};
+    Vector3 position = {static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+        0.0f, static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)};
 
     (void)tile;
-    _raylib->drawCube(position, 0.9f, 0.2f, 0.9f, LIGHTGRAY);
-    _raylib->drawCubeWires(position, 0.9f, 0.2f, 0.9f, BLACK);
+    int seed = static_cast<int>(x * 73856093 ^ y * 19349663);
+    float angle = static_cast<float>((seed % 10) - 5);
+
+    float offsetSeed = static_cast<float>((x * 2654435761u) ^ (y * 1597334677u));
+    float offsetX = (static_cast<float>(std::sin(offsetSeed)) * 0.08f);
+    float offsetZ = (static_cast<float>(std::cos(offsetSeed)) * 0.08f);
+    position.x += offsetX;
+    position.z += offsetZ;
+
+    _raylib->drawModelEx("platform", position, {0.0f, 1.0f, 0.0f},
+        angle, {0.9f, 0.9f, 0.9f}, WHITE);
 }
 
 void Map::drawPlayers(int x, int y)
@@ -78,9 +88,9 @@ void Map::drawPlayers(int x, int y)
 
     for (size_t i = 0; i < playersOnTile.size(); ++i) {
         Vector3 position = {
-            static_cast<float>(x),
+            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::PLAYER, x, y, i),
-            static_cast<float>(y)
+            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
         Color teamColor = getTeamColor(playersOnTile[i]->teamName);
@@ -152,9 +162,9 @@ void Map::drawEggs(int x, int y)
 
     for (size_t i = 0; i < eggsOnTile.size(); ++i) {
         Vector3 position = {
-            static_cast<float>(x),
+            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::EGG, x, y, i),
-            static_cast<float>(y)
+            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
         Color teamColor = getTeamColor(eggsOnTile[i]->teamName);
@@ -168,18 +178,15 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
     if (tile.food <= 0)
         return;
 
-    Color foodColor = BROWN;
-    float foodSize = 0.25f;
-
     for (int i = 0; i < tile.food; ++i) {
         Vector3 position = {
-            static_cast<float>(x),
+            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::FOOD, x, y, static_cast<size_t>(i)),
-            static_cast<float>(y)
+            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        _raylib->drawCube(position, foodSize, foodSize, foodSize, foodColor);
-        _raylib->drawCubeWires(position, foodSize, foodSize, foodSize, BLACK);
+        _raylib->drawModelEx("food", position, {0.0f, 1.0f, 0.0f},
+            0.0f, {0.005f, 0.005f, 0.005f}, WHITE);
     }
 }
 
@@ -189,19 +196,16 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
         tile.mendiane <= 0 && tile.phiras <= 0 && tile.thystame <= 0)
         return;
 
-    Color rockColor = BLUE;
-    float foodSize = 0.25f;
-
     for (int i = 0; i < tile.linemate + tile.deraumere + tile.sibur + tile.mendiane +
             tile.phiras + tile.thystame; ++i) {
         Vector3 position = {
-            static_cast<float>(x),
+            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(i)),
-            static_cast<float>(y)
+            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        _raylib->drawCube(position, foodSize, foodSize, foodSize, rockColor);
-        _raylib->drawCubeWires(position, foodSize, foodSize, foodSize, BLACK);
+        _raylib->drawModelEx("rock", position, {0.0f, 1.0f, 0.0f},
+            0.0f, {0.3f, 0.3f, 0.3f}, WHITE);
     }
 }
 
