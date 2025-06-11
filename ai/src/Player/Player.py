@@ -274,6 +274,13 @@ class Player:
         if self.incantationPhase == "checkNbPlayers":
             self.communication.sendLook()
 
+        elif self.incantationPhase == "dropStones":
+            stones = LVL_UPGRADES[self.level]["stones"]
+            for stone, quantity in stones.items():
+                for _ in range(quantity):
+                    self.communication.sendSetObject(stone)
+            self.incantationPhase = "canStartIncantation"
+
         elif self.incantationPhase == "canStartIncantation":
             self.communication.sendIncantation()
             self.incantationPhase = "startedIncantation"
@@ -294,7 +301,7 @@ class Player:
             if len(self.look) > 0 and "player" in self.look[0].keys():
                 playerCount = self.look[0]["player"]
                 if playerCount >= LVL_UPGRADES[self.level]["players"]:
-                    self.incantationPhase = "canStartIncantation"
+                    self.incantationPhase = "dropStones"
                 else:
                     self.incantationPhase = "needMorePlayers"
 
