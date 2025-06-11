@@ -18,7 +18,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _gameInfos(gameInfos)
 {
     this->_dlLoader = DLLoader<std::shared_ptr<IDisplay>>();
-    this->_dlLoader.Open("./lib/libZappyRayLib.so");
+    this->_dlLoader.Open("./gui/lib/libZappyRayLib.so");
     if (!this->_dlLoader.getHandler()) {
         std::cerr << "Failed to open library: " << dlerror() << std::endl;
         exit(84);

@@ -106,7 +106,7 @@ class Raylib : public IDisplay {
 
         virtual void drawRectangleRec(FloatRect rec, Color32 color);
 
-        Raylib() = default;
+        Raylib();
         ~Raylib() = default;
 };
 

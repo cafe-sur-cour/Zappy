@@ -14,7 +14,7 @@ CXX = g++
 
 ENCAPPS = RaylibEnc/libZappyRayLibCpp.a
 
-CFLAGS = -std=c++20 -Wall -Wextra -Werror -fPIC -lraylib
+CFLAGS = -std=c++20 -Wall -Wextra -Werror -fPIC -lraylib -g
 
 OBJ = $(SRC:.cpp=.o)
 

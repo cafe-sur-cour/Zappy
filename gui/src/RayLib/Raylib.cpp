@@ -10,6 +10,11 @@
 #include "../Utils/GamepadConstants.hpp"
 
 
+Raylib::Raylib()
+{
+    this->_raylib = std::make_unique<RayLibEnc>();
+}
+
 Vector2i Raylib::getScreenSize()
 {
     return {this->_raylib->getScreenWidth(), this->_raylib->getScreenHeight()};

@@ -44,7 +44,7 @@ TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
 INCLUDES = -I./include -I./src
 
-CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror -L./src/DLLoader/ -lDLoader
+CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror -L./src/DLLoader/ -lDLoader  -g
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 LIBS = -L./src/Communication -lcommunication \
