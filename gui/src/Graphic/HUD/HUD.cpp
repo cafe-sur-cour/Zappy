@@ -15,8 +15,9 @@
 #include "HUD.hpp"
 
 HUD::HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos,
-         std::shared_ptr<IAudio> audio)
-    : _containers(), _raylib(raylib), _gameInfos(gameInfos), _audio(audio)
+         std::shared_ptr<IAudio> audio, std::function<void()> resetCameraFunc)
+    : _containers(), _raylib(raylib), _gameInfos(gameInfos), _audio(audio),
+      _resetCameraFunc(resetCameraFunc)
 {
     _help = std::make_shared<Help>(raylib, audio);
     initDefaultLayout(15.0f, 20.0f);
@@ -241,8 +242,12 @@ void HUD::initCameraResetButton()
         15.0f, 70.0f,
         70.0f, 15.0f,
         "RESET CAMERA",
-        []() {
-            // Placeholder for camera reset functionality
+        [this]() {
+            _raylib->initCamera();
+
+            if (_resetCameraFunc) {
+                _resetCameraFunc();
+            }
         },
         {240, 240, 60, 255},
         {255, 255, 100, 255},
@@ -362,8 +367,11 @@ void HUD::clearPlayerInventoryElements()
         return;
 
     std::vector<std::string> elementIds = {
-        "player_info_title", "player_info_id", "player_info_level", "player_info_team",
-        "player_info_position", "player_info_orientation", "inventory_title",
+        "player_info_title",
+        "player_info_separator",
+        "player_info_level", "player_info_team",
+        "player_info_position", "player_info_orientation",
+        "inventory_title",
         "inventory_separator",
         "inventory_food", "inventory_linemate", "inventory_deraumere", "inventory_sibur",
         "inventory_mendiane", "inventory_phiras", "inventory_thystame"
@@ -860,4 +868,9 @@ void HUD::updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode came
     if (thystameElem) {
         thystameElem->setText("Thystame: " + std::to_string(player.inventory.thystame));
     }
+}
+
+void HUD::setResetCameraCallback(std::function<void()> resetFunc)
+{
+    _resetCameraFunc = resetFunc;
 }
