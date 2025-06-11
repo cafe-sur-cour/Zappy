@@ -187,7 +187,7 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
         };
 
         _raylib->drawModelEx("food", position, {0.0f, 1.0f, 0.0f},
-            0.0f, {0.0025f, 0.0025f, 0.0025f}, WHITE);
+            0.0f, {0.005f, 0.005f, 0.005f}, WHITE);
     }
 }
 
