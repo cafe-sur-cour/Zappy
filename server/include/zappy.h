@@ -59,7 +59,7 @@ typedef struct command_pf_s {
 
 typedef struct {
     char *command;
-    int base_time;
+    float base_time;
     action_priority_t priority;
     int (*handler)(player_t *, char *, zappy_t *);
 } command_info_t;
@@ -157,7 +157,8 @@ void execute_action(player_t *player, action_request_t *action,
 void queue_action(player_t *player, char *command, zappy_t *zappy);
 action_queue_t *init_action_queue(void);
 void free_action_queue(action_queue_t *queue);
-action_request_t *create_action_request(char *command, player_t *player);
+action_request_t *create_action_request(char *command, player_t *player,
+    int frequency);
 const command_info_t *find_command_info(char *command);
 action_request_t *dequeue_highest_priority_action(action_queue_t *queue);
 void free_action_request(action_request_t *action);
