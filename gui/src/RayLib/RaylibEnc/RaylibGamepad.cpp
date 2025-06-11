@@ -2,19 +2,19 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400-NAN-4-1-zappy-albane.merian
 ** File description:
-** RaylibGamepad
+** RaylibEncGamepad
 */
 
 #include <iostream>
-#include "RayLib.hpp"
-#include "../Utils/GamepadConstants.hpp"
+#include "RayLibEnc.hpp"
+#include "../../Utils/GamepadConstants.hpp"
 
-bool RayLib::isGamepadAvailable(int gamepad) const
+bool RayLibEnc::isGamepadAvailable(int gamepad) const
 {
     return IsGamepadAvailable(gamepad);
 }
 
-bool RayLib::isGamepadButtonPressed(int gamepad, int button) const
+bool RayLibEnc::isGamepadButtonPressed(int gamepad, int button) const
 {
     if (!isGamepadAvailable(gamepad))
         return false;
@@ -22,7 +22,7 @@ bool RayLib::isGamepadButtonPressed(int gamepad, int button) const
     return IsGamepadButtonPressed(gamepad, button);
 }
 
-bool RayLib::isGamepadButtonDown(int gamepad, int button) const
+bool RayLibEnc::isGamepadButtonDown(int gamepad, int button) const
 {
     if (!isGamepadAvailable(gamepad))
         return false;
@@ -30,7 +30,7 @@ bool RayLib::isGamepadButtonDown(int gamepad, int button) const
     return IsGamepadButtonDown(gamepad, button);
 }
 
-bool RayLib::isGamepadButtonReleased(int gamepad, int button) const
+bool RayLibEnc::isGamepadButtonReleased(int gamepad, int button) const
 {
     if (!isGamepadAvailable(gamepad))
         return false;
@@ -38,7 +38,7 @@ bool RayLib::isGamepadButtonReleased(int gamepad, int button) const
     return IsGamepadButtonReleased(gamepad, button);
 }
 
-float RayLib::getGamepadAxisMovement(int gamepad, int axis) const
+float RayLibEnc::getGamepadAxisMovement(int gamepad, int axis) const
 {
     if (!isGamepadAvailable(gamepad))
         return 0.0f;

@@ -2,13 +2,13 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400-NAN-4-1-zappy-albane.merian
 ** File description:
-** RaylibInput
+** RaylibEncInput
 */
 
-#include "RayLib.hpp"
-#include "../Utils/GamepadConstants.hpp"
+#include "RayLibEnc.hpp"
+#include "../../Utils/GamepadConstants.hpp"
 
-bool RayLib::isMouseButtonDown(int button) const
+bool RayLibEnc::isMouseButtonDown(int button) const
 {
     if (button == MOUSE_BUTTON_LEFT && isGamepadButtonDown(0, GAMEPAD_BUTTON_A))
         return true;
@@ -16,7 +16,7 @@ bool RayLib::isMouseButtonDown(int button) const
     return IsMouseButtonDown(button);
 }
 
-bool RayLib::isMouseButtonPressed(int button) const
+bool RayLibEnc::isMouseButtonPressed(int button) const
 {
     if (button == MOUSE_BUTTON_LEFT && isGamepadButtonPressed(0, GAMEPAD_BUTTON_A))
         return true;
@@ -24,7 +24,7 @@ bool RayLib::isMouseButtonPressed(int button) const
     return IsMouseButtonPressed(button);
 }
 
-bool RayLib::isMouseButtonReleased(int button) const
+bool RayLibEnc::isMouseButtonReleased(int button) const
 {
     if (button == MOUSE_BUTTON_LEFT && IsGamepadButtonReleased(0, GAMEPAD_BUTTON_A))
         return true;
@@ -32,32 +32,32 @@ bool RayLib::isMouseButtonReleased(int button) const
     return IsMouseButtonReleased(button);
 }
 
-bool RayLib::isKeyDown(int key) const
+bool RayLibEnc::isKeyDown(int key) const
 {
     return IsKeyDown(key);
 }
 
-bool RayLib::isKeyPressed(int key) const
+bool RayLibEnc::isKeyPressed(int key) const
 {
     return IsKeyPressed(key);
 }
 
-bool RayLib::isKeyReleased(int key) const
+bool RayLibEnc::isKeyReleased(int key) const
 {
     return IsKeyReleased(key);
 }
 
-Vector2 RayLib::getMousePosition() const
+Vector2 RayLibEnc::getMousePosition() const
 {
     return GetMousePosition();
 }
 
-void RayLib::setMousePosition(int x, int y)
+void RayLibEnc::setMousePosition(int x, int y)
 {
     SetMousePosition(x, y);
 }
 
-void RayLib::disableCursor()
+void RayLibEnc::disableCursor()
 {
     if (!_isCursorLocked) {
         DisableCursor();
@@ -65,7 +65,7 @@ void RayLib::disableCursor()
     }
 }
 
-void RayLib::enableCursor()
+void RayLibEnc::enableCursor()
 {
     if (_isCursorLocked) {
         EnableCursor();
@@ -73,17 +73,17 @@ void RayLib::enableCursor()
     }
 }
 
-int RayLib::getScreenWidth() const
+int RayLibEnc::getScreenWidth() const
 {
     return GetScreenWidth();
 }
 
-int RayLib::getScreenHeight() const
+int RayLibEnc::getScreenHeight() const
 {
     return GetScreenHeight();
 }
 
-Vector2 RayLib::getMouseDelta()
+Vector2 RayLibEnc::getMouseDelta()
 {
     if (_isCursorLocked) {
         return GetMouseDelta();
@@ -97,7 +97,7 @@ Vector2 RayLib::getMouseDelta()
     }
 }
 
-float RayLib::getMouseWheelMove() const
+float RayLibEnc::getMouseWheelMove() const
 {
     return GetMouseWheelMove();
 }

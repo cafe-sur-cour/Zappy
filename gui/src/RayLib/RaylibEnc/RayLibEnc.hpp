@@ -2,21 +2,21 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400-NAN-4-1-zappy-albane.merian
 ** File description:
-** RayLib
+** RayLibEnc
 */
 
-#ifndef RAYLIB_HPP_
-#define RAYLIB_HPP_
+#ifndef RAYLIBENC_HPP_
+#define RAYLIBENC_HPP_
 
 #include <string>
 #include <map>
 #include <memory>
 #include "raylib.h"
 
-class RayLib {
+class RayLibEnc {
     public:
-        RayLib();
-        ~RayLib();
+        RayLibEnc();
+        ~RayLibEnc();
 
         // Window management methods
         void initWindow(int width, int height, const std::string &title);
@@ -140,4 +140,4 @@ class RayLib {
         std::map<std::string, Music> _musics;
 };
 
-#endif /* !RAYLIB_HPP_ */
+#endif /* !RAYLIBEnc_HPP_ */

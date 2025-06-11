@@ -6,16 +6,16 @@
 */
 
 #include <string>
-#include "RayLib.hpp"
+#include "RayLibEnc.hpp"
 
-void RayLib::initWindow(int width, int height, const std::string &title)
+void RayLibEnc::initWindow(int width, int height, const std::string &title)
 {
     SetTraceLogLevel(LOG_NONE);
     InitWindow(width, height, title.c_str());
     _isInitialized = true;
 }
 
-void RayLib::closeWindow()
+void RayLibEnc::closeWindow()
 {
     if (_isInitialized) {
         CloseWindow();
@@ -23,57 +23,57 @@ void RayLib::closeWindow()
     }
 }
 
-bool RayLib::windowShouldClose() const
+bool RayLibEnc::windowShouldClose() const
 {
     return WindowShouldClose();
 }
 
-void RayLib::beginDrawing()
+void RayLibEnc::beginDrawing()
 {
     BeginDrawing();
 }
 
-void RayLib::endDrawing()
+void RayLibEnc::endDrawing()
 {
     EndDrawing();
 }
 
-void RayLib::clearBackground(Color color)
+void RayLibEnc::clearBackground(Color color)
 {
     ClearBackground(color);
 }
 
-bool RayLib::isWindowReady() const
+bool RayLibEnc::isWindowReady() const
 {
     return IsWindowReady();
 }
 
-int RayLib::getMonitorWidth(int monitor) const
+int RayLibEnc::getMonitorWidth(int monitor) const
 {
     return GetMonitorWidth(monitor);
 }
 
-int RayLib::getMonitorHeight(int monitor) const
+int RayLibEnc::getMonitorHeight(int monitor) const
 {
     return GetMonitorHeight(monitor);
 }
 
-void RayLib::waitTime(float seconds) const
+void RayLibEnc::waitTime(float seconds) const
 {
     WaitTime(seconds);
 }
 
-void RayLib::setTargetFPS(int fps) const
+void RayLibEnc::setTargetFPS(int fps) const
 {
     SetTargetFPS(fps);
 }
 
-int RayLib::getFPS() const
+int RayLibEnc::getFPS() const
 {
     return GetFPS();
 }
 
-float RayLib::getFrameTime() const
+float RayLibEnc::getFrameTime() const
 {
     return GetFrameTime();
 }
