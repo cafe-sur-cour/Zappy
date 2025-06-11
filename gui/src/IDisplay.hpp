@@ -72,7 +72,14 @@ typedef struct IntRect {
 #define CBROWN COLOR(127, 106, 79)
 #define CBLUE COLOR(0, 121, 241)
 #define CWHITE COLOR(255, 255, 255)
+
 #define CRAYWHITE COLOR(245, 245, 245)
+#define CPINK COLOR(255, 109, 194)
+#define CGREEN COLOR(0, 228, 48)
+#define CMAROON COLOR(190, 33, 55)
+#define CPURPLE COLOR(200, 122, 255)
+#define CORANGE COLOR(255, 161, 0)
+#define CYELLOW COLOR(253, 249, 0)
 
 class IDisplay {
     public:

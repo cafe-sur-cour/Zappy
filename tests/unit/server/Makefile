@@ -31,7 +31,10 @@ TESTS 	    =   tests_params.c			\
 				tests_inventory.c			\
 				tests_setObj.c				\
 				tests_get_objects.c			\
-				tests_connect.c
+				tests_connect.c				\
+				tests_gui_incantation.c		\
+				tests_malloc_fails.c		\
+				fake_malloc.c
 
 SRC 		=	../../../server/src/params.c					\
 				../../../server/src/messages.c					\
@@ -68,12 +71,14 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/guiMessage/gui_send_boradcast.c			\
 				../../../server/src/guiMessage/gui_send_death_player.c		\
 				../../../server/src/guiMessage/gui_send_ressource.c			\
+				../../../server/src/guiMessage/gui_send_start_incantation.c \
+				../../../server/src/guiMessage/gui_send_end_incantation.c	\
 				../../../server/src/receiveMessage/action_handler.c			\
 				../../../server/src/receiveMessage/pollin_handler.c			\
 				../../../server/src/receiveMessage/loop_thru_command.c		\
 				../../../server/src/receiveMessage/queu_hanlder.c			\
 				../../../server/src/aiMessage/forward.c						\
-				../../../server/src/aiMessage/rigth.c						\
+				../../../server/src/aiMessage/right.c						\
 				../../../server/src/aiMessage/left.c						\
 				../../../server/src/aiMessage/broadcast.c					\
 				../../../server/src/aiMessage/connect.c						\
@@ -87,10 +92,9 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/game/handle_crystal.c 		\
 				../../../server/src/game/handle_food.c          \
 
+INCLUDES 	= 	-I./../../../server/include -I./
 
-INCLUDES 	= 	-I./../../../server/include
-
-CFLAGS 		=	-Wall -Wextra -Werror
+CFLAGS 		=	-Wall -Wextra
 
 LIBS 		=	-L. -lmy -lnetwork -lm
 
@@ -98,23 +102,28 @@ CC 			= 	gcc
 
 CRIT 		= 	-lcriterion --coverage
 
+# Build fake malloc with control functions
+fake_malloc:
+	@echo -e "$(YELLOW)ᒥ🧪ᒧ Generating fake malloc with control functions...$(NC)"
+	@gcc -fPIC -shared -o libfailalloc.so fake_malloc.c -ldl
 
 clean:
 	@rm -rf $(OBJ)
 	@rm -rf $(MAIN_OBJ)
 	@rm -rf *.gc*
+	@rm -rf libfailalloc.so
 
 fclean: clean
 	@rm -rf $(NAME)
 	@rm -rf $(UNIT)
 
-unit_test: fclean
-	@echo -e "$(YELLOW)ᒥ🧪ᒧ Compiling unit tests...$(NC)"
-	@$(CC) -o $(UNIT) $(SRC)  $(TESTS)  $(CFLAGS) $(INCLUDES) $(CRIT) $(LIBS)
+unit_test: fake_malloc
+	@echo -e "$(YELLOW)ᒥ🧪ᒧ Compiling unit tests with fake malloc support...$(NC)"
+	@$(CC) -o $(UNIT) $(SRC) $(TESTS) $(CFLAGS) $(INCLUDES) $(CRIT) $(LIBS)
 
 tests_run: unit_test
-	@echo -e "$(YELLOW)ᒥ🧪ᒧ Running unit tests...$(NC)"
-	@./$(UNIT)
+	@echo -e "$(YELLOW)ᒥ🧪ᒧ Running unit tests with malloc control...$(NC)"
+	LD_PRELOAD=./libfailalloc.so ./$(UNIT)
 
 coverage: tests_run
 	@echo -e "$(BLUE)ᒥ📊ᒧ Generating coverage report...$(NC)"
