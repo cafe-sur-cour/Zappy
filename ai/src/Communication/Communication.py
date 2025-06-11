@@ -15,6 +15,7 @@ from src.Exceptions.Exceptions import (
     CommunicationInvalidResponseException,
     SocketException,
 )
+from src.Logger.Logger import Logger
 
 
 class Communication:
@@ -37,6 +38,8 @@ class Communication:
         self.socket = Socket(host, port)
 
         self.mutex = threading.Lock()
+
+        self.logger = Logger()
 
     def __del__(self):
         try:
@@ -158,12 +161,12 @@ class Communication:
 
             for fd, event in fd_vs_event:
                 if event & select.POLLHUP:
-                    print("Server disconnected (POLLHUP)")
+                    self.logger.error("Server disconnected (POLLHUP)")
                     with self.mutex:
                         self.playerDead = True
                     return
                 if event & select.POLLERR:
-                    print("Communication error (POLLERR)")
+                    self.logger.error("Communication error (POLLERR)")
                     with self.mutex:
                         self.playerDead = True
                     raise CommunicationInvalidResponseException(
@@ -178,7 +181,7 @@ class Communication:
         except SocketException:
             raise
         except Exception as e:
-            print(f"Unexpected error in receive: {e}")
+            self.logger.error(f"Unexpected error in receive: {e}")
             with self.mutex:
                 self.playerDead = True
 
