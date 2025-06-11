@@ -30,7 +30,8 @@ TESTS 	    =   tests_params.c			\
 				tests_left.c				\
 				tests_inventory.c			\
 				tests_setObj.c				\
-				get_objects.c
+				tests_get_objects.c			\
+				tests_connect.c
 
 SRC 		=	../../../server/src/params.c					\
 				../../../server/src/messages.c					\
