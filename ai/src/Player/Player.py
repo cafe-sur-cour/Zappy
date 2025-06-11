@@ -69,9 +69,12 @@ class Player:
 
     def __del__(self):
         try:
-            self.communication.stopLoop()
-            if self._commThread.is_alive():
+            if hasattr(self, 'communication') and self.communication:
+                self.communication.stopLoop()
+            if hasattr(self, '_commThread') and self._commThread and self._commThread.is_alive():
                 self._commThread.join(timeout=1.0)
+        except (SystemExit, KeyboardInterrupt):
+            pass
         except Exception:
             pass
 
