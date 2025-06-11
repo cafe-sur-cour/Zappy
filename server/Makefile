@@ -28,6 +28,7 @@ SRC 		=	src/params.c					\
 				src/game/graphic_client.c		\
 				src/game/handle_crystal.c 		\
 				src/game/handle_food.c          \
+				src/game/handle_remove.c 		\
 				src/free.c						\
 				src/algo.c						\
 				src/accept.c					\

@@ -193,4 +193,12 @@ void add_sibur(inventory_t *inventory);
 void add_mendiane(inventory_t *inventory);
 void add_phiras(inventory_t *inventory);
 void add_thystame(inventory_t *inventory);
+
+void rm_food(inventory_t *inventory);
+void rm_linemate(inventory_t *inventory);
+void rm_deraumere(inventory_t *inventory);
+void rm_sibur(inventory_t *inventory);
+void rm_mendiane(inventory_t *inventory);
+void rm_phiras(inventory_t *inventory);
+void rm_thystame(inventory_t *inventory);
 #endif /* !ZAPPY_H_ */

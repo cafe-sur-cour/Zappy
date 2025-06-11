@@ -27,3 +27,17 @@ void add_thystame(inventory_t *inventory)
         inventory->nbThystame++;
     }
 }
+
+void rm_food(inventory_t *inventory)
+{
+    if (inventory && inventory->nbFood > 0) {
+        inventory->nbFood--;
+    }
+}
+
+void rm_linemate(inventory_t *inventory)
+{
+    if (inventory && inventory->nbLinemate > 0) {
+        inventory->nbLinemate--;
+    }
+}
