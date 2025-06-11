@@ -12,6 +12,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <functional>
 #include "Containers/Containers.hpp"
 #include "../../RayLib/RayLib.hpp"
 #include "../../Game/GameInfos.hpp"
@@ -31,9 +32,13 @@ class HUD {
          * @brief Construct a new HUD object
          *
          * @param raylib Reference to the RayLib instance
+         * @param gameInfos Reference to game information
+         * @param audio Reference to audio system
+         * @param resetCameraFunc Optional callback function to reset camera mode
          */
         HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos,
-            std::shared_ptr<IAudio> audio);
+            std::shared_ptr<IAudio> audio,
+            std::function<void()> resetCameraFunc = nullptr);
 
         /**
          * @brief Destroy the HUD object
@@ -217,6 +222,13 @@ class HUD {
          */
         zappy::structs::Player getPlayerById(int playerId) const;
 
+        /**
+         * @brief Set a callback function to reset the camera
+         *
+         * @param resetFunc Function to call when camera reset is requested
+         */
+        void setResetCameraCallback(std::function<void()> resetFunc);
+
     private:
         /**
          * @brief Create the square container in the top-left corner
@@ -343,4 +355,5 @@ class HUD {
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<IAudio> _audio;
         std::shared_ptr<Help> _help;
+        std::function<void()> _resetCameraFunc;
 };
