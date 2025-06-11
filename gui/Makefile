@@ -44,17 +44,17 @@ TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
 INCLUDES = -I./include -I./src
 
-CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror -L./src/DLLoader/ -lDLoader  -g
+CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror -L./src/DLLoader/ -lDLLoader  -g
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 LIBS = -L./src/Communication -lcommunication \
-		-L./src/Audio -laudio -L./src/DLLoader/ -lDLoader -lsfml-audio \
+		-L./src/Audio -laudio -L./src/DLLoader/ -lDLLoader -lsfml-audio \
 		-lGL -lm -lpthread -ldl -lrt -lX11
 
 COMM_LIB = src/Communication/libcommunication.a
 RAYLIB_LIB = src/RayLib/libZappyRayLib.so
 AUDIO_LIB = src/Audio/libaudio.a
-DLoader_LIB = src/DllLoader/libDLoader.a
+DLLoader_LIB = src/DllLoader/libDLLoader.a
 
 NAME = zappy_gui
 
