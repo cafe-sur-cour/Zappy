@@ -11,11 +11,36 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
+static team_t *find_team_by_name(zappy_t *zappy, const char *team_name)
+{
+    for (team_t *team = zappy->game->teams; team != NULL; team = team->next) {
+        if (strcmp(team->name, team_name) == 0)
+            return team;
+    }
+    return NULL;
+}
+
+static int send_nbr_slots(player_t *player, int nb_available_slots)
+{
+    int str_len_slots = int_str_len(nb_available_slots);
+    char buffer[str_len_slots + 2];
+
+    snprintf(buffer, sizeof(buffer), "%d\n", nb_available_slots);
+    buffer[str_len_slots + 1] = '\0';
+    return write_message(player->network->fd, buffer);
+}
 
 int handle_connect_nbr(player_t *player, char *command, zappy_t *zappy)
 {
+    team_t *player_team = NULL;
+    int nb_available_slots = 0;
+
     (void)command;
-    (void)player;
-    (void)zappy;
-    return 0;
+    player_team = find_team_by_name(zappy, player->team);
+    if (player_team == NULL)
+        return -1;
+    nb_available_slots = zappy->params->nb_client - player_team->nbPlayers;
+    return send_nbr_slots(player, nb_available_slots);
 }

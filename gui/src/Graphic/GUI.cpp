@@ -84,6 +84,7 @@ void GUI::update()
 
     updateCamera();
     _hud->updateTeamPlayersDisplay(_gameInfos);
+    _hud->updatePlayerInventoryDisplay(_cameraManager->getPlayerId(), _cameraMode);
     _hud->update();
 }
 
@@ -160,6 +161,14 @@ void GUI::switchCameraMode(zappy::gui::CameraMode mode)
         }
     }
 
+    if (mode == zappy::gui::CameraMode::PLAYER && _cameraMode !=
+        zappy::gui::CameraMode::PLAYER) {
+        _hud->initPlayerInventoryDisplay(_cameraManager->getPlayerId());
+    } else if (mode != zappy::gui::CameraMode::PLAYER && _cameraMode ==
+        zappy::gui::CameraMode::PLAYER) {
+        _hud->clearPlayerInventoryElements();
+    }
+
     _cameraMode = mode;
 }
 
@@ -175,6 +184,9 @@ void GUI::switchCameraModeNext()
 void GUI::setPlayerToFollow(int playerId)
 {
     _cameraManager->setPlayerId(playerId);
+    if (_cameraMode == zappy::gui::CameraMode::PLAYER) {
+        _hud->initPlayerInventoryDisplay(playerId);
+    }
 }
 
 int GUI::getPlayerToFollow() const
