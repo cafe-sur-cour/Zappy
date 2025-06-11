@@ -19,6 +19,7 @@
 Map::Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<RayLib> raylib)
     : _gameInfos(std::move(gameInfos)), _raylib(raylib)
 {
+    _colors = {BLUE, YELLOW, PURPLE, ORANGE, PINK, MAROON, RED, GREEN};
 }
 
 Map::~Map()
@@ -27,14 +28,12 @@ Map::~Map()
 
 Color Map::getTeamColor(const std::string &teamName)
 {
+    if (teamName.empty())
+        return WHITE;
+
     if (_teamColors.find(teamName) == _teamColors.end()) {
-        unsigned int seed = static_cast<unsigned int>(time(nullptr));
-        _teamColors[teamName] = {
-            static_cast<unsigned char>(rand_r(&seed) % 200 + 55),
-            static_cast<unsigned char>(rand_r(&seed) % 200 + 55),
-            static_cast<unsigned char>(rand_r(&seed) % 200 + 55),
-            255
-        };
+        _teamColors[teamName] = _colors[_colorIndex];
+        _colorIndex = (_colorIndex + 1) % _colors.size();
     }
     return _teamColors[teamName];
 }
