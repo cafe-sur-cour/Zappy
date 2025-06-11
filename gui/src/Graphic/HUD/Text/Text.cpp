@@ -10,18 +10,18 @@
 #include <string>
 
 Text::Text(
-    std::shared_ptr<RayLib> raylib,
+    std::shared_ptr<IDisplay> display,
     float x, float y,
     const std::string& text,
     float fontSize,
     Color color
-) : AUIElement(raylib, x, y, raylib->measureText(text, fontSize), fontSize),
+) : AUIElement(display, x, y, display->measureText(text, fontSize), fontSize),
     _text(text),
     _fontSize(fontSize),
     _color(color),
-    _raylib(raylib)
+    _display(display)
 {
-    _bounds.width = _raylib->measureText(_text, _fontSize);
+    _bounds.width = this->_display->measureText(_text, _fontSize);
     _bounds.height = fontSize;
 }
 
@@ -30,7 +30,7 @@ void Text::draw()
     if (!_visible)
         return;
 
-    _raylib->drawText(_text, _bounds.x, _bounds.y, _fontSize, _color);
+    this->_display->drawText(_text, _bounds.x, _bounds.y, _fontSize, _color);
 }
 
 void Text::update()
@@ -41,7 +41,7 @@ void Text::setText(const std::string& text)
 {
     _text = text;
 
-    _bounds.width = _raylib->measureText(_text, _fontSize);
+    _bounds.width = this->_display->measureText(_text, _fontSize);
 }
 
 std::string Text::getText() const
@@ -53,7 +53,7 @@ void Text::setFontSize(float fontSize)
 {
     _fontSize = fontSize;
 
-    _bounds.width = _raylib->measureText(_text, _fontSize);
+    _bounds.width = this->_display->measureText(_text, _fontSize);
     _bounds.height = _fontSize;
 }
 
@@ -77,5 +77,5 @@ void Text::setSize(float width, float height)
     (void)width;
     setFontSize(height);
 
-    _bounds.width = _raylib->measureText(_text, _fontSize);
+    _bounds.width = this->_display->measureText(_text, _fontSize);
 }

@@ -17,6 +17,7 @@
 #include "../../Game/GameInfos.hpp"
 #include "../../Audio/IAudio.hpp"
 #include "Help/Help.hpp"
+#include "../IDisplay.hpp"
 
 /**
  * @brief Main HUD class to manage all UI elements
@@ -31,7 +32,7 @@ class HUD {
          *
          * @param raylib Reference to the RayLib instance
          */
-        HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos,
+        HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
             std::shared_ptr<IAudio> audio);
 
         /**
@@ -310,7 +311,7 @@ class HUD {
                              float yPos, const std::vector<int>& playerNumbers);
 
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
-        std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<IAudio> _audio;
         std::shared_ptr<Help> _help;

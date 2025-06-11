@@ -9,7 +9,7 @@
 
 #include <memory>
 #include "IUIElement.hpp"
-#include "../../../RayLib/RayLib.hpp"
+#include "../../IDisplay.hpp"
 
 /**
  * @brief Structure to store relative positions and sizes as percentages
@@ -36,7 +36,7 @@ class AUIElement : public IUIElement {
          * @param width Element width
          * @param height Element height
          */
-        AUIElement(std::shared_ptr<RayLib> raylib, float x, float y, float width,
+        AUIElement(std::shared_ptr<IDisplay> display, float x, float y, float width,
             float height);
 
         /**
@@ -78,7 +78,7 @@ class AUIElement : public IUIElement {
         UIRelativePosition getRelativePosition() const;
 
     protected:
-        std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<IDisplay> _display;
         Rectangle _bounds;
         UIRelativePosition _relativePos;
         bool _visible;

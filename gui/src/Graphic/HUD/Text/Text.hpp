@@ -12,6 +12,7 @@
 
 #include "../UIElement/AUIElement.hpp"
 #include "../../../RayLib/RayLib.hpp"
+#include "../../IDisplay.hpp"
 
 /**
  * @brief Text UI element
@@ -30,7 +31,7 @@ class Text : public AUIElement {
          * @param color Text color
          */
         Text(
-            std::shared_ptr<RayLib> raylib,
+            std::shared_ptr<IDisplay> raylib,
             float x, float y,
             const std::string& text,
             float fontSize = 20.0f,
@@ -107,5 +108,5 @@ class Text : public AUIElement {
         std::string _text;
         float _fontSize;
         Color _color;
-        std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<IDisplay> _display;
 };

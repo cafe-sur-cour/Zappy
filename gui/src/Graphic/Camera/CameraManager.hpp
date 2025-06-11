@@ -16,7 +16,7 @@
 
 class CameraManager {
     public:
-        explicit CameraManager(std::shared_ptr<RayLib> raylib);
+        explicit CameraManager(std::shared_ptr<IDisplay> display);
         ~CameraManager();
 
         void updateCamera(zappy::gui::CameraMode mode);
@@ -37,7 +37,7 @@ class CameraManager {
         void setMapInstance(std::shared_ptr<Map> map);
 
     private:
-        std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<Map> _map;
         Vector3 _mapCenter;

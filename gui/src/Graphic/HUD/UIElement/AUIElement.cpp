@@ -9,12 +9,12 @@
 #include <memory>
 
 AUIElement::AUIElement(
-    std::shared_ptr<RayLib> raylib,
+    std::shared_ptr<IDisplay> display,
     float x,
     float y,
     float width,
     float height)
-    : _raylib(raylib), _bounds({x, y, width, height}), _visible(true)
+    : _display(display), _bounds({x, y, width, height}), _visible(true)
 {
     _relativePos.xPercent = 0;
     _relativePos.yPercent = 0;
@@ -35,7 +35,7 @@ Rectangle AUIElement::getBounds() const
 
 bool AUIElement::contains(float x, float y) const
 {
-    return _raylib->checkCollisionPointRec({x, y}, _bounds);
+    return this->_display->checkCollisionPointRec({x, y}, _bounds);
 }
 
 void AUIElement::setVisible(bool visible)

@@ -10,7 +10,7 @@
 #include <string>
 #include <memory>
 #include <vector>
-#include "../../../RayLib/RayLib.hpp"
+#include "../../IDisplay.hpp"
 
 /**
  * @brief Interface for HUD containers

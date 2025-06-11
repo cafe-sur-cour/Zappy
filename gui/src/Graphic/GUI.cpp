@@ -17,21 +17,22 @@
 GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _gameInfos(gameInfos)
 {
-    _raylib = std::make_shared<RayLib>();
+    this->_display = std::make_shared<RayLib>();
 
     _cameraMode = zappy::gui::CameraMode::FREE;
-    _windowWidth = _raylib->getMonitorWidth(0);
-    _windowHeight = _raylib->getMonitorHeight(0);
+    auto monitorSize = this->_display->getMonitorSize();
+    this->_windowWidth = monitorSize.first;
+    this->_windowHeight = monitorSize.second;
 
-    _raylib->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
-    _raylib->initCamera();
-    _isRunning = _raylib->isWindowReady();
-    _raylib->setTargetFPS(zappy::gui::FPS);
-    _audio = std::make_shared<Audio>();
-    _map = std::make_unique<Map>(_gameInfos, _raylib);
-    _hud = std::make_unique<HUD>(_raylib, _gameInfos, _audio);
+    this->_display->initWindow(this->_windowWidth, this->_windowHeight, zappy::gui::WINDOW_TITLE);
+    this->_display->initCamera();
+    _isRunning = this->_display->isWindowReady();
+    this->_display->setTargetFPS(zappy::gui::FPS);
+    this->_audio = std::make_shared<Audio>();
+    this->_map = std::make_unique<Map>(_gameInfos, this->_display);
+    this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio);
 
-    _cameraManager = std::make_unique<CameraManager>(_raylib);
+    _cameraManager = std::make_unique<CameraManager>(this->_display);
     _cameraManager->setGameInfos(_gameInfos);
     _cameraManager->setMapInstance(std::shared_ptr<Map>(_map.get(), [](Map*){}));
     const auto& mapSize = _gameInfos->getMapSize();
@@ -48,7 +49,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
 
 GUI::~GUI()
 {
-    _raylib->closeWindow();
+    this->_display->closeWindow();
 }
 
 void GUI::run()
@@ -70,18 +71,17 @@ void GUI::updateCamera()
 
 void GUI::update()
 {
-    if (this->_raylib->windowShouldClose())
-        this->_isRunning = false;
-    if (_raylib->isKeyReleased(KEY_TAB) ||
-        _raylib->isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_SHOULDER))
+    this->_isRunning = this->_display->isOpen();
+    if (this->_display->isKeyReleased(KEY_TAB) ||
+        this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_LEFT_SHOULDER)))
         switchCameraModeNext();
 
     if (_cameraMode == zappy::gui::CameraMode::PLAYER) {
-        if (_raylib->isKeyReleased(KEY_UP) ||
-            _raylib->isGamepadButtonReleased(0, GAMEPAD_BUTTON_UP))
+        if (this->_display->isKeyReleased(KEY_UP) ||
+            this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_UP)))
             switchToNextPlayer();
-        if (_raylib->isKeyReleased(KEY_DOWN) ||
-            _raylib->isGamepadButtonReleased(0, GAMEPAD_BUTTON_DOWN))
+        if (this->_display->isKeyReleased(KEY_DOWN) ||
+            this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_DOWN)))
             switchToPreviousPlayer();
     }
 
@@ -97,19 +97,19 @@ bool GUI::isRunning()
 
 void GUI::draw()
 {
-    if (!_isRunning || _raylib->windowShouldClose())
+    if (!_isRunning)
         return;
 
-    _raylib->beginDrawing();
-    _raylib->clearBackground(RAYWHITE);
+    this->_display->beginDrawing();
+    this->_display->clearBackground(RAYWHITE);
 
-    _raylib->begin3DMode();
+    this->_display->begin3DMode();
     _map->draw();
-    _raylib->end3DMode();
+    this->_display->end3DMode();
 
     _hud->draw();
 
-    _raylib->endDrawing();
+    this->_display->endDrawing();
 }
 
 int GUI::getWindowWidth() const
@@ -122,23 +122,23 @@ int GUI::getWindowHeight() const
 }
 void GUI::setWindowWidth(int width)
 {
-    if (width <= 0 || width > _raylib->getMonitorWidth(0))
+    if (width <= 0 || width > this->_display->getMonitorWidth(0))
         return;
 
     _windowWidth = width;
-    _raylib->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
-    _hud->handleResize(_raylib->getScreenWidth(), _raylib->getScreenHeight(),
+    this->_display->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
+    _hud->handleResize(this->_display->getScreenWidth(), this->_display->getScreenHeight(),
         _windowWidth, _windowHeight);
 }
 
 void GUI::setWindowHeight(int height)
 {
-    if (height <= 0 || height > _raylib->getMonitorHeight(0))
+    if (height <= 0 || height > this->_display->getMonitorHeight(0))
         return;
 
     _windowHeight = height;
-    _raylib->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
-    _hud->handleResize(_raylib->getScreenWidth(), _raylib->getScreenHeight(),
+    this->_display->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
+    _hud->handleResize(this->_display->getScreenWidth(), this->_display->getScreenHeight(),
         _windowWidth, _windowHeight);
 }
 
@@ -262,7 +262,7 @@ void GUI::switchToPreviousPlayer()
 
 void GUI::initModels()
 {
-    if (!_raylib->loadModel("player", "gui/assets/models/fallguys.glb", {0.0f, 0.0f, 475.0f}))
+    if (!this->_display->loadModel("player", "gui/assets/models/fallguys.glb", {0.0f, 0.0f, 475.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load player model."
                   << colors::RESET << std::endl;
 }

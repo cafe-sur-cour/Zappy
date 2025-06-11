@@ -17,6 +17,7 @@
 #include "../Audio/IAudio.hpp"
 #include "../Utils/Constants.hpp"
 #include "Camera/CameraManager.hpp"
+#include "../IDisplay.hpp"
 
 class GUI {
     public:
@@ -48,7 +49,7 @@ class GUI {
         void initModels();
 
         bool _isRunning;
-        std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<Map> _map;
         std::unique_ptr<HUD> _hud;

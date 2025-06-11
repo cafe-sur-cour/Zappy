@@ -10,7 +10,7 @@
 #include <memory>
 #include <string>
 #include "../Containers/Containers.hpp"
-#include "../../../RayLib/RayLib.hpp"
+#include "../../IDisplay.hpp"
 #include "../../../Audio/IAudio.hpp"
 
 /**
@@ -27,7 +27,7 @@ class Help {
          * @param raylib Reference to the RayLib instance
          * @param audio Reference to the audio system
          */
-        Help(std::shared_ptr<RayLib> raylib, std::shared_ptr<IAudio> audio);
+        Help(std::shared_ptr<IDisplay> display, std::shared_ptr<IAudio> audio);
 
         /**
          * @brief Destroy the Help object
@@ -77,7 +77,7 @@ class Help {
          */
         void initHelpContainer();
 
-        std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<IDisplay> _display;
         std::shared_ptr<IAudio> _audio;
         std::shared_ptr<Containers> _helpContainer;
         bool _visible;

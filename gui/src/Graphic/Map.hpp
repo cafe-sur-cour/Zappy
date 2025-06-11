@@ -11,8 +11,11 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
+#include "../../RayLib/RayLib.hpp"
 #include "../Game/GameInfos.hpp"
-#include "../RayLib/RayLib.hpp"
+#include "../IDisplay.hpp"
+
+//TODO(noa) : Retier le raylib, faire attention au couleurs
 
 enum class DisplayPriority {
     TILE = 0,
@@ -24,7 +27,7 @@ enum class DisplayPriority {
 
 class Map {
     public:
-        Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<RayLib> raylib);
+        Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<IDisplay> display);
         ~Map();
 
         void draw();
@@ -39,7 +42,7 @@ class Map {
 
     private:
         std::shared_ptr<GameInfos> _gameInfos;
-        std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<IDisplay> _display;
         std::unordered_map<std::string, Color> _teamColors;
 
         static constexpr float BASE_HEIGHT_TILE = 0.0f;

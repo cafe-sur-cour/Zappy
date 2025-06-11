@@ -39,7 +39,7 @@ class AContainers : public IContainers {
          * @param width Container width
          * @param height Container height
          */
-        AContainers(std::shared_ptr<RayLib> raylib, float x, float y, float width,
+        AContainers(std::shared_ptr<IDisplay> display, float x, float y, float width,
             float height);
 
         /**
@@ -78,7 +78,7 @@ class AContainers : public IContainers {
         void updatePositionFromRelative();
 
     protected:
-        std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<IDisplay> _display;
         Rectangle _bounds;
         RelativePosition _relativePos;
         Color _backgroundColor;

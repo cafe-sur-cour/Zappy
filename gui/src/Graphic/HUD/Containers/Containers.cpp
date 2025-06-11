@@ -10,15 +10,14 @@
 #include <memory>
 
 Containers::Containers(
-    std::shared_ptr<RayLib> raylib,
+    std::shared_ptr<IDisplay> display,
     std::shared_ptr<IAudio> audio,
     float x,
     float y,
     float width,
     float height,
     Color backgroundColor)
-    : AContainers(raylib, x, y, width, height),
-      _raylib(raylib),
+    : AContainers(display, x, y, width, height),
       _audio(audio),
       _hasBackgroundTexture(false),
       _elements()
@@ -29,7 +28,7 @@ Containers::Containers(
 Containers::~Containers()
 {
     if (_hasBackgroundTexture)
-        _raylib->unloadTexture(_backgroundTexture);
+        this->_display->unloadTexture(_backgroundTexture);
 }
 
 void Containers::draw()
@@ -37,7 +36,7 @@ void Containers::draw()
     if (!_visible)
         return;
 
-    _raylib->beginScissorMode(
+    this->_display->beginScissorMode(
         static_cast<int>(_bounds.x),
         static_cast<int>(_bounds.y),
         static_cast<int>(_bounds.width),
@@ -46,12 +45,12 @@ void Containers::draw()
 
     if (_hasBackground) {
         if (_hasBackgroundTexture) {
-            _raylib->drawTextureRec(_backgroundTexture,
+            this->_display->drawTextureRec(_backgroundTexture,
                 (Rectangle){0, 0, _bounds.width, _bounds.height},
                 (Vector2){_bounds.x, _bounds.y},
                 WHITE);
         } else {
-            _raylib->drawRectangleRec(_bounds, _backgroundColor);
+            this->_display->drawRectangleRec(_bounds, _backgroundColor);
         }
     }
 
@@ -62,7 +61,7 @@ void Containers::draw()
         pair.second->draw();
     }
 
-    _raylib->endScissorMode();
+    this->_display->endScissorMode();
 
     for (auto& pair : _elements) {
         if (pair.first.find("scrollbar") != std::string::npos) {
@@ -94,7 +93,7 @@ void Containers::setHasBackground(bool hasBackground)
 void Containers::setBackgroundTexture(Texture2D texture)
 {
     if (_hasBackgroundTexture)
-        _raylib->unloadTexture(_backgroundTexture);
+        this->_display->unloadTexture(_backgroundTexture);
 
     _backgroundTexture = texture;
     _hasBackgroundTexture = true;
@@ -159,7 +158,7 @@ std::shared_ptr<Button> Containers::addButton(
     std::function<void()> callback
 )
 {
-    auto button = std::make_shared<Button>(_raylib, _audio, x, y, width,
+    auto button = std::make_shared<Button>(this->_display, _audio, x, y, width,
         height, text, callback);
 
     if (addElement(id, button))
@@ -180,7 +179,7 @@ std::shared_ptr<Button> Containers::addButton(
     Color textColor
 )
 {
-    auto button = std::make_shared<Button>(_raylib, _audio, x, y, width, height,
+    auto button = std::make_shared<Button>(this->_display, _audio, x, y, width, height,
         text, callback);
     button->setColors(normalColor, hoverColor, pressedColor, textColor);
 
@@ -198,7 +197,7 @@ std::shared_ptr<Text> Containers::addText(
     Color color
 )
 {
-    auto textElement = std::make_shared<Text>(_raylib, x, y, text, fontSize, color);
+    auto textElement = std::make_shared<Text>(this->_display, x, y, text, fontSize, color);
 
     if (addElement(id, textElement))
         return textElement;
@@ -284,7 +283,7 @@ std::shared_ptr<Button> Containers::addButtonPercent(
     float width = (_bounds.width * widthPercent) / 100.0f;
     float height = (_bounds.height * heightPercent) / 100.0f;
 
-    auto button = std::make_shared<Button>(_raylib, _audio, x, y, width, height,
+    auto button = std::make_shared<Button>(this->_display, _audio, x, y, width, height,
         text, callback);
 
     button->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
@@ -334,7 +333,7 @@ std::shared_ptr<Text> Containers::addTextPercent(
     float y = (_bounds.height * yPercent) / 100.0f;
     float fontSize = (_bounds.height * fontSizePercent) / 100.0f;
 
-    auto textElement = std::make_shared<Text>(_raylib, x, y, text, fontSize, color);
+    auto textElement = std::make_shared<Text>(this->_display, x, y, text, fontSize, color);
 
     textElement->setRelativePosition(xPercent, yPercent, 0.0f, fontSizePercent);
 

@@ -12,11 +12,10 @@
 #include <vector>
 #include <string>
 
-#include "../RayLib/RayLib.hpp"
 #include "Map.hpp"
 
-Map::Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<RayLib> raylib)
-    : _gameInfos(std::move(gameInfos)), _raylib(raylib)
+Map::Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<IDisplay> display)
+    : _gameInfos(std::move(gameInfos)), _display(display)
 {
 }
 
@@ -56,8 +55,8 @@ void Map::drawTile(int x, int y, const zappy::structs::Tile &tile)
     Vector3 position = {static_cast<float>(x), 0.0f, static_cast<float>(y)};
 
     (void)tile;
-    _raylib->drawCube(position, 0.9f, 0.2f, 0.9f, LIGHTGRAY);
-    _raylib->drawCubeWires(position, 0.9f, 0.2f, 0.9f, BLACK);
+    this->_display->drawCube(position, 0.9f, 0.2f, 0.9f, LIGHTGRAY);
+    this->_display->drawCubeWires(position, 0.9f, 0.2f, 0.9f, BLACK);
 }
 
 void Map::drawPlayers(int x, int y)
@@ -95,7 +94,7 @@ void Map::drawPlayers(int x, int y)
             case 3: rotationAngle = 270.0f; break;
         }
 
-        _raylib->drawModelEx("player", position, {0.0f, 1.0f, 0.0f},
+        this->_display->drawModelEx("player", position, {0.0f, 1.0f, 0.0f},
             rotationAngle, {zappy::gui::PLAYER_SCALE, zappy::gui::PLAYER_SCALE,
                 zappy::gui::PLAYER_SCALE}, teamColor);
         drawOrientationArrow(position, playersOnTile[i]->orientation,
@@ -123,7 +122,7 @@ void Map::drawOrientationArrow(const Vector3 &position, int orientation, float p
         case 2: end.z += arrowLength; break;
         case 3: end.x -= arrowLength; break;
     }
-    _raylib->drawCylinderEx(start, end, 0.05f, 0.05f, 8, RED);
+    this->_display->drawCylinderEx(start, end, 0.05f, 0.05f, 8, RED);
 
     Vector3 coneStart = end;
     Vector3 coneEnd;
@@ -134,7 +133,7 @@ void Map::drawOrientationArrow(const Vector3 &position, int orientation, float p
         case 2: coneEnd = {end.x, end.y, end.z + arrowHeadSize}; break;
         case 3: coneEnd = {end.x - arrowHeadSize, end.y, end.z}; break;
     }
-    _raylib->drawCylinderEx(coneStart, coneEnd, arrowWidth, 0.0f, 8, RED);
+    this->_display->drawCylinderEx(coneStart, coneEnd, arrowWidth, 0.0f, 8, RED);
 }
 
 void Map::drawEggs(int x, int y)
@@ -158,8 +157,8 @@ void Map::drawEggs(int x, int y)
         };
 
         Color teamColor = getTeamColor(eggsOnTile[i]->teamName);
-        _raylib->drawSphere(position, eggRadius, teamColor);
-        _raylib->drawSphereWires(position, eggRadius, 8, 8, BLACK);
+        this->_display->drawSphere(position, eggRadius, teamColor);
+        this->_display->drawSphereWires(position, eggRadius, 8, 8, BLACK);
     }
 }
 
@@ -178,8 +177,8 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
             static_cast<float>(y)
         };
 
-        _raylib->drawCube(position, foodSize, foodSize, foodSize, foodColor);
-        _raylib->drawCubeWires(position, foodSize, foodSize, foodSize, BLACK);
+        this->_display->drawCube(position, foodSize, foodSize, foodSize, foodColor);
+        this->_display->drawCubeWires(position, foodSize, foodSize, foodSize, BLACK);
     }
 }
 
@@ -200,8 +199,8 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
             static_cast<float>(y)
         };
 
-        _raylib->drawCube(position, foodSize, foodSize, foodSize, rockColor);
-        _raylib->drawCubeWires(position, foodSize, foodSize, foodSize, BLACK);
+        this->_display->drawCube(position, foodSize, foodSize, foodSize, rockColor);
+        this->_display->drawCubeWires(position, foodSize, foodSize, foodSize, BLACK);
     }
 }
 

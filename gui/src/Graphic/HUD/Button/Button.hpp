@@ -12,8 +12,8 @@
 #include <memory>
 
 #include "../UIElement/AUIElement.hpp"
-#include "../../../RayLib/RayLib.hpp"
 #include "../../../Audio/IAudio.hpp"
+#include "../../IDisplay.hpp"
 
 /**
  * @brief Button UI element
@@ -33,7 +33,7 @@ class Button : public AUIElement {
          * @param callback Function to call when button is clicked
          */
         Button(
-            std::shared_ptr<RayLib> raylib,
+            std::shared_ptr<IDisplay> display,
             std::shared_ptr<IAudio> audio,
             float x, float y,
             float width, float height,
@@ -112,6 +112,6 @@ class Button : public AUIElement {
         bool _isHovered;
         bool _isPressed;
 
-        std::shared_ptr<RayLib> _raylib;
+        std::shared_ptr<IDisplay> _display;
         std::shared_ptr<IAudio> _audio;
 };

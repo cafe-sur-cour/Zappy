@@ -14,11 +14,11 @@
 #include "../../Utils/Constants.hpp"
 #include "HUD.hpp"
 
-HUD::HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos,
+HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
          std::shared_ptr<IAudio> audio)
-    : _containers(), _raylib(raylib), _gameInfos(gameInfos), _audio(audio)
+    : _containers(), _display(display), _gameInfos(gameInfos), _audio(audio)
 {
-    _help = std::make_shared<Help>(raylib, audio);
+    _help = std::make_shared<Help>(display, audio);
     initDefaultLayout(15.0f, 20.0f);
     initExitButton();
     initSettingsButton();
@@ -34,7 +34,7 @@ HUD::~HUD()
 
 void HUD::draw()
 {
-    for (auto& pair : _containers) {
+    for (auto &pair : _containers) {
         pair.second->draw();
     }
 
@@ -67,7 +67,7 @@ std::shared_ptr<Containers> HUD::addContainer(
         return nullptr;
 
     auto container = std::make_shared<Containers>(
-        _raylib,
+        _display,
         _audio,
         x,
         y,
@@ -124,8 +124,9 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
     if (bottomHeightPercent <= 0.0f)
         bottomHeightPercent = 20.0f;
 
-    int screenHeight = _raylib->getScreenHeight();
-    int screenWidth = _raylib->getScreenWidth();
+    std::pair<int, int> screenSize = this->_display->getScreenSize();
+    int screenHeight = screenSize.second;
+    int screenWidth = screenSize.first;
 
     float sideWidth = (screenWidth * sideWidthPercent) / 100.0f;
     float bottomHeight = (screenHeight * bottomHeightPercent) / 100.0f;
@@ -177,7 +178,7 @@ void HUD::initExitButton()
         70.0f, 15.0f,
         "EXIT",
         [this]() {
-            _raylib->closeWindow();
+            this->_display->closeWindow();
         },
         {240, 60, 60, 255},
         {255, 100, 100, 255},
