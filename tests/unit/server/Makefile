@@ -28,7 +28,9 @@ TESTS 	    =   tests_params.c			\
 				tests_look.c				\
 				tests_right.c				\
 				tests_left.c				\
-				tests_inventory.c
+				tests_inventory.c			\
+				tests_setObj.c				\
+				get_objects.c
 
 SRC 		=	../../../server/src/params.c					\
 				../../../server/src/messages.c					\
