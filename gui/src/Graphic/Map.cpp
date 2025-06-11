@@ -197,9 +197,6 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
         tile.mendiane <= 0 && tile.phiras <= 0 && tile.thystame <= 0)
         return;
 
-    Color rockColor = BLUE;
-    float foodSize = 0.25f;
-
     for (int i = 0; i < tile.linemate + tile.deraumere + tile.sibur + tile.mendiane +
             tile.phiras + tile.thystame; ++i) {
         Vector3 position = {
@@ -208,8 +205,8 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        _raylib->drawCube(position, foodSize, foodSize, foodSize, rockColor);
-        _raylib->drawCubeWires(position, foodSize, foodSize, foodSize, BLACK);
+        _raylib->drawModelEx("rock", position, {0.0f, 1.0f, 0.0f},
+            0.0f, {0.3f, 0.3f, 0.3f}, WHITE);
     }
 }
 
