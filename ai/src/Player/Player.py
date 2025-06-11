@@ -189,11 +189,15 @@ class Player:
         if not self.is_child_process:
             print(f"Command '{self.roombaState['lastCommand']}' failed")
 
+    def handleResponseOK(self) -> None:
+        return
+
     def handleCommandResponse(self, response: str) -> None:
         switcher = {
             "inventory": self.handleResponseInventory,
             "look": self.handleResponseLook,
             "ko": self.handleResponseKO,
+            "ok": self.handleResponseOK,
         }
         handler = switcher.get(response.strip(), None)
         if handler:
