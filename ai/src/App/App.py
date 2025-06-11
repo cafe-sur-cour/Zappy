@@ -6,7 +6,9 @@
 ##
 
 import os
+import sys
 import signal
+import time
 from src.Utils.Utils import (
     FAILURE,
     SUCCESS,
@@ -34,22 +36,53 @@ class App:
 
     def _signal_handler(self, signum, frame):
         if self.is_main_process:
-            print(f"\n{Colors.CYAN}Shutting down AI team {self.name}...{Colors.RESET}")
+            print(f"{Colors.CYAN}Shutting down AI team {self.name}...{Colors.RESET}")
             self.running = False
             self._cleanup_children()
+            exit(SUCCESS)
 
     def _cleanup_children(self):
         if not self.is_main_process:
             return
 
+        if len(self.childs) > 0:
+            print(f"{Colors.YELLOW}Terminating {len(self.childs)} AI child processes...{Colors.RESET}")
+
         for pid in self.childs:
             try:
                 os.kill(pid, signal.SIGTERM)
-                os.waitpid(pid, os.WNOHANG)
             except (ProcessLookupError, ChildProcessError):
                 pass
             except Exception:
                 pass
+
+        time.sleep(0.5)
+
+        force_killed = []
+        for pid in self.childs:
+            try:
+                os.kill(pid, 0)
+                os.kill(pid, signal.SIGKILL)
+                force_killed.append(pid)
+            except (ProcessLookupError, ChildProcessError):
+                pass
+            except Exception:
+                pass
+
+        for pid in self.childs:
+            try:
+                os.waitpid(pid, 0)
+            except (ProcessLookupError, ChildProcessError):
+                pass
+            except Exception:
+                pass
+
+        num_children = len(self.childs)
+        self.childs.clear()
+        if force_killed:
+            print(f"{Colors.RED}Force killed {len(force_killed)} AI child processes{Colors.RESET}")
+        if num_children > 0:
+            print(f"{Colors.GREEN}All AI processes terminated.{Colors.RESET}")
 
     def __del__(self):
         if self.is_main_process:
@@ -61,8 +94,8 @@ class App:
             return -1
         if pid == 0:
             self.is_main_process = False
-            signal.signal(signal.SIGINT, signal.SIG_DFL)
-            signal.signal(signal.SIGTERM, signal.SIG_DFL)
+            signal.signal(signal.SIGINT, self._child_signal_handler)
+            signal.signal(signal.SIGTERM, self._child_signal_handler)
 
             try:
                 p = Player(self.name, self.ip, self.port)
@@ -79,6 +112,11 @@ class App:
                 exit(FAILURE)
             exit(SUCCESS)
         return pid
+
+    def _child_signal_handler(self, signum, frame):
+        sys.stdout.flush()
+        sys.stderr.flush()
+        os._exit(SUCCESS)
 
     def run(self):
         print(f"{Colors.GREEN}Starting Zappy AI for team: {self.name}...{Colors.RESET}")
@@ -102,7 +140,12 @@ class App:
 
         try:
             player.startComThread()
-            player.loop()
+            while self.running:
+                try:
+                    player.loop()
+                    break
+                except KeyboardInterrupt:
+                    break
         except (CommunicationException, SocketException):
             print(f"{Colors.RED}Server connection lost for team {self.name}{Colors.RESET}")
             return FAILURE
