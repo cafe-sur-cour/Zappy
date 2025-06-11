@@ -12,13 +12,13 @@ import time
 from src.Utils.Utils import (
     FAILURE,
     SUCCESS,
-    Colors
 )
 from src.Player.Player import Player
 from src.Exceptions.Exceptions import (
     CommunicationException,
     SocketException
 )
+from src.Logger.Logger import Logger
 
 
 class App:
@@ -29,6 +29,7 @@ class App:
         self.childs: list[int] = []
         self.running = True
         self.is_main_process = True
+        self.logger = Logger()
 
         if self.is_main_process:
             signal.signal(signal.SIGINT, self._signal_handler)
@@ -36,7 +37,7 @@ class App:
 
     def _signal_handler(self, signum, frame):
         if self.is_main_process:
-            print(f"{Colors.CYAN}Shutting down AI team {self.name}...{Colors.RESET}")
+            self.logger.info(f"Shutting down AI team {self.name}...")
             self.running = False
             self._cleanup_children()
             exit(SUCCESS)
@@ -46,11 +47,7 @@ class App:
             return
 
         if len(self.childs) > 0:
-            print(
-                f"{Colors.YELLOW}"
-                f"Terminating {len(self.childs)} AI child processes..."
-                f"{Colors.RESET}"
-            )
+            self.logger.info(f"Terminating {len(self.childs)} AI child processes...")
 
         for pid in self.childs:
             try:
@@ -84,13 +81,9 @@ class App:
         num_children = len(self.childs)
         self.childs.clear()
         if force_killed:
-            print(
-                f"{Colors.RED}"
-                f"Force killed {len(force_killed)} AI child processes"
-                f"{Colors.RESET}"
-            )
+            self.logger.info(f"Force killed {len(force_killed)} AI child processes")
         if num_children > 0:
-            print(f"{Colors.GREEN}All AI processes terminated.{Colors.RESET}")
+            self.logger.success(f"All AI processes terminated.")
 
     def __del__(self):
         if self.is_main_process:
@@ -127,14 +120,14 @@ class App:
         os._exit(SUCCESS)
 
     def run(self):
-        print(f"{Colors.GREEN}Starting Zappy AI for team: {self.name}...{Colors.RESET}")
+        self.logger.success(f"Starting Zappy AI for team: {self.name}...")
         player = Player(self.name, self.ip, self.port)
         slots, x, y = 0, 0, 0
 
         try:
             slots, x, y = player.communication.connectToServer()
         except (CommunicationException, SocketException) as e:
-            print(f"{Colors.RED}Failed to connect to server: {e}{Colors.RESET}")
+            self.logger.error(f"Failed to connect to server: {e}")
             return FAILURE
 
         player.setMapSize(x, y)
@@ -155,17 +148,17 @@ class App:
                 except KeyboardInterrupt:
                     break
         except (CommunicationException, SocketException):
-            print(f"{Colors.RED}Server connection lost for team {self.name}{Colors.RESET}")
+            self.logger.error(f"Server connection lost for team {self.name}")
             return FAILURE
         except KeyboardInterrupt:
-            print(f"{Colors.YELLOW}Interrupted - shutting down team {self.name}{Colors.RESET}")
+            self.logger.info(f"Interrupted - shutting down team {self.name}")
             return SUCCESS
         except Exception as e:
-            print(f"{Colors.RED}Unexpected error in main player: {e}{Colors.RESET}")
+            self.logger.error(f"Unexpected error in main player: {e}")
             return FAILURE
         finally:
             if self.is_main_process:
-                print(f"{Colors.YELLOW}AI team {self.name} finished{Colors.RESET}")
+                self.logger.info(f"AI team {self.name} finished")
                 self._cleanup_children()
 
         return SUCCESS
