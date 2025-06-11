@@ -32,7 +32,7 @@ static void print_broadcast_server(player_t *source, player_t *dest, int orienta
 
 static int get_orientation(int x, int y)
 {
-    double angle = atan2(y, x) * 180.0 / 3.14159265358979323846;
+    double angle = atan2(y, x) * 180.0 / M_PI;
 
     if (angle >= -22.5 && angle < 22.5)
         return 3;
