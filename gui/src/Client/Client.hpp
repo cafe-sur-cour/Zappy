@@ -10,6 +10,7 @@
 
 #include <memory>
 #include <filesystem>
+#include <string>
 #include "../Utils/Constants.hpp"
 #include "../Communication/ICommunication.hpp"
 #include "../Game/GameInfos.hpp"

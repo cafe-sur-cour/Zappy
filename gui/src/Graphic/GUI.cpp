@@ -25,7 +25,8 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
         throw Exceptions::ModuleError(lib + ": Lib input empty");
     this->_dlLoader.Open(lib.c_str());
     if (!this->_dlLoader.getHandler())
-        throw Exceptions::ModuleError(lib + ": Failed to open library: " + std::string(dlerror()));
+        throw Exceptions::ModuleError(lib + ": Failed to open library: " +
+            std::string(dlerror()));
     using CreateFunc = std::shared_ptr<IDisplay>(*)();
     using GetTypeFunc = ModuleType_t(*)();
 

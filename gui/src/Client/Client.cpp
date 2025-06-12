@@ -9,6 +9,7 @@
 #include <memory>
 #include <thread>
 #include <chrono>
+#include <string>
 
 #include "Client.hpp"
 #include "../Communication/Communication.hpp"
@@ -47,7 +48,8 @@ void Client::_tryToCreateGuiWithSharedLibInFolder(const std::string &libPath)
         for (const auto &entry : std::filesystem::directory_iterator(libPath)) {
             if (entry.path().extension() == ".so") {
                 try {
-                    this->_gui = std::make_unique<GUI>(this->_gameInfos, entry.path().string());
+                    this->_gui = std::make_unique<GUI>(this->_gameInfos,
+                        entry.path().string());
                     break;
                 } catch (Exceptions::ModuleError &e) {
                     this->_gui = nullptr;
