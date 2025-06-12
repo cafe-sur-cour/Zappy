@@ -116,6 +116,16 @@ namespace Exceptions {
                                   "Receive Error: " + message +
                                   colors::RESET) {}
     };
+
+    class ModuleError : public std::exception {
+        private:
+            std::string _message = "";
+        public:
+            ModuleError(const std::string &msg) : _message(msg) {};
+            const char *what() const noexcept override {
+                return this->_message.c_str();
+            }
+    };
 }
 
 #endif /* !EXCEPTIONS_HPP_ */
