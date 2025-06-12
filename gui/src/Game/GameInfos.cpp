@@ -13,11 +13,12 @@
 
 #include "GameInfos.hpp"
 
-GameInfos::GameInfos() :
+GameInfos::GameInfos(std::shared_ptr<ICommunication> communication) :
     _mapWidth(0),
     _mapHeight(0),
     _gameOver(false)
 {
+    _communication = communication;
 }
 
 GameInfos::~GameInfos()
@@ -35,8 +36,12 @@ std::pair<int, int> GameInfos::getMapSize() const
     return std::make_pair(_mapWidth, _mapHeight);
 }
 
-void GameInfos::setTimeUnit(int timeUnit)
+void GameInfos::setTimeUnit(int timeUnit, bool sendToServer)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    if (sendToServer)
+        _communication->sendMessage("sst " + std::to_string(timeUnit) + "\n");
     _timeUnit = timeUnit;
 }
 

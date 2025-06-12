@@ -15,16 +15,17 @@
 #include <string>
 
 #include "../Utils/Constants.hpp"
+#include "../Communication/ICommunication.hpp"
 
 class GameInfos {
     public:
-        GameInfos();
+        GameInfos(std::shared_ptr<ICommunication> communication);
         ~GameInfos();
 
         void setMapSize(int width, int height);
         std::pair<int, int> getMapSize() const;
 
-        void setTimeUnit(int timeUnit);
+        void setTimeUnit(int timeUnit, bool sendToServer = false);
         int getTimeUnit() const;
 
         void updateTile(const zappy::structs::Tile tile);
@@ -77,6 +78,8 @@ class GameInfos {
         std::string _winningTeam;
 
         mutable std::mutex _dataMutex;
+
+        std::shared_ptr<ICommunication> _communication;
 };
 
 #endif /* !GAMEINFOS_HPP_ */
