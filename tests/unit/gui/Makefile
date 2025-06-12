@@ -48,7 +48,7 @@ CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 LIBS = -L../../../gui/src/Communication -lcommunication \
-		-L../../../gui/src/RayLib -lraylib_wrapper -lraylib \
+		-L../../../gui/src/RayLib \
 		-L../../../gui/src/Audio -laudio -lsfml-audio \
 		-lGL -lm -lpthread -ldl -lrt -lX11
 
