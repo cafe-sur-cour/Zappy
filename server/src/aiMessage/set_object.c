@@ -56,7 +56,6 @@ int add_elem_to_tile(zappy_t *zappy, int x, int y, char *name)
     return remove_crystal_from_tile(zappy, x, y, name);
 }
 
-
 static int rm_item_to_inventory(inventory_t *inventory, char *name)
 {
     item_handler_t handlers[] = {
