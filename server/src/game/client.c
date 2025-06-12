@@ -70,6 +70,8 @@ static player_t *malloc_player(void)
 {
     player_t *player = malloc(sizeof(player_t));
 
+    if (!player)
+        return NULL;
     player->id = -1;
     player->network = malloc(sizeof(network_t));
     if (!player->network) {
