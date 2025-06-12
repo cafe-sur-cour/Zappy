@@ -429,7 +429,10 @@ class Player:
                         break
                     self.handleCommandResponse(response)
 
-                if not self.communication.hasPendingCommands():
+                if (
+                    not self.communication.hasPendingCommands() and
+                    not self.inIncantation
+                ):
                     if self.canIncant:
                         self.incantationAction()
                     elif self.goToIncantation:
