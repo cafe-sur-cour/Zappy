@@ -19,7 +19,7 @@
 
 class GameInfos {
     public:
-        GameInfos(std::shared_ptr<ICommunication> communication);
+        explicit GameInfos(std::shared_ptr<ICommunication> communication);
         ~GameInfos();
 
         void setMapSize(int width, int height);

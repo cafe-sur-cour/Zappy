@@ -5,10 +5,12 @@
 ** Slider
 */
 
-#include "Slider.hpp"
 #include <chrono>
 #include <algorithm>
 #include <cmath>
+#include <string>
+#include <memory>
+#include "Slider.hpp"
 
 Slider::Slider(
     std::shared_ptr<RayLib> raylib,

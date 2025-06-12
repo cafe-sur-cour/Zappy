@@ -524,12 +524,11 @@ std::shared_ptr<Containers> HUD::createTpsContainer(
     float bottomHeight,
     float bottomHeightPercent)
 {
-    // Position TPS container in the top right corner
-    float containerWidth = 300.0f;  // Fixed width for the TPS container
-    float containerHeight = 60.0f;  // Fixed height for the TPS container
+    float containerWidth = 300.0f;
+    float containerHeight = 60.0f;
     (void)bottomHeight;
     (void)bottomHeightPercent;
-    
+
     auto tpsContainer = addContainer(
         "tps_container",
         screenWidth - containerWidth, 0,
@@ -538,15 +537,14 @@ std::shared_ptr<Containers> HUD::createTpsContainer(
     );
 
     if (tpsContainer) {
-        // Set relative position for top right corner
         float widthPercent = (containerWidth / screenWidth) * 100.0f;
         float heightPercent = (containerHeight / screenHeight) * 100.0f;
-        
+
         tpsContainer->setRelativePosition(
-            100.0f - widthPercent,  // X: right side
-            0,                      // Y: top
-            widthPercent,           // Width
-            heightPercent);         // Height
+            100.0f - widthPercent,
+            0,
+            widthPercent,
+            heightPercent);
     }
 
     return tpsContainer;
