@@ -143,6 +143,10 @@ class Player:
         self.canIncant: bool = False
 
         self.incantationPhase: str = "checkNbPlayers"
+        self.incantationLastCommand: str = None
+
+        self.goToIncantation: bool = False
+        self.incantationDirection: int = 0
 
     def __del__(self):
         try:
@@ -211,22 +215,6 @@ class Player:
                 self.communication.sendSetObject(stone)
                 return
 
-    def getDirectionFromSound(self, direction: int) -> str:
-        if direction == 0:
-            return "self"
-
-        direction_map = {
-            1: "forward",
-            2: "forwardLeft",
-            3: "left",
-            4: "backLeft",
-            5: "back",
-            6: "backRight",
-            7: "right",
-            8: "forwardRight"
-        }
-        return direction_map.get(direction, "unknown")
-
     def hasEnoughFoodForIncantation(self) -> bool:
         nbStones = sum(
             LVL_UPGRADES[self.level]["stones"].values()
@@ -279,25 +267,69 @@ class Player:
     def incantationAction(self) -> None:
         if self.incantationPhase == "checkNbPlayers":
             self.communication.sendLook()
+            self.incantationLastCommand = "look"
 
         elif self.incantationPhase == "dropStones":
             if not self.hasEnoughFoodForIncantation():
                 self.canIncant = False
                 self.incantationPhase = "checkNbPlayers"
                 return
-            stones = LVL_UPGRADES[self.level]["stones"]
+            stones: dict[str, int] = LVL_UPGRADES[self.level]["stones"]
             for stone, quantity in stones.items():
                 for _ in range(quantity):
                     self.communication.sendSetObject(stone)
             self.incantationPhase = "canStartIncantation"
+            self.incantationLastCommand = "set"
 
         elif self.incantationPhase == "canStartIncantation":
             self.communication.sendIncantation()
             self.incantationPhase = "startedIncantation"
-    
+            self.incantationLastCommand = "incantation"
+
         elif self.incantationPhase == "needMorePlayers":
             self.broadcaster.broadcastMessage(f"incantation {self.level}")
             self.incantationPhase = "checkNbPlayers"
+            self.incantationLastCommand = "broadcast"
+
+    def getDirectionFromSound(self, direction: int) -> list[()]:
+        stepsMap = {
+            1: [
+                self.communication.sendForward
+            ],
+            2: [
+                self.communication.sendForward
+            ],
+            3: [
+                self.communication.sendLeft,
+                self.communication.sendForward
+            ],
+            4: [
+                self.communication.sendRight,
+                self.communication.sendRight,
+                self.communication.sendForward
+            ],
+            5: [
+                self.communication.sendRight,
+                self.communication.sendRight,
+                self.communication.sendForward
+            ],
+            6: [
+                self.communication.sendRight,
+                self.communication.sendRight,
+                self.communication.sendForward
+            ],
+            7: [
+                self.communication.sendRight,
+                self.communication.sendForward
+            ],
+            8: [
+                self.communication.sendForward
+            ]
+        }
+        return stepsMap.get(direction, [])
+
+    def goToIncantationAction(self) -> None:
+        pass
 
     def handleResponseInventory(self) -> None:
         self.inventory = self.communication.getInventory() or self.inventory
@@ -316,8 +348,10 @@ class Player:
                     self.incantationPhase = "needMorePlayers"
 
     def handleResponseKO(self) -> None:
-        self.logger.error(f"Command '{self.roombaState['lastCommand']}' failed")
-        if self.canIncant and self.incantationPhase == "startedIncantation":
+        if not self.canIncant:
+            self.logger.error(f"Command '{self.roombaState['lastCommand']}' failed")
+        if self.canIncant:
+            self.logger.error(f"Command '{self.incantationLastCommand}' failed")
             self.incantationPhase = "checkNbPlayers"
             self.canIncant = False
 
@@ -360,10 +394,14 @@ class Player:
                 else:
                     switcher[key]()
                 return
-        handler = switcher.get(response.strip(), None)
-        if handler:
-            handler()
         self.logger.error(f"Unknown response: {response.strip()}")
+
+    def handleMessages(self, direction: int, message: str) -> None:
+        if message.startswith("incantation "):
+            lvl = message.split(" ")[1]
+            if lvl == self.level:
+                self.incantationDirection = direction
+                self.goToIncantation = True
 
     def loop(self) -> None:
         try:
@@ -372,8 +410,7 @@ class Player:
                     data = self.communication.getLastMessage()
                     direction = data[0]
                     message = self.broadcaster.revealMessage(data[1])
-                    if message and not self.is_child_process:
-                        self.logger.display(f"Received message: {message}")
+                    self.handleMessages(direction, message)
 
                 if self.communication.hasResponses():
                     response = self.communication.getLastResponse()
@@ -384,6 +421,8 @@ class Player:
                 if not self.communication.hasPendingCommands():
                     if self.canIncant:
                         self.incantationAction()
+                    elif self.goToIncantation:
+                        self.goToIncantationAction()
                     else:
                         self.roombaAction()
 
