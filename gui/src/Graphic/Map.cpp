@@ -157,8 +157,6 @@ void Map::drawEggs(int x, int y)
         }
     }
 
-    float eggRadius = 0.2f;
-
     for (size_t i = 0; i < eggsOnTile.size(); ++i) {
         Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
@@ -167,8 +165,15 @@ void Map::drawEggs(int x, int y)
         };
 
         Color32 teamColor = getTeamColor(eggsOnTile[i]->teamName);
-        this->_display->drawSphere(position, eggRadius, teamColor);
-        this->_display->drawSphereWires(position, eggRadius, 8, 8, CBLACK);
+
+        static float timeAccumulator = 0.0f;
+        timeAccumulator += this->_display->getFrameTime();
+
+        float rotationAngle = timeAccumulator * 0.50f +
+            static_cast<float>(x * 10 + y * 15 + i * 20);
+
+        this->_display->drawModelEx("egg", position, {0.0f, 1.0f, 0.0f},
+            rotationAngle, {zappy::gui::EGG_SCALE, zappy::gui::EGG_SCALE, zappy::gui::EGG_SCALE}, teamColor);
     }
 }
 
@@ -177,15 +182,27 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
     if (tile.food <= 0)
         return;
 
+    static float timeAccumulator = 0.0f;
+    timeAccumulator += this->_display->getFrameTime();
+
     for (int i = 0; i < tile.food; ++i) {
+        float baseHeight = getOffset(DisplayPriority::FOOD, x, y, static_cast<size_t>(i));
+        float phase = static_cast<float>(x * 10 + y * 15 + i * 20) * 0.1f;
+        float floatOffset = sin(timeAccumulator * zappy::gui::FOOD_FLOAT_SPEED + phase) *
+            zappy::gui::FOOD_FLOAT_AMPLITUDE;
         Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-            getOffset(DisplayPriority::FOOD, x, y, static_cast<size_t>(i)),
+            baseHeight + floatOffset,
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
+        float rotationAngle = timeAccumulator * 0.50f +
+            static_cast<float>(x * 10 + y * 15 + i * 20);
+
         this->_display->drawModelEx("food", position, {0.0f, 1.0f, 0.0f},
-            0.0f, {0.005f, 0.005f, 0.005f}, CWHITE);
+            rotationAngle,
+            {zappy::gui::FOOD_SCALE, zappy::gui::FOOD_SCALE, zappy::gui::FOOD_SCALE},
+            CWHITE);
     }
 }
 
@@ -203,8 +220,14 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
+        static float timeAccumulator = 0.0f;
+        timeAccumulator += this->_display->getFrameTime();
+
+        float rotationAngle = timeAccumulator * 0.50f +
+            static_cast<float>(x * 10 + y * 15 + i * 20);
+
         this->_display->drawModelEx("rock", position, {0.0f, 1.0f, 0.0f},
-            0.0f, {0.3f, 0.3f, 0.3f}, CWHITE);
+            rotationAngle, {0.2f, 0.2f, 0.2f}, CWHITE);
     }
 }
 
