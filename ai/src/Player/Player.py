@@ -397,9 +397,6 @@ class Player:
                 else:
                     switcher[key]()
                 return
-        handler = switcher.get(response.strip(), None)
-        if handler:
-            handler()
         self.logger.error(f"Unknown response: {response.strip()}")
 
     def loop(self) -> None:
