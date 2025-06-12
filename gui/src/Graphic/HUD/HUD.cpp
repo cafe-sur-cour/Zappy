@@ -36,7 +36,7 @@ HUD::~HUD()
 
 void HUD::draw()
 {
-    for (auto &pair : _containers) {
+    for (const auto &pair : _containers) {
         pair.second->draw();
     }
 

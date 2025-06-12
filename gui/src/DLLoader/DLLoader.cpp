@@ -1,6 +1,6 @@
 /*
 ** EPITECH PROJECT, 2025
-** B-OOP-400-NAN-4-1-raytracer-albane.merian
+** zappy
 ** File description:
 ** DLLoader
 */

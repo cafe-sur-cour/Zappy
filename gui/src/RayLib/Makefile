@@ -14,7 +14,7 @@ CXX = g++
 
 ENCAPPS = RaylibEnc/libZappyRayLibCpp.a
 
-CFLAGS = -std=c++20 -Wall -Wextra -Werror -fPIC -lraylib -g
+CFLAGS = -std=c++20 -Wall -Wextra -Werror -fPIC -lraylib
 
 OBJ = $(SRC:.cpp=.o)
 
@@ -23,7 +23,7 @@ all: $(NAME)
 
 $(NAME): $(ENCAPPS) $(OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Creating shared library $(NAME)...$(NC)"
-	$(CXX) -shared -o $(NAME) $(OBJ) $(ENCAPPS) $(CFLAGS) -fvisibility=hidden
+	$(CXX) -shared -o $(NAME) $(OBJ) $(ENCAPPS) $(CFLAGS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ Library $(NAME) created successfully!$(NC)"
 
 $(ENCAPPS):

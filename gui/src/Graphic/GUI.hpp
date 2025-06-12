@@ -26,8 +26,6 @@ class GUI {
 
         void run();
 
-        std::string getFirstSharedLibInFolder(const std::string &libPath = "./lib/");
-
         int getWindowWidth() const;
         int getWindowHeight() const;
         void setWindowWidth(int width);
@@ -42,6 +40,7 @@ class GUI {
         void switchToPreviousPlayer();
 
     private:
+        std::string _getFirstSharedLibInFolder(const std::string &libPath = "./lib/");
         void updateCamera();
         virtual void update();
         virtual void draw();

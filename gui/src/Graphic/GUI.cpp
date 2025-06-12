@@ -16,7 +16,7 @@
 #include "../Utils/Constants.hpp"
 #include "../Utils/GamepadConstants.hpp"
 
-std::string GUI::getFirstSharedLibInFolder(const std::string &libPath)
+std::string GUI::_getFirstSharedLibInFolder(const std::string &libPath)
 {
     try {
         for (const auto &entry : std::filesystem::directory_iterator(libPath)) {
@@ -34,7 +34,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _gameInfos(gameInfos)
 {
     this->_dlLoader = DLLoader<std::shared_ptr<IDisplay>>();
-    auto lib = this->getFirstSharedLibInFolder("./gui/lib/");
+    auto lib = this->_getFirstSharedLibInFolder("./gui/lib/");
     if (lib.empty()) {
         std::cerr << "NO lib found in the lib folder" << std::endl;
         exit(84);

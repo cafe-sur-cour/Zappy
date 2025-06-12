@@ -45,7 +45,8 @@ TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
 INCLUDES = -I./include -I./src
 
-CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror -L./src/DLLoader/ -lDLLoader  -g
+CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror -L./src/DLLoader/ \
+	-lDLLoader
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 LIBS = -L./src/Communication -lcommunication \
@@ -134,4 +135,5 @@ tests_run: communication_lib audio_lib $(SRC) $(TEST_SRC)
 	./$(UNIT_TESTS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ All tests completed!$(NC)"
 
-.PHONY: all clean fclean re communication_lib raylib_lib audio_lib coverage tests_run
+.PHONY: all clean fclean re communication_lib raylib_lib audio_lib coverage \
+	tests_run

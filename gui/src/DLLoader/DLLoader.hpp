@@ -1,6 +1,6 @@
 /*
 ** EPITECH PROJECT, 2025
-** arcade
+** zappy
 ** File description:
 ** DLLoader
 */
