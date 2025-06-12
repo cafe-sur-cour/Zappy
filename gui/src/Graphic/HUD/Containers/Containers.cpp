@@ -29,6 +29,10 @@ void Containers::draw()
     if (!_visible)
         return;
 
+    if (_hasBackground) {
+        this->_display->drawRectangleRec(_bounds, _backgroundColor);
+    }
+
     this->_display->beginScissorMode(
         {
             static_cast<int>(_bounds.x),
