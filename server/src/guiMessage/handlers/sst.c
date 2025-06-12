@@ -35,5 +35,6 @@ int sst(zappy_t *zappy, graph_net_t *graphic, char *message)
     if (send_sst_message(graphic, new_freq) == -1)
         return -1;
     zappy->params->freq = new_freq;
+    printf("Frequency updated to %d\n", new_freq);
     return 0;
 }
