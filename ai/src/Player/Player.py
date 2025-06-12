@@ -194,7 +194,7 @@ class Player:
         self.y = y
         self.roombaState["targetForward"] = max(x, y)
 
-    def getNeededStonesByPriority(self) -> list[str]:
+    def getNeededStonesByPriority(self) -> list[(str, int)]:
         neededStones = []
         if self.level == 8:
             return neededStones
@@ -203,7 +203,7 @@ class Player:
             neededQuantity = quantity - self.inventory.get(stone, 0)
             neededStones.append((neededQuantity, stone))
         neededStones.sort(key=lambda x: x[0], reverse=True)
-        neededStones = [stone for quantity, stone in neededStones if quantity > 0]
+        neededStones = [(stone, quantity) for quantity, stone in neededStones if quantity > 0]
         return neededStones
 
     def dropStonesForSurvival(self) -> None:
@@ -234,10 +234,12 @@ class Player:
                         self.communication.sendTakeObject("food")
                     tookStones = False
                     neededStones = self.getNeededStonesByPriority()
-                    for stone in neededStones:
-                        if stone in self.look[0].keys():
+                    tile = self.look[0]
+                    for stone, quantity in neededStones:
+                        if stone in tile.keys():
                             tookStones = True
-                            self.communication.sendTakeObject(stone)
+                            for _ in range(min(quantity, tile[stone])):
+                                self.communication.sendTakeObject(stone)
                     if tookStones:
                         self.communication.sendInventory()
                 self.roombaState["lastCommand"] = "take"
@@ -291,7 +293,7 @@ class Player:
             self.incantationPhase = "checkNbPlayers"
             self.incantationLastCommand = "broadcast"
 
-    def getDirectionFromSound(self, direction: int) -> list[()]:
+    def getStepsFromDirection(self) -> list[()]:
         stepsMap = {
             1: [
                 self.communication.sendForward
@@ -326,10 +328,15 @@ class Player:
                 self.communication.sendForward
             ]
         }
-        return stepsMap.get(direction, [])
+        return stepsMap.get(self.incantationDirection, [])
 
     def goToIncantationAction(self) -> None:
-        pass
+        if self.incantationDirection == 0:
+            self.inIncantation = True
+            return
+        steps = self.getStepsFromDirection()
+        for step in steps:
+            step()
 
     def handleResponseInventory(self) -> None:
         self.inventory = self.communication.getInventory() or self.inventory
@@ -354,6 +361,8 @@ class Player:
             self.logger.error(f"Command '{self.incantationLastCommand}' failed")
             self.incantationPhase = "checkNbPlayers"
             self.canIncant = False
+        self.inIncantation = False
+        self.goToIncantation = False
 
     def handleResponseOK(self) -> None:
         return
@@ -370,6 +379,8 @@ class Player:
                 self.level = new_level
                 self.canIncant = False
                 self.incantationPhase = "checkNbPlayers"
+                self.goToIncantation = False
+                self.inIncantation = False
             else:
                 self.logger.error(
                     f"Unexpected level response: got {new_level}, old level = {self.level}"
@@ -415,10 +426,14 @@ class Player:
                 if self.communication.hasResponses():
                     response = self.communication.getLastResponse()
                     if response.strip() == "dead":
+                        self.logger.display("Player died")
                         break
                     self.handleCommandResponse(response)
 
-                if not self.communication.hasPendingCommands():
+                if (
+                    not self.communication.hasPendingCommands() and
+                    not self.inIncantation
+                ):
                     if self.canIncant:
                         self.incantationAction()
                     elif self.goToIncantation:
