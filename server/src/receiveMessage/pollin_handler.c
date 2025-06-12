@@ -25,7 +25,7 @@ void free_action_request(action_request_t *action)
 
 static void write_end_incantation(player_t *player, zappy_t *zappy)
 {
-    char msg[19] = NULL;
+    char msg[19];
 
     if (handle_end_incantation(player, zappy) == 0) {
         snprintf(msg, 19, "Current level: %d\n", player->level);
