@@ -27,6 +27,7 @@ SRC =	../../../gui/src/Client/Client.cpp \
 		../../../gui/src/Graphic/HUD/Containers/Containers.cpp \
 		../../../gui/src/Graphic/HUD/Containers/AContainers.cpp \
 		../../../gui/src/Graphic/HUD/Text/Text.cpp \
+		../../../gui/src/Graphic/HUD/Slider/Slider.cpp \
 		../../../gui/src/Graphic/HUD/UIElement/AUIElement.cpp \
 		../../../gui/src/Graphic/HUD/HUD.cpp \
 		../../../gui/src/Graphic/Camera/CameraManager.cpp \
