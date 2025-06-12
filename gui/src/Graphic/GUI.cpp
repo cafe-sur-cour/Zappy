@@ -10,44 +10,36 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
-#include <filesystem>
 #include "GUI.hpp"
+#include "../Exceptions/Exceptions.hpp"
+#include "../DLLoader/LoaderType.hpp"
 #include "../Audio/Audio.hpp"
 #include "../Utils/Constants.hpp"
 #include "../Utils/GamepadConstants.hpp"
 
-std::string GUI::_getFirstSharedLibInFolder(const std::string &libPath)
-{
-    try {
-        for (const auto &entry : std::filesystem::directory_iterator(libPath)) {
-            if (entry.path().extension() == ".so") {
-                return entry.path().string();
-            }
-        }
-    } catch (const std::filesystem::filesystem_error &e) {
-        std::cerr << "Error accessing directory: " << e.what() << std::endl;
-    }
-    return "";
-}
-
-GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
-    _gameInfos(gameInfos)
+GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
+    : _isRunning(false), _gameInfos(gameInfos)
 {
     this->_dlLoader = DLLoader<std::shared_ptr<IDisplay>>();
-    auto lib = this->_getFirstSharedLibInFolder("./gui/lib/");
-    if (lib.empty()) {
-        std::cerr << "NO lib found in the lib folder" << std::endl;
-        exit(84);
-    }
+    if (lib.empty())
+        throw Exceptions::ModuleError(lib + ": Lib input empty");
     this->_dlLoader.Open(lib.c_str());
-    if (!this->_dlLoader.getHandler()) {
-        std::cerr << "Failed to open library: " << dlerror() << std::endl;
-        exit(84);
-    }
+    if (!this->_dlLoader.getHandler())
+        throw Exceptions::ModuleError(lib + ": Failed to open library: " +
+            std::string(dlerror()));
     using CreateFunc = std::shared_ptr<IDisplay>(*)();
-    CreateFunc create = reinterpret_cast<CreateFunc>(this->_dlLoader.Symbol("create"));
-    this->_display = create();
+    using GetTypeFunc = ModuleType_t(*)();
 
+    GetTypeFunc getTypeFunc = reinterpret_cast<GetTypeFunc>(this->_dlLoader.Symbol("getType"));
+    if (!getTypeFunc || getTypeFunc() != ModuleType_t::DISPLAY_MODULE)
+        throw Exceptions::ModuleError(lib + ": Not a valid module");
+
+    CreateFunc createFunc = reinterpret_cast<CreateFunc>(this->_dlLoader.Symbol("create"));
+    if (!createFunc)
+        throw Exceptions::ModuleError(lib + ": No create symbole found in the shared lib");
+    this->_display = createFunc();
+
+    std::cout << lib + ": Module GUI Found" << std::endl;
     _cameraMode = zappy::gui::CameraMode::FREE;
     auto monitorSize = this->_display->getMonitorSize();
     this->_windowWidth = monitorSize.x;
