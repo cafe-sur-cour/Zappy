@@ -42,7 +42,8 @@ void GameInfos::setTimeUnit(int timeUnit, bool sendToServer)
 
     if (sendToServer)
         _communication->sendMessage("sst " + std::to_string(timeUnit) + "\n");
-    _timeUnit = timeUnit;
+    else
+        _timeUnit = timeUnit;
 }
 
 int GameInfos::getTimeUnit() const
