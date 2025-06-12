@@ -7,6 +7,7 @@
 
 #include <string>
 #include <memory>
+#include <iostream>
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
@@ -27,6 +28,7 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
     initCameraResetButton();
     initTeamPlayersDisplay(_gameInfos);
     initTpsSlider(_gameInfos, _display, _audio);
+    this->_initHelpInformation();
 }
 
 HUD::~HUD()
@@ -160,6 +162,27 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
                             bottomHeightPercent);
 }
 
+void HUD::_initHelpInformation()
+{
+    auto bottomContainer = this->getBottomContainer();
+
+    bottomContainer->addTextPercent(
+        "cam_info_mode",
+        2.f, 10.f,
+        "Camera mod: NONE",
+        7.0f,
+        {245, 224, 80, 255}
+    );
+
+    bottomContainer->addTextPercent(
+        "help_cam_key",
+        2.f, 30.f,
+        "NONE",
+        7.0f,
+        {255, 236, 183, 255}
+    );
+}
+
 std::shared_ptr<Containers> HUD::getSideContainer() const
 {
     return getContainer("side_container");
@@ -263,8 +286,8 @@ void HUD::initCameraResetButton()
                 _resetCameraFunc();
             }
         },
-        {240, 240, 60, 255},
-        {255, 255, 100, 255},
+        {245, 224, 80, 255},
+        {255, 235, 120, 255},
         {200, 200, 40, 255},
         {255, 255, 255, 255}
     );
@@ -784,6 +807,80 @@ void HUD::initPlayerInventoryDisplay(int playerId)
         7.0f,
         {255, 20, 147, 255}
     );
+}
+
+std::string HUD::_camModeToText(zappy::gui::CameraMode cameraMode)
+{
+    switch (cameraMode)
+    {
+    case zappy::gui::CameraMode::FREE:
+        return "Free";
+    case zappy::gui::CameraMode::PLAYER:
+        return "Player";
+    case zappy::gui::CameraMode::TARGETED:
+        return "Targeted";
+    default:
+        return "Unknown";
+    }
+    return "Unknown";
+}
+
+std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAvailable)
+{
+    if (!isGamePadAvailable) {
+        switch (cameraMode)
+        {
+        case zappy::gui::CameraMode::FREE:
+            return "UP | DOWN | RIGHT | LEFT = Change camera direction\n\n"
+                "Z | Q | S | D = Move camera\n";
+        case zappy::gui::CameraMode::PLAYER:
+            return "UP | DOWN = Next / Previous player\n\n"
+                "RIGHT | LEFT = Change camera direction";
+        case zappy::gui::CameraMode::TARGETED:
+            return "UP | DOWN | RIGHT | LEFT = Rotate camera around map origin\n\n"
+                    "MouseWheel = Zoom / Unzoom\n";
+        default:
+            return "Unknown";
+        }
+    }
+    // TODO(NOA): Demander à Eliott
+    switch (cameraMode)
+    {
+    case zappy::gui::CameraMode::FREE:
+        return "Z | Q | S | D = Move camera\n\n"
+            "UP | DOWN | RIGHT | LEFT = Change camera direction\n";
+    case zappy::gui::CameraMode::PLAYER:
+        return "UP | DOWN = Next / Previous player\n\n"
+            "RIGHT | LEFT = Change camera direction";
+    case zappy::gui::CameraMode::TARGETED:
+        return "UP | DOWN | RIGHT | LEFT = Rotate camera around map origin\n\n"
+            "RT | LT = Zoom / Unzoom";
+    default:
+        return "Unknown";
+    }
+    return "Unknown";
+}
+
+void HUD::updateHelpInformationHUD(zappy::gui::CameraMode cameraMode)
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    auto camInfoElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("cam_info_mode"));
+    auto strCamMode = this->_camModeToText(cameraMode);
+    if (camInfoElem && camInfoElem->getText() != "Camera mod: " + strCamMode) {
+        camInfoElem->setText("Camera mod: " + strCamMode);
+        return;
+    }
+    auto keyHelp = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("help_cam_key"));
+    auto camHelpKey = this->_camKeyHelp(cameraMode, this->_display->isGamepadAvailable());
+    if (keyHelp && keyHelp->getText() != camHelpKey) {
+        keyHelp->setText(camHelpKey);
+        return;
+    }
 }
 
 void HUD::updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode cameraMode)
