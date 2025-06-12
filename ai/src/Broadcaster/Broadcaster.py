@@ -15,7 +15,6 @@ class Broadcaster:
         self.hasher = Hash(team)
 
     def revealMessage(self, message: str) -> str:
-        message = ""
         try:
             message = self.hasher.unHashMessage(message.strip())
         except Exception as e:
