@@ -15,6 +15,7 @@
 
 const graphic_pf_t GRAPHIC_COMMAND[] = {
     {"msz\n", &msz},
+    {"bct\n", &bct},
     {NULL, NULL}
 };
 
@@ -73,8 +74,9 @@ static int poll_graphic_commands(zappy_t *zappy, graph_net_t *current,
     char *buffer)
 {
     for (int i = 0; GRAPHIC_COMMAND[i].command != NULL; i++) {
-        if (strcmp(GRAPHIC_COMMAND[i].command, buffer) == 0)
-            return GRAPHIC_COMMAND[i].handler(zappy, current);
+        if (strncmp(GRAPHIC_COMMAND[i].command, buffer,
+            strlen(GRAPHIC_COMMAND[i].command)) == 0)
+            return GRAPHIC_COMMAND[i].handler(zappy, current, buffer);
     }
     return -1;
 }

@@ -66,7 +66,7 @@ typedef struct {
 
 typedef struct graphic_pf_s {
     char *command;
-    int (*handler)(zappy_t *zappy, graph_net_t *graphic);
+    int (*handler)(zappy_t *zappy, graph_net_t *graphic, char *message);
 } graphic_pf_t;
 
 /* messages.c */
@@ -226,6 +226,7 @@ void rm_phiras(inventory_t *inventory);
 void rm_thystame(inventory_t *inventory);
 
 /* Element handler.c */
-int msz(zappy_t *zappy, graph_net_t *graphic);
+int msz(zappy_t *zappy, graph_net_t *graphic, char *message);
+int bct(zappy_t *zappy, graph_net_t *graphic, char *message);
 
 #endif /* !ZAPPY_H_ */
