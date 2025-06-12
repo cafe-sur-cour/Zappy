@@ -329,7 +329,14 @@ class Player:
         return stepsMap.get(direction, [])
 
     def goToIncantationAction(self) -> None:
-        pass
+        if self.incantationDirection == 0:
+            return
+        steps = self.getStepsFromDirection()
+        for step in steps:
+            step()
+        self.goToIncantation = False
+        self.roombaState["lastCommand"] = "forward"
+        self.roombaState["forwardCount"] = 0
 
     def handleResponseInventory(self) -> None:
         self.inventory = self.communication.getInventory() or self.inventory
