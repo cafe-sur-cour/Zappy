@@ -426,6 +426,7 @@ class Player:
                 if self.communication.hasResponses():
                     response = self.communication.getLastResponse()
                     if response.strip() == "dead":
+                        self.logger.display("Player died")
                         break
                     self.handleCommandResponse(response)
 
