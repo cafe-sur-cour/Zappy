@@ -9,6 +9,7 @@
 #define GUI_HPP_
 
 #include <memory>
+#include <string>
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
 #include "HUD/HUD.hpp"
