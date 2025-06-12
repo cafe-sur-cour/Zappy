@@ -276,18 +276,6 @@ class HUD {
             float bottomHeightPercent);
 
         /**
-         * @brief Record element positions for scrolling
-         *
-         * @param container The container with elements
-         * @param initialYPositions Map to store initial positions
-         * @param lastContainerHeight Last container height for comparison
-         */
-        void recordElementPositions(
-            std::shared_ptr<Containers> container,
-            std::unordered_map<std::string, float>& initialYPositions,
-            float& lastContainerHeight);
-
-        /**
          * @brief Update elements positions based on scroll value
          *
          * @param container The container with elements

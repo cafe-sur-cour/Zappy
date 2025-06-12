@@ -79,7 +79,8 @@ void CameraManager::updateCameraTargetMode()
         int screenCenterX = screenSize.x / 2;
         int screenCenterY = screenSize.y / 2;
 
-        this->_display->setMousePosition({static_cast<float>(screenCenterX), static_cast<float>(screenCenterY)});
+        this->_display->setMousePosition({static_cast<float>(screenCenterX),
+            static_cast<float>(screenCenterY)});
         this->_display->disableCursor();
     }
 
@@ -103,7 +104,8 @@ void CameraManager::updateCameraTargetMode()
             Vector2i screenSize = this->_display->getScreenSize();
             int screenCenterX = screenSize.x / 2;
             int screenCenterY = screenSize.y / 2;
-            this->_display->setMousePosition({static_cast<float>(screenCenterX), static_cast<float>(screenCenterY)});
+            this->_display->setMousePosition({static_cast<float>(screenCenterX),
+                static_cast<float>(screenCenterY)});
         }
     }
 
@@ -117,8 +119,10 @@ void CameraManager::updateCameraTargetMode()
         if (_targetDistance > 100.0f) _targetDistance = 100.0f;
     }
 
-    bool isZoomingIn = this->_display->isGamepadButtonDown(this->_display->getKeyId(GM_PD_RIGHT_TRIGGER));
-    bool isZoomingOut = this->_display->isGamepadButtonDown(this->_display->getKeyId(GM_PD_LEFT_TRIGGER));
+    bool isZoomingIn = this->_display->isGamepadButtonDown(
+        this->_display->getKeyId(GM_PD_RIGHT_TRIGGER));
+    bool isZoomingOut = this->_display->isGamepadButtonDown(
+        this->_display->getKeyId(GM_PD_LEFT_TRIGGER));
     if (isZoomingIn) {
         _targetDistance -= zappy::gui::CAMERA_SPEED * deltaTime;
         if (_targetDistance < 5.0f) _targetDistance = 5.0f;
@@ -135,8 +139,10 @@ void CameraManager::updateCameraTargetMode()
         _targetAngleXZ -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
 
     if (this->_display->isGamepadAvailable()) {
-        float rightStickX = this->_display->getGamepadAxisMovement(this->_display->getKeyId(GM_PD_AXIS_RIGHT_X));
-        float rightStickY = this->_display->getGamepadAxisMovement(this->_display->getKeyId(GM_PD_AXIS_RIGHT_Y));
+        float rightStickX = this->_display->getGamepadAxisMovement(
+            this->_display->getKeyId(GM_PD_AXIS_RIGHT_X));
+        float rightStickY = this->_display->getGamepadAxisMovement(
+            this->_display->getKeyId(GM_PD_AXIS_RIGHT_Y));
 
         if (fabs(rightStickX) > zappy::gui::GAMEPAD_DEADZONE)
             _targetAngleXZ += rightStickX * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
@@ -191,7 +197,8 @@ void CameraManager::handlePlayerCameraMouseInput()
 
     if (this->_display->isMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
         _isPlayerViewDragging = true;
-        this->_display->setMousePosition({static_cast<float>(screenCenterX), static_cast<float>(screenCenterY)});
+        this->_display->setMousePosition({static_cast<float>(screenCenterX),
+            static_cast<float>(screenCenterY)});
         this->_display->disableCursor();
     }
 
@@ -205,7 +212,8 @@ void CameraManager::handlePlayerCameraMouseInput()
         const float rotationSensitivity = zappy::gui::CAMERA_SENSITIVITY;
 
         _playerAngleXZ += mouseDelta.x * rotationSensitivity;
-        this->_display->setMousePosition({static_cast<float>(screenCenterX), static_cast<float>(screenCenterY)});
+        this->_display->setMousePosition({static_cast<float>(screenCenterX),
+            static_cast<float>(screenCenterY)});
     }
 }
 
@@ -291,7 +299,8 @@ void CameraManager::updateCameraPlayerMode()
         _playerAngleXZ -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
 
     if (this->_display->isGamepadAvailable()) {
-        float rightStickX = this->_display->getGamepadAxisMovement(this->_display->getKeyId(GM_PD_AXIS_RIGHT_X));
+        float rightStickX = this->_display->getGamepadAxisMovement(
+            this->_display->getKeyId(GM_PD_AXIS_RIGHT_X));
 
         if (fabs(rightStickX) > zappy::gui::GAMEPAD_DEADZONE)
             _playerAngleXZ += rightStickX * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;

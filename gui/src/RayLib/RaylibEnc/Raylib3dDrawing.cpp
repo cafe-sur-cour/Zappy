@@ -12,7 +12,8 @@ void RayLibEnc::drawGrid(int slices, float spacing)
     DrawGrid(slices, spacing);
 }
 
-void RayLibEnc::drawCube(Vector3 position, float width, float height, float length, Color color)
+void RayLibEnc::drawCube(Vector3 position, float width, float height, float length,
+    Color color)
 {
     DrawCube(position, width, height, length, color);
 }

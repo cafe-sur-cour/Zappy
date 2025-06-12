@@ -5,9 +5,9 @@
 ** entryPoint
 */
 
+#include <memory>
 #include "../IDisplay.hpp"
 #include "Raylib.hpp"
-#include <memory>
 
 extern "C" {
     __attribute__((visibility("default")))

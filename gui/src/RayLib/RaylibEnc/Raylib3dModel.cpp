@@ -67,7 +67,8 @@ void RayLibEnc::drawModelEx(const std::string& id, Vector3 position, Vector3 rot
     }
 }
 
-void RayLibEnc::drawModelWires(const std::string& id, Vector3 position, float scale, Color tint)
+void RayLibEnc::drawModelWires(const std::string& id, Vector3 position,
+    float scale, Color tint)
 {
     auto it = _models.find(id);
     if (it != _models.end()) {

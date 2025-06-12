@@ -38,7 +38,8 @@ void RayLibEnc::drawRectangleRec(Rectangle rec, Color color)
     DrawRectangleRec(rec, color);
 }
 
-void RayLibEnc::drawText(const std::string& text, float x, float y, float fontSize, Color color)
+void RayLibEnc::drawText(const std::string& text, float x, float y, float fontSize,
+    Color color)
 {
     DrawText(text.c_str(),
              static_cast<int>(x),
@@ -52,7 +53,8 @@ float RayLibEnc::measureText(const std::string& text, float fontSize) const
     return static_cast<float>(MeasureText(text.c_str(), static_cast<int>(fontSize)));
 }
 
-void RayLibEnc::drawTextureRec(Texture2D texture, Rectangle source, Vector2 position, Color tint)
+void RayLibEnc::drawTextureRec(Texture2D texture, Rectangle source, Vector2 position,
+    Color tint)
 {
     DrawTextureRec(texture, source, position, tint);
 }

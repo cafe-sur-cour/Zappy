@@ -60,7 +60,8 @@ void Button::update()
     _isHovered = contains(mousePoint.x, mousePoint.y);
 
     bool wasPressed = _isPressed;
-    _isPressed = _isHovered && this->_display->isMouseButtonDown(this->_display->getKeyId(MOUSE_LEFT));
+    _isPressed = _isHovered && this->_display->isMouseButtonDown(
+        this->_display->getKeyId(MOUSE_LEFT));
 
     if (wasPressed && !_isPressed && _isHovered && _callback) {
         _audio->playSound("click", 100.0f);

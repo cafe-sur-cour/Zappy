@@ -151,25 +151,35 @@ class IDisplay {
         virtual void endScissorMode() = 0;
         virtual void beginScissorMode(IntRect) = 0;
 
-        virtual bool loadModel(const std::string& id, const std::string& filepath, Vector3f center = {0.0f, 0.0f, 0.0f}) = 0;
+        virtual bool loadModel(const std::string& id, const std::string& filepath,
+            Vector3f center = {0.0f, 0.0f, 0.0f}) = 0;
 
-        virtual void drawCube(Vector3f position, float width, float height, float length, Color32 color) = 0;
-        virtual void drawCubeWires(Vector3f position, float width, float height, float length, Color32 color) = 0;
+        virtual void drawCube(Vector3f position, float width, float height, float length,
+            Color32 color) = 0;
+        virtual void drawCubeWires(Vector3f position, float width, float height, float length,
+            Color32 color) = 0;
 
         virtual void drawSphere(Vector3f position, float radius, Color32 color) = 0;
-        virtual void drawSphereWires(Vector3f position, float radius, int rings, int slices, Color32 color) = 0;
+        virtual void drawSphereWires(Vector3f position, float radius, int rings, int slices,
+            Color32 color) = 0;
 
-        virtual void drawCylinder(Vector3f position, float radiusTop, float radiusBottom, float height, int slices, Color32 color) = 0;
-        virtual void drawCylinderWires(Vector3f position, float radiusTop, float radiusBottom, float height, int slices, Color32 color) = 0;
-        virtual void drawCylinderEx(Vector3f startPos, Vector3f endPos, float startRadius, float endRadius, int sides, Color32 color) = 0;
+        virtual void drawCylinder(Vector3f position, float radiusTop, float radiusBottom,
+            float height, int slices, Color32 color) = 0;
+        virtual void drawCylinderWires(Vector3f position, float radiusTop, float radiusBottom,
+            float height, int slices, Color32 color) = 0;
+        virtual void drawCylinderEx(Vector3f startPos, Vector3f endPos, float startRadius,
+            float endRadius, int sides, Color32 color) = 0;
 
         virtual void drawPlane(Vector3f position, Vector2f size, Color32 color) = 0;
 
         virtual void drawLine3D(Vector3f startPos, Vector3f endPos, Color32 color) = 0;
 
-        virtual void drawModelEx(const std::string& id, Vector3f position, Vector3f rotationAxis, float rotationAngle, Vector3f scale, Color32 tint = CWHITE) = 0;
+        virtual void drawModelEx(const std::string& id, Vector3f position,
+            Vector3f rotationAxis, float rotationAngle, Vector3f scale,
+            Color32 tint = CWHITE) = 0;
 
-        virtual void drawText(const std::string& text, float x, float y, float fontSize, Color32 color) = 0;
+        virtual void drawText(const std::string& text, float x, float y, float fontSize,
+            Color32 color) = 0;
 
         virtual void drawRectangleRec(FloatRect rec, Color32 color) = 0;
         ~IDisplay() = default;

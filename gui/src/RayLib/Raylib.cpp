@@ -6,6 +6,8 @@
 */
 
 #include <iostream>
+#include <string>
+#include <memory>
 #include "Raylib.hpp"
 #include "../Utils/GamepadConstants.hpp"
 
@@ -246,57 +248,75 @@ void Raylib::beginScissorMode(IntRect data)
 
 void Raylib::drawCube(Vector3f pos, float width, float height, float length, Color32 color)
 {
-    return this->_raylib->drawCube({pos.x, pos.y, pos.z}, width, height, length, {color.r, color.g, color.b, color.a});
+    return this->_raylib->drawCube({pos.x, pos.y, pos.z}, width, height, length,
+    {color.r, color.g, color.b, color.a});
 }
 
-void Raylib::drawCubeWires(Vector3f pos, float width, float height, float length, Color32 color)
+void Raylib::drawCubeWires(Vector3f pos, float width, float height, float length,
+    Color32 color)
 {
-    return this->_raylib->drawCubeWires({pos.x, pos.y, pos.z}, width, height, length, {color.r, color.g, color.b, color.a});
+    return this->_raylib->drawCubeWires({pos.x, pos.y, pos.z}, width, height,
+        length, {color.r, color.g, color.b, color.a});
 }
 
 void Raylib::drawSphere(Vector3f pos, float radius, Color32 color)
 {
-    return this->_raylib->drawSphere({pos.x, pos.y, pos.z}, radius, {color.r, color.g, color.b, color.a});
+    return this->_raylib->drawSphere({pos.x, pos.y, pos.z}, radius,
+        {color.r, color.g, color.b, color.a});
 }
 
 void Raylib::drawSphereWires(Vector3f pos, float radius, int rings, int slices, Color32 color)
 {
-    return this->_raylib->drawSphereWires({pos.x, pos.y, pos.z}, radius, rings, slices, {color.r, color.g, color.b, color.a});
+    return this->_raylib->drawSphereWires({pos.x, pos.y, pos.z}, radius, rings,
+        slices, {color.r, color.g, color.b, color.a});
 }
 
-void Raylib::drawCylinder(Vector3f pos, float radiusTop, float radiusBottom, float height, int slices, Color32 color)
+void Raylib::drawCylinder(Vector3f pos, float radiusTop, float radiusBottom,
+    float height, int slices, Color32 color)
 {
-    return this->_raylib->drawCylinder({pos.x, pos.y, pos.z}, radiusTop, radiusBottom, height, slices, {color.r, color.g, color.b, color.a});
+    return this->_raylib->drawCylinder({pos.x, pos.y, pos.z}, radiusTop, radiusBottom,
+        height, slices, {color.r, color.g, color.b, color.a});
 }
 
-void Raylib::drawCylinderWires(Vector3f pos, float radiusTop, float radiusBottom, float height, int slices, Color32 color)
+void Raylib::drawCylinderWires(Vector3f pos, float radiusTop, float radiusBottom,
+    float height, int slices, Color32 color)
 {
-    return this->_raylib->drawCylinderWires({pos.x, pos.y, pos.z}, radiusTop, radiusBottom, height, slices, {color.r, color.g, color.b, color.a});
+    return this->_raylib->drawCylinderWires({pos.x, pos.y, pos.z}, radiusTop, radiusBottom,
+        height, slices, {color.r, color.g, color.b, color.a});
 }
 
-void Raylib::drawCylinderEx(Vector3f startPos, Vector3f endPos, float startRadius, float endRadius, int sides, Color32 color)
+void Raylib::drawCylinderEx(Vector3f startPos, Vector3f endPos, float startRadius,
+    float endRadius, int sides, Color32 color)
 {
-    return this->_raylib->drawCylinderEx({startPos.x, startPos.y, startPos.z}, {endPos.x, endPos.y, endPos.z}, startRadius, endRadius, sides, {color.r, color.g, color.b, color.a});
+    return this->_raylib->drawCylinderEx({startPos.x, startPos.y, startPos.z},
+        {endPos.x, endPos.y, endPos.z}, startRadius, endRadius, sides,
+        {color.r, color.g, color.b, color.a});
 }
 
 void Raylib::drawPlane(Vector3f pos, Vector2f size, Color32 color)
 {
-    return this->_raylib->drawPlane({pos.x, pos.y, pos.z}, {size.x, size.y}, {color.r, color.g, color.b, color.a});
+    return this->_raylib->drawPlane({pos.x, pos.y, pos.z}, {size.x, size.y},
+        {color.r, color.g, color.b, color.a});
 }
 
 void Raylib::drawLine3D(Vector3f startPos, Vector3f endPos, Color32 color)
 {
-    return this->_raylib->drawLine3D({startPos.x, startPos.y, startPos.z}, {endPos.x, endPos.y, endPos.z}, {color.r, color.g, color.b, color.a});
+    return this->_raylib->drawLine3D({startPos.x, startPos.y, startPos.z},
+        {endPos.x, endPos.y, endPos.z}, {color.r, color.g, color.b, color.a});
 }
 
-void Raylib::drawModelEx(const std::string &id, Vector3f pos, Vector3f rota, float angle, Vector3f scale, Color32 color)
+void Raylib::drawModelEx(const std::string &id, Vector3f pos, Vector3f rota, float angle,
+    Vector3f scale, Color32 color)
 {
-    return this->_raylib->drawModelEx(id, {pos.x, pos.y, pos.z}, {rota.x, rota.y, rota.z}, angle, {scale.x, scale.y, scale.z}, {color.r, color.g, color.b, color.a});
+    return this->_raylib->drawModelEx(id, {pos.x, pos.y, pos.z}, {rota.x, rota.y, rota.z},
+        angle, {scale.x, scale.y, scale.z}, {color.r, color.g, color.b, color.a});
 }
 
-void Raylib::drawText(const std::string &text, float x, float y, float fontSize, Color32 color)
+void Raylib::drawText(const std::string &text, float x, float y, float fontSize,
+    Color32 color)
 {
-    return this->_raylib->drawText(text, x, y, fontSize, {color.r, color.g, color.b, color.a});
+    return this->_raylib->drawText(text, x, y, fontSize,
+        {color.r, color.g, color.b, color.a});
 }
 
 void Raylib::drawRectangleRec(FloatRect frect, Color32 color)

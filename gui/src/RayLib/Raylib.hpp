@@ -7,13 +7,15 @@
 
 #ifndef RAYLIB_HPP_
 #define RAYLIB_HPP_
+#include <memory>
+#include <string>
 #include "../IDisplay.hpp"
 #include "RaylibEnc/RayLibEnc.hpp"
-#include <memory>
 
 class Raylib : public IDisplay {
     private:
         std::unique_ptr<RayLibEnc> _raylib;
+
     public:
         virtual Vector2i getMonitorSize();
         virtual Vector2i getScreenSize();
@@ -84,25 +86,35 @@ class Raylib : public IDisplay {
         virtual void begin3DMode();
         virtual void end3DMode();
 
-        virtual bool loadModel(const std::string& id, const std::string& filepath, Vector3f center = {0.0f, 0.0f, 0.0f});
+        virtual bool loadModel(const std::string& id, const std::string& filepath,
+            Vector3f center = {0.0f, 0.0f, 0.0f});
 
-        virtual void drawCube(Vector3f position, float width, float height, float length, Color32 color);
-        virtual void drawCubeWires(Vector3f position, float width, float height, float length, Color32 color);
+        virtual void drawCube(Vector3f position, float width, float height, float length,
+            Color32 color);
+        virtual void drawCubeWires(Vector3f position, float width, float height, float length,
+            Color32 color);
 
         virtual void drawSphere(Vector3f position, float radius, Color32 color);
-        virtual void drawSphereWires(Vector3f position, float radius, int rings, int slices, Color32 color);
+        virtual void drawSphereWires(Vector3f position, float radius, int rings, int slices,
+            Color32 color);
 
-        virtual void drawCylinder(Vector3f position, float radiusTop, float radiusBottom, float height, int slices, Color32 color);
-        virtual void drawCylinderWires(Vector3f position, float radiusTop, float radiusBottom, float height, int slices, Color32 color);
-        virtual void drawCylinderEx(Vector3f startPos, Vector3f endPos, float startRadius, float endRadius, int sides, Color32 color);
+        virtual void drawCylinder(Vector3f position, float radiusTop, float radiusBottom,
+            float height, int slices, Color32 color);
+        virtual void drawCylinderWires(Vector3f position, float radiusTop, float radiusBottom,
+            float height, int slices, Color32 color);
+        virtual void drawCylinderEx(Vector3f startPos, Vector3f endPos, float startRadius,
+            float endRadius, int sides, Color32 color);
 
         virtual void drawPlane(Vector3f position, Vector2f size, Color32 color);
 
         virtual void drawLine3D(Vector3f startPos, Vector3f endPos, Color32 color);
 
-        virtual void drawModelEx(const std::string& id, Vector3f position, Vector3f rotationAxis, float rotationAngle, Vector3f scale, Color32 tint = CWHITE);
+        virtual void drawModelEx(const std::string& id, Vector3f position,
+            Vector3f rotationAxis, float rotationAngle, Vector3f scale,
+            Color32 tint = CWHITE);
 
-        virtual void drawText(const std::string& text, float x, float y, float fontSize, Color32 color);
+        virtual void drawText(const std::string& text, float x, float y, float fontSize,
+            Color32 color);
 
         virtual void drawRectangleRec(FloatRect rec, Color32 color);
 

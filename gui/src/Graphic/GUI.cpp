@@ -32,7 +32,8 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     this->_windowWidth = monitorSize.x;
     this->_windowHeight = monitorSize.y;
 
-    this->_display->initWindow(this->_windowWidth, this->_windowHeight, zappy::gui::WINDOW_TITLE);
+    this->_display->initWindow(this->_windowWidth, this->_windowHeight,
+        zappy::gui::WINDOW_TITLE);
     this->_display->initCamera();
     _isRunning = this->_display->isWindowReady();
     this->_display->setTargetFPS(zappy::gui::FPS);
@@ -287,11 +288,13 @@ void GUI::switchToPreviousPlayer()
 
 void GUI::initModels()
 {
-    if (!this->_display->loadModel("player", "gui/assets/models/fall_guy.glb", {0.0f, -75.0f, 0.0f}))
+    if (!this->_display->loadModel("player", "gui/assets/models/fall_guy.glb",
+        {0.0f, -75.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load player model."
                   << colors::RESET << std::endl;
 
-    if (!this->_display->loadModel("platform", "gui/assets/models/tile.glb", {0.0f, 0.25f, 0.0f}))
+    if (!this->_display->loadModel("platform", "gui/assets/models/tile.glb",
+        {0.0f, 0.25f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load platform model."
                   << colors::RESET << std::endl;
 

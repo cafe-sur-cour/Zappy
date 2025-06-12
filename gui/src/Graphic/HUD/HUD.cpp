@@ -506,45 +506,9 @@ std::shared_ptr<Containers> HUD::createBottomContainer(
     return bottomContainer;
 }
 
-void HUD::recordElementPositions(
-    std::shared_ptr<Containers> container,
-    std::unordered_map<std::string, float>& initialYPositions,
-    float& lastContainerHeight)
-{
-    FloatRect containerBounds = container->getBounds();
-    float containerHeight = containerBounds.height;
-
-    initialYPositions.clear();
-    lastContainerHeight = containerHeight;
-
-    for (int i = 0; i < 100; i++) {
-        std::string idBase = "team_display_" + std::to_string(i);
-
-        auto separatorElem = container->getElement(idBase + "_separator");
-        if (separatorElem)
-            initialYPositions[idBase + "_separator"] = separatorElem->getBounds().y;
-
-        auto titleElem = container->getElement(idBase + "_title");
-        if (titleElem) {
-            initialYPositions[idBase + "_title"] = titleElem->getBounds().y;
-
-            auto statsElem = container->getElement(idBase + "_stats");
-            if (statsElem)
-                initialYPositions[idBase + "_stats"] = statsElem->getBounds().y;
-
-            for (int j = 0; j < 50; j++) {
-                std::string playerID = idBase + "_player_" + std::to_string(j);
-                auto playerElem = container->getElement(playerID);
-                if (playerElem)
-                    initialYPositions[playerID] = playerElem->getBounds().y;
-            }
-        }
-    }
-}
-
 std::pair<float, float> HUD::calculateContentMetrics(
     std::shared_ptr<Containers> container,
-    const std::unordered_map<std::string, float>& initialYPositions)
+    const std::unordered_map<std::string, float> &initialYPositions)
 {
     FloatRect containerBounds = container->getBounds();
     float maxY = containerBounds.y;

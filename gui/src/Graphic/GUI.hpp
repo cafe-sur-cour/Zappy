@@ -8,6 +8,7 @@
 #ifndef GUI_HPP_
 #define GUI_HPP_
 
+#include <memory>
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
 #include "HUD/HUD.hpp"
@@ -16,7 +17,6 @@
 #include "Camera/CameraManager.hpp"
 #include "../IDisplay.hpp"
 #include "../DLLoader/DLLoader.hpp"
-#include <memory>
 
 class GUI {
     public:
