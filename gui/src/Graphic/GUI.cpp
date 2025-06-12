@@ -9,16 +9,37 @@
 #include <memory>
 #include <iostream>
 #include <algorithm>
+#include <filesystem>
 #include "GUI.hpp"
 #include "../Audio/Audio.hpp"
 #include "../Utils/Constants.hpp"
 #include "../Utils/GamepadConstants.hpp"
 
+std::string GUI::getFirstSharedLibInFolder(const std::string &libPath)
+{;
+
+	try {
+		for (const auto &entry : std::filesystem::directory_iterator(libPath)) {
+			if (entry.path().extension() == ".so") {
+                return entry.path().string();
+			}
+		}
+	} catch (const std::filesystem::filesystem_error &e) {
+		std::cerr << "Error accessing directory: " << e.what() << std::endl;
+	}
+    return "";
+}
+
 GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _gameInfos(gameInfos)
 {
     this->_dlLoader = DLLoader<std::shared_ptr<IDisplay>>();
-    this->_dlLoader.Open("./gui/lib/libZappyRayLib.so");
+    auto lib = this->getFirstSharedLibInFolder("./gui/lib/");
+    if (lib.empty()) {
+        std::cerr << "NO lib found in the lib folder" << std::endl;
+        exit(84);
+    }
+    this->_dlLoader.Open(lib.c_str());
     if (!this->_dlLoader.getHandler()) {
         std::cerr << "Failed to open library: " << dlerror() << std::endl;
         exit(84);

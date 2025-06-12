@@ -26,7 +26,7 @@ class GUI {
 
         void run();
 
-        void loadSharedLib();
+        std::string getFirstSharedLibInFolder(const std::string &libPath = "./lib/");
 
         int getWindowWidth() const;
         int getWindowHeight() const;
