@@ -194,7 +194,7 @@ class Player:
         self.y = y
         self.roombaState["targetForward"] = max(x, y)
 
-    def getNeededStonesByPriority(self) -> list[str]:
+    def getNeededStonesByPriority(self) -> list[(str, int)]:
         neededStones = []
         if self.level == 8:
             return neededStones
@@ -203,7 +203,7 @@ class Player:
             neededQuantity = quantity - self.inventory.get(stone, 0)
             neededStones.append((neededQuantity, stone))
         neededStones.sort(key=lambda x: x[0], reverse=True)
-        neededStones = [stone for quantity, stone in neededStones if quantity > 0]
+        neededStones = [(stone, quantity) for quantity, stone in neededStones if quantity > 0]
         return neededStones
 
     def dropStonesForSurvival(self) -> None:
