@@ -82,6 +82,7 @@ bool Containers::addElement(const std::string& id, std::shared_ptr<IUIElement> e
 
     auto button = std::dynamic_pointer_cast<Button>(element);
     auto text = std::dynamic_pointer_cast<Text>(element);
+    auto slider = std::dynamic_pointer_cast<Slider>(element);
 
     float xPercent = (elemBounds.x / _bounds.width) * 100.0f;
     float yPercent = (elemBounds.y / _bounds.height) * 100.0f;
@@ -92,6 +93,8 @@ bool Containers::addElement(const std::string& id, std::shared_ptr<IUIElement> e
         button->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
     } else if (text) {
         text->setRelativePosition(xPercent, yPercent, 0.0f, heightPercent);
+    } else if (slider) {
+        slider->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
     }
 
     element->setPosition(_bounds.x + elemBounds.x, _bounds.y + elemBounds.y);
@@ -190,6 +193,7 @@ void Containers::handleResize(int oldWidth, int oldHeight, int newWidth, int new
     for (auto& pair : _elements) {
         auto button = std::dynamic_pointer_cast<Button>(pair.second);
         auto text = std::dynamic_pointer_cast<Text>(pair.second);
+        auto slider = std::dynamic_pointer_cast<Slider>(pair.second);
 
         UIRelativePosition elemRelPos;
         bool hasRelativePos = false;
@@ -199,6 +203,9 @@ void Containers::handleResize(int oldWidth, int oldHeight, int newWidth, int new
             hasRelativePos = true;
         } else if (text) {
             elemRelPos = text->getRelativePosition();
+            hasRelativePos = true;
+        } else if (slider) {
+            elemRelPos = slider->getRelativePosition();
             hasRelativePos = true;
         }
 
@@ -214,6 +221,8 @@ void Containers::handleResize(int oldWidth, int oldHeight, int newWidth, int new
                 button->setSize(elemNewWidth, elemNewHeight);
             } else if (text) {
                 text->setFontSize(elemNewHeight);
+            } else if (slider) {
+                slider->setSize(elemNewWidth, elemNewHeight);
             }
         } else {
             FloatRect elemBounds = pair.second->getBounds();
@@ -234,6 +243,8 @@ void Containers::handleResize(int oldWidth, int oldHeight, int newWidth, int new
                 button->setSize(elemNewWidth, elemNewHeight);
             } else if (text) {
                 text->setFontSize(elemNewHeight);
+            } else if (slider) {
+                slider->setSize(elemNewWidth, elemNewHeight);
             }
         }
     }
@@ -308,6 +319,51 @@ std::shared_ptr<Text> Containers::addTextPercent(
 
     if (addElement(id, textElement))
         return textElement;
+
+    return nullptr;
+}
+
+std::shared_ptr<Slider> Containers::addSlider(
+    const std::string& id,
+    float x, float y,
+    float width, float height,
+    float minValue, float maxValue,
+    float initialValue,
+    const std::string& text,
+    std::function<void(float)> onValueChanged
+)
+{
+    auto slider = std::make_shared<Slider>(_display, x, y, width, height,
+        minValue, maxValue, initialValue, text, onValueChanged);
+
+    if (addElement(id, slider))
+        return slider;
+
+    return nullptr;
+}
+
+std::shared_ptr<Slider> Containers::addSliderPercent(
+    const std::string& id,
+    float xPercent, float yPercent,
+    float widthPercent, float heightPercent,
+    float minValue, float maxValue,
+    float initialValue,
+    const std::string& text,
+    std::function<void(float)> onValueChanged
+)
+{
+    float x = (_bounds.width * xPercent) / 100.0f;
+    float y = (_bounds.height * yPercent) / 100.0f;
+    float width = (_bounds.width * widthPercent) / 100.0f;
+    float height = (_bounds.height * heightPercent) / 100.0f;
+
+    auto slider = std::make_shared<Slider>(_display, x, y, width, height,
+        minValue, maxValue, initialValue, text, onValueChanged);
+
+    slider->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
+
+    if (addElement(id, slider))
+        return slider;
 
     return nullptr;
 }

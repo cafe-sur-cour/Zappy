@@ -178,6 +178,9 @@ class IDisplay {
             Vector3f rotationAxis, float rotationAngle, Vector3f scale,
             Color32 tint = CWHITE) = 0;
 
+        virtual void drawCircle(float centerX, float centerY, float radius, Color32 color) = 0;
+        virtual void drawCircleLines(float centerX, float centerY, float radius, Color32 color) = 0;
+
         virtual void drawText(const std::string& text, float x, float y, float fontSize,
             Color32 color) = 0;
 

@@ -325,6 +325,16 @@ void Raylib::drawRectangleRec(FloatRect frect, Color32 color)
     return this->_raylib->drawRectangleRec(rect, {color.r, color.g, color.b, color.a});
 }
 
+void Raylib::drawCircle(float centerX, float centerY, float radius, Color32 color)
+{
+    return this->_raylib->drawCircle(centerX, centerY, radius, {color.r, color.g, color.b, color.a});
+}
+
+void Raylib::drawCircleLines(float centerX, float centerY, float radius, Color32 color)
+{
+    return this->_raylib->drawCircleLines(centerX, centerY, radius, {color.r, color.g, color.b, color.a});
+}
+
 void Raylib::end3DMode()
 {
     return this->_raylib->end3DMode();

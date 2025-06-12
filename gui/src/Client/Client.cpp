@@ -14,8 +14,7 @@
 #include "../Communication/Communication.hpp"
 #include "../CLI/CLI.hpp"
 
-Client::Client(int ac, const char *const *av) :
-    _gameInfos(std::make_shared<GameInfos>())
+Client::Client(int ac, const char *const *av)
 {
     initialize(ac, av);
 
@@ -25,6 +24,7 @@ Client::Client(int ac, const char *const *av) :
               << colors::RESET << std::endl;
 
     _communication = std::make_shared<Communication>(_config);
+    _gameInfos = std::make_shared<GameInfos>(_communication);
     _msgHandler = std::make_unique<MsgHandler>(_gameInfos, _communication);
 
     if (!_communication->isConnected())

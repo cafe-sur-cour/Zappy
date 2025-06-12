@@ -48,6 +48,16 @@ void RayLibEnc::drawText(const std::string& text, float x, float y, float fontSi
              color);
 }
 
+void RayLibEnc::drawCircle(float centerX, float centerY, float radius, Color color)
+{
+    DrawCircle(static_cast<int>(centerX), static_cast<int>(centerY), radius, color);
+}
+
+void RayLibEnc::drawCircleLines(float centerX, float centerY, float radius, Color color)
+{
+    DrawCircleLines(static_cast<int>(centerX), static_cast<int>(centerY), radius, color);
+}
+
 float RayLibEnc::measureText(const std::string& text, float fontSize) const
 {
     return static_cast<float>(MeasureText(text.c_str(), static_cast<int>(fontSize)));

@@ -25,6 +25,8 @@ class GUI {
 
         void run();
 
+        void loadSharedLib();
+
         int getWindowWidth() const;
         int getWindowHeight() const;
         void setWindowWidth(int width);
@@ -47,7 +49,9 @@ class GUI {
 
         void initModels();
 
+        std::string _currentLibLoaded;
         bool _isRunning;
+
         DLLoader<std::shared_ptr<IDisplay>> _dlLoader;
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;

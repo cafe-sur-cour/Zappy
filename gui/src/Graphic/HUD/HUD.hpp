@@ -148,6 +148,8 @@ class HUD {
          */
         std::shared_ptr<Containers> getSquareContainer() const;
 
+        std::shared_ptr<Containers> getTpsContainer() const;
+
         /**
          * @brief Initialize an exit button in the square container
          *
@@ -193,6 +195,11 @@ class HUD {
          * @param gameInfos The game information containing teams and players
          */
         void updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos);
+
+        void initTpsSlider(std::shared_ptr<GameInfos> gameInfos,
+            std::shared_ptr<IDisplay> raylib, std::shared_ptr<IAudio> audio);
+
+        void updateTpsSlider(std::shared_ptr<GameInfos> gameInfos);
 
         /**
          * @brief Initialize the player inventory display in the bottom container
@@ -270,6 +277,12 @@ class HUD {
          * @return std::shared_ptr<Containers> The created container
          */
         std::shared_ptr<Containers> createBottomContainer(
+            int screenWidth,
+            int screenHeight,
+            float bottomHeight,
+            float bottomHeightPercent);
+
+        std::shared_ptr<Containers> createTpsContainer(
             int screenWidth,
             int screenHeight,
             float bottomHeight,

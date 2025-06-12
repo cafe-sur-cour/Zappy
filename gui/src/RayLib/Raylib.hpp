@@ -116,6 +116,9 @@ class Raylib : public IDisplay {
         virtual void drawText(const std::string& text, float x, float y, float fontSize,
             Color32 color);
 
+        virtual void drawCircle(float centerX, float centerY, float radius, Color32 color);
+        virtual void drawCircleLines(float centerX, float centerY, float radius, Color32 color);
+
         virtual void drawRectangleRec(FloatRect rec, Color32 color);
 
         Raylib();

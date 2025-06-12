@@ -17,6 +17,7 @@
 #include "../UIElement/IUIElement.hpp"
 #include "../Button/Button.hpp"
 #include "../Text/Text.hpp"
+#include "../Slider/Slider.hpp"
 #include "../../../Audio/IAudio.hpp"
 #include "../../../IDisplay.hpp"
 
@@ -163,6 +164,58 @@ class Containers : public AContainers {
             const std::string& text,
             float fontSize = 20.0f,
             Color32 color = CBLACK
+        );
+
+        /**
+         * @brief Create and add a slider to the container
+         *
+         * @param id Unique identifier for the slider
+         * @param x X coordinate relative to container
+         * @param y Y coordinate relative to container
+         * @param width Slider width
+         * @param height Slider height
+         * @param minValue Minimum value for the slider
+         * @param maxValue Maximum value for the slider
+         * @param initialValue Initial value for the slider
+         * @param text Slider label text
+         * @param onValueChanged Callback function when value changes
+         *
+         * @return std::shared_ptr<Slider> Pointer to the created slider, or nullptr if ID already exists
+         */
+        std::shared_ptr<Slider> addSlider(
+            const std::string& id,
+            float x, float y,
+            float width, float height,
+            float minValue, float maxValue,
+            float initialValue,
+            const std::string& text,
+            std::function<void(float)> onValueChanged
+        );
+
+        /**
+         * @brief Create and add a slider to the container using relative percentages
+         *
+         * @param id Unique identifier for the slider
+         * @param xPercent X position as percentage of container width (0-100)
+         * @param yPercent Y position as percentage of container height (0-100)
+         * @param widthPercent Width as percentage of container width (0-100)
+         * @param heightPercent Height as percentage of container height (0-100)
+         * @param minValue Minimum value for the slider
+         * @param maxValue Maximum value for the slider
+         * @param initialValue Initial value for the slider
+         * @param text Slider label text
+         * @param onValueChanged Callback function when value changes
+         *
+         * @return std::shared_ptr<Slider> Pointer to the created slider, or nullptr if ID already exists
+         */
+        std::shared_ptr<Slider> addSliderPercent(
+            const std::string& id,
+            float xPercent, float yPercent,
+            float widthPercent, float heightPercent,
+            float minValue, float maxValue,
+            float initialValue,
+            const std::string& text,
+            std::function<void(float)> onValueChanged
         );
 
         /**
