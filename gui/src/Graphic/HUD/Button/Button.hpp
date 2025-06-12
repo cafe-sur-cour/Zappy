@@ -15,23 +15,8 @@
 #include "../../../Audio/IAudio.hpp"
 #include "../../../IDisplay.hpp"
 
-/**
- * @brief Button UI element
- *
- * A clickable button with text that can trigger a callback when clicked
- */
 class Button : public AUIElement {
     public:
-        /**
-         * @brief Construct a new Button
-         *
-         * @param x X coordinate
-         * @param y Y coordinate
-         * @param width Button width
-         * @param height Button height
-         * @param text Button text
-         * @param callback Function to call when button is clicked
-         */
         Button(
             std::shared_ptr<IDisplay> display,
             std::shared_ptr<IAudio> audio,
@@ -41,50 +26,18 @@ class Button : public AUIElement {
             std::function<void()> callback
         );
 
-        /**
-         * @brief Destroy the Button
-         */
         ~Button() override = default;
 
-        /**
-         * @brief Draw the button
-         */
         void draw() override;
 
-        /**
-         * @brief Update the button state
-         */
         void update() override;
 
-        /**
-         * @brief Set the text of the button
-         *
-         * @param text New text
-         */
         void setText(const std::string& text);
 
-        /**
-         * @brief Get the text of the button
-         *
-         * @return std::string Button text
-         */
         std::string getText() const;
 
-        /**
-         * @brief Set the callback function
-         *
-         * @param callback Function to call when button is clicked
-         */
         void setCallback(std::function<void()> callback);
 
-        /**
-         * @brief Set the colors of the button
-         *
-         * @param normal Normal color
-         * @param hover Hover color
-         * @param pressed Pressed color
-         * @param textColor Text color
-         */
         void setColors(
             Color32 normal,
             Color32 hover,
@@ -92,12 +45,6 @@ class Button : public AUIElement {
             Color32 textColor
         );
 
-        /**
-         * @brief Set the size of the button
-         *
-         * @param width New button width
-         * @param height New button height
-         */
         void setSize(float width, float height) override;
 
     private:
