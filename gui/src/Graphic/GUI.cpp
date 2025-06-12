@@ -315,7 +315,11 @@ void GUI::initModels()
         std::cout << colors::T_RED << "[ERROR] Failed to load food model."
                   << colors::RESET << std::endl;
 
-    if (!this->_display->loadModel("rock", "gui/assets/models/rock.glb", {0.0f, 0.0f, 0.0f}))
+    if (!this->_display->loadModel("rock", "gui/assets/models/soccerball.glb", {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load rock model."
+                  << colors::RESET << std::endl;
+
+    if (!this->_display->loadModel("egg", "gui/assets/models/egg.glb", {0.0f, 0.0f, 0.0f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load egg model."
                   << colors::RESET << std::endl;
 }
