@@ -22,6 +22,7 @@ const graphic_pf_t GRAPHIC_COMMAND[] = {
     {"plv", &plv},
     {"pin", &pin},
     {"sgt", &sgt},
+    {"sst", &sst},
     {NULL, NULL}
 };
 
