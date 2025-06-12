@@ -2,14 +2,14 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400-NAN-4-1-zappy-albane.merian
 ** File description:
-** Raylib3dModel
+** RaylibEnc3dModel
 */
 
 #include <string>
-#include "RayLib.hpp"
+#include "RayLibEnc.hpp"
 #include "raymath.h"
 
-bool RayLib::loadModel(const std::string& id, const std::string& filepath, Vector3 center)
+bool RayLibEnc::loadModel(const std::string& id, const std::string& filepath, Vector3 center)
 {
     if (_models.find(id) != _models.end())
         unloadModel(id);
@@ -24,7 +24,7 @@ bool RayLib::loadModel(const std::string& id, const std::string& filepath, Vecto
     return true;
 }
 
-void RayLib::drawModel(const std::string& id, Vector3 position, float scale, Color tint)
+void RayLibEnc::drawModel(const std::string& id, Vector3 position, float scale, Color tint)
 {
     auto it = _models.find(id);
     if (it != _models.end()) {
@@ -37,7 +37,7 @@ void RayLib::drawModel(const std::string& id, Vector3 position, float scale, Col
     }
 }
 
-void RayLib::drawModelEx(const std::string& id, Vector3 position, Vector3 rotationAxis,
+void RayLibEnc::drawModelEx(const std::string& id, Vector3 position, Vector3 rotationAxis,
                       float rotationAngle, Vector3 scale, Color tint)
 {
     auto it = _models.find(id);
@@ -67,7 +67,8 @@ void RayLib::drawModelEx(const std::string& id, Vector3 position, Vector3 rotati
     }
 }
 
-void RayLib::drawModelWires(const std::string& id, Vector3 position, float scale, Color tint)
+void RayLibEnc::drawModelWires(const std::string& id, Vector3 position,
+    float scale, Color tint)
 {
     auto it = _models.find(id);
     if (it != _models.end()) {
@@ -80,7 +81,7 @@ void RayLib::drawModelWires(const std::string& id, Vector3 position, float scale
     }
 }
 
-void RayLib::drawModelWiresEx(const std::string& id, Vector3 position, Vector3 rotationAxis,
+void RayLibEnc::drawModelWiresEx(const std::string& id, Vector3 position, Vector3 rotationAxis,
                            float rotationAngle, Vector3 scale, Color tint)
 {
     auto it = _models.find(id);
@@ -111,7 +112,7 @@ void RayLib::drawModelWiresEx(const std::string& id, Vector3 position, Vector3 r
     }
 }
 
-void RayLib::unloadModel(const std::string& id)
+void RayLibEnc::unloadModel(const std::string& id)
 {
     auto it = _models.find(id);
     if (it != _models.end()) {
@@ -120,7 +121,7 @@ void RayLib::unloadModel(const std::string& id)
     }
 }
 
-void RayLib::unloadAllModels()
+void RayLibEnc::unloadAllModels()
 {
     for (auto& pair : _models) {
         UnloadModel(pair.second.model);
@@ -129,7 +130,7 @@ void RayLib::unloadAllModels()
     _models.clear();
 }
 
-bool RayLib::modelExists(const std::string& id) const
+bool RayLibEnc::modelExists(const std::string& id) const
 {
     return _models.find(id) != _models.end();
 }

@@ -13,23 +13,22 @@
 #include <string>
 #include <cmath>
 
-#include "../RayLib/RayLib.hpp"
 #include "Map.hpp"
 
-Map::Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<RayLib> raylib)
-    : _gameInfos(std::move(gameInfos)), _raylib(raylib)
+Map::Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<IDisplay> display)
+    : _gameInfos(std::move(gameInfos)), _display(display)
 {
-    _colors = {BLUE, YELLOW, PURPLE, ORANGE, PINK, MAROON, RED, GREEN};
+    _colors = {CBLUE, CYELLOW, CPURPLE, CORANGE, CPINK, CMAROON, CRED, CGREEN};
 }
 
 Map::~Map()
 {
 }
 
-Color Map::getTeamColor(const std::string &teamName)
+Color32 Map::getTeamColor(const std::string &teamName)
 {
     if (teamName.empty())
-        return WHITE;
+        return CWHITE;
 
     if (_teamColors.find(teamName) == _teamColors.end()) {
         _teamColors[teamName] = _colors[_colorIndex];
@@ -53,7 +52,7 @@ void Map::draw()
 
 void Map::drawTile(int x, int y, const zappy::structs::Tile &tile)
 {
-    Vector3 position = {static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+    Vector3f position = {static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
         0.0f, static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)};
 
     (void)tile;
@@ -66,8 +65,8 @@ void Map::drawTile(int x, int y, const zappy::structs::Tile &tile)
     position.x += offsetX;
     position.z += offsetZ;
 
-    _raylib->drawModelEx("platform", position, {0.0f, 1.0f, 0.0f},
-        angle, {0.9f, 0.9f, 0.9f}, WHITE);
+    this->_display->drawModelEx("platform", position, {0.0f, 1.0f, 0.0f},
+        angle, {0.9f, 0.9f, 0.9f}, CWHITE);
 }
 
 void Map::drawPlayers(int x, int y)
@@ -87,13 +86,13 @@ void Map::drawPlayers(int x, int y)
     float cylinderHeight = 0.4f;
 
     for (size_t i = 0; i < playersOnTile.size(); ++i) {
-        Vector3 position = {
+        Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::PLAYER, x, y, i),
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        Color teamColor = getTeamColor(playersOnTile[i]->teamName);
+        Color32 teamColor = getTeamColor(playersOnTile[i]->teamName);
         float rotationAngle = 0.0f;
         int direction = playersOnTile[i]->orientation - 1;
 
@@ -105,7 +104,7 @@ void Map::drawPlayers(int x, int y)
             case 3: rotationAngle = 270.0f; break;
         }
 
-        _raylib->drawModelEx("player", position, {0.0f, 1.0f, 0.0f},
+        this->_display->drawModelEx("player", position, {0.0f, 1.0f, 0.0f},
             rotationAngle, {zappy::gui::PLAYER_SCALE, zappy::gui::PLAYER_SCALE,
                 zappy::gui::PLAYER_SCALE}, teamColor);
         drawOrientationArrow(position, playersOnTile[i]->orientation,
@@ -113,16 +112,16 @@ void Map::drawPlayers(int x, int y)
     }
 }
 
-void Map::drawOrientationArrow(const Vector3 &position, int orientation, float playerHeight)
+void Map::drawOrientationArrow(const Vector3f &position, int orientation, float playerHeight)
 {
     float arrowLength = 0.35f;
     float arrowWidth = 0.15f;
     float arrowHeadSize = 0.2f;
 
-    Vector3 arrowPos = position;
+    Vector3f arrowPos = position;
     arrowPos.y += playerHeight / 2 + 0.15f;
-    Vector3 start = arrowPos;
-    Vector3 end = arrowPos;
+    Vector3f start = arrowPos;
+    Vector3f end = arrowPos;
 
     int direction = orientation - 1;
     if (direction < 0) direction = 0;
@@ -133,10 +132,10 @@ void Map::drawOrientationArrow(const Vector3 &position, int orientation, float p
         case 2: end.z += arrowLength; break;
         case 3: end.x -= arrowLength; break;
     }
-    _raylib->drawCylinderEx(start, end, 0.05f, 0.05f, 8, RED);
+    this->_display->drawCylinderEx(start, end, 0.05f, 0.05f, 8, CRED);
 
-    Vector3 coneStart = end;
-    Vector3 coneEnd;
+    Vector3f coneStart = end;
+    Vector3f coneEnd;
 
     switch (direction) {
         case 0: coneEnd = {end.x, end.y, end.z - arrowHeadSize}; break;
@@ -144,7 +143,7 @@ void Map::drawOrientationArrow(const Vector3 &position, int orientation, float p
         case 2: coneEnd = {end.x, end.y, end.z + arrowHeadSize}; break;
         case 3: coneEnd = {end.x - arrowHeadSize, end.y, end.z}; break;
     }
-    _raylib->drawCylinderEx(coneStart, coneEnd, arrowWidth, 0.0f, 8, RED);
+    this->_display->drawCylinderEx(coneStart, coneEnd, arrowWidth, 0.0f, 8, CRED);
 }
 
 void Map::drawEggs(int x, int y)
@@ -161,15 +160,15 @@ void Map::drawEggs(int x, int y)
     float eggRadius = 0.2f;
 
     for (size_t i = 0; i < eggsOnTile.size(); ++i) {
-        Vector3 position = {
+        Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::EGG, x, y, i),
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        Color teamColor = getTeamColor(eggsOnTile[i]->teamName);
-        _raylib->drawSphere(position, eggRadius, teamColor);
-        _raylib->drawSphereWires(position, eggRadius, 8, 8, BLACK);
+        Color32 teamColor = getTeamColor(eggsOnTile[i]->teamName);
+        this->_display->drawSphere(position, eggRadius, teamColor);
+        this->_display->drawSphereWires(position, eggRadius, 8, 8, CBLACK);
     }
 }
 
@@ -179,14 +178,14 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
         return;
 
     for (int i = 0; i < tile.food; ++i) {
-        Vector3 position = {
+        Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::FOOD, x, y, static_cast<size_t>(i)),
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        _raylib->drawModelEx("food", position, {0.0f, 1.0f, 0.0f},
-            0.0f, {0.005f, 0.005f, 0.005f}, WHITE);
+        this->_display->drawModelEx("food", position, {0.0f, 1.0f, 0.0f},
+            0.0f, {0.005f, 0.005f, 0.005f}, CWHITE);
     }
 }
 
@@ -198,14 +197,14 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
 
     for (int i = 0; i < tile.linemate + tile.deraumere + tile.sibur + tile.mendiane +
             tile.phiras + tile.thystame; ++i) {
-        Vector3 position = {
+        Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(i)),
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        _raylib->drawModelEx("rock", position, {0.0f, 1.0f, 0.0f},
-            0.0f, {0.3f, 0.3f, 0.3f}, WHITE);
+        this->_display->drawModelEx("rock", position, {0.0f, 1.0f, 0.0f},
+            0.0f, {0.3f, 0.3f, 0.3f}, CWHITE);
     }
 }
 
@@ -288,8 +287,8 @@ float Map::getOffset(DisplayPriority priority, int x, int y, size_t stackIndex)
             for (const auto& tile : tiles) {
                 if (tile.x == x && tile.y == y &&
                     (tile.linemate > 0 || tile.deraumere > 0 ||
-                     tile.sibur > 0 || tile.mendiane > 0 ||
-                     tile.phiras > 0 || tile.thystame > 0)) {
+                        tile.sibur > 0 || tile.mendiane > 0 ||
+                        tile.phiras > 0 || tile.thystame > 0)) {
                     rockCount++;
                 }
             }

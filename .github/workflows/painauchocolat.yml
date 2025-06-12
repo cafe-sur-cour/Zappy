@@ -58,7 +58,7 @@ jobs:
           git clone https://github.com/raysan5/raylib.git raylib
           cd raylib
           mkdir build && cd build
-          cmake -DSHARED=ON -DBUILD_EXAMPLES=OFF ..
+          cmake -DSHARED=ON -DBUILD_EXAMPLES=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON ..
           make -j$(nproc)
           make install
           ldconfig
@@ -195,7 +195,7 @@ jobs:
           git clone https://github.com/raysan5/raylib.git raylib
           cd raylib
           mkdir build && cd build
-          cmake -DSHARED=ON -DBUILD_EXAMPLES=OFF ..
+          cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DSHARED=ON -DBUILD_EXAMPLES=OFF ..
           make -j$(nproc)
           make install
           ldconfig
@@ -249,7 +249,7 @@ jobs:
           git clone https://github.com/raysan5/raylib.git raylib
           cd raylib
           mkdir build && cd build
-          cmake -DSHARED=ON -DBUILD_EXAMPLES=OFF ..
+          cmake -DSHARED=ON -DBUILD_EXAMPLES=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON ..
           make -j$(nproc)
           make install
           ldconfig

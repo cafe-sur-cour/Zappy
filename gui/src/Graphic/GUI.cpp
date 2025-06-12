@@ -9,37 +9,68 @@
 #include <memory>
 #include <iostream>
 #include <algorithm>
+#include <string>
+#include <filesystem>
 #include "GUI.hpp"
 #include "../Audio/Audio.hpp"
 #include "../Utils/Constants.hpp"
 #include "../Utils/GamepadConstants.hpp"
 
+std::string GUI::_getFirstSharedLibInFolder(const std::string &libPath)
+{
+    try {
+        for (const auto &entry : std::filesystem::directory_iterator(libPath)) {
+            if (entry.path().extension() == ".so") {
+                return entry.path().string();
+            }
+        }
+    } catch (const std::filesystem::filesystem_error &e) {
+        std::cerr << "Error accessing directory: " << e.what() << std::endl;
+    }
+    return "";
+}
+
 GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
     _gameInfos(gameInfos)
 {
-    _raylib = std::make_shared<RayLib>();
+    this->_dlLoader = DLLoader<std::shared_ptr<IDisplay>>();
+    auto lib = this->_getFirstSharedLibInFolder("./gui/lib/");
+    if (lib.empty()) {
+        std::cerr << "NO lib found in the lib folder" << std::endl;
+        exit(84);
+    }
+    this->_dlLoader.Open(lib.c_str());
+    if (!this->_dlLoader.getHandler()) {
+        std::cerr << "Failed to open library: " << dlerror() << std::endl;
+        exit(84);
+    }
+    using CreateFunc = std::shared_ptr<IDisplay>(*)();
+    CreateFunc create = reinterpret_cast<CreateFunc>(this->_dlLoader.Symbol("create"));
+    this->_display = create();
 
     _cameraMode = zappy::gui::CameraMode::FREE;
-    _windowWidth = _raylib->getMonitorWidth(0);
-    _windowHeight = _raylib->getMonitorHeight(0);
+    auto monitorSize = this->_display->getMonitorSize();
+    this->_windowWidth = monitorSize.x;
+    this->_windowHeight = monitorSize.y;
 
-    _raylib->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
-    _raylib->initCamera();
-    _isRunning = _raylib->isWindowReady();
-    _raylib->setTargetFPS(zappy::gui::FPS);
-    _audio = std::make_shared<Audio>();
-    _map = std::make_unique<Map>(_gameInfos, _raylib);
-    _hud = std::make_unique<HUD>(_raylib, _gameInfos, _audio,
+    this->_display->initWindow(this->_windowWidth, this->_windowHeight,
+        zappy::gui::WINDOW_TITLE);
+    this->_display->initCamera();
+    _isRunning = this->_display->isWindowReady();
+    this->_display->setTargetFPS(zappy::gui::FPS);
+    this->_audio = std::make_shared<Audio>();
+    this->_map = std::make_unique<Map>(_gameInfos, this->_display);
+    this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio,
         [this]() {
             this->switchCameraMode(zappy::gui::CameraMode::FREE);
         });
 
-    _cameraManager = std::make_unique<CameraManager>(_raylib);
+    _cameraManager = std::make_unique<CameraManager>(this->_display);
     _cameraManager->setGameInfos(_gameInfos);
     _cameraManager->setMapInstance(std::shared_ptr<Map>(_map.get(), [](Map*){}));
     const auto& mapSize = _gameInfos->getMapSize();
 
-    Vector3 mapCenter = {
+    Vector3f mapCenter = {
         static_cast<float>(mapSize.first - 1) / 2.0f, 0.0f,
         static_cast<float>(mapSize.second - 1) / 2.0f
     };
@@ -51,15 +82,16 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
 
 GUI::~GUI()
 {
-    _raylib->closeWindow();
+    this->_display->closeWindow();
 }
 
 void GUI::run()
 {
-    if (!_isRunning)
+    if (!_isRunning) {
         return;
+    }
 
-    while (!_raylib->windowShouldClose()) {
+    while (_isRunning) {
         update();
         draw();
     }
@@ -72,16 +104,17 @@ void GUI::updateCamera()
 
 void GUI::update()
 {
-    if (_raylib->isKeyReleased(KEY_TAB) ||
-        _raylib->isGamepadButtonReleased(0, GAMEPAD_BUTTON_LEFT_SHOULDER))
+    this->_isRunning = this->_display->isOpen();
+    if (this->_display->isKeyReleased(this->_display->getKeyId(TAB)) ||
+        this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_LEFT_SHOULDER)))
         switchCameraModeNext();
 
     if (_cameraMode == zappy::gui::CameraMode::PLAYER) {
-        if (_raylib->isKeyReleased(KEY_UP) ||
-            _raylib->isGamepadButtonReleased(0, GAMEPAD_BUTTON_UP))
+        if (this->_display->isKeyReleased(this->_display->getKeyId(UP)) ||
+            this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_UP)))
             switchToNextPlayer();
-        if (_raylib->isKeyReleased(KEY_DOWN) ||
-            _raylib->isGamepadButtonReleased(0, GAMEPAD_BUTTON_DOWN))
+        if (this->_display->isKeyReleased(this->_display->getKeyId(DOWN)) ||
+            this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_DOWN)))
             switchToPreviousPlayer();
     }
 
@@ -91,21 +124,26 @@ void GUI::update()
     _hud->update();
 }
 
+bool GUI::isRunning()
+{
+    return this->_isRunning;
+}
+
 void GUI::draw()
 {
-    if (!_isRunning || _raylib->windowShouldClose())
+    if (!this->_display->isOpen())
         return;
 
-    _raylib->beginDrawing();
-    _raylib->clearBackground(RAYWHITE);
+    this->_display->beginDrawing();
+    this->_display->clearBackground(CRAYWHITE);
 
-    _raylib->begin3DMode();
+    this->_display->begin3DMode();
     _map->draw();
-    _raylib->end3DMode();
+    this->_display->end3DMode();
 
     _hud->draw();
 
-    _raylib->endDrawing();
+    this->_display->endDrawing();
 }
 
 int GUI::getWindowWidth() const
@@ -118,23 +156,25 @@ int GUI::getWindowHeight() const
 }
 void GUI::setWindowWidth(int width)
 {
-    if (width <= 0 || width > _raylib->getMonitorWidth(0))
+    if (width <= 0 || width > this->_display->getMonitorSize().x)
         return;
 
     _windowWidth = width;
-    _raylib->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
-    _hud->handleResize(_raylib->getScreenWidth(), _raylib->getScreenHeight(),
+    auto screenSize = this->_display->getScreenSize();
+    this->_display->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
+    _hud->handleResize(screenSize.x, screenSize.y,
         _windowWidth, _windowHeight);
 }
 
 void GUI::setWindowHeight(int height)
 {
-    if (height <= 0 || height > _raylib->getMonitorHeight(0))
+    if (height <= 0 || height > this->_display->getMonitorSize().y)
         return;
 
     _windowHeight = height;
-    _raylib->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
-    _hud->handleResize(_raylib->getScreenWidth(), _raylib->getScreenHeight(),
+    auto screenSize = this->_display->getScreenSize();
+    this->_display->initWindow(_windowWidth, _windowHeight, zappy::gui::WINDOW_TITLE);
+    _hud->handleResize(screenSize.x, screenSize.y,
         _windowWidth, _windowHeight);
 }
 
@@ -144,7 +184,7 @@ void GUI::switchCameraMode(zappy::gui::CameraMode mode)
         _cameraMode != zappy::gui::CameraMode::TARGETED) {
         const auto& mapSize = _gameInfos->getMapSize();
 
-        Vector3 mapCenter = {
+        Vector3f mapCenter = {
             static_cast<float>(mapSize.first - 1) / 2.0f, 0.0f,
             static_cast<float>(mapSize.second - 1) / 2.0f
         };
@@ -269,19 +309,21 @@ void GUI::switchToPreviousPlayer()
 
 void GUI::initModels()
 {
-    if (!_raylib->loadModel("player", "gui/assets/models/fall_guy.glb", {0.0f, -75.0f, 0.0f}))
+    if (!this->_display->loadModel("player", "gui/assets/models/fall_guy.glb",
+        {0.0f, -75.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load player model."
                   << colors::RESET << std::endl;
 
-    if (!_raylib->loadModel("platform", "gui/assets/models/tile.glb", {0.0f, 0.25f, 0.0f}))
+    if (!this->_display->loadModel("platform", "gui/assets/models/tile.glb",
+        {0.0f, 0.25f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load platform model."
                   << colors::RESET << std::endl;
 
-    if (!_raylib->loadModel("food", "gui/assets/models/apple.glb", {0.0f, 0.0f, 0.0f}))
+    if (!this->_display->loadModel("food", "gui/assets/models/apple.glb", {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load food model."
                   << colors::RESET << std::endl;
 
-    if (!_raylib->loadModel("rock", "gui/assets/models/rock.glb", {0.0f, 0.0f, 0.0f}))
+    if (!this->_display->loadModel("rock", "gui/assets/models/rock.glb", {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load rock model."
                   << colors::RESET << std::endl;
 }
