@@ -8,7 +8,6 @@
 #include <cmath>
 #include <algorithm>
 #include "CameraManager.hpp"
-#include "raylib.h"
 #include "raymath.h"
 #include "../../Utils/GamepadConstants.hpp"
 
@@ -72,7 +71,7 @@ void CameraManager::updateCameraTargetMode()
 {
     float deltaTime = this->_display->getFrameTime();
 
-    if (this->_display->isMouseButtonPressed(MOUSE_RIGHT)) {
+    if (this->_display->isMouseButtonPressed(this->_display->getKeyId(MOUSE_RIGHT))) {
         _isDragging = true;
 
         Vector2i screenSize = this->_display->getScreenSize();
@@ -84,7 +83,7 @@ void CameraManager::updateCameraTargetMode()
         this->_display->disableCursor();
     }
 
-    if (this->_display->isMouseButtonReleased(MOUSE_RIGHT)) {
+    if (this->_display->isMouseButtonReleased(this->_display->getKeyId(MOUSE_RIGHT))) {
         _isDragging = false;
         this->_display->enableCursor();
     }
@@ -195,14 +194,14 @@ void CameraManager::handlePlayerCameraMouseInput()
     int screenCenterX = screenSize.x / 2;
     int screenCenterY = screenSize.y / 2;
 
-    if (this->_display->isMouseButtonPressed(MOUSE_BUTTON_RIGHT)) {
+    if (this->_display->isMouseButtonPressed(this->_display->getKeyId(MOUSE_RIGHT))) {
         _isPlayerViewDragging = true;
         this->_display->setMousePosition({static_cast<float>(screenCenterX),
             static_cast<float>(screenCenterY)});
         this->_display->disableCursor();
     }
 
-    if (this->_display->isMouseButtonReleased(MOUSE_BUTTON_RIGHT)) {
+    if (this->_display->isMouseButtonReleased(this->_display->getKeyId(MOUSE_RIGHT))) {
         _isPlayerViewDragging = false;
         this->_display->enableCursor();
     }
