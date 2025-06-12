@@ -11,9 +11,18 @@
 #include "../../../include/network.h"
 #include "../../../include/my.h"
 
+static void print_sst_debug(int time)
+{
+    int len = int_str_len(time) + 38;
+    char debug[len];
+
+    snprintf(debug, len + 1, "SST command received. New frequency: %d.", time);
+    valid_message(debug);
+}
+
 static int send_sst_message(graph_net_t *graphic, int time)
 {
-    int size = 5 + int_str_len(time);
+    int size = 6 + int_str_len(time);
     char buffer[size];
 
     snprintf(buffer, size, "sst %d\n", time);
@@ -25,16 +34,16 @@ int sst(zappy_t *zappy, graph_net_t *graphic, char *message)
     int new_freq = 0;
 
     if (strlen(message) < 6) {
-        error_message("Invalid plv message format.");
+        error_message("Invalid sst message format.");
         return -1;
     }
-    if (sscanf(message, "plv %d\n", &new_freq) != 1) {
-        error_message("Invalid plv pattern.");
+    if (sscanf(message, "sst %d\n", &new_freq) != 1) {
+        error_message("Invalid sst pattern.");
         return -1;
     }
     if (send_sst_message(graphic, new_freq) == -1)
         return -1;
     zappy->params->freq = new_freq;
-    printf("Frequency updated to %d\n", new_freq);
+    print_sst_debug(zappy->params->freq);
     return 0;
 }

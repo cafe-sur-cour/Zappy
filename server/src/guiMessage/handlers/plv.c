@@ -13,7 +13,7 @@
 
 static int send_plv_message(graph_net_t *graphic, player_t *player)
 {
-    int size = 7 + int_str_len(player->id) + int_str_len(player->level);
+    int size = 8 + int_str_len(player->id) + int_str_len(player->level);
     char buffer[size];
 
     snprintf(buffer, size, "plv #%d %d\n", player->id, player->level);

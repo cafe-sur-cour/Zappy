@@ -13,7 +13,7 @@
 
 static int send_sgt_message(graph_net_t *graphic, int time)
 {
-    int size = 5 + int_str_len(time);
+    int size = 6 + int_str_len(time);
     char buffer[size];
 
     snprintf(buffer, size, "sgt %d\n", time);

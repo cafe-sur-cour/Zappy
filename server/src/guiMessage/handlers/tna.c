@@ -13,7 +13,7 @@
 
 static int send_tna_message(graph_net_t *graphic, char const *team_name)
 {
-    char buffer[5 + strlen(team_name)];
+    char buffer[6 + strlen(team_name)];
 
     snprintf(buffer, 5 + strlen(team_name), "tna %s\n", team_name);
     if (write_message(graphic->fd, buffer) == -1)

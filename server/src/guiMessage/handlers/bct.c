@@ -14,7 +14,7 @@
 int send_bct_message(graph_net_t *graphic, int x, int y,
     inventory_t *inventory)
 {
-    int size = 13 + int_str_len(x) + int_str_len(y) + int_str_len(inventory->nbFood) +
+    int size = 14 + int_str_len(x) + int_str_len(y) + int_str_len(inventory->nbFood) +
         int_str_len(inventory->nbLinemate) + int_str_len(inventory->nbDeraumere) +
         int_str_len(inventory->nbSibur) + int_str_len(inventory->nbMendiane) +
         int_str_len(inventory->nbPhiras) + int_str_len(inventory->nbThystame);

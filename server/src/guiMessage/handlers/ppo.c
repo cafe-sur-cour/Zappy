@@ -13,7 +13,7 @@
 
 static int send_ppo_message(graph_net_t *graphic, player_t *player)
 {
-    int size = 12 + int_str_len(player->id) + int_str_len(player->posX) +
+    int size = 13 + int_str_len(player->id) + int_str_len(player->posX) +
         int_str_len(player->posY);
     char buffer[size];
 

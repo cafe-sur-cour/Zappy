@@ -13,7 +13,7 @@
 
 static int send_pin_message(graph_net_t *graphic, player_t *player)
 {
-    int size = 15 + int_str_len(player->id) + int_str_len(player->posX) +
+    int size = 16 + int_str_len(player->id) + int_str_len(player->posX) +
         int_str_len(player->posY) + int_str_len(player->inventory->nbFood) +
         int_str_len(player->inventory->nbLinemate) +
         int_str_len(player->inventory->nbDeraumere) +
