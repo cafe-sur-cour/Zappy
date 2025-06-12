@@ -12,32 +12,18 @@ from src.Hash.Hash import Hash
 class Broadcaster:
     def __init__(self, com: Communication, team: str) -> None:
         self.com = com
-        self.hash = Hash(team)
-        self.lastIndex = 0
+        self.hasher = Hash(team)
 
     def revealMessage(self, message: str) -> str:
-        data = ""
+        message = ""
         try:
-            data = self.hash.unHashMessage(message.strip())
+            message = self.hasher.unHashMessage(message.strip())
         except Exception as e:
             print(f"Error unhashing message: {e}")
-            data = ""
+            message = ""
 
-        if not data:
+        if not message:
             return ""
-
-        if "/" not in data:
-            return ""
-        contents = data.split("/")
-        if len(contents) != 2:
-            return ""
-
-        message, index = contents
-
-        index = int(index.strip())
-        if index <= self.lastIndex:
-            return ""
-        self.lastIndex = index
 
         return message.strip()
 
@@ -49,19 +35,14 @@ class Broadcaster:
         if not message:
             return
 
-        self.lastIndex += 1
-        message += f"/{self.lastIndex}"
-
         hashedMessage = ""
         try:
-            hashedMessage = self.hash.hashMessage(message)
+            hashedMessage = self.hasher.hashMessage(message)
         except Exception as e:
             print(f"Error hashing message: {e}")
-            self.lastIndex -= 1
             return
 
         if not hashedMessage:
-            self.lastIndex -= 1
             return
 
         self.com.sendBroadcast(hashedMessage)
