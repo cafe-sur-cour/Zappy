@@ -424,6 +424,8 @@ class Player:
                 if not self.communication.hasPendingCommands():
                     if self.canIncant:
                         self.incantationAction()
+                    elif self.goToIncantation:
+                        self.goToIncantationAction()
                     else:
                         self.roombaAction()
 
