@@ -143,6 +143,10 @@ class Player:
         self.canIncant: bool = False
 
         self.incantationPhase: str = "checkNbPlayers"
+        self.incantationLastCommand: str = None
+
+        self.goToIncantation: bool = False
+        self.incantationDirection: int = 0
 
     def __del__(self):
         try:
