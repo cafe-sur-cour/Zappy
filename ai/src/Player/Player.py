@@ -293,7 +293,7 @@ class Player:
             self.incantationPhase = "checkNbPlayers"
             self.incantationLastCommand = "broadcast"
 
-    def getStepsFromDirection(self, direction: int) -> list[()]:
+    def getStepsFromDirection(self) -> list[()]:
         stepsMap = {
             1: [
                 self.communication.sendForward
@@ -328,7 +328,7 @@ class Player:
                 self.communication.sendForward
             ]
         }
-        return stepsMap.get(direction, [])
+        return stepsMap.get(self.incantationDirection, [])
 
     def goToIncantationAction(self) -> None:
         if self.incantationDirection == 0:
