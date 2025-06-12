@@ -28,6 +28,7 @@ SRC 		=	src/params.c					\
 				src/game/graphic_client.c		\
 				src/game/handle_crystal.c 		\
 				src/game/handle_food.c          \
+				src/game/get_ids_player_tile.c 	\
 				src/game/handle_remove.c 		\
 				src/free.c						\
 				src/algo.c						\
@@ -59,6 +60,7 @@ SRC 		=	src/params.c					\
 				src/aiMessage/connect.c						\
 				src/aiMessage/eject.c						\
 				src/aiMessage/incantation.c					\
+				src/aiMessage/end_incantation.c				\
 				src/aiMessage/inventory.c					\
 				src/aiMessage/set_object.c  					\
 				src/aiMessage/take_object.c					\

@@ -122,7 +122,7 @@ Test(gui_incantation, send_start_incantation_no_players, .init = redirect_all_st
     
     int result = send_start_incantation(zappy, player, player_list, nb_player);
     
-    cr_assert_eq(result, 0);
+    cr_assert_eq(result, -1);
     
     cleanup_test_data(zappy, player);
 }

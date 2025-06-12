@@ -34,7 +34,9 @@ TESTS 	    =   tests_params.c			\
 				tests_connect.c				\
 				tests_gui_incantation.c		\
 				tests_malloc_fails.c		\
-				fake_malloc.c
+				fake_malloc.c				\
+				tests_incantation.c			\
+				tests_grapClients.c
 
 SRC 		=	../../../server/src/params.c					\
 				../../../server/src/messages.c					\
@@ -48,6 +50,7 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/game/init_egg.c					\
 				../../../server/src/game/graphic_client.c		\
 				../../../server/src/game/handle_remove.c 		\
+				../../../server/src/game/get_ids_player_tile.c 	\
 				../../../server/src/algo.c						\
 				../../../server/src/free.c						\
 				../../../server/src/signal.c					\
@@ -89,6 +92,7 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/aiMessage/take_object.c					\
 				../../../server/src/aiMessage/fork.c						\
 				../../../server/src/aiMessage/look.c						\
+				../../../server/src/aiMessage/end_incantation.c				\
 				../../../server/src/game/handle_crystal.c 		\
 				../../../server/src/game/handle_food.c          \
 

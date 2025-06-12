@@ -44,19 +44,19 @@ int send_start_incantation(zappy_t *zappy, player_t *player, int *player_list,
 {
     int playerIds = len_player_id(player_list, nb_player);
     int xlenght = int_str_len(player->posX) + int_str_len(player->posY) +
-        int_str_len(player->level) + playerIds + 8 + nb_player;
+        int_str_len(player->level) + playerIds + 8 + (nb_player * 2);
     char *message = malloc(sizeof(char) * xlenght);
     int offset = 0;
 
-    if (message == NULL)
+    if (message == NULL || nb_player < 1)
         return -1;
     offset = snprintf(message, xlenght, "pic %d %d %d",
         player->posX, player->posY, player->level);
     for (int i = 0; i < nb_player; i++)
-        offset += snprintf(message + offset, xlenght - offset, " %d",
+        offset += snprintf(message + offset, xlenght - offset, " #%d",
             player_list[i]);
     snprintf(message + offset, xlenght - offset, "\n");
     if (zappy->params->is_debug == true)
-        printf("Sending to GUI: %s", message);
+        printf("Nb player  %d Sending to GUI: %s", nb_player, message);
     return send_message_to_graphics(message, zappy);
 }

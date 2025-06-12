@@ -16,20 +16,20 @@
 int print_inventory_server(player_t *player, int len)
 {
     int n = len + int_str_len(player->id);
-    char *debug = calloc(n + 91 + 1, sizeof(char));
+    char *d = calloc(n + 91 + 1, sizeof(char));
 
-    if (!debug) {
+    if (!d) {
         error_message("Memory allocation failed for inventory debug print.");
         return -1;
     }
-    snprintf(debug, 90 + n + 1, "Player (%d) inventory: [food %d, linemate %d, "
+    snprintf(d, 90 + n + 1, "Player (%d) inventory: [food %d, linemate %d, "
         "deraumere %d, sibur %d, mendiane %d, phiras %d, thystame %d].",
         player->id, player->inventory->nbFood, player->inventory->nbLinemate,
         player->inventory->nbDeraumere, player->inventory->nbSibur,
         player->inventory->nbMendiane, player->inventory->nbPhiras,
         player->inventory->nbThystame);
-    valid_message(debug);
-    free(debug);
+    valid_message(d);
+    free(d);
     return 0;
 }
 
