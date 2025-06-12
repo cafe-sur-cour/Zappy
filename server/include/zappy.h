@@ -228,5 +228,8 @@ void rm_thystame(inventory_t *inventory);
 /* Element handler.c */
 int msz(zappy_t *zappy, graph_net_t *graphic, char *message);
 int bct(zappy_t *zappy, graph_net_t *graphic, char *message);
+int send_bct_message(graph_net_t *graphic, int x, int y,
+    inventory_t *inventory);
+int mct(zappy_t *zappy, graph_net_t *graphic, char *message);
 
 #endif /* !ZAPPY_H_ */
