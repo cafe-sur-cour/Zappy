@@ -128,11 +128,9 @@ void GUI::draw()
 
     this->_display->beginDrawing();
 
-    this->_display->clearBackground(Color32{0, 0, 0, 255});
+    this->_display->clearBackground(Color32{255, 255, 255, 255});
 
-    if (!_skyboxLoaded) {
-        this->_display->drawSimpleSkybox();
-    }
+    this->_display->drawSimpleSkybox();
 
     this->_display->begin3DMode();
 
