@@ -45,18 +45,23 @@ class Broadcaster:
         if not message:
             return
 
-        hashedMessage = ""
+        message = message.strip()
+        if not message:
+            return
 
+        self.lastIndex += 1
+        message += f"/{self.lastIndex}"
+
+        hashedMessage = ""
         try:
             hashedMessage = self.hash.hashMessage(message)
         except Exception as e:
             print(f"Error hashing message: {e}")
+            self.lastIndex -= 1
             return
 
         if not hashedMessage:
+            self.lastIndex -= 1
             return
-
-        self.lastIndex += 1
-        hashedMessage += f"/{self.lastIndex}"
 
         self.com.sendBroadcast(hashedMessage)

@@ -227,6 +227,12 @@ class Player:
         }
         return direction_map.get(direction, "unknown")
 
+    def hasEnoughFoodForIncantation(self) -> bool:
+        nbStones = sum(
+            LVL_UPGRADES[self.level]["stones"].values()
+        )
+        return self.inventory["food"] * 126 >= nbStones * 7 + 300
+
     def roombaAction(self) -> None:
         if self.roombaState["phase"] == "forward":
             if self.roombaState["lastCommand"] in ("left", "forward", None):
@@ -275,6 +281,10 @@ class Player:
             self.communication.sendLook()
 
         elif self.incantationPhase == "dropStones":
+            if not self.hasEnoughFoodForIncantation():
+                self.canIncant = False
+                self.incantationPhase = "checkNbPlayers"
+                return
             stones = LVL_UPGRADES[self.level]["stones"]
             for stone, quantity in stones.items():
                 for _ in range(quantity):
