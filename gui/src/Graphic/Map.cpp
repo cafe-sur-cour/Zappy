@@ -212,22 +212,105 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
         tile.mendiane <= 0 && tile.phiras <= 0 && tile.thystame <= 0)
         return;
 
-    for (int i = 0; i < tile.linemate + tile.deraumere + tile.sibur + tile.mendiane +
-            tile.phiras + tile.thystame; ++i) {
+    static float timeAccumulator = 0.0f;
+    timeAccumulator += this->_display->getFrameTime();
+
+    int index = 0;
+
+    for (int i = 0; i < tile.linemate; ++i) {
         Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(i)),
+            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
-
-        static float timeAccumulator = 0.0f;
-        timeAccumulator += this->_display->getFrameTime();
 
         float rotationAngle = timeAccumulator * 0.50f +
             static_cast<float>(x * 10 + y * 15 + i * 20);
 
-        this->_display->drawModelEx("rock", position, {0.0f, 1.0f, 0.0f},
-            rotationAngle, {0.2f, 0.2f, 0.2f}, CWHITE);
+        this->_display->drawModelEx("linemate", position, {0.0f, 1.0f, 0.0f},
+            rotationAngle,
+            {zappy::gui::LINEMATE_SCALE, zappy::gui::LINEMATE_SCALE, zappy::gui::LINEMATE_SCALE},
+            CWHITE);
+    }
+
+    for (int i = 0; i < tile.deraumere; ++i) {
+        Vector3f position = {
+            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+        };
+
+        float rotationAngle = timeAccumulator * 0.50f +
+            static_cast<float>(x * 10 + y * 15 + i * 20);
+
+        this->_display->drawModelEx("deraumere", position, {0.0f, 1.0f, 0.0f},
+            rotationAngle,
+            {zappy::gui::DERAUMERE_SCALE, zappy::gui::DERAUMERE_SCALE, zappy::gui::DERAUMERE_SCALE},
+            CWHITE);
+    }
+
+    for (int i = 0; i < tile.sibur; ++i) {
+        Vector3f position = {
+            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+        };
+
+        float rotationAngle = timeAccumulator * 0.50f +
+            static_cast<float>(x * 10 + y * 15 + i * 20);
+
+        this->_display->drawModelEx("sibur", position, {0.0f, 1.0f, 0.0f},
+            rotationAngle,
+            {zappy::gui::SIBUR_SCALE, zappy::gui::SIBUR_SCALE, zappy::gui::SIBUR_SCALE},
+            CWHITE);
+    }
+
+    for (int i = 0; i < tile.mendiane; ++i) {
+        Vector3f position = {
+            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+        };
+
+        float rotationAngle = timeAccumulator * 0.50f +
+            static_cast<float>(x * 10 + y * 15 + i * 20);
+
+        this->_display->drawModelEx("mendiane", position, {0.0f, 1.0f, 0.0f},
+            rotationAngle,
+            {zappy::gui::MENDIANE_SCALE, zappy::gui::MENDIANE_SCALE, zappy::gui::MENDIANE_SCALE},
+            CWHITE);
+    }
+
+    for (int i = 0; i < tile.phiras; ++i) {
+        Vector3f position = {
+            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+        };
+
+        float rotationAngle = timeAccumulator * 0.50f +
+            static_cast<float>(x * 10 + y * 15 + i * 20);
+
+        this->_display->drawModelEx("phiras", position, {0.0f, 1.0f, 0.0f},
+            rotationAngle,
+            {zappy::gui::PHIRAS_SCALE, zappy::gui::PHIRAS_SCALE, zappy::gui::PHIRAS_SCALE},
+            CWHITE);
+    }
+
+    for (int i = 0; i < tile.thystame; ++i) {
+        Vector3f position = {
+            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+        };
+
+        float rotationAngle = timeAccumulator * 0.50f +
+            static_cast<float>(x * 10 + y * 15 + i * 20);
+
+        this->_display->drawModelEx("thystame", position, {0.0f, 1.0f, 0.0f},
+            rotationAngle,
+            {zappy::gui::THYSTAME_SCALE, zappy::gui::THYSTAME_SCALE, zappy::gui::THYSTAME_SCALE},
+            CWHITE);
     }
 }
 
