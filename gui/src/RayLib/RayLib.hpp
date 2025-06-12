@@ -121,6 +121,8 @@ class RayLib {
         // 2D Drawing methods
         void drawRectangleRec(Rectangle rec, Color color);
         void drawText(const std::string& text, float x, float y, float fontSize, Color color);
+        void drawCircle(float centerX, float centerY, float radius, Color color);
+        void drawCircleLines(float centerX, float centerY, float radius, Color color);
         float measureText(const std::string& text, float fontSize) const;
 
     private:
