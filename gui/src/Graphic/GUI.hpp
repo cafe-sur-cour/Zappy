@@ -21,7 +21,7 @@
 
 class GUI {
     public:
-        explicit GUI(std::shared_ptr<GameInfos> gameInfos);
+        GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &libPath);
         ~GUI();
 
         void run();
@@ -40,7 +40,6 @@ class GUI {
         void switchToPreviousPlayer();
 
     private:
-        std::string _getFirstSharedLibInFolder(const std::string &libPath = "./lib/");
         void updateCamera();
         virtual void update();
         virtual void draw();
