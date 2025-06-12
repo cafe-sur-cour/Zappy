@@ -215,22 +215,6 @@ class Player:
                 self.communication.sendSetObject(stone)
                 return
 
-    def getDirectionFromSound(self, direction: int) -> str:
-        if direction == 0:
-            return "self"
-
-        direction_map = {
-            1: "forward",
-            2: "forwardLeft",
-            3: "left",
-            4: "backLeft",
-            5: "back",
-            6: "backRight",
-            7: "right",
-            8: "forwardRight"
-        }
-        return direction_map.get(direction, "unknown")
-
     def hasEnoughFoodForIncantation(self) -> bool:
         nbStones = sum(
             LVL_UPGRADES[self.level]["stones"].values()
