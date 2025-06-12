@@ -279,22 +279,25 @@ class Player:
     def incantationAction(self) -> None:
         if self.incantationPhase == "checkNbPlayers":
             self.communication.sendLook()
+            self.incantationLastCommand = "look"
 
         elif self.incantationPhase == "dropStones":
             if not self.hasEnoughFoodForIncantation():
                 self.canIncant = False
                 self.incantationPhase = "checkNbPlayers"
                 return
-            stones = LVL_UPGRADES[self.level]["stones"]
+            stones: dict[str, int] = LVL_UPGRADES[self.level]["stones"]
             for stone, quantity in stones.items():
                 for _ in range(quantity):
                     self.communication.sendSetObject(stone)
             self.incantationPhase = "canStartIncantation"
+            self.incantationLastCommand = "set"
 
         elif self.incantationPhase == "canStartIncantation":
             self.communication.sendIncantation()
             self.incantationPhase = "startedIncantation"
-    
+            self.incantationLastCommand = "incantation"
+
         elif self.incantationPhase == "needMorePlayers":
             self.broadcaster.broadcastMessage(f"incantation {self.level}")
             self.incantationPhase = "checkNbPlayers"
