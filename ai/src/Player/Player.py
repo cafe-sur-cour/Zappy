@@ -291,7 +291,7 @@ class Player:
             self.incantationPhase = "checkNbPlayers"
             self.incantationLastCommand = "broadcast"
 
-    def getDirectionFromSound(self, direction: int) -> list[()]:
+    def getStepsFromDirection(self, direction: int) -> list[()]:
         stepsMap = {
             1: [
                 self.communication.sendForward
