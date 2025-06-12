@@ -26,6 +26,7 @@ HUD::HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos,
     initHelpButton();
     initCameraResetButton();
     initTeamPlayersDisplay(_gameInfos);
+    initTpsSlider(_gameInfos, _raylib, _audio);
 }
 
 HUD::~HUD()
@@ -55,6 +56,7 @@ void HUD::update()
     }
 
     updateTeamPlayersDisplay(_gameInfos);
+    updateTpsSlider(_gameInfos);
 }
 
 std::shared_ptr<Containers> HUD::addContainer(
@@ -149,6 +151,12 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
                             screenHeight,
                             bottomHeight,
                             bottomHeightPercent);
+
+    auto tpsContainer = createTpsContainer(
+                            screenWidth,
+                            screenHeight,
+                            bottomHeight,
+                            bottomHeightPercent);
 }
 
 std::shared_ptr<Containers> HUD::getSideContainer() const
@@ -164,6 +172,11 @@ std::shared_ptr<Containers> HUD::getBottomContainer() const
 std::shared_ptr<Containers> HUD::getSquareContainer() const
 {
     return getContainer("square_container");
+}
+
+std::shared_ptr<Containers> HUD::getTpsContainer() const
+{
+    return getContainer("tps_container");
 }
 
 void HUD::initExitButton()
@@ -503,6 +516,40 @@ std::shared_ptr<Containers> HUD::createBottomContainer(
     }
 
     return bottomContainer;
+}
+
+std::shared_ptr<Containers> HUD::createTpsContainer(
+    int screenWidth,
+    int screenHeight,
+    float bottomHeight,
+    float bottomHeightPercent)
+{
+    // Position TPS container in the top right corner
+    float containerWidth = 300.0f;  // Fixed width for the TPS container
+    float containerHeight = 60.0f;  // Fixed height for the TPS container
+    (void)bottomHeight;
+    (void)bottomHeightPercent;
+    
+    auto tpsContainer = addContainer(
+        "tps_container",
+        screenWidth - containerWidth, 0,
+        containerWidth, containerHeight,
+        {40, 40, 40, 200}
+    );
+
+    if (tpsContainer) {
+        // Set relative position for top right corner
+        float widthPercent = (containerWidth / screenWidth) * 100.0f;
+        float heightPercent = (containerHeight / screenHeight) * 100.0f;
+        
+        tpsContainer->setRelativePosition(
+            100.0f - widthPercent,  // X: right side
+            0,                      // Y: top
+            widthPercent,           // Width
+            heightPercent);         // Height
+    }
+
+    return tpsContainer;
 }
 
 void HUD::recordElementPositions(
@@ -873,4 +920,48 @@ void HUD::updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode came
 void HUD::setResetCameraCallback(std::function<void()> resetFunc)
 {
     _resetCameraFunc = resetFunc;
+}
+
+void HUD::initTpsSlider(
+    std::shared_ptr<GameInfos> gameInfos,
+    std::shared_ptr<RayLib> raylib,
+    std::shared_ptr<IAudio> audio)
+{
+    auto tpsContainer = getTpsContainer();
+    if (!tpsContainer || !gameInfos || !raylib || !audio)
+        return;
+
+    tpsContainer->addSliderPercent(
+        "tps_slider", 5.0f, 15.0f, 150.0f, 100.0f,
+        1.0f, 250.0f, gameInfos->getTimeUnit(),
+        "Frequency (TPS): ",
+        [gameInfos, raylib, audio](float value) {
+            gameInfos->setTimeUnit(static_cast<int>(value), true);
+        }
+    );
+}
+
+void HUD::updateTpsSlider(std::shared_ptr<GameInfos> gameInfos)
+{
+    auto tpsContainer = getTpsContainer();
+    if (!tpsContainer || !gameInfos)
+        return;
+
+    auto slider = std::dynamic_pointer_cast<Slider>(
+        tpsContainer->getElement("tps_slider"));
+
+    if (!slider)
+        return;
+
+    static std::chrono::steady_clock::time_point lastUpdateTime;
+    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
+    std::chrono::duration<float> elapsed = now - lastUpdateTime;
+    if (elapsed.count() < 2.0f)
+        return;
+
+    lastUpdateTime = now;
+    if (slider->isDragging())
+        return;
+
+    slider->setValue(static_cast<float>(gameInfos->getTimeUnit()));
 }
