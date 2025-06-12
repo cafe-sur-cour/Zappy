@@ -31,6 +31,7 @@ class Map {
 
         void draw();
         void drawBroadcastingPlayers();
+        void drawIncantations();
         void drawTile(int x, int y, const zappy::structs::Tile &tile);
         void drawRock(int x, int y, const zappy::structs::Tile &tile);
         void drawFood(int x, int y, const zappy::structs::Tile &tile);
