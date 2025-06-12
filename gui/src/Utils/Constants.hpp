@@ -8,6 +8,20 @@
 #ifndef CONSTANTS_HPP_
 #define CONSTANTS_HPP_
 
+    inline const float PLAYER_SCALE = 0.005f;
+    inline const float EGG_SCALE = 1.0f;
+    inline const float FOOD_SCALE = 0.005f;
+    inline const float FOOD_FLOAT_AMPLITUDE = 0.05f;
+    inline const float FOOD_FLOAT_SPEED = 1.5f;
+
+    inline const float ROCK_SCALE = 0.2f;
+    inline const float LINEMATE_SCALE = 0.2f;    // soccerball
+    inline const float DERAUMERE_SCALE = 0.15f;  // beachball
+    inline const float SIBUR_SCALE = 0.15f;      // basketball
+    inline const float MENDIANE_SCALE = 0.18f;   // bowlingball
+    inline const float PHIRAS_SCALE = 0.1f;      // eightball
+    inline const float THYSTAME_SCALE = 0.1f;    // tennisball
+
 #include <string>
 #include <vector>
 #include "HelpText.hpp"
@@ -133,6 +147,17 @@ namespace zappy::gui {
     inline const float POSITION_MULTIPLIER = 2.2f;
 
     inline const float PLAYER_SCALE = 0.005f;
+    inline const float EGG_SCALE = 1.0f;
+    inline const float FOOD_SCALE = 0.005f;
+    inline const float FOOD_FLOAT_AMPLITUDE = 0.05f;
+    inline const float FOOD_FLOAT_SPEED = 0.10f;
+
+    inline const float LINEMATE_SCALE = 0.2f;    // soccerball
+    inline const float DERAUMERE_SCALE = 0.15f;  // beachball
+    inline const float SIBUR_SCALE = 0.15f;      // basketball
+    inline const float MENDIANE_SCALE = 0.18f;   // bowlingball
+    inline const float PHIRAS_SCALE = 0.1f;      // eightball
+    inline const float THYSTAME_SCALE = 0.1f;    // tennisball
 
     enum class CameraMode {
         FREE = 0,

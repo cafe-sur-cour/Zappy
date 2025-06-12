@@ -39,6 +39,17 @@ class RayLibEnc {
         // Texture methods
         void drawTextureRec(Texture2D texture, Rectangle source, Vector2 position, Color tint);
         void unloadTexture(Texture2D texture);
+        Texture2D loadTextureFromFile(const std::string& filepath);
+        void drawTextureEx(Texture2D texture, Vector2 position, Color tint);
+        void drawTextureScaled(Texture2D texture, float x, float y, float width, float height,
+            Color tint);
+
+        // Texture map accessor methods
+        bool hasTexture(const std::string& id) const;
+        Texture2D getTexture(const std::string& id) const;
+        void addTexture(const std::string& id, Texture2D texture);
+
+        void drawSimpleSkybox();
 
         // Input methods
         bool isMouseButtonDown(int button) const;
@@ -118,6 +129,10 @@ class RayLibEnc {
         void unloadAllModels();
         bool modelExists(const std::string& id) const;
 
+        // Skybox methods
+        bool loadSkybox(const std::string& id, const std::string& filepath);
+        void drawSkybox(const std::string& id);
+
         // 2D Drawing methods
         void drawRectangleRec(Rectangle rec, Color color);
         void drawText(const std::string& text, float x, float y, float fontSize, Color color);
@@ -138,6 +153,7 @@ class RayLibEnc {
         };
 
         std::map<std::string, ModelData> _models;
+        std::map<std::string, Texture2D> _textures;
         std::map<std::string, Sound> _sounds;
         std::map<std::string, Music> _musics;
 };

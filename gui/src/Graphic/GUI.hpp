@@ -63,6 +63,8 @@ class GUI {
         int _windowHeight;
 
         zappy::gui::CameraMode _cameraMode;
+        bool _backgroundLoaded;
+        bool _skyboxLoaded;
 };
 
 #endif /* !GUI_HPP_ */

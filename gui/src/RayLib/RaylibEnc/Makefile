@@ -20,6 +20,9 @@ SRC =	RayLibEnc.cpp	\
 		RaylibGamepad.cpp \
 		Raylib3dDrawing.cpp	\
 		Raylib3dModel.cpp	\
+		RaylibTextures.cpp	\
+		RaylibSkybox.cpp	\
+		ColorGradientSkybox.cpp
 
 OBJ = $(SRC:.cpp=.o)
 

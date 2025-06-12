@@ -187,6 +187,23 @@ class IDisplay {
             Color32 color) = 0;
 
         virtual void drawRectangleRec(FloatRect rec, Color32 color) = 0;
+
+        virtual bool loadTexture(const std::string& id, const std::string& filepath) = 0;
+
+        virtual void drawTexture(const std::string& id, float x, float y,
+            Color32 tint = CWHITE) = 0;
+
+        virtual void drawTextureScaled(const std::string& id, float x, float y, float width,
+            float height, Color32 tint = CWHITE) = 0;
+
+        virtual Vector2f getTextureSize(const std::string& id) const = 0;
+
+        virtual bool loadSkybox(const std::string& id, const std::string& filepath) = 0;
+
+        virtual void drawSkybox(const std::string& id) = 0;
+
+        virtual void drawSimpleSkybox() = 0;
+
         ~IDisplay() = default;
 };
 
