@@ -292,9 +292,6 @@ class Player:
             self.incantationLastCommand = "broadcast"
 
     def getDirectionFromSound(self, direction: int) -> list[()]:
-        if direction == 0:
-            return []
-
         stepsMap = {
             1: [
                 self.communication.sendForward
