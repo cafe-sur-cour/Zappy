@@ -367,3 +367,68 @@ bool Raylib::loadModel(const std::string& id, const std::string& filepath, Vecto
 {
     return this->_raylib->loadModel(id, filepath, {center.x, center.y, center.z});
 }
+
+bool Raylib::loadTexture(const std::string& id, const std::string& filepath)
+{
+    if (this->_raylib->hasTexture(id)) {
+        std::cout << "Texture " << id << " already exists" << std::endl;
+        return true;
+    }
+
+    Texture2D texture = this->_raylib->loadTextureFromFile(filepath);
+    if (texture.id == 0) {
+        std::cout << "Failed to load texture " << filepath << std::endl;
+        return false;
+    }
+
+    this->_raylib->addTexture(id, texture);
+    return true;
+}
+
+void Raylib::drawTexture(const std::string& id, float x, float y, Color32 tint)
+{
+    if (!this->_raylib->hasTexture(id)) {
+        std::cout << "Texture " << id << " not found" << std::endl;
+        return;
+    }
+
+    Texture2D texture = this->_raylib->getTexture(id);
+    this->_raylib->drawTextureEx(texture, {x, y}, {tint.r, tint.g, tint.b, tint.a});
+}
+
+void Raylib::drawTextureScaled(const std::string& id, float x, float y, float width, float height, Color32 tint)
+{
+    if (!this->_raylib->hasTexture(id)) {
+        std::cout << "Texture " << id << " not found" << std::endl;
+        return;
+    }
+
+    Texture2D texture = this->_raylib->getTexture(id);
+    this->_raylib->drawTextureScaled(texture, x, y, width, height, {tint.r, tint.g, tint.b, tint.a});
+}
+
+Vector2f Raylib::getTextureSize(const std::string& id) const
+{
+    if (!this->_raylib->hasTexture(id)) {
+        std::cout << "Texture " << id << " not found" << std::endl;
+        return {0.0f, 0.0f};
+    }
+
+    Texture2D texture = this->_raylib->getTexture(id);
+    return {static_cast<float>(texture.width), static_cast<float>(texture.height)};
+}
+
+bool Raylib::loadSkybox(const std::string& id, const std::string& filepath)
+{
+    return this->_raylib->loadSkybox(id, filepath);
+}
+
+void Raylib::drawSkybox(const std::string& id)
+{
+    this->_raylib->drawSkybox(id);
+}
+
+void Raylib::drawSimpleSkybox()
+{
+    this->_raylib->drawSimpleSkybox();
+}
