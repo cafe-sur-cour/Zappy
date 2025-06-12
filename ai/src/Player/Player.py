@@ -413,8 +413,7 @@ class Player:
                     data = self.communication.getLastMessage()
                     direction = data[0]
                     message = self.broadcaster.revealMessage(data[1])
-                    if message and not self.is_child_process:
-                        self.logger.display(f"Received message: {message}")
+                    self.handleMessages(direction, message)
 
                 if self.communication.hasResponses():
                     response = self.communication.getLastResponse()
