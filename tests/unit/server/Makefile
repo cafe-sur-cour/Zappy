@@ -13,59 +13,60 @@ NC=\033[0m
 
 UNIT 	    = 	unit_tests
 
-TESTS 	    =   tests_params.c			\
-				tests_errors.c			\
-				tests_checkers.c		\
-				tests_server.c			\
-				tests_map_init.c		\
-				tests_free.c			\
-				tests_guiMessage.c		\
-				tests_client.c			\
-				tests_network.c			\
-				tests_aiMessage.c		\
-				tests_messaggeReception.c	\
-				tests_handler_elem.c		\
-				tests_look.c				\
-				tests_right.c				\
-				tests_left.c				\
-				tests_inventory.c			\
-				tests_setObj.c				\
-				tests_get_objects.c			\
-				tests_connect.c				\
-				tests_gui_incantation.c		\
-				tests_malloc_fails.c		\
+TESTS 	    =   tests_params.c						\
+				tests_errors.c						\
+				tests_checkers.c					\
+				tests_server.c						\
+				tests_map_init.c					\
+				tests_free.c						\
+				tests_guiMessage.c					\
+				tests_client.c						\
+				tests_network.c						\
+				tests_aiMessage.c					\
+				tests_messaggeReception.c			\
+				tests_handler_elem.c				\
+				tests_look.c						\
+				tests_right.c						\
+				tests_left.c						\
+				tests_inventory.c					\
+				tests_setObj.c						\
+				tests_get_objects.c					\
+				tests_connect.c						\
+				tests_gui_incantation.c				\
+				tests_msz.c							\
+				tests_malloc_fails.c				\
 				fake_malloc.c
 
-SRC 		=	../../../server/src/params.c					\
-				../../../server/src/messages.c					\
-				../../../server/src/checkers.c					\
-				../../../server/src/server.c					\
-				../../../server/src/game/player.c					\
-				../../../server/src/protocol.c					\
-				../../../server/src/game/client.c					\
-				../../../server/src/accept.c					\
-				../../../server/src/game/game.c						\
-				../../../server/src/game/init_egg.c					\
-				../../../server/src/game/graphic_client.c		\
-				../../../server/src/game/handle_remove.c 		\
-				../../../server/src/algo.c						\
-				../../../server/src/free.c						\
-				../../../server/src/signal.c					\
-				../../../server/src/params_checkers.c 			\
-				../../../server/src/network/accept_connection.c			\
-				../../../server/src/network/buffer.c			\
-				../../../server/src/network/close.c		\
-				../../../server/src/network/create_server.c	\
-				../../../server/src/network/hanlde_input.c		\
-				../../../server/src/network/print_error.c		\
-				../../../server/src/network/send_message.c		\
-				../../../server/src/guiMessage/gui_send_map_data.c	\
-				../../../server/src/guiMessage/gui_send_team_name.c	\
-				../../../server/src/guiMessage/gui_send_eggs.c		\
-				../../../server/src/guiMessage/gui_send_time.c		\
-				../../../server/src/guiMessage/gui_send_egg_death.c \
-				../../../server/src/guiMessage/gui_send_egg_connect.c	\
-				../../../server/src/guiMessage/gui_send_player_info.c	\
+SRC 		=	../../../server/src/params.c								\
+				../../../server/src/messages.c								\
+				../../../server/src/checkers.c								\
+				../../../server/src/server.c								\
+				../../../server/src/game/player.c							\
+				../../../server/src/protocol.c								\
+				../../../server/src/game/client.c							\
+				../../../server/src/accept.c								\
+				../../../server/src/game/game.c								\
+				../../../server/src/game/init_egg.c							\
+				../../../server/src/game/graphic_client.c					\
+				../../../server/src/game/handle_remove.c 					\
+				../../../server/src/algo.c									\
+				../../../server/src/free.c									\
+				../../../server/src/signal.c								\
+				../../../server/src/params_checkers.c 						\
+				../../../server/src/network/accept_connection.c				\
+				../../../server/src/network/buffer.c						\
+				../../../server/src/network/close.c							\
+				../../../server/src/network/create_server.c					\
+				../../../server/src/network/hanlde_input.c					\
+				../../../server/src/network/print_error.c					\
+				../../../server/src/network/send_message.c					\
+				../../../server/src/guiMessage/gui_send_map_data.c			\
+				../../../server/src/guiMessage/gui_send_team_name.c			\
+				../../../server/src/guiMessage/gui_send_eggs.c				\
+				../../../server/src/guiMessage/gui_send_time.c				\
+				../../../server/src/guiMessage/gui_send_egg_death.c 		\
+				../../../server/src/guiMessage/gui_send_egg_connect.c		\
+				../../../server/src/guiMessage/gui_send_player_info.c		\
 				../../../server/src/guiMessage/gui_send_rest_info_player.c	\
 				../../../server/src/guiMessage/gui_miscellaneous_send.c		\
 				../../../server/src/guiMessage/gui_send_boradcast.c			\
@@ -73,6 +74,15 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/guiMessage/gui_send_ressource.c			\
 				../../../server/src/guiMessage/gui_send_start_incantation.c \
 				../../../server/src/guiMessage/gui_send_end_incantation.c	\
+				../../../server/src/guiMessage/handlers/msz.c				\
+				../../../server/src/guiMessage/handlers/bct.c				\
+				../../../server/src/guiMessage/handlers/mct.c				\
+				../../../server/src/guiMessage/handlers/tna.c				\
+				../../../server/src/guiMessage/handlers/ppo.c				\
+				../../../server/src/guiMessage/handlers/plv.c				\
+				../../../server/src/guiMessage/handlers/pin.c				\
+				../../../server/src/guiMessage/handlers/sgt.c				\
+				../../../server/src/guiMessage/handlers/sst.c				\
 				../../../server/src/receiveMessage/action_handler.c			\
 				../../../server/src/receiveMessage/pollin_handler.c			\
 				../../../server/src/receiveMessage/loop_thru_command.c		\
@@ -85,12 +95,13 @@ SRC 		=	../../../server/src/params.c					\
 				../../../server/src/aiMessage/eject.c						\
 				../../../server/src/aiMessage/incantation.c					\
 				../../../server/src/aiMessage/inventory.c					\
-				../../../server/src/aiMessage/set_object.c  					\
+				../../../server/src/aiMessage/set_object.c  				\
 				../../../server/src/aiMessage/take_object.c					\
 				../../../server/src/aiMessage/fork.c						\
 				../../../server/src/aiMessage/look.c						\
-				../../../server/src/game/handle_crystal.c 		\
-				../../../server/src/game/handle_food.c          \
+				../../../server/src/game/handle_crystal.c 					\
+				../../../server/src/game/handle_food.c          			\
+
 
 INCLUDES 	= 	-I./../../../server/include -I./
 
@@ -117,7 +128,7 @@ fclean: clean
 	@rm -rf $(NAME)
 	@rm -rf $(UNIT)
 
-unit_test: fake_malloc
+unit_test: fclean fake_malloc
 	@echo -e "$(YELLOW)ᒥ🧪ᒧ Compiling unit tests with fake malloc support...$(NC)"
 	@$(CC) -o $(UNIT) $(SRC) $(TESTS) $(CFLAGS) $(INCLUDES) $(CRIT) $(LIBS)
 
