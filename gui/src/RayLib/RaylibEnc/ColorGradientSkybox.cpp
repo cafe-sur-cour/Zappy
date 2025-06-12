@@ -31,12 +31,4 @@ void RayLibEnc::drawSimpleSkybox()
         screenHeight/2,
         middleColor,
         bottomColor);
-
-    Color cloudColor = {255, 255, 255, 100};
-
-    DrawRectangle(screenWidth/5, screenHeight/8, screenWidth/6, screenHeight/20, cloudColor);
-    DrawRectangle(screenWidth/2, screenHeight/6, screenWidth/5, screenHeight/25, cloudColor);
-    DrawRectangle(3*screenWidth/4, screenHeight/10, screenWidth/7, screenHeight/30,
-        cloudColor);
-    DrawRectangle(screenWidth/8, screenHeight/4, screenWidth/9, screenHeight/40, cloudColor);
 }
