@@ -123,6 +123,20 @@ class Raylib : public IDisplay {
 
         virtual void drawRectangleRec(FloatRect rec, Color32 color);
 
+        virtual bool loadTexture(const std::string& id, const std::string& filepath);
+
+        virtual void drawTexture(const std::string& id, float x, float y, Color32 tint = CWHITE);
+
+        virtual void drawTextureScaled(const std::string& id, float x, float y, float width, float height, Color32 tint = CWHITE);
+
+        virtual Vector2f getTextureSize(const std::string& id) const;
+
+        virtual bool loadSkybox(const std::string& id, const std::string& filepath);
+
+        virtual void drawSkybox(const std::string& id);
+
+        virtual void drawSimpleSkybox();
+
         Raylib();
         ~Raylib() = default;
 };
