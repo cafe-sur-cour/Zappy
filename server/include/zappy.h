@@ -232,6 +232,7 @@ int mct(zappy_t *zappy, graph_net_t *graphic, char *message);
 int tna(zappy_t *zappy, graph_net_t *graphic, char *message);
 int ppo(zappy_t *zappy, graph_net_t *graphic, char *message);
 int plv(zappy_t *zappy, graph_net_t *graphic, char *message);
+int pin(zappy_t *zappy, graph_net_t *graphic, char *message);
 player_t *get_player_by_id(game_t *game, int player_id);
 int send_bct_message(graph_net_t *graphic, int x, int y,
     inventory_t *inventory);

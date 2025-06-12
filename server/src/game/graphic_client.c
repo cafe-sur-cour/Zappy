@@ -20,6 +20,7 @@ const graphic_pf_t GRAPHIC_COMMAND[] = {
     {"tna", &tna},
     {"ppo", &ppo},
     {"plv", &plv},
+    {"pin", &pin},
     {NULL, NULL}
 };
 
