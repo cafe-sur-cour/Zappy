@@ -234,10 +234,12 @@ class Player:
                         self.communication.sendTakeObject("food")
                     tookStones = False
                     neededStones = self.getNeededStonesByPriority()
-                    for stone in neededStones:
-                        if stone in self.look[0].keys():
+                    tile = self.look[0]
+                    for stone, quantity in neededStones:
+                        if stone in tile.keys():
                             tookStones = True
-                            self.communication.sendTakeObject(stone)
+                            for _ in range(min(quantity, tile[stone])):
+                                self.communication.sendTakeObject(stone)
                     if tookStones:
                         self.communication.sendInventory()
                 self.roombaState["lastCommand"] = "take"
