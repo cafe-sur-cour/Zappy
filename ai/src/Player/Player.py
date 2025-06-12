@@ -361,6 +361,8 @@ class Player:
             self.logger.error(f"Command '{self.incantationLastCommand}' failed")
             self.incantationPhase = "checkNbPlayers"
             self.canIncant = False
+        self.inIncantation = False
+        self.goToIncantation = False
 
     def handleResponseOK(self) -> None:
         return
