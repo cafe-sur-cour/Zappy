@@ -379,6 +379,8 @@ class Player:
                 self.level = new_level
                 self.canIncant = False
                 self.incantationPhase = "checkNbPlayers"
+                self.goToIncantation = False
+                self.inIncantation = False
             else:
                 self.logger.error(
                     f"Unexpected level response: got {new_level}, old level = {self.level}"
