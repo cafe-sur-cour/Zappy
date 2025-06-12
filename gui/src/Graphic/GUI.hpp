@@ -9,14 +9,15 @@
 #define GUI_HPP_
 
 #include <memory>
-
-#include "../RayLib/RayLib.hpp"
+#include <string>
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
 #include "HUD/HUD.hpp"
 #include "../Audio/IAudio.hpp"
 #include "../Utils/Constants.hpp"
 #include "Camera/CameraManager.hpp"
+#include "../IDisplay.hpp"
+#include "../DLLoader/DLLoader.hpp"
 
 class GUI {
     public:
@@ -39,15 +40,20 @@ class GUI {
         void switchToPreviousPlayer();
 
     private:
+        std::string _getFirstSharedLibInFolder(const std::string &libPath = "./lib/");
         void updateCamera();
-        void update();
-        void draw();
+        virtual void update();
+        virtual void draw();
+        virtual bool isRunning();
         bool playerExists(int playerId) const;
 
         void initModels();
 
+        std::string _currentLibLoaded;
         bool _isRunning;
-        std::shared_ptr<RayLib> _raylib;
+
+        DLLoader<std::shared_ptr<IDisplay>> _dlLoader;
+        std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<Map> _map;
         std::unique_ptr<HUD> _hud;

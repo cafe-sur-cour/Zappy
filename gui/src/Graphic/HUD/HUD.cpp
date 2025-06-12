@@ -14,19 +14,19 @@
 #include "../../Utils/Constants.hpp"
 #include "HUD.hpp"
 
-HUD::HUD(std::shared_ptr<RayLib> raylib, std::shared_ptr<GameInfos> gameInfos,
+HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
          std::shared_ptr<IAudio> audio, std::function<void()> resetCameraFunc)
-    : _containers(), _raylib(raylib), _gameInfos(gameInfos), _audio(audio),
+    : _containers(), _display(display), _gameInfos(gameInfos), _audio(audio),
       _resetCameraFunc(resetCameraFunc)
 {
-    _help = std::make_shared<Help>(raylib, audio);
+    _help = std::make_shared<Help>(display, audio);
     initDefaultLayout(15.0f, 20.0f);
     initExitButton();
     initSettingsButton();
     initHelpButton();
     initCameraResetButton();
     initTeamPlayersDisplay(_gameInfos);
-    initTpsSlider(_gameInfos, _raylib, _audio);
+    initTpsSlider(_gameInfos, _display, _audio);
 }
 
 HUD::~HUD()
@@ -36,7 +36,7 @@ HUD::~HUD()
 
 void HUD::draw()
 {
-    for (auto& pair : _containers) {
+    for (const auto &pair : _containers) {
         pair.second->draw();
     }
 
@@ -63,14 +63,14 @@ std::shared_ptr<Containers> HUD::addContainer(
     const std::string& id,
     float x, float y,
     float width, float height,
-    Color backgroundColor
+    Color32 backgroundColor
 )
 {
     if (_containers.find(id) != _containers.end())
         return nullptr;
 
     auto container = std::make_shared<Containers>(
-        _raylib,
+        _display,
         _audio,
         x,
         y,
@@ -127,8 +127,9 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
     if (bottomHeightPercent <= 0.0f)
         bottomHeightPercent = 20.0f;
 
-    int screenHeight = _raylib->getScreenHeight();
-    int screenWidth = _raylib->getScreenWidth();
+    auto screenSize = this->_display->getScreenSize();
+    int screenHeight = screenSize.x;
+    int screenWidth = screenSize.y;
 
     float sideWidth = (screenWidth * sideWidthPercent) / 100.0f;
     float bottomHeight = (screenHeight * bottomHeightPercent) / 100.0f;
@@ -191,7 +192,7 @@ void HUD::initExitButton()
         70.0f, 15.0f,
         "EXIT",
         [this]() {
-            _raylib->closeWindow();
+            this->_display->closeWindow();
         },
         {240, 60, 60, 255},
         {255, 100, 100, 255},
@@ -256,7 +257,7 @@ void HUD::initCameraResetButton()
         70.0f, 15.0f,
         "RESET CAMERA",
         [this]() {
-            _raylib->initCamera();
+            this->_display->initCamera();
 
             if (_resetCameraFunc) {
                 _resetCameraFunc();
@@ -524,8 +525,8 @@ std::shared_ptr<Containers> HUD::createTpsContainer(
     float bottomHeight,
     float bottomHeightPercent)
 {
-    float containerWidth = 300.0f;
-    float containerHeight = 60.0f;
+    float containerWidth = 200.0f;
+    float containerHeight = 120.0f;
     (void)bottomHeight;
     (void)bottomHeightPercent;
 
@@ -550,53 +551,17 @@ std::shared_ptr<Containers> HUD::createTpsContainer(
     return tpsContainer;
 }
 
-void HUD::recordElementPositions(
-    std::shared_ptr<Containers> container,
-    std::unordered_map<std::string, float>& initialYPositions,
-    float& lastContainerHeight)
-{
-    Rectangle containerBounds = container->getBounds();
-    float containerHeight = containerBounds.height;
-
-    initialYPositions.clear();
-    lastContainerHeight = containerHeight;
-
-    for (int i = 0; i < 100; i++) {
-        std::string idBase = "team_display_" + std::to_string(i);
-
-        auto separatorElem = container->getElement(idBase + "_separator");
-        if (separatorElem)
-            initialYPositions[idBase + "_separator"] = separatorElem->getBounds().y;
-
-        auto titleElem = container->getElement(idBase + "_title");
-        if (titleElem) {
-            initialYPositions[idBase + "_title"] = titleElem->getBounds().y;
-
-            auto statsElem = container->getElement(idBase + "_stats");
-            if (statsElem)
-                initialYPositions[idBase + "_stats"] = statsElem->getBounds().y;
-
-            for (int j = 0; j < 50; j++) {
-                std::string playerID = idBase + "_player_" + std::to_string(j);
-                auto playerElem = container->getElement(playerID);
-                if (playerElem)
-                    initialYPositions[playerID] = playerElem->getBounds().y;
-            }
-        }
-    }
-}
-
 std::pair<float, float> HUD::calculateContentMetrics(
     std::shared_ptr<Containers> container,
-    const std::unordered_map<std::string, float>& initialYPositions)
+    const std::unordered_map<std::string, float> &initialYPositions)
 {
-    Rectangle containerBounds = container->getBounds();
+    FloatRect containerBounds = container->getBounds();
     float maxY = containerBounds.y;
 
     for (const auto& pair : initialYPositions) {
         auto element = container->getElement(pair.first);
         if (element) {
-            Rectangle bounds = element->getBounds();
+            FloatRect bounds = element->getBounds();
             float elemBottom = bounds.y + bounds.height;
             if (elemBottom > maxY) maxY = elemBottom;
         }
@@ -922,18 +887,18 @@ void HUD::setResetCameraCallback(std::function<void()> resetFunc)
 
 void HUD::initTpsSlider(
     std::shared_ptr<GameInfos> gameInfos,
-    std::shared_ptr<RayLib> raylib,
+    std::shared_ptr<IDisplay> display,
     std::shared_ptr<IAudio> audio)
 {
     auto tpsContainer = getTpsContainer();
-    if (!tpsContainer || !gameInfos || !raylib || !audio)
+    if (!tpsContainer || !gameInfos || !display || !audio)
         return;
 
     tpsContainer->addSliderPercent(
         "tps_slider", 5.0f, 15.0f, 150.0f, 100.0f,
         1.0f, 250.0f, gameInfos->getTimeUnit(),
         "Frequency (TPS): ",
-        [gameInfos, raylib, audio](float value) {
+        [gameInfos, display, audio](float value) {
             gameInfos->setTimeUnit(static_cast<int>(value), true);
         }
     );

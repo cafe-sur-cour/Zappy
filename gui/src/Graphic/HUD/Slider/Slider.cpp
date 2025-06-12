@@ -13,14 +13,14 @@
 #include "Slider.hpp"
 
 Slider::Slider(
-    std::shared_ptr<RayLib> raylib,
+    std::shared_ptr<IDisplay> display,
     float x, float y,
     float width, float height,
     float minValue, float maxValue,
     float initialValue,
     const std::string& text,
     std::function<void(float)> onValueChanged
-) : AUIElement(raylib, x, y, width, height),
+) : AUIElement(display, x, y, width, height),
     _value(initialValue),
     _minValue(minValue),
     _maxValue(maxValue),
@@ -49,38 +49,38 @@ void Slider::draw()
 
     float textX = _bounds.x;
     float textY = _bounds.y;
-    _raylib->drawText(_text, textX, textY, textFontSize, _textColor);
+    _display->drawText(_text, textX, textY, textFontSize, _textColor);
 
     std::string valueText = std::to_string(static_cast<int>(_value));
     float valueFontSize = _bounds.height * 0.25f;
-    float textWidth = _raylib->measureText(_text, textFontSize);
+    float textWidth = _display->measureText(_text, textFontSize);
     float valueX = textX + textWidth + 10.0f;
     float valueY = _bounds.y;
-    _raylib->drawText(valueText, valueX, valueY, valueFontSize, _textColor);
+    _display->drawText(valueText, valueX, valueY, valueFontSize, _textColor);
 
     float sliderY = _bounds.y + textFontSize + 10.0f;
     float sliderStartX = _bounds.x;
 
     float trackThickness = _bounds.height * 0.15f;
-    Rectangle trackRect = {
+    FloatRect trackRect = {
         sliderStartX,
         sliderY - trackThickness * 0.5f,
         _sliderTrackWidth,
         trackThickness
     };
-    _raylib->drawRectangleRec(trackRect, _trackColor);
+    _display->drawRectangleRec(trackRect, _trackColor);
 
     float handlePos = getHandlePosition();
-    Rectangle fillRect = {
+    FloatRect fillRect = {
         sliderStartX,
         sliderY - trackThickness * 0.5f,
         handlePos - sliderStartX,
         trackThickness
     };
-    _raylib->drawRectangleRec(fillRect, _fillColor);
+    _display->drawRectangleRec(fillRect, _fillColor);
 
-    _raylib->drawCircle(handlePos, sliderY, _sliderHandleRadius, _handleColor);
-    _raylib->drawCircleLines(handlePos, sliderY, _sliderHandleRadius, {100, 100, 100, 255});
+    _display->drawCircle(handlePos, sliderY, _sliderHandleRadius, _handleColor);
+    _display->drawCircleLines(handlePos, sliderY, _sliderHandleRadius, {100, 100, 100, 255});
 }
 
 void Slider::update()
@@ -88,16 +88,16 @@ void Slider::update()
     if (!_visible)
         return;
 
-    Vector2 mousePos = _raylib->getMousePosition();
+    Vector2f mousePos = _display->getMousePosition();
 
-    if (_raylib->isMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+    if (_display->isMouseButtonPressed(this->_display->getKeyId(MOUSE_LEFT))) {
         if (isMouseOverHandle(mousePos.x, mousePos.y)) {
             _isDragging = true;
         }
     }
 
     if (_isDragging) {
-        if (_raylib->isMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        if (_display->isMouseButtonDown(this->_display->getKeyId(MOUSE_LEFT))) {
             updateValueFromMousePosition(mousePos.x);
         } else {
             _isDragging = false;
@@ -105,7 +105,7 @@ void Slider::update()
     }
 
     if (_hasUnnotifiedChange) {
-        _lastChangeTime += _raylib->getFrameTime();
+        _lastChangeTime += _display->getFrameTime();
         if (_lastChangeTime >= 0.5f) {
             if (_onValueChanged && _value != _lastNotifiedValue) {
                 _onValueChanged(_value);

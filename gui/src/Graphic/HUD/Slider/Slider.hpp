@@ -12,12 +12,13 @@
 #include <functional>
 #include <memory>
 
+#include "../../../IDisplay.hpp"
 #include "../UIElement/AUIElement.hpp"
 
 class Slider : public AUIElement {
     public:
         Slider(
-            std::shared_ptr<RayLib> raylib,
+            std::shared_ptr<IDisplay> raylib,
             float x, float y,
             float width, float height,
             float minValue, float maxValue,
@@ -54,10 +55,10 @@ class Slider : public AUIElement {
         float _sliderTrackWidth;
         float _sliderHandleRadius;
 
-        Color _trackColor;
-        Color _fillColor;
-        Color _handleColor;
-        Color _textColor;
+        Color32 _trackColor;
+        Color32 _fillColor;
+        Color32 _handleColor;
+        Color32 _textColor;
 
         float _lastChangeTime;
         bool _hasUnnotifiedChange;

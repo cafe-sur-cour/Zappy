@@ -2,15 +2,15 @@
 ** EPITECH PROJECT, 2025
 ** B-YEP-400-NAN-4-1-zappy-albane.merian
 ** File description:
-** RaylibCamera
+** RaylibEncCamera
 */
 
-#include "RayLib.hpp"
+#include "RayLibEnc.hpp"
 #include "raymath.h"
-#include "../Utils/Constants.hpp"
-#include "../Utils/GamepadConstants.hpp"
+#include "../../Utils/Constants.hpp"
+#include "../../Utils/GamepadConstants.hpp"
 
-void RayLib::initCamera()
+void RayLibEnc::initCamera()
 {
     _camera.position = (Vector3){ 0.0f, 30.0f, 30.0f };
     _camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
@@ -19,37 +19,37 @@ void RayLib::initCamera()
     _camera.projection = CAMERA_PERSPECTIVE;
 }
 
-void RayLib::setCameraPosition(Vector3 position)
+void RayLibEnc::setCameraPosition(Vector3 position)
 {
     _camera.position = position;
 }
 
-void RayLib::setCameraTarget(Vector3 target)
+void RayLibEnc::setCameraTarget(Vector3 target)
 {
     _camera.target = target;
 }
 
-void RayLib::setCameraUp(Vector3 up)
+void RayLibEnc::setCameraUp(Vector3 up)
 {
     _camera.up = up;
 }
 
-void RayLib::setCameraFovy(float fovy)
+void RayLibEnc::setCameraFovy(float fovy)
 {
     _camera.fovy = fovy;
 }
 
-void RayLib::setCameraProjection(int projection)
+void RayLibEnc::setCameraProjection(int projection)
 {
     _camera.projection = projection;
 }
 
-void RayLib::updateCamera(int mode)
+void RayLibEnc::updateCamera(int mode)
 {
     UpdateCamera(&_camera, mode);
 }
 
-void RayLib::updateCameraFreeMode()
+void RayLibEnc::updateCameraFreeMode()
 {
     float deltaTime = getFrameTime();
     float moveSpeed = zappy::gui::CAMERA_SPEED * deltaTime;
@@ -247,7 +247,7 @@ void RayLib::updateCameraFreeMode()
     }
 }
 
-Camera3D RayLib::getCamera() const
+Camera3D RayLibEnc::getCamera() const
 {
     return _camera;
 }

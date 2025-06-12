@@ -10,26 +10,18 @@
 #include <memory>
 
 Containers::Containers(
-    std::shared_ptr<RayLib> raylib,
+    std::shared_ptr<IDisplay> display,
     std::shared_ptr<IAudio> audio,
     float x,
     float y,
     float width,
     float height,
-    Color backgroundColor)
-    : AContainers(raylib, x, y, width, height),
-      _raylib(raylib),
+    Color32 backgroundColor)
+    : AContainers(display, x, y, width, height),
       _audio(audio),
-      _hasBackgroundTexture(false),
       _elements()
 {
     _backgroundColor = backgroundColor;
-}
-
-Containers::~Containers()
-{
-    if (_hasBackgroundTexture)
-        _raylib->unloadTexture(_backgroundTexture);
 }
 
 void Containers::draw()
@@ -37,23 +29,18 @@ void Containers::draw()
     if (!_visible)
         return;
 
-    _raylib->beginScissorMode(
-        static_cast<int>(_bounds.x),
-        static_cast<int>(_bounds.y),
-        static_cast<int>(_bounds.width),
-        static_cast<int>(_bounds.height)
-    );
-
     if (_hasBackground) {
-        if (_hasBackgroundTexture) {
-            _raylib->drawTextureRec(_backgroundTexture,
-                (Rectangle){0, 0, _bounds.width, _bounds.height},
-                (Vector2){_bounds.x, _bounds.y},
-                WHITE);
-        } else {
-            _raylib->drawRectangleRec(_bounds, _backgroundColor);
-        }
+        this->_display->drawRectangleRec(_bounds, _backgroundColor);
     }
+
+    this->_display->beginScissorMode(
+        {
+            static_cast<int>(_bounds.x),
+            static_cast<int>(_bounds.y),
+            static_cast<int>(_bounds.width),
+            static_cast<int>(_bounds.height)
+        }
+    );
 
     for (auto& pair : _elements) {
         if (pair.first.find("scrollbar") != std::string::npos) {
@@ -62,7 +49,7 @@ void Containers::draw()
         pair.second->draw();
     }
 
-    _raylib->endScissorMode();
+    this->_display->endScissorMode();
 
     for (auto& pair : _elements) {
         if (pair.first.find("scrollbar") != std::string::npos) {
@@ -81,28 +68,9 @@ void Containers::update()
     }
 }
 
-void Containers::setBackgroundColor(Color color)
+void Containers::setBackgroundColor(Color32 color)
 {
     _backgroundColor = color;
-}
-
-void Containers::setHasBackground(bool hasBackground)
-{
-    _hasBackground = hasBackground;
-}
-
-void Containers::setBackgroundTexture(Texture2D texture)
-{
-    if (_hasBackgroundTexture)
-        _raylib->unloadTexture(_backgroundTexture);
-
-    _backgroundTexture = texture;
-    _hasBackgroundTexture = true;
-}
-
-bool Containers::hasBackgroundTexture() const
-{
-    return _hasBackgroundTexture;
 }
 
 bool Containers::addElement(const std::string& id, std::shared_ptr<IUIElement> element)
@@ -110,7 +78,7 @@ bool Containers::addElement(const std::string& id, std::shared_ptr<IUIElement> e
     if (_elements.find(id) != _elements.end())
         return false;
 
-    Rectangle elemBounds = element->getBounds();
+    FloatRect elemBounds = element->getBounds();
 
     auto button = std::dynamic_pointer_cast<Button>(element);
     auto text = std::dynamic_pointer_cast<Text>(element);
@@ -162,7 +130,7 @@ std::shared_ptr<Button> Containers::addButton(
     std::function<void()> callback
 )
 {
-    auto button = std::make_shared<Button>(_raylib, _audio, x, y, width,
+    auto button = std::make_shared<Button>(this->_display, _audio, x, y, width,
         height, text, callback);
 
     if (addElement(id, button))
@@ -177,13 +145,13 @@ std::shared_ptr<Button> Containers::addButton(
     float width, float height,
     const std::string& text,
     std::function<void()> callback,
-    Color normalColor,
-    Color hoverColor,
-    Color pressedColor,
-    Color textColor
+    Color32 normalColor,
+    Color32 hoverColor,
+    Color32 pressedColor,
+    Color32 textColor
 )
 {
-    auto button = std::make_shared<Button>(_raylib, _audio, x, y, width, height,
+    auto button = std::make_shared<Button>(this->_display, _audio, x, y, width, height,
         text, callback);
     button->setColors(normalColor, hoverColor, pressedColor, textColor);
 
@@ -198,10 +166,10 @@ std::shared_ptr<Text> Containers::addText(
     float x, float y,
     const std::string& text,
     float fontSize,
-    Color color
+    Color32 color
 )
 {
-    auto textElement = std::make_shared<Text>(_raylib, x, y, text, fontSize, color);
+    auto textElement = std::make_shared<Text>(this->_display, x, y, text, fontSize, color);
 
     if (addElement(id, textElement))
         return textElement;
@@ -257,7 +225,7 @@ void Containers::handleResize(int oldWidth, int oldHeight, int newWidth, int new
                 slider->setSize(elemNewWidth, elemNewHeight);
             }
         } else {
-            Rectangle elemBounds = pair.second->getBounds();
+            FloatRect elemBounds = pair.second->getBounds();
 
             float elemRelXPercent = ((elemBounds.x - _bounds.x) / _bounds.width) * 100.0f;
             float elemRelYPercent = ((elemBounds.y - _bounds.y) / _bounds.height) * 100.0f;
@@ -295,7 +263,7 @@ std::shared_ptr<Button> Containers::addButtonPercent(
     float width = (_bounds.width * widthPercent) / 100.0f;
     float height = (_bounds.height * heightPercent) / 100.0f;
 
-    auto button = std::make_shared<Button>(_raylib, _audio, x, y, width, height,
+    auto button = std::make_shared<Button>(this->_display, _audio, x, y, width, height,
         text, callback);
 
     button->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
@@ -312,10 +280,10 @@ std::shared_ptr<Button> Containers::addButtonPercent(
     float widthPercent, float heightPercent,
     const std::string& text,
     std::function<void()> callback,
-    Color normalColor,
-    Color hoverColor,
-    Color pressedColor,
-    Color textColor
+    Color32 normalColor,
+    Color32 hoverColor,
+    Color32 pressedColor,
+    Color32 textColor
 )
 {
     auto button = addButtonPercent(
@@ -338,14 +306,14 @@ std::shared_ptr<Text> Containers::addTextPercent(
     float xPercent, float yPercent,
     const std::string& text,
     float fontSizePercent,
-    Color color
+    Color32 color
 )
 {
     float x = (_bounds.width * xPercent) / 100.0f;
     float y = (_bounds.height * yPercent) / 100.0f;
     float fontSize = (_bounds.height * fontSizePercent) / 100.0f;
 
-    auto textElement = std::make_shared<Text>(_raylib, x, y, text, fontSize, color);
+    auto textElement = std::make_shared<Text>(this->_display, x, y, text, fontSize, color);
 
     textElement->setRelativePosition(xPercent, yPercent, 0.0f, fontSizePercent);
 
@@ -365,7 +333,7 @@ std::shared_ptr<Slider> Containers::addSlider(
     std::function<void(float)> onValueChanged
 )
 {
-    auto slider = std::make_shared<Slider>(_raylib, x, y, width, height,
+    auto slider = std::make_shared<Slider>(_display, x, y, width, height,
         minValue, maxValue, initialValue, text, onValueChanged);
 
     if (addElement(id, slider))
@@ -389,7 +357,7 @@ std::shared_ptr<Slider> Containers::addSliderPercent(
     float width = (_bounds.width * widthPercent) / 100.0f;
     float height = (_bounds.height * heightPercent) / 100.0f;
 
-    auto slider = std::make_shared<Slider>(_raylib, x, y, width, height,
+    auto slider = std::make_shared<Slider>(_display, x, y, width, height,
         minValue, maxValue, initialValue, text, onValueChanged);
 
     slider->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
