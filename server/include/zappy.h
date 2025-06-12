@@ -99,6 +99,8 @@ bool process_new_client(const char *team_name, int fd, zappy_t *server);
 team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server);
 int get_next_free_id(zappy_t *server);
 void check_player_status(zappy_t *zappy);
+void update_player_food_timer(player_t *player, zappy_t *zappy);
+bool is_player_starving(player_t *player);
 
 /* init_map.c */
 void init_game(zappy_t *server);
