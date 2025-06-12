@@ -10,9 +10,11 @@
 
 #include <memory>
 #include <unordered_map>
+#include <vector>
 #include <string>
+#include <chrono>
 #include "../Game/GameInfos.hpp"
-#include "../RayLib/RayLib.hpp"
+#include "../IDisplay.hpp"
 
 enum class DisplayPriority {
     TILE = 0,
@@ -24,23 +26,28 @@ enum class DisplayPriority {
 
 class Map {
     public:
-        Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<RayLib> raylib);
+        Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<IDisplay> display);
         ~Map();
 
         void draw();
+        void drawBroadcastingPlayers();
         void drawTile(int x, int y, const zappy::structs::Tile &tile);
         void drawRock(int x, int y, const zappy::structs::Tile &tile);
         void drawFood(int x, int y, const zappy::structs::Tile &tile);
         void drawPlayers(int x, int y);
         void drawEggs(int x, int y);
-        Color getTeamColor(const std::string &teamName);
+        Color32 getTeamColor(const std::string &teamName);
 
         float getOffset(DisplayPriority priority, int x, int y, size_t stackIndex = 0);
 
     private:
         std::shared_ptr<GameInfos> _gameInfos;
-        std::shared_ptr<RayLib> _raylib;
-        std::unordered_map<std::string, Color> _teamColors;
+        std::shared_ptr<IDisplay> _display;
+        std::unordered_map<std::string, Color32> _teamColors;
+        std::vector<Color32> _colors;
+        int _colorIndex = 0;
+
+        std::unordered_map<int, std::chrono::steady_clock::time_point> _broadcastStartTimes;
 
         static constexpr float BASE_HEIGHT_TILE = 0.0f;
         static constexpr float BASE_HEIGHT_FOOD = 0.2f;
@@ -52,8 +59,10 @@ class Map {
         static constexpr float EGG_HEIGHT = 0.3f;
         static constexpr float PLAYER_HEIGHT = 1.1f;
 
-        void drawOrientationArrow(const Vector3 &position, int orientation,
+        void drawOrientationArrow(const Vector3f &position, int orientation,
             float playerHeight);
+        void drawTorus(const Vector3f &position, float radius, float thickness,
+            int radialSegments, Color32 color);
 };
 
 #endif /* !MAP_HPP_ */

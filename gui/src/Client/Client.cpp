@@ -9,13 +9,13 @@
 #include <memory>
 #include <thread>
 #include <chrono>
+#include <string>
 
 #include "Client.hpp"
 #include "../Communication/Communication.hpp"
 #include "../CLI/CLI.hpp"
 
-Client::Client(int ac, const char *const *av) :
-    _gameInfos(std::make_shared<GameInfos>())
+Client::Client(int ac, const char *const *av)
 {
     initialize(ac, av);
 
@@ -25,17 +25,43 @@ Client::Client(int ac, const char *const *av) :
               << colors::RESET << std::endl;
 
     _communication = std::make_shared<Communication>(_config);
+    _gameInfos = std::make_shared<GameInfos>(_communication);
     _msgHandler = std::make_unique<MsgHandler>(_gameInfos, _communication);
 
     if (!_communication->isConnected())
         return;
-
-    _gui = std::make_unique<GUI>(_gameInfos);
+    this->_tryToCreateGuiWithSharedLibInFolder();
+    if (!this->_gui) {
+        std::cerr << "No gui lib found" << std::endl;
+        exit(84);
+    }
     _gui->run();
 }
 
 Client::~Client()
 {
+}
+
+void Client::_tryToCreateGuiWithSharedLibInFolder(const std::string &libPath)
+{
+    try {
+        for (const auto &entry : std::filesystem::directory_iterator(libPath)) {
+            if (entry.path().extension() == ".so") {
+                try {
+                    this->_gui = std::make_unique<GUI>(this->_gameInfos,
+                        entry.path().string());
+                    break;
+                } catch (Exceptions::ModuleError &e) {
+                    this->_gui = nullptr;
+                    std::cerr << e.what() << std::endl;
+                    continue;
+                }
+            }
+        }
+    } catch (const std::filesystem::filesystem_error &e) {
+        std::cerr << "Error accessing directory: " << e.what() << std::endl;
+    }
+    return;
 }
 
 void Client::initialize(int ac, const char *const *av)

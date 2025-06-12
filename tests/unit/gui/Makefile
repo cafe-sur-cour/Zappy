@@ -27,6 +27,7 @@ SRC =	../../../gui/src/Client/Client.cpp \
 		../../../gui/src/Graphic/HUD/Containers/Containers.cpp \
 		../../../gui/src/Graphic/HUD/Containers/AContainers.cpp \
 		../../../gui/src/Graphic/HUD/Text/Text.cpp \
+		../../../gui/src/Graphic/HUD/Slider/Slider.cpp \
 		../../../gui/src/Graphic/HUD/UIElement/AUIElement.cpp \
 		../../../gui/src/Graphic/HUD/HUD.cpp \
 		../../../gui/src/Graphic/Camera/CameraManager.cpp \
@@ -48,7 +49,7 @@ CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 LIBS = -L../../../gui/src/Communication -lcommunication \
-		-L../../../gui/src/RayLib -lraylib_wrapper -lraylib \
+		-L../../../gui/src/RayLib \
 		-L../../../gui/src/Audio -laudio -lsfml-audio \
 		-lGL -lm -lpthread -ldl -lrt -lX11
 

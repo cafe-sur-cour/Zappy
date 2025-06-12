@@ -9,19 +9,20 @@
 #include <memory>
 
 AContainers::AContainers(
-    std::shared_ptr<RayLib> raylib,
+    std::shared_ptr<IDisplay> display,
     float x,
     float y,
     float width,
     float height)
-    : _raylib(raylib),
+    : _display(display),
       _bounds({x, y, width, height}),
-      _backgroundColor(RAYWHITE),
+      _backgroundColor(CRAYWHITE),
       _visible(true),
       _hasBackground(true)
 {
-    int screenWidth = raylib->getScreenWidth();
-    int screenHeight = raylib->getScreenHeight();
+    Vector2i screenSize = this->_display->getScreenSize();
+    int screenWidth = screenSize.x;
+    int screenHeight = screenSize.y;
 
     _relativePos.xPercent = (x / screenWidth) * 100.0f;
     _relativePos.yPercent = (y / screenHeight) * 100.0f;
@@ -34,8 +35,9 @@ void AContainers::setPosition(float x, float y)
     _bounds.x = x;
     _bounds.y = y;
 
-    int screenWidth = _raylib->getScreenWidth();
-    int screenHeight = _raylib->getScreenHeight();
+    Vector2i screenSize = this->_display->getScreenSize();
+    int screenWidth = screenSize.x;
+    int screenHeight = screenSize.y;
 
     _relativePos.xPercent = (x / screenWidth) * 100.0f;
     _relativePos.yPercent = (y / screenHeight) * 100.0f;
@@ -46,21 +48,22 @@ void AContainers::setSize(float width, float height)
     _bounds.width = width;
     _bounds.height = height;
 
-    int screenWidth = _raylib->getScreenWidth();
-    int screenHeight = _raylib->getScreenHeight();
+    Vector2i screenSize = this->_display->getScreenSize();
+    int screenWidth = screenSize.x;
+    int screenHeight = screenSize.y;
 
     _relativePos.widthPercent = (width / screenWidth) * 100.0f;
     _relativePos.heightPercent = (height / screenHeight) * 100.0f;
 }
 
-Rectangle AContainers::getBounds() const
+FloatRect AContainers::getBounds() const
 {
     return _bounds;
 }
 
 bool AContainers::contains(float x, float y) const
 {
-    return _raylib->checkCollisionPointRec({x, y}, _bounds);
+    return this->_display->checkCollisionPointRec({x, y}, _bounds);
 }
 
 void AContainers::setVisible(bool visible)
@@ -94,8 +97,9 @@ RelativePosition AContainers::getRelativePosition() const
 
 void AContainers::updatePositionFromRelative()
 {
-    int screenWidth = _raylib->getScreenWidth();
-    int screenHeight = _raylib->getScreenHeight();
+    Vector2i screenSize = this->_display->getScreenSize();
+    int screenWidth = screenSize.x;
+    int screenHeight = screenSize.y;
 
     _bounds.x = (screenWidth * _relativePos.xPercent) / 100.0f;
     _bounds.y = (screenHeight * _relativePos.yPercent) / 100.0f;

@@ -9,7 +9,8 @@
 #define CLIENT_HPP_
 
 #include <memory>
-
+#include <filesystem>
+#include <string>
 #include "../Utils/Constants.hpp"
 #include "../Communication/ICommunication.hpp"
 #include "../Game/GameInfos.hpp"
@@ -22,6 +23,7 @@ class Client {
         ~Client();
 
     private:
+        void _tryToCreateGuiWithSharedLibInFolder(const std::string &libPath = "./gui/lib/");
         zappy::structs::Config _config;
         void initialize(int ac, const char * const *av);
 

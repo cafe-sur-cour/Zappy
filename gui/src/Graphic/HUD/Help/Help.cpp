@@ -13,8 +13,8 @@
 #include <fstream>
 #include "../../../Utils/Constants.hpp"
 
-Help::Help(std::shared_ptr<RayLib> raylib, std::shared_ptr<IAudio> audio)
-    : _raylib(raylib), _audio(audio), _helpContainer(nullptr), _visible(false)
+Help::Help(std::shared_ptr<IDisplay> display, std::shared_ptr<IAudio> audio)
+    : _display(display), _audio(audio), _helpContainer(nullptr), _visible(false)
 {
     initHelpContainer();
 }
@@ -60,11 +60,12 @@ void Help::handleResize(int oldWidth, int oldHeight, int newWidth, int newHeight
 
 void Help::initHelpContainer()
 {
-    if (!_raylib)
+    if (!_display)
         return;
 
-    int screenWidth = _raylib->getScreenWidth();
-    int screenHeight = _raylib->getScreenHeight();
+    Vector2i screenSize = this->_display->getScreenSize();
+    int screenWidth = screenSize.x;
+    int screenHeight = screenSize.y;
 
     float width = screenWidth * 0.50f;
     float height = screenHeight * 0.30f;
@@ -72,11 +73,11 @@ void Help::initHelpContainer()
     float y = (screenHeight - height) / 2;
 
     _helpContainer = std::make_shared<Containers>(
-        _raylib,
+        _display,
         _audio,
         x, y,
         width, height,
-        Color{50, 50, 50, 240}
+        Color32{50, 50, 50, 240}
     );
 
     _helpContainer->setRelativePosition(
