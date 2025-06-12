@@ -351,8 +351,10 @@ class Player:
                     self.incantationPhase = "needMorePlayers"
 
     def handleResponseKO(self) -> None:
-        self.logger.error(f"Command '{self.roombaState['lastCommand']}' failed")
-        if self.canIncant and self.incantationPhase == "startedIncantation":
+        if not self.canIncant:
+            self.logger.error(f"Command '{self.roombaState['lastCommand']}' failed")
+        if self.canIncant:
+            self.logger.error(f"Command '{self.incantationLastCommand}' failed")
             self.incantationPhase = "checkNbPlayers"
             self.canIncant = False
 
