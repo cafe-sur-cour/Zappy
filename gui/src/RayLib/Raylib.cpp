@@ -396,7 +396,13 @@ void Raylib::drawTexture(const std::string& id, float x, float y, Color32 tint)
     this->_raylib->drawTextureEx(texture, {x, y}, {tint.r, tint.g, tint.b, tint.a});
 }
 
-void Raylib::drawTextureScaled(const std::string& id, float x, float y, float width, float height, Color32 tint)
+void Raylib::drawTextureScaled(
+    const std::string& id,
+    float x,
+    float y,
+    float width,
+    float height,
+    Color32 tint)
 {
     if (!this->_raylib->hasTexture(id)) {
         std::cout << "Texture " << id << " not found" << std::endl;
@@ -404,7 +410,13 @@ void Raylib::drawTextureScaled(const std::string& id, float x, float y, float wi
     }
 
     Texture2D texture = this->_raylib->getTexture(id);
-    this->_raylib->drawTextureScaled(texture, x, y, width, height, {tint.r, tint.g, tint.b, tint.a});
+    this->_raylib->drawTextureScaled(
+        texture,
+        x,
+        y,
+        width,
+        height,
+        {tint.r, tint.g, tint.b, tint.a});
 }
 
 Vector2f Raylib::getTextureSize(const std::string& id) const

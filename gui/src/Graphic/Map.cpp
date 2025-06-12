@@ -173,7 +173,10 @@ void Map::drawEggs(int x, int y)
             static_cast<float>(x * 10 + y * 15 + i * 20);
 
         this->_display->drawModelEx("egg", position, {0.0f, 1.0f, 0.0f},
-            rotationAngle, {zappy::gui::EGG_SCALE, zappy::gui::EGG_SCALE, zappy::gui::EGG_SCALE}, teamColor);
+            rotationAngle, {zappy::gui::EGG_SCALE,
+                            zappy::gui::EGG_SCALE,
+                            zappy::gui::EGG_SCALE},
+                            teamColor);
     }
 }
 
@@ -229,7 +232,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
 
         this->_display->drawModelEx("linemate", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
-            {zappy::gui::LINEMATE_SCALE, zappy::gui::LINEMATE_SCALE, zappy::gui::LINEMATE_SCALE},
+            {zappy::gui::LINEMATE_SCALE,
+             zappy::gui::LINEMATE_SCALE,
+             zappy::gui::LINEMATE_SCALE},
             CWHITE);
     }
 
@@ -245,7 +250,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
 
         this->_display->drawModelEx("deraumere", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
-            {zappy::gui::DERAUMERE_SCALE, zappy::gui::DERAUMERE_SCALE, zappy::gui::DERAUMERE_SCALE},
+            {zappy::gui::DERAUMERE_SCALE,
+             zappy::gui::DERAUMERE_SCALE,
+             zappy::gui::DERAUMERE_SCALE},
             CWHITE);
     }
 
@@ -277,7 +284,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
 
         this->_display->drawModelEx("mendiane", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
-            {zappy::gui::MENDIANE_SCALE, zappy::gui::MENDIANE_SCALE, zappy::gui::MENDIANE_SCALE},
+            {zappy::gui::MENDIANE_SCALE,
+             zappy::gui::MENDIANE_SCALE,
+             zappy::gui::MENDIANE_SCALE},
             CWHITE);
     }
 
@@ -309,7 +318,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
 
         this->_display->drawModelEx("thystame", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
-            {zappy::gui::THYSTAME_SCALE, zappy::gui::THYSTAME_SCALE, zappy::gui::THYSTAME_SCALE},
+            {zappy::gui::THYSTAME_SCALE,
+             zappy::gui::THYSTAME_SCALE,
+             zappy::gui::THYSTAME_SCALE},
             CWHITE);
     }
 }

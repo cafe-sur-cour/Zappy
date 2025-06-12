@@ -316,8 +316,7 @@ void GUI::initModels()
         std::cout << colors::T_GREEN << "[INFO] Successfully loaded skybox texture."
                 << colors::RESET << std::endl;
         _skyboxLoaded = true;
-    }
-    else {
+    } else {
         std::cout << colors::T_RED << "[ERROR] Failed to load skybox texture."
                 << colors::RESET << std::endl;
         if (!_backgroundLoaded) {
@@ -343,27 +342,33 @@ void GUI::initModels()
         std::cout << colors::T_RED << "[ERROR] Failed to load food model."
                   << colors::RESET << std::endl;
 
-    if (!this->_display->loadModel("linemate", "gui/assets/models/soccerball.glb", {0.0f, 0.0f, 0.0f}))
+    if (!this->_display->loadModel("linemate", "gui/assets/models/soccerball.glb",
+        {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load linemate model."
                   << colors::RESET << std::endl;
 
-    if (!this->_display->loadModel("deraumere", "gui/assets/models/beachball.glb", {0.0f, 0.0f, 0.0f}))
+    if (!this->_display->loadModel("deraumere", "gui/assets/models/beachball.glb",
+        {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load deraumere model."
                   << colors::RESET << std::endl;
 
-    if (!this->_display->loadModel("sibur", "gui/assets/models/basketball.glb", {0.0f, 0.0f, 0.0f}))
+    if (!this->_display->loadModel("sibur", "gui/assets/models/basketball.glb",
+        {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load sibur model."
                   << colors::RESET << std::endl;
 
-    if (!this->_display->loadModel("mendiane", "gui/assets/models/bowlingball.glb", {0.0f, 0.0f, 0.0f}))
+    if (!this->_display->loadModel("mendiane", "gui/assets/models/bowlingball.glb",
+        {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load mendiane model."
                   << colors::RESET << std::endl;
 
-    if (!this->_display->loadModel("phiras", "gui/assets/models/eightball.glb", {0.0f, 0.0f, 0.0f}))
+    if (!this->_display->loadModel("phiras", "gui/assets/models/eightball.glb",
+        {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load phiras model."
                   << colors::RESET << std::endl;
 
-    if (!this->_display->loadModel("thystame", "gui/assets/models/tennisball.glb", {0.0f, 0.0f, 0.0f}))
+    if (!this->_display->loadModel("thystame", "gui/assets/models/tennisball.glb",
+        {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load thystame model."
                   << colors::RESET << std::endl;
 

@@ -190,9 +190,11 @@ class IDisplay {
 
         virtual bool loadTexture(const std::string& id, const std::string& filepath) = 0;
 
-        virtual void drawTexture(const std::string& id, float x, float y, Color32 tint = CWHITE) = 0;
+        virtual void drawTexture(const std::string& id, float x, float y,
+            Color32 tint = CWHITE) = 0;
 
-        virtual void drawTextureScaled(const std::string& id, float x, float y, float width, float height, Color32 tint = CWHITE) = 0;
+        virtual void drawTextureScaled(const std::string& id, float x, float y, float width,
+            float height, Color32 tint = CWHITE) = 0;
 
         virtual Vector2f getTextureSize(const std::string& id) const = 0;
 

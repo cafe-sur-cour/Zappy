@@ -5,8 +5,9 @@
 ** TextureMethods
 */
 
-#include "RayLibEnc.hpp"
 #include <iostream>
+#include <string>
+#include "RayLibEnc.hpp"
 
 Texture2D RayLibEnc::loadTextureFromFile(const std::string& filepath)
 {
@@ -18,9 +19,14 @@ void RayLibEnc::drawTextureEx(Texture2D texture, Vector2 position, Color tint)
     DrawTexture(texture, position.x, position.y, tint);
 }
 
-void RayLibEnc::drawTextureScaled(Texture2D texture, float x, float y, float width, float height, Color tint)
+void RayLibEnc::drawTextureScaled(Texture2D texture, float x, float y, float width,
+    float height, Color tint)
 {
-    Rectangle source = { 0.0f, 0.0f, (float)texture.width, (float)texture.height };
+    Rectangle source = {
+        0.0f,
+        0.0f,
+        static_cast<float>(texture.width),
+        static_cast<float>(texture.height)};
     Rectangle dest = { x, y, width, height };
     DrawTexturePro(texture, source, dest, {0, 0}, 0.0f, tint);
 }

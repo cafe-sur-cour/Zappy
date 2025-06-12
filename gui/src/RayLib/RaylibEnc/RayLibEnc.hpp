@@ -41,7 +41,8 @@ class RayLibEnc {
         void unloadTexture(Texture2D texture);
         Texture2D loadTextureFromFile(const std::string& filepath);
         void drawTextureEx(Texture2D texture, Vector2 position, Color tint);
-        void drawTextureScaled(Texture2D texture, float x, float y, float width, float height, Color tint);
+        void drawTextureScaled(Texture2D texture, float x, float y, float width, float height,
+            Color tint);
 
         // Texture map accessor methods
         bool hasTexture(const std::string& id) const;
@@ -127,7 +128,7 @@ class RayLibEnc {
         void unloadModel(const std::string& id);
         void unloadAllModels();
         bool modelExists(const std::string& id) const;
-        
+
         // Skybox methods
         bool loadSkybox(const std::string& id, const std::string& filepath);
         void drawSkybox(const std::string& id);

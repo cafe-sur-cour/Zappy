@@ -5,9 +5,10 @@
 ** RaylibSkybox
 */
 
-#include "RayLibEnc.hpp"
 #include <iostream>
 #include <cmath>
+#include <string>
+#include "RayLibEnc.hpp"
 
 bool RayLibEnc::loadSkybox(const std::string& id, const std::string& filepath)
 {
@@ -20,7 +21,7 @@ bool RayLibEnc::loadSkybox(const std::string& id, const std::string& filepath)
     Mesh cube = GenMeshCube(10000.0f, 10000.0f, 10000.0f);
 
     for (int i = 0; i < cube.vertexCount; i++) {
-        Vector3 v = *(Vector3*)&cube.vertices[i*3];
+        Vector3 v = *reinterpret_cast<Vector3*>(&cube.vertices[i*3]);
         float length = std::sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
         if (length > 0) {
             v.x /= length;
