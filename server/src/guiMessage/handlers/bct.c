@@ -44,7 +44,5 @@ int bct(zappy_t *zappy, graph_net_t *graphic, char *message)
         error_message("Coordinates out of bounds.");
         return -1;
     }
-    if (send_bct_message(graphic, x, y, &zappy->game->map->tiles[x][y]) == -1)
-        return -1;
-    return 0;
+    return send_bct_message(graphic, x, y, &zappy->game->map->tiles[x][y]);
 }

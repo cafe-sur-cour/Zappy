@@ -122,6 +122,19 @@ static game_t *new_game(zappy_t *zappy)
     }
     game->map->width = 10;
     game->map->height = 10;
+    game->map->tiles = malloc(game->map->height * sizeof(inventory_t *));
+    for (int i = 0; i < game->map->height; i++) {
+        game->map->tiles[i] = calloc(game->map->width, sizeof(inventory_t));
+        for (int j = 0; j < game->map->width; j++) {
+            game->map->tiles[i][j].nbFood = 2;
+            game->map->tiles[i][j].nbLinemate = 3;
+            game->map->tiles[i][j].nbDeraumere = 1;
+            game->map->tiles[i][j].nbSibur = 1;
+            game->map->tiles[i][j].nbMendiane = 0;
+            game->map->tiles[i][j].nbPhiras = 0;
+            game->map->tiles[i][j].nbThystame = 5;
+        }
+    }
     for (int i = 0; i < zappy->params->nb_team; i++) {
         zappy->game->teams = new_team(zappy->params->teams[i], zappy->params->nb_client);
     }
@@ -170,46 +183,70 @@ static zappy_t *default_zappy(void)
     return zappy;
 }
 
-// Test for msz command
+// Test for bct command
 
-Test(msz, valid_command, .init = redirect_all_std)
+Test(bct, valid_command, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "msz\n";
+    char message[] = "bct 2 2\n";
     FILE *fp = fopen("gui_socket", "r");
     char buffer[100];
     int result;
 
     cr_assert_not_null(zappy);
-    result = msz(zappy, zappy->graph, message);
+    result = bct(zappy, zappy->graph, message);
     cr_assert_eq(result, 0);
     fgets(buffer, sizeof(buffer), fp);
     fclose(fp);
     remove("gui_socket");
-    cr_assert_str_eq(buffer, "msz 10 10\n");
+    cr_assert_str_eq(buffer, "bct 2 2 2 3 1 1 0 0 5\n");
 }
 
-Test(msz, invalid_command, .init = redirect_all_std)
+Test(bct, invalid_command_only_bct, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "mzs\n";
+    char message[] = "btc\n";
     int result;
 
     cr_assert_not_null(zappy);
-    result = msz(zappy, zappy->graph, message);
+    result = bct(zappy, zappy->graph, message);
     cr_assert_eq(result, -1);
     remove("gui_socket");
 }
 
-Test(msz, invalid_file_descriptor, .init = redirect_all_std)
+Test(bct, invalid_command_pattern, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "msz\n";
+    char message[] = "btc 20 erfghfghg\n";
+    int result;
+
+    cr_assert_not_null(zappy);
+    result = bct(zappy, zappy->graph, message);
+    cr_assert_eq(result, -1);
+    remove("gui_socket");
+}
+
+Test(bct, invalid_file_descriptor, .init = redirect_all_std)
+{
+    zappy_t *zappy = default_zappy();
+    char message[] = "bct 2 2\n";
     int result;
 
     cr_assert_not_null(zappy);
     zappy->graph->fd = -1;
-    result = msz(zappy, zappy->graph, message);
+    result = bct(zappy, zappy->graph, message);
+    cr_assert_eq(result, -1);
+    remove("gui_socket");
+}
+
+Test(bct, invalid_command_out_of_bounds, .init = redirect_all_std)
+{
+    zappy_t *zappy = default_zappy();
+    char message[] = "bct 200 24\n";
+    int result;
+
+    cr_assert_not_null(zappy);
+    result = bct(zappy, zappy->graph, message);
     cr_assert_eq(result, -1);
     remove("gui_socket");
 }
