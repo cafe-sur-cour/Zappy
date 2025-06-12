@@ -23,7 +23,6 @@
 
 class Containers : public AContainers {
     public:
-
         Containers(std::shared_ptr<IDisplay> display, std::shared_ptr<IAudio> audio,
             float x, float y, float width, float height,
             Color32 backgroundColor = {40, 40, 40, 200});
