@@ -54,6 +54,7 @@ class GameInfos {
 
         void addIncantation(const zappy::structs::Incantation incantation);
         void removeIncantation(int x, int y, int result);
+        const std::vector<zappy::structs::Incantation> getIncantations();
 
         void addEgg(const zappy::structs::Egg egg);
         void updateEggHatched(int eggNumber);

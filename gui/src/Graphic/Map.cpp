@@ -51,6 +51,7 @@ void Map::draw()
         drawRock(tile.x, tile.y, tile);
     }
     drawBroadcastingPlayers();
+    drawIncantations();
 }
 
 void Map::drawTile(int x, int y, const zappy::structs::Tile &tile)
@@ -516,5 +517,60 @@ void Map::drawTorus(const Vector3f &position, float radius, float thickness,
         };
 
         this->_display->drawCylinderEx(point1, point2, thickness, thickness, 8, color);
+    }
+}
+
+void Map::drawIncantations()
+{
+    const auto& incantations = _gameInfos->getIncantations();
+    if (incantations.empty())
+        return;
+
+    static float timeAccumulator = 0.0f;
+    timeAccumulator += this->_display->getFrameTime();
+
+    for (const auto& incantation : incantations) {
+        float levelProgress = static_cast<float>(incantation.level - 1) / 7.0f;
+
+        unsigned char red = static_cast<unsigned char>(50 + levelProgress * 180);
+        unsigned char green = static_cast<unsigned char>(150 + (1.0f - levelProgress) * 80);
+        unsigned char blue = static_cast<unsigned char>(255 - levelProgress * 200);
+        Color32 incantationColor = {red, green, blue, 70};
+
+        for (size_t i = 0; i < incantation.players.size(); ++i) {
+            Vector3f basePosition = {
+                static_cast<float>(incantation.x * zappy::gui::POSITION_MULTIPLIER),
+                getOffset(DisplayPriority::PLAYER, incantation.x, incantation.y, i) + 0.4f,
+                static_cast<float>(incantation.y * zappy::gui::POSITION_MULTIPLIER)
+            };
+
+            float phase =
+                static_cast<float>(incantation.x * 10 + incantation.y * 15 + i * 25) * 0.1f;
+            float floatOffset = sin(timeAccumulator * 0.8f + phase) * 0.12f;
+            float radiusVariation = 0.7f + sin(timeAccumulator * 1.2f + phase) * 0.08f;
+
+            Vector3f bubblePosition = basePosition;
+            bubblePosition.y += floatOffset;
+
+            this->_display->drawSphere(bubblePosition, radiusVariation, incantationColor);
+
+            Vector3f highlightPos = bubblePosition;
+            highlightPos.x += radiusVariation * 0.3f;
+            highlightPos.y += radiusVariation * 0.4f;
+            highlightPos.z += radiusVariation * 0.2f;
+
+            Color32 highlightColor = {255, 255, 255, 180};
+            this->_display->drawSphere(highlightPos, radiusVariation * 0.15f,
+                highlightColor);
+
+            Vector3f highlight2Pos = bubblePosition;
+            highlight2Pos.x -= radiusVariation * 0.2f;
+            highlight2Pos.y += radiusVariation * 0.3f;
+            highlight2Pos.z -= radiusVariation * 0.1f;
+
+            Color32 highlight2Color = {255, 255, 255, 90};
+            this->_display->drawSphere(highlight2Pos, radiusVariation * 0.08f,
+                highlight2Color);
+        }
     }
 }

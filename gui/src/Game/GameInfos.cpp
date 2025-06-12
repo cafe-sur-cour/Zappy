@@ -275,6 +275,13 @@ void GameInfos::removeIncantation(int x, int y, int result)
     (void)result;
 }
 
+const std::vector<zappy::structs::Incantation> GameInfos::getIncantations()
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    return _incantations;
+}
+
 void GameInfos::addEgg(const zappy::structs::Egg egg)
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
