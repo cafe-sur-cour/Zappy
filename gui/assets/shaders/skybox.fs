@@ -14,9 +14,9 @@ void main()
 
     finalColor = texelColor * colDiffuse;
 
-    finalColor.rgb = mix(finalColor.rgb, pow(finalColor.rgb, vec3(1.1)), 0.5);
+    finalColor.rgb += vec3(0.2, 0.2, 0.2);
 
-    finalColor.rgb = max(finalColor.rgb, vec3(0.05));
+    finalColor.rgb = max(finalColor.rgb, vec3(0.3));
 
     finalColor.a = 1.0;
 }
