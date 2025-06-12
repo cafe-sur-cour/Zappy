@@ -525,8 +525,8 @@ std::shared_ptr<Containers> HUD::createTpsContainer(
     float bottomHeight,
     float bottomHeightPercent)
 {
-    float containerWidth = 300.0f;
-    float containerHeight = 60.0f;
+    float containerWidth = 200.0f;
+    float containerHeight = 120.0f;
     (void)bottomHeight;
     (void)bottomHeightPercent;
 

@@ -131,7 +131,7 @@ bool GUI::isRunning()
 
 void GUI::draw()
 {
-    if (!_isRunning)
+    if (!this->_display->isOpen())
         return;
 
     this->_display->beginDrawing();
