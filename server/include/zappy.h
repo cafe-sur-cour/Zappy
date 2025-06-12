@@ -64,6 +64,11 @@ typedef struct {
     int (*handler)(player_t *, char *, zappy_t *);
 } command_info_t;
 
+typedef struct graphic_pf_s {
+    char *command;
+    int (*handler)(zappy_t *zappy, graph_net_t *graphic);
+} graphic_pf_t;
+
 /* messages.c */
 int helper(void);
 void error_message(const char *message);
@@ -219,4 +224,8 @@ void rm_sibur(inventory_t *inventory);
 void rm_mendiane(inventory_t *inventory);
 void rm_phiras(inventory_t *inventory);
 void rm_thystame(inventory_t *inventory);
+
+/* Element handler.c */
+int msz(zappy_t *zappy, graph_net_t *graphic);
+
 #endif /* !ZAPPY_H_ */

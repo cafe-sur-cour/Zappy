@@ -48,15 +48,15 @@ SRC 		=	src/params.c										\
 				src/guiMessage/gui_send_ressource.c					\
 				src/guiMessage/gui_send_start_incantation.c 		\
 				src/guiMessage/gui_send_end_incantation.c			\
-				src/guiMessage/handlers/msz							\
-				src/guiMessage/handlers/bct							\
-				src/guiMessage/handlers/mct							\
-				src/guiMessage/handlers/tna							\
-				src/guiMessage/handlers/ppo							\
-				src/guiMessage/handlers/plv							\
-				src/guiMessage/handlers/pin							\
-				src/guiMessage/handlers/sgt							\
-				src/guiMessage/handlers/sst							\
+				src/guiMessage/handlers/msz.c						\
+				src/guiMessage/handlers/bct.c						\
+				src/guiMessage/handlers/mct.c						\
+				src/guiMessage/handlers/tna.c						\
+				src/guiMessage/handlers/ppo.c						\
+				src/guiMessage/handlers/plv.c						\
+				src/guiMessage/handlers/pin.c						\
+				src/guiMessage/handlers/sgt.c						\
+				src/guiMessage/handlers/sst.c						\
 				src/receiveMessage/action_handler.c					\
 				src/receiveMessage/pollin_handler.c					\
 				src/receiveMessage/loop_thru_command.c				\

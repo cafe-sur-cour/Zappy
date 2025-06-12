@@ -11,10 +11,11 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-const char *GRAPHIC_COMMAND[] = {
-    "msz", "bct", "mct", "tna", "ppo", "plv", "pin",
-    "sgt", "sst", NULL
+const graphic_pf_t GRAPHIC_COMMAND[] = {
+    {"msz\n", &msz},
+    {NULL, NULL}
 };
 
 graph_net_t *add_graph_node(graph_net_t **head, int fd)
@@ -68,23 +69,17 @@ static void disconnect_and_remove_client(zappy_t *zappy, int fd)
     }
 }
 
-static void poll_graphic_commands(zappy_t *zappy, graph_net_t *current,
+static int poll_graphic_commands(zappy_t *zappy, graph_net_t *current,
     char *buffer)
 {
-    for (int i = 0; buffer[i] != '\0'; i++) {
-        if (buffer[i] == '\n') {
-            buffer[i] = '\0';
-            if (current->mapSent == false) {
-                send_map(zappy, current->fd);
-                current->mapSent = true;
-            }
-            valid_message(buffer);
-            i++;
-        }
+    for (int i = 0; GRAPHIC_COMMAND[i].command != NULL; i++) {
+        if (strcmp(GRAPHIC_COMMAND[i].command, buffer) == 0)
+            return GRAPHIC_COMMAND[i].handler(zappy, current);
     }
+    return -1;
 }
 
-static void poll_graphic(zappy_t *zappy, int poll_result,
+static int poll_graphic(zappy_t *zappy, int poll_result,
     struct pollfd *pfd, graph_net_t *current)
 {
     char *buffer = NULL;
@@ -93,13 +88,17 @@ static void poll_graphic(zappy_t *zappy, int poll_result,
     poll_result = poll(pfd, 1, 0);
     if (poll_result == -1 || (pfd->revents & (POLLHUP | POLLERR | POLLNVAL))) {
         disconnect_and_remove_client(zappy, current->fd);
+        return -1;
     }
     if (pfd->revents & POLLIN) {
         buffer = get_message(pfd->fd, 50);
-        if (buffer == NULL)
+        if (buffer == NULL) {
             disconnect_and_remove_client(zappy, current->fd);
-        poll_graphic_commands(zappy, current, buffer);
+            return -1;
+        }
+        return poll_graphic_commands(zappy, current, buffer);
     }
+    return 0;
 }
 
 void poll_graphic_clients(zappy_t *zappy)
