@@ -298,6 +298,50 @@ class Player:
         elif self.incantationPhase == "needMorePlayers":
             self.broadcaster.broadcastMessage(f"incantation {self.level}")
             self.incantationPhase = "checkNbPlayers"
+            self.incantationLastCommand = "broadcast"
+
+    def getDirectionFromSound(self, direction: int) -> list[()]:
+        if direction == 0:
+            return []
+
+        stepsMap = {
+            1: [
+                self.communication.sendForward
+            ],
+            2: [
+                self.communication.sendForward
+            ],
+            3: [
+                self.communication.sendLeft,
+                self.communication.sendForward
+            ],
+            4: [
+                self.communication.sendRight,
+                self.communication.sendRight,
+                self.communication.sendForward
+            ],
+            5: [
+                self.communication.sendRight,
+                self.communication.sendRight,
+                self.communication.sendForward
+            ],
+            6: [
+                self.communication.sendRight,
+                self.communication.sendRight,
+                self.communication.sendForward
+            ],
+            7: [
+                self.communication.sendRight,
+                self.communication.sendForward
+            ],
+            8: [
+                self.communication.sendForward
+            ]
+        }
+        return stepsMap.get(direction, [])
+
+    def goToIncantationAction(self) -> None:
+        pass
 
     def handleResponseInventory(self) -> None:
         self.inventory = self.communication.getInventory() or self.inventory
