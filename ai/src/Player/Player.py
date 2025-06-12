@@ -399,6 +399,13 @@ class Player:
                 return
         self.logger.error(f"Unknown response: {response.strip()}")
 
+    def handleMessages(self, direction: int, message: str) -> None:
+        if message.startswith("incantation "):
+            lvl = message.split(" ")[1]
+            if lvl == self.level:
+                self.incantationDirection = direction
+                self.goToIncantation = True
+
     def loop(self) -> None:
         try:
             while not self.communication.playerIsDead():
