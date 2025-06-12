@@ -35,7 +35,8 @@ TESTS 	    =   tests_params.c			\
 				tests_gui_incantation.c		\
 				tests_malloc_fails.c		\
 				fake_malloc.c				\
-				tests_incantation.c
+				tests_incantation.c			\
+				tests_grapClients.c
 
 SRC 		=	../../../server/src/params.c					\
 				../../../server/src/messages.c					\

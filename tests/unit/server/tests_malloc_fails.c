@@ -592,3 +592,12 @@ Test(malloc_fails, print_right_server, .init = redirect_all_std) {
     cr_assert_eq(result, -1); // Should fail due to malloc failure
     disable_malloc_failure();
 }
+
+Test(malloc_fails, add_grah_node, .init = redirect_all_std) {
+    graph_net_t *head = NULL;
+
+    enable_malloc_failure(0);
+    graph_net_t *result = add_graph_node(&head, 1);
+    cr_assert_null(result);
+    disable_malloc_failure();
+}
