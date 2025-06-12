@@ -13,11 +13,13 @@
 #include <string.h>
 
 static void loop_thrue_player_team(int *player_list, int nb_players,
-    player_t *current_player)
+    player_t *current_player, zappy_t *zappy)
 {
     for (int i = 0; i < nb_players; i++) {
-        if (current_player->id == player_list[i])
+        if (current_player->id == player_list[i]) {
             current_player->level += 1;
+            send_player_level(zappy, current_player);
+        }
     }
 }
 
@@ -30,7 +32,8 @@ void increase_level_player(int *player_list, int nb_players, zappy_t *zappy)
     while (current_team != NULL) {
         current_player = current_team->players;
         while (current_player != NULL) {
-            loop_thrue_player_team(player_list, nb_players, current_player);
+            loop_thrue_player_team(player_list, nb_players, current_player,
+                zappy);
             current_player = current_player->next;
         }
         current_team = current_team->next;
