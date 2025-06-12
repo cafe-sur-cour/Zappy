@@ -230,6 +230,7 @@ int msz(zappy_t *zappy, graph_net_t *graphic, char *message);
 int bct(zappy_t *zappy, graph_net_t *graphic, char *message);
 int mct(zappy_t *zappy, graph_net_t *graphic, char *message);
 int tna(zappy_t *zappy, graph_net_t *graphic, char *message);
+int ppo(zappy_t *zappy, graph_net_t *graphic, char *message);
 int send_bct_message(graph_net_t *graphic, int x, int y,
     inventory_t *inventory);
 

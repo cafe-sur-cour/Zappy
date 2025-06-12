@@ -18,6 +18,7 @@ const graphic_pf_t GRAPHIC_COMMAND[] = {
     {"bct", &bct},
     {"mct", &mct},
     {"tna", &tna},
+    {"ppo", &ppo},
     {NULL, NULL}
 };
 

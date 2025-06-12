@@ -29,7 +29,6 @@ int send_bct_message(graph_net_t *graphic, int x, int y,
 
 int bct(zappy_t *zappy, graph_net_t *graphic, char *message)
 {
-    char *pos = NULL;
     int x = 0;
     int y = 0;
 
@@ -37,7 +36,7 @@ int bct(zappy_t *zappy, graph_net_t *graphic, char *message)
         error_message("Invalid bct message format.");
         return -1;
     }
-    if (sscanf(pos, "bct %d %d\n", &x, &y) != 2) {
+    if (sscanf(message, "bct %d %d\n", &x, &y) != 2) {
         error_message("Invalid bct pattern.");
         return -1;
     }
