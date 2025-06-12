@@ -12,6 +12,8 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <iostream>
+#include <chrono>
 
 #include "Map.hpp"
 
@@ -48,6 +50,7 @@ void Map::draw()
         drawFood(tile.x, tile.y, tile);
         drawRock(tile.x, tile.y, tile);
     }
+    drawBroadcastingPlayers();
 }
 
 void Map::drawTile(int x, int y, const zappy::structs::Tile &tile)
@@ -305,5 +308,96 @@ float Map::getOffset(DisplayPriority priority, int x, int y, size_t stackIndex)
 
         default:
             return 0.5f + (stackIndex * 0.2f);
+    }
+}
+
+void Map::drawBroadcastingPlayers()
+{
+    auto currentTime = std::chrono::steady_clock::now();
+    const float ANIMATION_DURATION = 2.0f;
+    const int NUM_RINGS = 3;
+    const float RING_DELAY = 0.5f;
+
+    const auto& newBroadcasts = _gameInfos->getPlayersBroadcasting();
+
+    for (const auto& broadcast : newBroadcasts) {
+        if (_broadcastStartTimes.find(broadcast.first) == _broadcastStartTimes.end())
+            _broadcastStartTimes[broadcast.first] = currentTime;
+    }
+
+    auto it = _broadcastStartTimes.begin();
+    while (it != _broadcastStartTimes.end()) {
+        int playerNumber = it->first;
+        auto startTime = it->second;
+
+        auto duration =
+            std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - startTime);
+        float elapsedTime = duration.count() / 1000.0f;
+
+        if (elapsedTime >= ANIMATION_DURATION) {
+            it = _broadcastStartTimes.erase(it);
+            continue;
+        }
+
+        const auto& playerInfo = _gameInfos->getPlayer(playerNumber);
+        if (playerInfo.teamName.empty()) {
+            ++it;
+            continue;
+        }
+
+        Vector3f position = {
+            static_cast<float>(playerInfo.x * zappy::gui::POSITION_MULTIPLIER),
+            getOffset(DisplayPriority::PLAYER, playerInfo.x, playerInfo.y) + 0.3f,
+            static_cast<float>(playerInfo.y * zappy::gui::POSITION_MULTIPLIER)
+        };
+
+        for (int ring = 0; ring < NUM_RINGS; ++ring) {
+            float ringStartTime = ring * RING_DELAY;
+
+            if (elapsedTime >= ringStartTime) {
+                float ringElapsedTime = elapsedTime - ringStartTime;
+                float ringDuration = ANIMATION_DURATION - ringStartTime;
+                float progress = std::min(1.0f, ringElapsedTime / ringDuration);
+                float maxRadius = 2.5f;
+                float animatedRadius = 0.3f + (progress * maxRadius);
+                float alpha = std::max(0.0f, 1.0f - progress);
+
+                if (alpha > 0.05f) {
+                    Color32 ringColor = CYELLOW;
+                    ringColor.a = static_cast<unsigned char>(alpha * 255);
+
+                    float thickness = 0.12f * (0.5f + 0.5f * alpha);
+
+                    drawTorus(position, animatedRadius, thickness, 16, ringColor);
+                }
+            }
+        }
+
+        ++it;
+    }
+}
+
+void Map::drawTorus(const Vector3f &position, float radius, float thickness,
+    int radialSegments, Color32 color)
+{
+    float angleStep = 2.0f * M_PI / radialSegments;
+
+    for (int i = 0; i < radialSegments; ++i) {
+        float angle1 = i * angleStep;
+        float angle2 = (i + 1) * angleStep;
+
+        Vector3f point1 = {
+            position.x + radius * std::cos(angle1),
+            position.y,
+            position.z + radius * std::sin(angle1)
+        };
+
+        Vector3f point2 = {
+            position.x + radius * std::cos(angle2),
+            position.y,
+            position.z + radius * std::sin(angle2)
+        };
+
+        this->_display->drawCylinderEx(point1, point2, thickness, thickness, 8, color);
     }
 }
