@@ -9,6 +9,7 @@
 #include <memory>
 #include <iostream>
 #include <algorithm>
+#include <string>
 #include <filesystem>
 #include "GUI.hpp"
 #include "../Audio/Audio.hpp"
@@ -16,17 +17,16 @@
 #include "../Utils/GamepadConstants.hpp"
 
 std::string GUI::getFirstSharedLibInFolder(const std::string &libPath)
-{;
-
-	try {
-		for (const auto &entry : std::filesystem::directory_iterator(libPath)) {
-			if (entry.path().extension() == ".so") {
+{
+    try {
+        for (const auto &entry : std::filesystem::directory_iterator(libPath)) {
+            if (entry.path().extension() == ".so") {
                 return entry.path().string();
-			}
-		}
-	} catch (const std::filesystem::filesystem_error &e) {
-		std::cerr << "Error accessing directory: " << e.what() << std::endl;
-	}
+            }
+        }
+    } catch (const std::filesystem::filesystem_error &e) {
+        std::cerr << "Error accessing directory: " << e.what() << std::endl;
+    }
     return "";
 }
 

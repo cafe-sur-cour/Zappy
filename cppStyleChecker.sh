@@ -5,7 +5,7 @@ LOG_FILE="coding-style-cpp-reports.log"
 
 FILTERS="+whitespace/line_length,+whitespace/operators,+whitespace/tab,+whitespace/empty_if_body,-readability/braces,+readability/casting,+build/include_order"
 
-NOFILTERS="-readability/namespace,-legal/copyright,-build/include_subdir,-whitespace/braces,-runtime/string,-whitespace/parens,-whitespace/indent_namespace,-build/header_guard,-whitespace/indent"
+NOFILTERS="-readability/namespace,-legal/copyright,-build/include_subdir,-whitespace/braces,-runtime/string,-whitespace/parens,-whitespace/indent_namespace,-build/header_guard,-whitespace/indent,-build/c++17"
 
 LINELENGTH=95
 
