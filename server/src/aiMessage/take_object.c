@@ -113,7 +113,7 @@ static int send_type_ressource(zappy_t *zappy, player_t *player,
     return 0;
 }
 
-/* Send the take to the ai, then sends bct, and pin */
+/* Send the take to the ai, then sends bct, pdr, and pin */
 int handle_take(player_t *player, char *command, zappy_t *zappy)
 {
     char *to = strtok(command, " ");

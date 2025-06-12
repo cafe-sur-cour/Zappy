@@ -18,8 +18,8 @@ tiles_t *shuffle_fisher(int width, int heigth)
     tiles_t tmp = {0, 0};
     int j = 0;
 
-    if (!tiles)
-        exit(84);
+    if (tiles == NULL)
+        return NULL;
     for (int i = 0; i < total; i++) {
         tiles[i].x = i % width;
         tiles[i].y = i / width;

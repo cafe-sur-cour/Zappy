@@ -80,6 +80,13 @@ typedef struct inventory_s {
     int nbThystame;
 } inventory_t;
 
+/* Definition of the incantation structure */
+typedef struct incantation_s {
+    int levelt_to_reach;
+    int nb_players;
+    inventory_t required_inventory;
+} incantation_t;
+
 
 /* Player struct */
 typedef struct player_s {
@@ -96,6 +103,7 @@ typedef struct player_s {
     time_t last_action_time;
     bool is_busy;
     int remaining_cooldown;
+    char *current_action;
 
     struct player_s *next;
 } player_t;
@@ -104,7 +112,7 @@ typedef struct player_s {
 typedef struct action_request_s {
     char *command;
     time_t timestamp;
-    int time_limit;  // in game ticks (7/f, 42/f, etc.)
+    float time_limit;  // in game ticks (7/f, 42/f, etc.)
     action_priority_t priority;
     player_t *player;
     struct action_request_s *next;

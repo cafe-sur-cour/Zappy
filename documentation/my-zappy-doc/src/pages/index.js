@@ -23,6 +23,9 @@ export default function Home() {
           <Link to="/docs/archi" style={{ margin: '1rem', fontSize: '1.2rem' }}>
             🏗️ Architecture
           </Link>
+          <Link to="/docs/userguide" style={{ margin: '1rem', fontSize: '1.2rem' }}>
+            🧭 User guide
+          </Link>
         </div>
         <div style={{ marginTop: '3rem' }}>
           <a

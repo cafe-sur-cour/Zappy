@@ -23,12 +23,14 @@ void execute_action(player_t *player, action_request_t *action, zappy_t *zappy)
         write_message(player->network->fd, "ko\n");
         return;
     }
-    player->remaining_cooldown = cmd_info->base_time;
+    player->remaining_cooldown = action->time_limit;
     if (cmd_info->base_time >= 42)
         player->is_busy = true;
     result = cmd_info->handler(player, action->command, zappy);
     if (result == 0)
         write_message(player->network->fd, "ok\n");
+    else if (result == -2)
+        write_message(player->network->fd, "Elevation underway\n");
     else
         write_message(player->network->fd, "ko\n");
 }
@@ -41,7 +43,7 @@ void queue_action(player_t *player, char *command, zappy_t *zappy)
     (void)zappy;
     if (!player->pending_actions)
         return;
-    action = create_action_request(command, player);
+    action = create_action_request(command, player, zappy->params->freq);
     if (!action)
         return;
     pthread_mutex_lock(&player->pending_actions->mutex);

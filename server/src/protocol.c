@@ -59,6 +59,7 @@ int start_protocol(zappy_t *zappy)
     setup_signal();
     diplay_help(zappy->params->port);
     while (*get_running_state()) {
+        tick_duration_ms = 1000 / zappy->params->freq;
         if (poll(&zappy->network->pollserver, 1, tick_duration_ms) == -1
             && *get_running_state()) {
             error_message("Poll failed.");

@@ -86,23 +86,24 @@ static map_t *set_tile(int x, int y, map_t *map, int type)
 }
 
 /* This function distrbute the ressources on the tiles */
-static void distribute_resources(zappy_t *server)
+static void distribute_resources(zappy_t *z)
 {
-    int mapValue = server->params->x * server->params->y;
+    int mapValue = z->params->x * z->params->y;
     float density[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
     int resources_count[7];
-    tiles_t *shuffled_tiles = shuffle_fisher(server->params->x,
-        server->params->y);
+    tiles_t *shuffled_tiles = shuffle_fisher(z->params->x,
+        z->params->y);
     int tile_index = 0;
     int *pos = NULL;
 
+    if (shuffled_tiles == NULL)
+        exit(84);
     for (int i = 0; i < 7; i++)
         resources_count[i] = (int)(mapValue * density[i]);
     for (int type = 0; type < 7; type++) {
         for (int count = 0; count < resources_count[type]; count++) {
             pos = distrib_tiles(&tile_index, shuffled_tiles, mapValue);
-            server->game->map = set_tile(pos[0], pos[1], server->game->map,
-                type);
+            z->game->map = set_tile(pos[0], pos[1], z->game->map, type);
             free(pos);
         }
     }

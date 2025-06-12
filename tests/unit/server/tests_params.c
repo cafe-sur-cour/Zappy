@@ -9,6 +9,7 @@
 #include <criterion/redirect.h>
 
 #include "zappy.h"
+#include "fake_malloc.h"
 
 static void redirect_all_std(void)
 {
@@ -380,3 +381,37 @@ Test(params, free_params_with_empty_teams, .init = redirect_all_std) {
 
 //     free_params(params);
 // }
+
+// Test malloc failure in check_args
+Test(params, check_args_malloc_failure, .init = redirect_all_std) {
+    char *argv[] = {"zappy_server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "-c", "3", "-f", "100"};
+    int argc = 14;
+
+    // Enable malloc failure immediately
+    enable_malloc_failure(0);
+
+    params_t *params = check_args(argc, argv);
+
+    // Should return NULL on malloc failure
+    cr_assert_null(params);
+    
+    // Disable malloc failure for cleanup
+    disable_malloc_failure();
+}
+
+// Test malloc failure during team allocation
+Test(params, check_args_malloc_failure_teams, .init = redirect_all_std) {
+    char *argv[] = {"zappy_server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "-c", "3", "-f", "100"};
+    int argc = 14;
+
+    // Enable malloc failure after initial allocations succeed but team allocation fails
+    enable_malloc_failure(2);
+
+    params_t *params = check_args(argc, argv);
+
+    // Should return NULL on malloc failure
+    cr_assert_null(params);
+    
+    // Disable malloc failure for cleanup
+    disable_malloc_failure();
+}
