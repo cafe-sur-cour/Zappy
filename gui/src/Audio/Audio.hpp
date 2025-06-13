@@ -15,21 +15,33 @@
 #include "IAudio.hpp"
 
 class Audio : public IAudio {
+
+    private:
+        std::vector<std::string> _musicId = {"main_theme"};
+        std::vector<std::string> _sfxId = {"click"};
+        std::map<std::string, std::unique_ptr<sf::Music>> _sounds;
+        float _levelSFX= 1.f;
+        float _levelMusic= 50.f;
+
+
     public:
         Audio();
         ~Audio();
 
+        float getSFXVolumeLevel();
+        float getMusicVolumeLevel();
+
+        void setSFXVolumeLevel(float);
+        void setMusicVolumeLevel(float);
+
         bool loadSound(const std::string& id, const std::string& filepath);
 
-        void playSound(const std::string& id, float volume = 1.0f);
+        void playSound(const std::string& id, float volume);
         void stopSound(const std::string& id);
         bool isSoundPlaying(const std::string& id) const;
 
         void setSoundLooping(const std::string& id, bool looping);
         void setSoundVolume(const std::string& id, float volume);
-
-    private:
-        std::map<std::string, std::unique_ptr<sf::Music>> _sounds;
 };
 
 #endif /* !AUDIO_HPP_ */

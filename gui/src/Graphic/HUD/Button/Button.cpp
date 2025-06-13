@@ -64,7 +64,7 @@ void Button::update()
         this->_display->getKeyId(MOUSE_LEFT));
 
     if (wasPressed && !_isPressed && _isHovered && _callback) {
-        _audio->playSound("click", 100.0f);
+        _audio->playSound("click", this->_audio->getSFXVolumeLevel());
         _callback();
     }
 }
