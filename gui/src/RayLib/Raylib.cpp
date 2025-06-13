@@ -71,6 +71,10 @@ int Raylib::getKeyId(Key key)
         return KEY_RIGHT;
     case LEFT:
         return KEY_LEFT;
+    case H:
+        return KEY_H;
+    case GM_PD_H:
+        return GAMEPAD_BUTTON_SELECT;
     case GM_PD_LEFT_SHOULDER:
         return GAMEPAD_BUTTON_LEFT_SHOULDER;
     case GM_PD_RIGHT_SHOULDER:

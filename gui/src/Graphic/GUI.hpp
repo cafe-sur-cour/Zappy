@@ -68,6 +68,7 @@ class GUI {
         int _windowHeight;
 
         zappy::gui::CameraMode _cameraMode;
+        bool _isHUDVisible = true;
         bool _backgroundLoaded;
         bool _skyboxLoaded;
         int _hoveredPlayerId;
