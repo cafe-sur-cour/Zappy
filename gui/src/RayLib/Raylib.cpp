@@ -223,9 +223,9 @@ float Raylib::getFrameTime()
     return this->_raylib->getFrameTime();
 }
 
-void Raylib::updateCameraFreeMode()
+void Raylib::updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed)
 {
-    return this->_raylib->updateCameraFreeMode();
+    return this->_raylib->updateCameraFreeMode(camMovingSpeed, camRotaSpeed);
 }
 
 float Raylib::measureText(const std::string& text, float fontSize) const

@@ -16,12 +16,13 @@
 #include "HUD.hpp"
 
 HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
-         std::shared_ptr<IAudio> audio, std::function<void()> resetCameraFunc)
-    : _containers(), _display(display), _gameInfos(gameInfos), _audio(audio),
+         std::shared_ptr<IAudio> audio,
+         std::shared_ptr<CameraManager> camera, std::function<void()> resetCameraFunc)
+    : _containers(), _display(display), _gameInfos(gameInfos), _audio(audio), _camera(camera),
       _resetCameraFunc(resetCameraFunc)
 {
     _help = std::make_shared<Help>(display, audio);
-    _settings = std::make_shared<Settings>(display, audio);
+    _settings = std::make_shared<Settings>(display, audio, camera);
     initDefaultLayout(15.0f, 20.0f);
     initExitButton();
     initSettingsButton();

@@ -154,7 +154,7 @@ class IDisplay {
 
         virtual float getFrameTime() = 0;
 
-        virtual void updateCameraFreeMode() = 0;
+        virtual void updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed) = 0;
 
         virtual float measureText(const std::string& text, float fontSize) const = 0;
 

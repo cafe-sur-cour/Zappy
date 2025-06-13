@@ -62,7 +62,7 @@ class GUI {
         std::unique_ptr<Map> _map;
         std::unique_ptr<HUD> _hud;
         std::shared_ptr<IAudio> _audio;
-        std::unique_ptr<CameraManager> _cameraManager;
+        std::shared_ptr<CameraManager> _cameraManager;
 
         int _windowWidth;
         int _windowHeight;

@@ -105,7 +105,7 @@ class RayLibEnc {
         void setCameraFovy(float fovy);
         void setCameraProjection(int projection);
         void updateCamera(int mode = CAMERA_FREE);
-        void updateCameraFreeMode();
+        void updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed);
         Camera3D getCamera() const;
 
         // 3D Drawing methods

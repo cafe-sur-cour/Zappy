@@ -140,9 +140,7 @@ namespace zappy::gui {
 
     inline const std::string WINDOW_TITLE = "Zappy GUI";
     inline const int FPS = 120;
-    inline const float CAMERA_SPEED = 7.5f;
     inline const float CAMERA_SENSITIVITY = 0.001f;
-    inline const float CAMERA_ROTATE_SPEED_KEY = 2.0f;
     inline const float GAMEPAD_STICK_SENSITIVITY = 3.0f;
     inline const float GAMEPAD_DEADZONE = 0.2f;
     inline const float POSITION_MULTIPLIER = 2.2f;
