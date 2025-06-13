@@ -36,6 +36,17 @@ class RayLibEnc {
         // Collision methods
         bool checkCollisionPointRec(Vector2 point, Rectangle rec) const;
 
+        // Ray and collision methods for 3D
+        Ray getMouseRay(Vector2 mousePosition);
+        RayCollision getRayCollisionBox(Ray ray, BoundingBox box);
+        RayCollision getRayCollisionSphere(Ray ray, Vector3 center, float radius);
+        bool checkCollisionBoxes(BoundingBox box1, BoundingBox box2);
+
+        // Utility methods for 3D collisions
+        Ray getMouseRayFromCurrent();
+        BoundingBox createBoundingBox(Vector3 center, Vector3 size);
+        BoundingBox createBoundingBoxFromMinMax(Vector3 min, Vector3 max);
+
         // Texture methods
         void drawTextureRec(Texture2D texture, Rectangle source, Vector2 position, Color tint);
         void unloadTexture(Texture2D texture);

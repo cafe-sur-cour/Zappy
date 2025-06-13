@@ -6,10 +6,25 @@
 */
 
 #include "zappy.h"
+#include "network.h"
 
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+const graphic_pf_t GRAPHIC_COMMAND[] = {
+    {"msz", &msz},
+    {"bct", &bct},
+    {"mct", &mct},
+    {"tna", &tna},
+    {"ppo", &ppo},
+    {"plv", &plv},
+    {"pin", &pin},
+    {"sgt", &sgt},
+    {"sst", &sst},
+    {NULL, NULL}
+};
 
 graph_net_t *add_graph_node(graph_net_t **head, int fd)
 {
@@ -62,21 +77,37 @@ static void disconnect_and_remove_client(zappy_t *zappy, int fd)
     }
 }
 
-static void poll_graphic(zappy_t *zappy, int poll_result,
+static int poll_graphic_commands(zappy_t *zappy, graph_net_t *current,
+    char *buffer)
+{
+    for (int i = 0; GRAPHIC_COMMAND[i].command != NULL; i++) {
+        if (strncmp(GRAPHIC_COMMAND[i].command, buffer,
+            strlen(GRAPHIC_COMMAND[i].command)) == 0)
+            return GRAPHIC_COMMAND[i].handler(zappy, current, buffer);
+    }
+    return -1;
+}
+
+static int poll_graphic(zappy_t *zappy, int poll_result,
     struct pollfd *pfd, graph_net_t *current)
 {
-    char buffer[1024];
+    char *buffer = NULL;
 
     pfd->events = POLLIN;
     poll_result = poll(pfd, 1, 0);
     if (poll_result == -1 || (pfd->revents & (POLLHUP | POLLERR | POLLNVAL))) {
         disconnect_and_remove_client(zappy, current->fd);
+        return -1;
     }
     if (pfd->revents & POLLIN) {
-        if ((read(current->fd, buffer, sizeof(buffer) - 1)) <= 0) {
+        buffer = get_message(pfd->fd, 50);
+        if (buffer == NULL) {
             disconnect_and_remove_client(zappy, current->fd);
+            return -1;
         }
+        return poll_graphic_commands(zappy, current, buffer);
     }
+    return 0;
 }
 
 void poll_graphic_clients(zappy_t *zappy)

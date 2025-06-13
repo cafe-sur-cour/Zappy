@@ -19,6 +19,7 @@ Audio::Audio()
     playSound("main_theme", 50.0f);
 
     loadSound("click", "gui/assets/sounds/click.wav");
+    loadSound("clickPlayer", "gui/assets/sounds/playerClick.wav");
 }
 
 Audio::~Audio()

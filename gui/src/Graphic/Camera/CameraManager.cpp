@@ -230,31 +230,31 @@ Vector3f CameraManager::calculatePlayerPosition(const zappy::structs::Player& pl
         };
     }
 
-    int playerX = player.x;
-    int playerY = player.y;
+    Vector3f interpolatedPos = _map->getPlayerInterpolatedPosition(player.number,
+        player.x, player.y);
 
     size_t playerIndex = 0;
     const auto& allPlayers = _gameInfos->getPlayers();
-    size_t playerCount = 0;
 
     for (const auto& p : allPlayers) {
-        if (p.x == playerX && p.y == playerY) {
+        if (p.x == player.x && p.y == player.y) {
             if (p.number == player.number) {
-                playerIndex = playerCount;
+                playerIndex = 0;
+                break;
             }
-            playerCount++;
+            playerIndex++;
         }
     }
 
-    float playerHeightOffset = _map->getOffset(DisplayPriority::PLAYER, playerX,
-        playerY, playerIndex);
+    float playerHeightOffset = _map->getOffset(DisplayPriority::PLAYER, player.x,
+        player.y, playerIndex);
     float playerEntityHeight = 0.4f;
     float targetHeight = playerHeightOffset + playerEntityHeight / 2.0f;
 
     return {
-        static_cast<float>(playerX * zappy::gui::POSITION_MULTIPLIER),
+        interpolatedPos.x,
         targetHeight,
-        static_cast<float>(playerY * zappy::gui::POSITION_MULTIPLIER)
+        interpolatedPos.z
     };
 }
 

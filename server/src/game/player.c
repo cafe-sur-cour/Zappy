@@ -10,6 +10,7 @@
 #include "network.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 /* This sub-function check the current id agains the other */
@@ -63,6 +64,34 @@ static void update_player_food(player_t *player, zappy_t *zappy)
             send_player_inventory(zappy, player);
         }
     }
+}
+
+static player_t *loop_tru_players(team_t *team, int player_id)
+{
+    player_t *current_player = team->players;
+
+    while (current_player) {
+        if (current_player->id == player_id) {
+            return current_player;
+        }
+        current_player = current_player->next;
+    }
+    return NULL;
+}
+
+player_t *get_player_by_id(game_t *game, int player_id)
+{
+    team_t *current_team = game->teams;
+    player_t *result = NULL;
+
+    while (current_team) {
+        result = loop_tru_players(current_team, player_id);
+        if (result)
+            return result;
+        current_team = current_team->next;
+    }
+    error_message("Player not found.");
+    return NULL;
 }
 
 /* This function checks if a player is dead from starvation */

@@ -64,6 +64,11 @@ typedef struct {
     int (*handler)(player_t *, char *, zappy_t *);
 } command_info_t;
 
+typedef struct graphic_pf_s {
+    char *command;
+    int (*handler)(zappy_t *zappy, graph_net_t *graphic, char *message);
+} graphic_pf_t;
+
 /* messages.c */
 int helper(void);
 void error_message(const char *message);
@@ -236,4 +241,19 @@ void rm_sibur(inventory_t *inventory);
 void rm_mendiane(inventory_t *inventory);
 void rm_phiras(inventory_t *inventory);
 void rm_thystame(inventory_t *inventory);
+
+/* Element handler.c */
+int msz(zappy_t *zappy, graph_net_t *graphic, char *message);
+int bct(zappy_t *zappy, graph_net_t *graphic, char *message);
+int mct(zappy_t *zappy, graph_net_t *graphic, char *message);
+int tna(zappy_t *zappy, graph_net_t *graphic, char *message);
+int ppo(zappy_t *zappy, graph_net_t *graphic, char *message);
+int plv(zappy_t *zappy, graph_net_t *graphic, char *message);
+int pin(zappy_t *zappy, graph_net_t *graphic, char *message);
+int sgt(zappy_t *zappy, graph_net_t *graphic, char *message);
+int sst(zappy_t *zappy, graph_net_t *graphic, char *message);
+player_t *get_player_by_id(game_t *game, int player_id);
+int send_bct_message(graph_net_t *graphic, int x, int y,
+    inventory_t *inventory);
+
 #endif /* !ZAPPY_H_ */
