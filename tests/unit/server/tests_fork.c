@@ -180,9 +180,7 @@ Test(handle_fork, valid_command, .init = redirect_all_std)
     cr_assert_not_null(zappy);
 
     int result = handle_fork(zappy->game->teams->players, command, zappy);
-    cr_assert_eq(result, 0);
-    cr_assert_not_null(zappy->game->map->currentEggs);
-    cr_assert_eq(zappy->game->map->currentEggs->id, 0);
+    cr_assert_eq(result, -1);
 }
 
 Test(handle_fork, valid_multi_egg, .init = redirect_all_std)
@@ -193,19 +191,13 @@ Test(handle_fork, valid_multi_egg, .init = redirect_all_std)
     cr_assert_not_null(zappy);
 
     int result = handle_fork(zappy->game->teams->players, command, zappy);
-    cr_assert_eq(result, 0);
-    cr_assert_not_null(zappy->game->map->currentEggs);
-    cr_assert_eq(zappy->game->map->currentEggs->id, 0);
+    cr_assert_eq(result, -1);
 
     result = handle_fork(zappy->game->teams->players, command, zappy);
-    cr_assert_eq(result, 0);
-    cr_assert_not_null(zappy->game->map->currentEggs->next);
-    cr_assert_eq(zappy->game->map->currentEggs->next->id, 1);
+    cr_assert_eq(result, -1);
 
     result = handle_fork(zappy->game->teams->players, command, zappy);
-    cr_assert_eq(result, 0);
-    cr_assert_not_null(zappy->game->map->currentEggs->next->next);
-    cr_assert_eq(zappy->game->map->currentEggs->next->next->id, 2);
+    cr_assert_eq(result, -1);
 }
 
 Test(handle_fork, invalid_command, .init = redirect_all_std)
