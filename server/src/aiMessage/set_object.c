@@ -41,6 +41,11 @@ static int remove_crystal_from_tile(zappy_t *zappy, int x, int y, char *name)
 
 int add_elem_to_tile(zappy_t *zappy, int x, int y, char *name)
 {
+    if (x < 0 || x >= zappy->game->map->width ||
+        y < 0 || y >= zappy->game->map->height) {
+        fprintf(stderr, "Error: Coordinates (%d,%d) out of bounds\n", x, y);
+        return -1;
+    }
     if (strcmp(name, "food") == 0) {
         zappy->game->map->tiles[x][y].nbFood++;
         return 0;
