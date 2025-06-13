@@ -18,6 +18,7 @@
 #include "../../Audio/IAudio.hpp"
 #include "../../Utils/Constants.hpp"
 #include "Help/Help.hpp"
+#include "Settings/Settings.hpp"
 #include "../../IDisplay.hpp"
 
 class HUD {
@@ -141,5 +142,6 @@ class HUD {
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<IAudio> _audio;
         std::shared_ptr<Help> _help;
+        std::shared_ptr<Settings> _settings;
         std::function<void()> _resetCameraFunc;
 };

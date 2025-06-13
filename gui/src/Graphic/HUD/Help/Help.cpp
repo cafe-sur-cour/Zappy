@@ -81,7 +81,7 @@ void Help::initHelpContainer()
     );
 
     _helpContainer->setRelativePosition(
-        17.5f, 20.0f,
+        15.f, 20.0f,
         40.0f, 60.0f
     );
 
@@ -100,7 +100,6 @@ void Help::initHelpContainer()
         "X",
         [this]() {
             this->hide();
-            if (_audio) _audio->playSound("click");
         },
         {200, 60, 60, 255},
         {255, 100, 100, 255},

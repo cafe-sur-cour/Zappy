@@ -83,6 +83,8 @@ bool Containers::addElement(const std::string& id, std::shared_ptr<IUIElement> e
     auto button = std::dynamic_pointer_cast<Button>(element);
     auto text = std::dynamic_pointer_cast<Text>(element);
     auto slider = std::dynamic_pointer_cast<Slider>(element);
+    auto image = std::dynamic_pointer_cast<Image>(element);
+    auto imageButton = std::dynamic_pointer_cast<ImageButton>(element);
 
     float xPercent = (elemBounds.x / _bounds.width) * 100.0f;
     float yPercent = (elemBounds.y / _bounds.height) * 100.0f;
@@ -95,6 +97,10 @@ bool Containers::addElement(const std::string& id, std::shared_ptr<IUIElement> e
         text->setRelativePosition(xPercent, yPercent, 0.0f, heightPercent);
     } else if (slider) {
         slider->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
+    } else if (image) {
+        image->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
+    } else if (imageButton) {
+        imageButton->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
     }
 
     element->setPosition(_bounds.x + elemBounds.x, _bounds.y + elemBounds.y);
@@ -177,6 +183,38 @@ std::shared_ptr<Text> Containers::addText(
     return nullptr;
 }
 
+std::shared_ptr<Image> Containers::addImage(
+    const std::string& id,
+    float x, float y,
+    float width, float height,
+    const std::string& imagePath
+)
+{
+    auto image = std::make_shared<Image>(this->_display, x, y, width, height, imagePath);
+
+    if (addElement(id, image))
+        return image;
+
+    return nullptr;
+}
+
+std::shared_ptr<Image> Containers::addImage(
+    const std::string& id,
+    float x, float y,
+    float width, float height,
+    const std::string& imagePath,
+    Color32 tint
+)
+{
+    auto image = std::make_shared<Image>(this->_display, x, y, width, height, imagePath);
+    image->setTint(tint);
+
+    if (addElement(id, image))
+        return image;
+
+    return nullptr;
+}
+
 void Containers::clearElements()
 {
     _elements.clear();
@@ -194,6 +232,8 @@ void Containers::handleResize(int oldWidth, int oldHeight, int newWidth, int new
         auto button = std::dynamic_pointer_cast<Button>(pair.second);
         auto text = std::dynamic_pointer_cast<Text>(pair.second);
         auto slider = std::dynamic_pointer_cast<Slider>(pair.second);
+        auto image = std::dynamic_pointer_cast<Image>(pair.second);
+        auto imageButton = std::dynamic_pointer_cast<ImageButton>(pair.second);
 
         UIRelativePosition elemRelPos;
         bool hasRelativePos = false;
@@ -206,6 +246,12 @@ void Containers::handleResize(int oldWidth, int oldHeight, int newWidth, int new
             hasRelativePos = true;
         } else if (slider) {
             elemRelPos = slider->getRelativePosition();
+            hasRelativePos = true;
+        } else if (image) {
+            elemRelPos = image->getRelativePosition();
+            hasRelativePos = true;
+        } else if (imageButton) {
+            elemRelPos = imageButton->getRelativePosition();
             hasRelativePos = true;
         }
 
@@ -223,6 +269,10 @@ void Containers::handleResize(int oldWidth, int oldHeight, int newWidth, int new
                 text->setFontSize(elemNewHeight);
             } else if (slider) {
                 slider->setSize(elemNewWidth, elemNewHeight);
+            } else if (image) {
+                image->setSize(elemNewWidth, elemNewHeight);
+            } else if (imageButton) {
+                imageButton->setSize(elemNewWidth, elemNewHeight);
             }
         } else {
             FloatRect elemBounds = pair.second->getBounds();
@@ -366,4 +416,116 @@ std::shared_ptr<Slider> Containers::addSliderPercent(
         return slider;
 
     return nullptr;
+}
+
+std::shared_ptr<Image> Containers::addImagePercent(
+    const std::string& id,
+    float xPercent, float yPercent,
+    float widthPercent, float heightPercent,
+    const std::string& imagePath
+)
+{
+    float x = (_bounds.width * xPercent) / 100.0f;
+    float y = (_bounds.height * yPercent) / 100.0f;
+    float width = (_bounds.width * widthPercent) / 100.0f;
+    float height = (_bounds.height * heightPercent) / 100.0f;
+
+    auto image = std::make_shared<Image>(this->_display, x, y, width, height, imagePath);
+
+    image->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
+
+    if (addElement(id, image))
+        return image;
+
+    return nullptr;
+}
+
+std::shared_ptr<Image> Containers::addImagePercent(
+    const std::string& id,
+    float xPercent, float yPercent,
+    float widthPercent, float heightPercent,
+    const std::string& imagePath,
+    Color32 tint
+)
+{
+    auto image = addImagePercent(id, xPercent, yPercent, widthPercent, heightPercent, imagePath);
+    
+    if (image)
+        image->setTint(tint);
+
+    return image;
+}
+
+std::shared_ptr<ImageButton> Containers::addImageButton(
+    const std::string& id,
+    float x, float y,
+    float width, float height,
+    const std::string& imagePath,
+    std::function<void()> callback
+)
+{
+    auto imageButton = std::make_shared<ImageButton>(this->_display, _audio, x, y, width, height, imagePath, callback);
+
+    if (addElement(id, imageButton))
+        return imageButton;
+
+    return nullptr;
+}
+
+std::shared_ptr<ImageButton> Containers::addImageButton(
+    const std::string& id,
+    float x, float y,
+    float width, float height,
+    const std::string& imagePath,
+    std::function<void()> callback,
+    Color32 tint
+)
+{
+    auto imageButton = std::make_shared<ImageButton>(this->_display, _audio, x, y, width, height, imagePath, callback);
+    imageButton->setTint(tint);
+
+    if (addElement(id, imageButton))
+        return imageButton;
+
+    return nullptr;
+}
+
+std::shared_ptr<ImageButton> Containers::addImageButtonPercent(
+    const std::string& id,
+    float xPercent, float yPercent,
+    float widthImage, float heightImage,
+    const std::string& imagePath,
+    std::function<void()> callback
+)
+{
+    float x = (_bounds.width * xPercent) / 100.0f;
+    float y = (_bounds.height * yPercent) / 100.0f;
+    float width = widthImage;
+    float height = heightImage;
+
+    auto imageButton = std::make_shared<ImageButton>(this->_display, _audio, x, y, width, height, imagePath, callback);
+
+    imageButton->setRelativePosition(xPercent, yPercent, widthImage, heightImage);
+
+    if (addElement(id, imageButton))
+        return imageButton;
+
+    return nullptr;
+}
+
+std::shared_ptr<ImageButton> Containers::addImageButtonPercent(
+    const std::string& id,
+    float xPercent, float yPercent,
+    float widthPercent, float heightPercent,
+    const std::string& imagePath,
+    std::function<void()> callback,
+    Color32 tint
+)
+{
+    auto imageButton = addImageButtonPercent(id, xPercent, yPercent, widthPercent, heightPercent, imagePath, callback);
+    
+    if (imageButton)
+        imageButton->setTint(tint);
+
+    return imageButton;
 }
