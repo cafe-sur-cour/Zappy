@@ -453,10 +453,10 @@ BoundingBox3D GUI::getPlayerBoundingBox(const zappy::structs::Player& player) co
         }
     }
 
-    playerPos.y = _map->getOffset(DisplayPriority::PLAYER, player.x, player.y, stackIndex);
+    playerPos.y = _map->getOffset(DisplayPriority::PLAYER, player.x, player.y, stackIndex) + 0.3f;
 
     const float boxWidth = 1.0f;
-    const float boxHeight = 1.5f;
+    const float boxHeight = 1.0f;
     const float boxDepth = 1.0f;
 
     Vector3f min = {
