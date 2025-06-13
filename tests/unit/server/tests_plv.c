@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Tests
 ** File description:
-** ppo
+** plv
 */
 
 #include <criterion/criterion.h>
@@ -170,71 +170,71 @@ static zappy_t *default_zappy(void)
     return zappy;
 }
 
-// Test for ppo command
+// Test for plv command
 
-Test(ppo, valid_command)
+Test(plv, valid_command)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "ppo #1\n";
+    char message[] = "plv #1\n";
     FILE *fp = fopen("gui_socket", "r");
     char buffer[100];
     int result;
 
 
     cr_assert_not_null(zappy);
-    result = ppo(zappy, zappy->graph, message);
+    result = plv(zappy, zappy->graph, message);
     cr_assert_eq(result, 0);
     fgets(buffer, sizeof(buffer), fp);
     fclose(fp);
     remove("gui_socket");
-    cr_assert_str_eq(buffer, "ppo #1 0 0 2\n");
+    cr_assert_str_eq(buffer, "plv #1 1\n");
 }
 
-Test(ppo, invalid_command_only_ppo, .init = redirect_all_std)
+Test(plv, invalid_command_only_plv, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "ppo\n";
+    char message[] = "plv\n";
     int result;
 
     cr_assert_not_null(zappy);
-    result = ppo(zappy, zappy->graph, message);
+    result = plv(zappy, zappy->graph, message);
     cr_assert_eq(result, -1);
     remove("gui_socket");
 }
 
-Test(ppo, invalid_command_pattern, .init = redirect_all_std)
+Test(plv, invalid_command_pattern, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "ppo #erfghfghg\n";
+    char message[] = "plv #erfghfghg\n";
     int result;
 
     cr_assert_not_null(zappy);
-    result = ppo(zappy, zappy->graph, message);
+    result = plv(zappy, zappy->graph, message);
     cr_assert_eq(result, -1);
     remove("gui_socket");
 }
 
-Test(ppo, invalid_file_descriptor, .init = redirect_all_std)
+Test(plv, invalid_file_descriptor, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "ppo #2\n";
+    char message[] = "plv #2\n";
     int result;
 
     cr_assert_not_null(zappy);
     zappy->graph->fd = -1;
-    result = ppo(zappy, zappy->graph, message);
+    result = plv(zappy, zappy->graph, message);
     cr_assert_eq(result, -1);
     remove("gui_socket");
 }
 
-Test(ppo, invalid_command_player, .init = redirect_all_std)
+Test(plv, invalid_command_player, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "ppo #200\n";
+    char message[] = "plv #200\n";
     int result;
 
     cr_assert_not_null(zappy);
-    result = ppo(zappy, zappy->graph, message);
+    result = plv(zappy, zappy->graph, message);
     cr_assert_eq(result, -1);
     remove("gui_socket");
 }

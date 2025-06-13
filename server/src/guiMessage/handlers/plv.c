@@ -34,5 +34,7 @@ int plv(zappy_t *zappy, graph_net_t *graphic, char *message)
         return -1;
     }
     player = get_player_by_id(zappy->game, player_id);
+    if (!player)
+        return -1;
     return send_plv_message(graphic, player);
 }
