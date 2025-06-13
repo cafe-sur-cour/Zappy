@@ -236,6 +236,74 @@ bool Raylib::checkCollisionPointRec(Vector2f fpoint, FloatRect frect)
     return this->_raylib->checkCollisionPointRec(point, rect);
 }
 
+Ray3D Raylib::getMouseRay(Vector2f mousePosition)
+{
+    Ray ray = this->_raylib->getMouseRay({mousePosition.x, mousePosition.y});
+    return {{ray.position.x, ray.position.y, ray.position.z},
+            {ray.direction.x, ray.direction.y, ray.direction.z}};
+}
+
+RayCollision3D Raylib::getRayCollisionBox(Ray3D ray, BoundingBox3D box)
+{
+    Ray raylibRay = {{ray.position.x, ray.position.y, ray.position.z},
+                     {ray.direction.x, ray.direction.y, ray.direction.z}};
+    BoundingBox raylibBox = {{box.min.x, box.min.y, box.min.z},
+                             {box.max.x, box.max.y, box.max.z}};
+
+    RayCollision collision = this->_raylib->getRayCollisionBox(raylibRay, raylibBox);
+    return {collision.hit, collision.distance,
+            {collision.point.x, collision.point.y, collision.point.z},
+            {collision.normal.x, collision.normal.y, collision.normal.z}};
+}
+
+RayCollision3D Raylib::getRayCollisionSphere(Ray3D ray, Vector3f center, float radius)
+{
+    Ray raylibRay = {{ray.position.x, ray.position.y, ray.position.z},
+                     {ray.direction.x, ray.direction.y, ray.direction.z}};
+    Vector3 raylibCenter = {center.x, center.y, center.z};
+
+    RayCollision collision = this->_raylib->getRayCollisionSphere(raylibRay, raylibCenter, radius);
+    return {collision.hit, collision.distance,
+            {collision.point.x, collision.point.y, collision.point.z},
+            {collision.normal.x, collision.normal.y, collision.normal.z}};
+}
+
+bool Raylib::checkCollisionBoxes(BoundingBox3D box1, BoundingBox3D box2)
+{
+    BoundingBox raylibBox1 = {{box1.min.x, box1.min.y, box1.min.z},
+                              {box1.max.x, box1.max.y, box1.max.z}};
+    BoundingBox raylibBox2 = {{box2.min.x, box2.min.y, box2.min.z},
+                              {box2.max.x, box2.max.y, box2.max.z}};
+
+    return this->_raylib->checkCollisionBoxes(raylibBox1, raylibBox2);
+}
+
+Ray3D Raylib::getMouseRayFromCurrent()
+{
+    Vector2f mousePos = getMousePosition();
+    return getMouseRay(mousePos);
+}
+
+BoundingBox3D Raylib::createBoundingBox(Vector3f center, Vector3f size)
+{
+    Vector3 centerRaylib = {center.x, center.y, center.z};
+    Vector3 sizeRaylib = {size.x, size.y, size.z};
+
+    BoundingBox box = this->_raylib->createBoundingBox(centerRaylib, sizeRaylib);
+    return {{box.min.x, box.min.y, box.min.z},
+            {box.max.x, box.max.y, box.max.z}};
+}
+
+BoundingBox3D Raylib::createBoundingBoxFromMinMax(Vector3f min, Vector3f max)
+{
+    Vector3 minRaylib = {min.x, min.y, min.z};
+    Vector3 maxRaylib = {max.x, max.y, max.z};
+
+    BoundingBox box = this->_raylib->createBoundingBoxFromMinMax(minRaylib, maxRaylib);
+    return {{box.min.x, box.min.y, box.min.z},
+            {box.max.x, box.max.y, box.max.z}};
+}
+
 void Raylib::endScissorMode()
 {
     return this->_raylib->endScissorMode();
