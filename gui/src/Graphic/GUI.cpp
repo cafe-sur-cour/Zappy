@@ -149,6 +149,13 @@ void GUI::draw()
     }
 
     _map->draw();
+    float offset = 0.0f;
+    for (auto &playerModel : zappy::gui::PLAYER_MODELS_INFO) {
+        this->_display->drawModelEx(
+            playerModel.name, {offset, -5.0f, 0.0f}, {0.0f, 1.0f, 0.0f},
+            playerModel.rotation, playerModel.scale, CWHITE);
+        offset += 1.0f;
+    }
 
     if (_hoveredPlayerId >= 0) {
         const auto& players = _gameInfos->getPlayers();
@@ -359,10 +366,7 @@ void GUI::initModels()
         }
     }
 
-    if (!this->_display->loadModel("player", "gui/assets/models/fall_guy.glb",
-        {0.0f, -75.0f, 0.0f}))
-        std::cout << colors::T_RED << "[ERROR] Failed to load player model."
-                  << colors::RESET << std::endl;
+    initPlayers();
 
     if (!this->_display->loadModel("platform", "gui/assets/models/tile.glb",
         {0.0f, 0.25f, 0.0f}))
@@ -406,6 +410,16 @@ void GUI::initModels()
     if (!this->_display->loadModel("egg", "gui/assets/models/egg.glb", {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load egg model."
                   << colors::RESET << std::endl;
+}
+
+void GUI::initPlayers()
+{
+    for (auto &playerModelInfo : zappy::gui::PLAYER_MODELS_INFO) {
+        if (!this->_display->loadModel(playerModelInfo.name,
+            playerModelInfo.modelPath, playerModelInfo.center))
+            std::cout << colors::T_RED << "[ERROR] Failed to load model: "
+                      << playerModelInfo.name << colors::RESET << std::endl;
+    }
 }
 
 void GUI::handlePlayerClicks()

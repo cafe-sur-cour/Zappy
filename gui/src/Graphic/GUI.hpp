@@ -48,6 +48,7 @@ class GUI {
         bool playerExists(int playerId) const;
 
         void initModels();
+        void initPlayers();
         void handlePlayerClicks();
         int getPlayerUnderMouse() const;
         BoundingBox3D getPlayerBoundingBox(const zappy::structs::Player& player) const;
