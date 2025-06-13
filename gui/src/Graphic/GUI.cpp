@@ -111,9 +111,11 @@ void GUI::update()
     }
 
     updateCamera();
-    _hud->updateTeamPlayersDisplay(_gameInfos);
-    _hud->updatePlayerInventoryDisplay(_cameraManager->getPlayerId(), _cameraMode);
-    _hud->update();
+    this->_hud->updateTeamPlayersDisplay(this->_gameInfos);
+    this->_hud->updatePlayerInventoryDisplay(this->_cameraManager->getPlayerId(),
+        this->_cameraMode);
+    this->_hud->updateHelpInformationHUD(this->_cameraMode);
+    this->_hud->update();
 }
 
 bool GUI::isRunning()

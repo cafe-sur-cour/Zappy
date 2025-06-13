@@ -79,6 +79,8 @@ class HUD {
 
         void updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode cameraMode);
 
+        void updateHelpInformationHUD(zappy::gui::CameraMode cameraMode);
+
         void clearPlayerInventoryElements();
 
         zappy::structs::Player getPlayerById(int playerId) const;
@@ -86,6 +88,12 @@ class HUD {
         void setResetCameraCallback(std::function<void()> resetFunc);
 
     private:
+        void _initHelpInformation();
+
+        std::string _camModeToText(zappy::gui::CameraMode, bool isGamePadAvailable);
+
+        std::string _camKeyHelp(zappy::gui::CameraMode, bool isGamePadAvailable);
+
         std::shared_ptr<Containers> createSquareContainer(float squareSize,
             float sideWidthPercent);
 
