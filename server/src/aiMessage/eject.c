@@ -56,7 +56,8 @@ static int eject_players(player_t *player, player_t *ejectman, zappy_t *zappy)
     return 0;
 }
 
-static int loop_thru_players(player_t *player, player_t *ejectman, zappy_t *zappy)
+static int loop_thru_players(player_t *player, player_t *ejectman,
+    zappy_t *zappy)
 {
     int n = 0;
     int result = 0;
