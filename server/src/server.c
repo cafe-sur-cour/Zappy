@@ -34,7 +34,8 @@ static zappy_t *set_zappy_bas(zappy_t *zappy)
     if (listen_socket(zappy->network->sockfd,
         zappy->params->nb_client) == -1) {
         close(zappy->network->sockfd);
-        return free_zappy(zappy);
+        free_zappy(zappy);
+        exit(84);
     }
     return zappy;
 }
