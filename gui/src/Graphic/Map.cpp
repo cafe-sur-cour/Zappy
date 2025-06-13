@@ -93,8 +93,6 @@ void Map::drawPlayers(int x, int y)
     if (playersOnTile.empty())
         return;
 
-    float cylinderHeight = 0.4f;
-
     for (size_t i = 0; i < playersOnTile.size(); ++i) {
         Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
@@ -598,7 +596,13 @@ void Map::updatePlayerRotations()
                 rotState.currentRotation = rotState.targetRotation;
                 rotState.isRotating = false;
             } else {
-                float rotationStep = zappy::gui::PLAYER_ROTATION_SPEED * deltaTime;
+                float currentTps = static_cast<float>(_gameInfos->getTimeUnit());
+                float referenceTps = 10.0f;
+                float maxTpsForScaling = 50.0f;
+                float effectiveTps = std::min(currentTps, maxTpsForScaling);
+                float scalingFactor = std::sqrt(effectiveTps / referenceTps);
+                float scaledRotationSpeed = zappy::gui::PLAYER_ROTATION_SPEED * scalingFactor;
+                float rotationStep = scaledRotationSpeed * deltaTime;
                 if (angleDiff > 0)
                     rotState.currentRotation += std::min(rotationStep, angleDiff);
                 else
