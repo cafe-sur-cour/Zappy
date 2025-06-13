@@ -17,8 +17,9 @@
 
 #include "../Utils/Constants.hpp"
 #include "../Communication/ICommunication.hpp"
+#include "../Observer/Subject.hpp"
 
-class GameInfos {
+class GameInfos : public Subject {
     public:
         explicit GameInfos(std::shared_ptr<ICommunication> communication);
         ~GameInfos();
@@ -84,6 +85,8 @@ class GameInfos {
         mutable std::mutex _dataMutex;
 
         std::shared_ptr<ICommunication> _communication;
+
+        void notifyStateChange();
 };
 
 #endif /* !GAMEINFOS_HPP_ */

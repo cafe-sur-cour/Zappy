@@ -347,3 +347,7 @@ const zappy::structs::Player GameInfos::getPlayer(int playerNumber) const
     }
     return zappy::structs::Player();
 }
+
+void GameInfos::notifyStateChange() {
+    notifyObservers();
+}

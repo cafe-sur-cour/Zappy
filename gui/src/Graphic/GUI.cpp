@@ -118,6 +118,11 @@ void GUI::update()
     this->_hud->update();
 }
 
+void GUI::refresh()
+{
+    update();
+}
+
 bool GUI::isRunning()
 {
     return this->_isRunning;

@@ -26,6 +26,9 @@ export default function Home() {
           <Link to="/docs/userguide" style={{ margin: '1rem', fontSize: '1.2rem' }}>
             🧭 User guide
           </Link>
+          <Link to="docs/developer-guide" style={{ margin: '1rem', fontSize: '1.2rem' }}>
+            👨‍💻 Developer guide
+          </Link>
         </div>
         <div style={{ marginTop: '3rem' }}>
           <a
