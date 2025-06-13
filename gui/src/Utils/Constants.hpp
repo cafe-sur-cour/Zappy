@@ -159,6 +159,9 @@ namespace zappy::gui {
     inline const float PHIRAS_SCALE = 0.1f;      // eightball
     inline const float THYSTAME_SCALE = 0.1f;    // tennisball
 
+    inline const float PLAYER_ROTATION_SPEED = 720.0f;
+    inline const float ROTATION_INTERPOLATION_THRESHOLD = 1.0f;
+
     enum class CameraMode {
         FREE = 0,
         TARGETED = 1,
