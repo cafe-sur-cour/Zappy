@@ -187,7 +187,8 @@ namespace zappy::gui {
         {"playerLvl3", "gui/assets/models/playerLvl3.glb", {0.0f, 20.0f, 0.0f}, {0.0045f, 0.0045f, 0.0045f}, 0.0f},
         {"playerLvl4", "gui/assets/models/playerLvl4.glb", {0.0f, 0.0025f, 0.0f}, {40.0f, 40.0f, 40.0f}, 35.0f},
         {"playerLvl5", "gui/assets/models/playerLvl5.glb", {8.0f, -1.8f, 0.0f}, {0.2f, 0.2f, 0.2f}, 0.0f},
-        {"playerLvl6", "gui/assets/models/playerLvl6.glb", {0.0f, 20.0f, 0.0f}, {0.009f, 0.009f, 0.009f}, 0.0f}
+        {"playerLvl6", "gui/assets/models/playerLvl6.glb", {0.0f, 20.0f, 0.0f}, {0.009f, 0.009f, 0.009f}, 0.0f},
+        {"playerLvl7", "gui/assets/models/playerLvl7.glb", {0.0f, 0.4f, 0.0f}, {0.25f, 0.25f, 0.25f}, 0.0f}
     };
 }
 
