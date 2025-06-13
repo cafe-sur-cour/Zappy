@@ -215,15 +215,49 @@ void GameInfos::updatePlayerExpulsion(int playerNumber)
 
 void GameInfos::updatePlayerDeath(int playerNumber)
 {
-    std::lock_guard<std::mutex> lock(_dataMutex);
+    try {
+        std::lock_guard<std::mutex> lock(_dataMutex);
 
-    if (playerNumber < 0)
-        return;
+        if (playerNumber < 0)
+            return;
 
-    _players.erase(std::remove_if(_players.begin(), _players.end(),
-        [playerNumber](const zappy::structs::Player &player) {
-            return player.number == playerNumber;
-        }), _players.end());
+        std::string teamName;
+        auto it = std::find_if(_players.begin(), _players.end(),
+            [playerNumber](const zappy::structs::Player &player) {
+                return player.number == playerNumber;
+            });
+
+        if (it != _players.end()) {
+            teamName = it->teamName;
+        } else {
+            return;
+        }
+
+        _players.erase(std::remove_if(_players.begin(), _players.end(),
+            [playerNumber](const zappy::structs::Player &player) {
+                return player.number == playerNumber;
+            }), _players.end());
+
+        if (!teamName.empty()) {
+            int remainingPlayers = std::count_if(_players.begin(), _players.end(),
+                [&teamName](const zappy::structs::Player &player) {
+                    return player.teamName == teamName;
+                });
+
+            if (remainingPlayers == 0 && !_gameOver) {
+                std::string eliminatedTeam = teamName;
+                lock.~lock_guard();
+                playDefeatSound(eliminatedTeam);
+                return;
+            }
+        }
+    } catch (const std::exception& e) {
+        std::cout << colors::T_RED << "[ERROR] Exception in updatePlayerDeath: "
+                  << e.what() << colors::RESET << std::endl;
+    } catch (...) {
+        std::cout << colors::T_RED << "[ERROR] Unknown exception in updatePlayerDeath"
+                  << colors::RESET << std::endl;
+    }
 }
 
 void GameInfos::updatePlayerResourceAction(int playerNumber, int resourceId, bool isCollecting)
@@ -350,9 +384,41 @@ const std::vector<zappy::structs::Egg> GameInfos::getEggs() const
 
 void GameInfos::setGameOver(const std::string &winningTeam)
 {
-    std::lock_guard<std::mutex> lock(_dataMutex);
-    _gameOver = true;
-    _winningTeam = winningTeam;
+    try {
+        std::lock_guard<std::mutex> lock(_dataMutex);
+        _gameOver = true;
+        _winningTeam = winningTeam;
+
+        if (_audio) {
+            _audio->playSound("win", 100.0f);
+        }
+    } catch (const std::exception& e) {
+        std::cout << colors::T_RED << "[ERROR] Exception in setGameOver: "
+                  << e.what() << colors::RESET << std::endl;
+    } catch (...) {
+        std::cout << colors::T_RED << "[ERROR] Unknown exception in setGameOver"
+                  << colors::RESET << std::endl;
+    }
+
+    notifyGameEvent(GameEventType::TEAM_WIN, winningTeam);
+}
+
+void GameInfos::playDefeatSound(const std::string &teamName)
+{
+    try {
+        std::lock_guard<std::mutex> lock(_dataMutex);
+
+        if (_audio) {
+            _audio->playSound("loose", 100.0f);
+        }
+    } catch (const std::exception& e) {
+        std::cout << colors::T_RED << "[ERROR] Exception in playDefeatSound: "
+                  << e.what() << colors::RESET << std::endl;
+    } catch (...) {
+        std::cout << colors::T_RED << "[ERROR] Unknown exception in playDefeatSound"
+                  << colors::RESET << std::endl;
+    }
+    notifyGameEvent(GameEventType::TEAM_DEFEAT, teamName);
 }
 
 std::pair<bool, std::string> GameInfos::isGameOver() const
