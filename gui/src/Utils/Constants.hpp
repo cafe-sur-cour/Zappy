@@ -178,12 +178,14 @@ namespace zappy::gui {
         std::string modelPath;
         Vector3f center;
         Vector3f scale;
+        float rotation;
     };
 
     inline const std::vector<PlayerModelInfo> PLAYER_MODELS_INFO = {
-        {"playerLvl1", "gui/assets/models/playerLvl1.glb", {0.0f, -75.0f, 0.0f}, {0.005f, 0.005f, 0.005f}},
-        {"playerLvl2", "gui/assets/models/playerLvl2.glb", {0.0f, -0.5f, 0.0f}, {0.25f, 0.25f, 0.25f}},
-        {"playerLvl3", "gui/assets/models/playerLvl3.glb", {0.0f, 20.0f, 0.0f}, {0.0045f, 0.0045f, 0.0045f}}
+        {"playerLvl1", "gui/assets/models/playerLvl1.glb", {0.0f, -75.0f, 0.0f}, {0.005f, 0.005f, 0.005f}, 0.0f},
+        {"playerLvl2", "gui/assets/models/playerLvl2.glb", {0.0f, -0.5f, 0.0f}, {0.25f, 0.25f, 0.25f}, 0.0f},
+        {"playerLvl3", "gui/assets/models/playerLvl3.glb", {0.0f, 20.0f, 0.0f}, {0.0045f, 0.0045f, 0.0045f}, 0.0f},
+        {"playerLvl4", "gui/assets/models/playerLvl4.glb", {0.0f, 0.0025f, 0.0f}, {40.0f, 40.0f, 40.0f}, 35.0f}
     };
 }
 

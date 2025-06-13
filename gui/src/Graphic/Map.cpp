@@ -108,12 +108,16 @@ void Map::drawAllPlayers()
         try {
             std::string playerModel = zappy::gui::PLAYER_MODELS_INFO.at(player.level - 1).name;
             Vector3f playerScale = zappy::gui::PLAYER_MODELS_INFO.at(player.level - 1).scale;
+            float playerInitialRotation = zappy::gui::PLAYER_MODELS_INFO.at(player.level - 1).rotation;
+            rotationAngle += playerInitialRotation;
 
             this->_display->drawModelEx(playerModel, interpolatedPosition, {0.0f, 1.0f, 0.0f},
                 rotationAngle, playerScale, teamColor);
         } catch (const std::out_of_range&) {
             std::string playerModel = zappy::gui::PLAYER_MODELS_INFO.at(0).name;
             Vector3f playerScale = zappy::gui::PLAYER_MODELS_INFO.at(0).scale;
+            float playerInitialRotation = zappy::gui::PLAYER_MODELS_INFO.at(0).rotation;
+            rotationAngle += playerInitialRotation;
 
             this->_display->drawModelEx(playerModel, interpolatedPosition, {0.0f, 1.0f, 0.0f},
                 rotationAngle, playerScale, teamColor);
