@@ -18,11 +18,16 @@
 #include "../Utils/Constants.hpp"
 #include "../Communication/ICommunication.hpp"
 #include "../Observer/Subject.hpp"
+#include "../Audio/IAudio.hpp"
 
 class GameInfos : public Subject {
     public:
         explicit GameInfos(std::shared_ptr<ICommunication> communication);
         ~GameInfos();
+
+        void setAudio(std::shared_ptr<IAudio> audio);
+        void setCurrentCameraMode(zappy::gui::CameraMode cameraMode);
+        void setCurrentPlayerFocus(int playerId);
 
         void setMapSize(int width, int height);
         std::pair<int, int> getMapSize() const;
@@ -85,6 +90,9 @@ class GameInfos : public Subject {
         mutable std::mutex _dataMutex;
 
         std::shared_ptr<ICommunication> _communication;
+        std::shared_ptr<IAudio> _audio;
+        zappy::gui::CameraMode _currentCameraMode;
+        int _currentPlayerFocus;
 
         void notifyStateChange();
 };
