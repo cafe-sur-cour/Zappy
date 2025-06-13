@@ -17,14 +17,14 @@ int send_egg(zappy_t *zappy, egg_t *egg)
 {
     egg_t *current = egg;
     int xLength = int_str_len(current->id) + int_str_len(current->posX) +
-        int_str_len(current->posY) + int_str_len(current->idLayer) + 20;
+        int_str_len(current->posY) + int_str_len(current->idLayer) + 11;
     char *message = malloc(sizeof(char) * xLength);
     graph_net_t *currentGraph = zappy->graph;
 
     if (message == NULL)
         return -1;
-    snprintf(message, xLength, "enw #%d #%d %d %d %s\n", current->id,
-        current->idLayer, current->posX, current->posY, current->teamName);
+    snprintf(message, xLength, "enw #%d #%d %d %d\n", current->id,
+        current->idLayer, current->posX, current->posY);
     if (zappy->params->is_debug == true)
         printf("Sending egg: %s", message);
     while (currentGraph != NULL) {

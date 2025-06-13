@@ -18,6 +18,7 @@ Audio::Audio()
     this->Audio::setSoundLooping("main_theme", true);
     this->Audio::playSound("main_theme", this->Audio::getMusicVolumeLevel());
     this->Audio::loadSound("click", "gui/assets/sounds/click.wav");
+    this->Audio::loadSound("clickPlayer", "gui/assets/sounds/playerClick.wav");
 }
 
 Audio::~Audio()

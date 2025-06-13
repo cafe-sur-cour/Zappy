@@ -422,6 +422,7 @@ void HUD::clearPlayerInventoryElements()
         "player_info_title",
         "player_info_separator",
         "player_info_level", "player_info_team",
+        "player_info_id", "player_info_ritual",
         "player_info_position", "player_info_orientation",
         "inventory_title",
         "inventory_separator",
@@ -701,8 +702,16 @@ void HUD::initPlayerInventoryDisplay(int playerId)
     );
 
     bottomContainer->addTextPercent(
-        "player_info_team",
+        "player_info_id",
         55.0f, 30.0f,
+        "ID: " + std::to_string(player.number),
+        7.0f,
+        {220, 220, 220, 255}
+    );
+
+    bottomContainer->addTextPercent(
+        "player_info_team",
+        55.0f, 45.0f,
         "Team: " + player.teamName,
         7.0f,
         {220, 220, 220, 255}
@@ -710,7 +719,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "player_info_level",
-        55.0f, 50.0f,
+        55.0f, 60.0f,
         "Level: " + std::to_string(player.level),
         7.0f,
         {220, 220, 220, 255}
@@ -735,10 +744,19 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "player_info_orientation",
-        65.0f, 50.0f,
+        65.0f, 45.0f,
         "Orientation: " + orientationStr,
         7.0f,
         {220, 220, 220, 255}
+    );
+
+    bool inRitual = isPlayerInIncantation(player.number);
+    bottomContainer->addTextPercent(
+        "player_info_ritual",
+        65.0f, 60.0f,
+        "Ritual: " + std::string(inRitual ? "Yes" : "No"),
+        7.0f,
+        inRitual ? Color32{255, 215, 0, 255} : Color32{220, 220, 220, 255}
     );
 
     bottomContainer->addTextPercent(
@@ -929,6 +947,27 @@ void HUD::updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode came
         levelElem->setText("Level: " + std::to_string(player.level));
     }
 
+    auto teamElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("player_info_team"));
+    if (teamElem) {
+        teamElem->setText("Team: " + player.teamName);
+    }
+
+    auto idElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("player_info_id"));
+    if (idElem) {
+        idElem->setText("ID: " + std::to_string(player.number));
+    }
+
+    bool inRitual = isPlayerInIncantation(player.number);
+    auto ritualElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("player_info_ritual"));
+    if (ritualElem) {
+        ritualElem->setText("Ritual: " + std::string(inRitual ? "Yes" : "No"));
+        ritualElem->setColor(inRitual ? Color32{255, 215, 0, 255} :
+                                        Color32{220, 220, 220, 255});
+    }
+
     auto posElem = std::dynamic_pointer_cast<Text>(
         bottomContainer->getElement("player_info_position"));
     if (posElem) {
@@ -1041,4 +1080,19 @@ void HUD::updateTpsSlider(std::shared_ptr<GameInfos> gameInfos)
         return;
 
     slider->setValue(static_cast<float>(gameInfos->getTimeUnit()));
+}
+
+bool HUD::isPlayerInIncantation(int playerId) const
+{
+    const auto& incantations = _gameInfos->getIncantations();
+
+    for (const auto& incantation : incantations) {
+        for (int id : incantation.players) {
+            if (id == playerId) {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }

@@ -15,6 +15,10 @@
 #include <iostream>
 #include <chrono>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #include "Map.hpp"
 
 Map::Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<IDisplay> display)
@@ -41,15 +45,19 @@ Color32 Map::getTeamColor(const std::string &teamName)
 
 void Map::draw()
 {
+    updatePlayerRotations();
+    updatePlayerPositions();
+
     auto tiles = _gameInfos->getTiles();
 
     for (const auto &tile : tiles) {
         drawTile(tile.x, tile.y, tile);
         drawEggs(tile.x, tile.y);
-        drawPlayers(tile.x, tile.y);
         drawFood(tile.x, tile.y, tile);
         drawRock(tile.x, tile.y, tile);
     }
+
+    drawAllPlayers();
     drawBroadcastingPlayers();
     drawIncantations();
 }
@@ -79,7 +87,14 @@ void Map::drawPlayers(int x, int y)
     std::vector<const zappy::structs::Player*> playersOnTile;
 
     for (const auto& player : players) {
-        if (player.x == x && player.y == y) {
+        Vector3f interpolatedPos = getPlayerInterpolatedPosition(player.number,
+            player.x, player.y);
+        int currentRenderX = static_cast<int>(std::round(interpolatedPos.x /
+            zappy::gui::POSITION_MULTIPLIER));
+        int currentRenderY = static_cast<int>(std::round(interpolatedPos.z /
+            zappy::gui::POSITION_MULTIPLIER));
+
+        if (currentRenderX == x && currentRenderY == y) {
             playersOnTile.push_back(&player);
         }
     }
@@ -87,67 +102,50 @@ void Map::drawPlayers(int x, int y)
     if (playersOnTile.empty())
         return;
 
-    float cylinderHeight = 0.4f;
-
     for (size_t i = 0; i < playersOnTile.size(); ++i) {
-        Vector3f position = {
-            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-            getOffset(DisplayPriority::PLAYER, x, y, i),
-            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-        };
+        Vector3f interpolatedPosition = getPlayerInterpolatedPosition(playersOnTile[i]->number,
+            playersOnTile[i]->x, playersOnTile[i]->y);
+
+        interpolatedPosition.y = getOffset(DisplayPriority::PLAYER, x, y, i);
 
         Color32 teamColor = getTeamColor(playersOnTile[i]->teamName);
-        float rotationAngle = 0.0f;
-        int direction = playersOnTile[i]->orientation - 1;
+        float rotationAngle = getPlayerInterpolatedRotation(playersOnTile[i]->number,
+            playersOnTile[i]->orientation);
 
-        if (direction < 0) direction = 0;
-        switch (direction) {
-            case 0: rotationAngle = 180.0f; break;
-            case 1: rotationAngle = 90.0f; break;
-            case 2: rotationAngle = 0.0f; break;
-            case 3: rotationAngle = 270.0f; break;
-        }
-
-        this->_display->drawModelEx("player", position, {0.0f, 1.0f, 0.0f},
+        this->_display->drawModelEx("player", interpolatedPosition, {0.0f, 1.0f, 0.0f},
             rotationAngle, {zappy::gui::PLAYER_SCALE, zappy::gui::PLAYER_SCALE,
                 zappy::gui::PLAYER_SCALE}, teamColor);
-        drawOrientationArrow(position, playersOnTile[i]->orientation,
-            cylinderHeight);
     }
 }
 
-void Map::drawOrientationArrow(const Vector3f &position, int orientation, float playerHeight)
+void Map::drawAllPlayers()
 {
-    float arrowLength = 0.35f;
-    float arrowWidth = 0.15f;
-    float arrowHeadSize = 0.2f;
+    const auto& players = _gameInfos->getPlayers();
 
-    Vector3f arrowPos = position;
-    arrowPos.y += playerHeight / 2 + 0.15f;
-    Vector3f start = arrowPos;
-    Vector3f end = arrowPos;
+    for (const auto& player : players) {
+        Vector3f interpolatedPosition = getPlayerInterpolatedPosition(player.number,
+            player.x, player.y);
 
-    int direction = orientation - 1;
-    if (direction < 0) direction = 0;
+        size_t stackIndex = 0;
+        for (const auto& otherPlayer : players) {
+            if (otherPlayer.number != player.number &&
+                otherPlayer.x == player.x && otherPlayer.y == player.y &&
+                otherPlayer.number < player.number) {
+                stackIndex++;
+            }
+        }
 
-    switch (direction) {
-        case 0: end.z -= arrowLength; break;
-        case 1: end.x += arrowLength; break;
-        case 2: end.z += arrowLength; break;
-        case 3: end.x -= arrowLength; break;
+        interpolatedPosition.y = getOffset(DisplayPriority::PLAYER, player.x, player.y,
+            stackIndex);
+
+        Color32 teamColor = getTeamColor(player.teamName);
+        float rotationAngle = getPlayerInterpolatedRotation(player.number,
+            player.orientation);
+
+        this->_display->drawModelEx("player", interpolatedPosition, {0.0f, 1.0f, 0.0f},
+            rotationAngle, {zappy::gui::PLAYER_SCALE, zappy::gui::PLAYER_SCALE,
+                zappy::gui::PLAYER_SCALE}, teamColor);
     }
-    this->_display->drawCylinderEx(start, end, 0.05f, 0.05f, 8, CRED);
-
-    Vector3f coneStart = end;
-    Vector3f coneEnd;
-
-    switch (direction) {
-        case 0: coneEnd = {end.x, end.y, end.z - arrowHeadSize}; break;
-        case 1: coneEnd = {end.x + arrowHeadSize, end.y, end.z}; break;
-        case 2: coneEnd = {end.x, end.y, end.z + arrowHeadSize}; break;
-        case 3: coneEnd = {end.x - arrowHeadSize, end.y, end.z}; break;
-    }
-    this->_display->drawCylinderEx(coneStart, coneEnd, arrowWidth, 0.0f, 8, CRED);
 }
 
 void Map::drawEggs(int x, int y)
@@ -463,10 +461,13 @@ void Map::drawBroadcastingPlayers()
             continue;
         }
 
+        Vector3f interpolatedPosition = getPlayerInterpolatedPosition(playerNumber,
+            playerInfo.x, playerInfo.y);
+
         Vector3f position = {
-            static_cast<float>(playerInfo.x * zappy::gui::POSITION_MULTIPLIER),
+            interpolatedPosition.x,
             getOffset(DisplayPriority::PLAYER, playerInfo.x, playerInfo.y) + 0.3f,
-            static_cast<float>(playerInfo.y * zappy::gui::POSITION_MULTIPLIER)
+            interpolatedPosition.z
         };
 
         for (int ring = 0; ring < NUM_RINGS; ++ring) {
@@ -573,4 +574,219 @@ void Map::drawIncantations()
                 highlight2Color);
         }
     }
+}
+
+float Map::orientationToRotation(int orientation)
+{
+    switch (orientation) {
+        case 1: return 180.0f;
+        case 2: return 90.0f;
+        case 3: return 0.0f;
+        case 4: return 270.0f;
+        default: return 0.0f;
+    }
+}
+
+float Map::normalizeAngle(float angle)
+{
+    while (angle < 0.0f) angle += 360.0f;
+    while (angle >= 360.0f) angle -= 360.0f;
+    return angle;
+}
+
+float Map::getShortestAngleDifference(float from, float to)
+{
+    float diff = normalizeAngle(to - from);
+    if (diff > 180.0f)
+        diff -= 360.0f;
+    return diff;
+}
+
+void Map::updatePlayerRotations()
+{
+    auto now = std::chrono::steady_clock::now();
+    const auto& players = _gameInfos->getPlayers();
+
+    for (const auto& player : players) {
+        int playerId = player.number;
+        float targetRotation = orientationToRotation(player.orientation);
+
+        if (_playerRotations.find(playerId) == _playerRotations.end()) {
+            _playerRotations[playerId] = PlayerRotationState();
+            _playerRotations[playerId].currentRotation = targetRotation;
+            _playerRotations[playerId].targetRotation = targetRotation;
+            _playerRotations[playerId].lastUpdateTime = now;
+            continue;
+        }
+
+        PlayerRotationState& rotState = _playerRotations[playerId];
+
+        if (std::abs(normalizeAngle(rotState.targetRotation) - normalizeAngle(targetRotation))
+            > zappy::gui::ROTATION_INTERPOLATION_THRESHOLD) {
+            rotState.targetRotation = targetRotation;
+            rotState.isRotating = true;
+        }
+
+        if (rotState.isRotating) {
+            auto deltaTime =
+                std::chrono::duration<float>(now - rotState.lastUpdateTime).count();
+            float angleDiff = getShortestAngleDifference(rotState.currentRotation,
+                rotState.targetRotation);
+
+            if (std::abs(angleDiff) < zappy::gui::ROTATION_INTERPOLATION_THRESHOLD) {
+                rotState.currentRotation = rotState.targetRotation;
+                rotState.isRotating = false;
+            } else {
+                float currentTps = static_cast<float>(_gameInfos->getTimeUnit());
+                float referenceTps = 10.0f;
+                float maxTpsForScaling = 50.0f;
+                float effectiveTps = std::min(currentTps, maxTpsForScaling);
+                float scalingFactor = std::sqrt(effectiveTps / referenceTps);
+                float scaledRotationSpeed = zappy::gui::PLAYER_ROTATION_SPEED * scalingFactor;
+                float rotationStep = scaledRotationSpeed * deltaTime;
+                if (angleDiff > 0)
+                    rotState.currentRotation += std::min(rotationStep, angleDiff);
+                else
+                    rotState.currentRotation += std::max(-rotationStep, angleDiff);
+                rotState.currentRotation = normalizeAngle(rotState.currentRotation);
+            }
+        }
+
+        rotState.lastUpdateTime = now;
+    }
+
+    auto it = _playerRotations.begin();
+    while (it != _playerRotations.end()) {
+        bool playerExists = std::any_of(players.begin(), players.end(),
+            [&](const zappy::structs::Player& p) { return p.number == it->first; });
+
+        if (!playerExists)
+            it = _playerRotations.erase(it);
+        else
+            ++it;
+    }
+}
+
+float Map::getPlayerInterpolatedRotation(int playerId, int serverOrientation)
+{
+    updatePlayerRotations();
+
+    auto it = _playerRotations.find(playerId);
+    if (it != _playerRotations.end()) {
+        return it->second.currentRotation;
+    }
+
+    return orientationToRotation(serverOrientation);
+}
+
+Vector3f Map::calculatePlayerWorldPosition(int x, int y)
+{
+    return {
+        static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+        0.0f,
+        static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+    };
+}
+
+float Map::getDistance(const Vector3f& from, const Vector3f& to)
+{
+    float dx = to.x - from.x;
+    float dy = to.y - from.y;
+    float dz = to.z - from.z;
+    return std::sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+Vector3f Map::lerpVector3f(const Vector3f& from, const Vector3f& to, float t)
+{
+    return {
+        from.x + (to.x - from.x) * t,
+        from.y + (to.y - from.y) * t,
+        from.z + (to.z - from.z) * t
+    };
+}
+
+void Map::updatePlayerPositions()
+{
+    auto now = std::chrono::steady_clock::now();
+    const auto& players = _gameInfos->getPlayers();
+
+    for (const auto& player : players) {
+        int playerId = player.number;
+        Vector3f targetPosition = calculatePlayerWorldPosition(player.x, player.y);
+
+        if (_playerPositions.find(playerId) == _playerPositions.end()) {
+            _playerPositions[playerId] = PlayerPositionState();
+            _playerPositions[playerId].currentPosition = targetPosition;
+            _playerPositions[playerId].targetPosition = targetPosition;
+            _playerPositions[playerId].lastUpdateTime = now;
+            continue;
+        }
+
+        PlayerPositionState& posState = _playerPositions[playerId];
+
+        float maxTileDistance = zappy::gui::POSITION_MULTIPLIER * 1.5f;
+        float distanceToTarget = getDistance(posState.currentPosition, targetPosition);
+
+        if (distanceToTarget > maxTileDistance) {
+            posState.currentPosition = targetPosition;
+            posState.targetPosition = targetPosition;
+            posState.isMoving = false;
+            posState.lastUpdateTime = now;
+            continue;
+        }
+
+        if (getDistance(posState.targetPosition, targetPosition) >
+            zappy::gui::MOVEMENT_INTERPOLATION_THRESHOLD) {
+            posState.targetPosition = targetPosition;
+            posState.isMoving = true;
+        }
+
+        if (posState.isMoving) {
+            auto deltaTime =
+                std::chrono::duration<float>(now - posState.lastUpdateTime).count();
+            float distance = getDistance(posState.currentPosition, posState.targetPosition);
+
+            if (distance < zappy::gui::MOVEMENT_INTERPOLATION_THRESHOLD) {
+                posState.currentPosition = posState.targetPosition;
+                posState.isMoving = false;
+            } else {
+                float currentTps = static_cast<float>(_gameInfos->getTimeUnit());
+                float referenceTps = 10.0f;
+                float maxTpsForScaling = 50.0f;
+                float effectiveTps = std::min(currentTps, maxTpsForScaling);
+                float scalingFactor = std::sqrt(effectiveTps / referenceTps);
+                float scaledMovementSpeed = zappy::gui::PLAYER_MOVEMENT_SPEED * scalingFactor;
+                float movementStep = scaledMovementSpeed * deltaTime;
+
+                float t = std::min(1.0f, movementStep / distance);
+                posState.currentPosition = lerpVector3f(posState.currentPosition,
+                    posState.targetPosition, t);
+            }
+        }
+
+        posState.lastUpdateTime = now;
+    }
+
+    auto it = _playerPositions.begin();
+    while (it != _playerPositions.end()) {
+        bool playerExists = std::any_of(players.begin(), players.end(),
+            [&](const zappy::structs::Player& p) { return p.number == it->first; });
+
+        if (!playerExists)
+            it = _playerPositions.erase(it);
+        else
+            ++it;
+    }
+}
+
+Vector3f Map::getPlayerInterpolatedPosition(int playerId, int serverX, int serverY)
+{
+    updatePlayerPositions();
+
+    auto it = _playerPositions.find(playerId);
+    if (it != _playerPositions.end()) {
+        return it->second.currentPosition;
+    }
+
+    return calculatePlayerWorldPosition(serverX, serverY);
 }

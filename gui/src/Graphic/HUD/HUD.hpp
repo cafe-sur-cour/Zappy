@@ -86,6 +86,8 @@ class HUD {
 
         zappy::structs::Player getPlayerById(int playerId) const;
 
+        bool isPlayerInIncantation(int playerId) const;
+
         void setResetCameraCallback(std::function<void()> resetFunc);
 
     private:
