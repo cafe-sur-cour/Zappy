@@ -13,14 +13,16 @@
 #include <string>
 #include <utility>
 #include <functional>
+#include <chrono>
 #include "Containers/Containers.hpp"
 #include "../../Game/GameInfos.hpp"
 #include "../../Audio/IAudio.hpp"
 #include "../../Utils/Constants.hpp"
 #include "Help/Help.hpp"
 #include "../../IDisplay.hpp"
+#include "../../Observer/IObserver.hpp"
 
-class HUD {
+class HUD : public IObserver {
     public:
         HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
             std::shared_ptr<IAudio> audio,
@@ -29,8 +31,6 @@ class HUD {
         ~HUD();
 
         void draw();
-
-        void update();
 
         std::shared_ptr<Containers> addContainer(
             const std::string& id,
@@ -89,6 +89,15 @@ class HUD {
 
         void setResetCameraCallback(std::function<void()> resetFunc);
 
+        void displayWinMessage(const std::string& teamName);
+
+        void displayLoseMessage(const std::string& teamName);
+
+        void updateGameMessages();
+
+        void update() override;
+        void onGameEvent(GameEventType eventType, const std::string& teamName) override;
+
     private:
         void _initHelpInformation();
 
@@ -138,10 +147,22 @@ class HUD {
                             const std::string& teamId,
                             float yPos, const std::vector<int>& playerNumbers);
 
+        void createMessageContainer();
+
+        struct GameMessage {
+            std::string id;
+            std::string text;
+            Color32 color;
+            std::chrono::steady_clock::time_point startTime;
+            float duration;
+        };
+
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<IAudio> _audio;
         std::shared_ptr<Help> _help;
         std::function<void()> _resetCameraFunc;
+        std::vector<GameMessage> _gameMessages;
+        static constexpr float MESSAGE_DURATION = 5.0f;
 };
