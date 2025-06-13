@@ -80,6 +80,8 @@ Settings::Settings(
         30.0f, 30.0f,
         Color32{50, 50, 50, 240}
     );
+    this->_musicLevel = this->_audio->getMusicVolumeLevel();
+    this->_sfxLevel = this->_audio->getSFXVolumeLevel();
 
     this->_settingsContainer->setRelativePosition(
         15.0f, 0.0f,

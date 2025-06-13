@@ -18,8 +18,8 @@ class Settings {
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<IAudio> _audio;
         std::shared_ptr<CameraManager> _camera;
-        float _sfxLevel = 25.f;
-        float _musicLevel = 25.f;
+        float _sfxLevel;
+        float _musicLevel;
         float _cameraMovingSpeed;
         float _cameraRotaSpeed;
         float _cameraZoomSpeed;
