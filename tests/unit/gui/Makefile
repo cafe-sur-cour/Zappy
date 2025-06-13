@@ -32,7 +32,8 @@ SRC =	../../../gui/src/Client/Client.cpp \
 		../../../gui/src/Graphic/HUD/HUD.cpp \
 		../../../gui/src/Graphic/Camera/CameraManager.cpp \
 		../../../gui/src/Graphic/HUD/Help/Help.cpp	 \
-		../../../gui/src/Observer/GuiObserver.cpp
+		../../../gui/src/Observer/GuiObserver.cpp	\
+		../../../gui/src/Observer/Subject.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 

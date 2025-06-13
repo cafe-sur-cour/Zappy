@@ -85,9 +85,7 @@ class GameInfos : public Subject {
 
         std::shared_ptr<ICommunication> _communication;
 
-        void notifyStateChange() {
-            notifyObservers();
-        }
+        void notifyStateChange();
 };
 
 #endif /* !GAMEINFOS_HPP_ */

@@ -32,7 +32,7 @@ class Client {
         std::shared_ptr<ICommunication> _communication;
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<MsgHandler> _msgHandler;
-        std::unique_ptr<GUI> _gui;
+        std::shared_ptr<GUI> _gui;
         std::shared_ptr<GuiObserver> _guiObserver;
 };
 
