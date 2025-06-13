@@ -65,8 +65,6 @@ static void handle_time_and_respawn(zappy_t *zappy, struct timespec *last_time,
     *time_since_last_spawn += delta;
     *last_time = current_time;
     if (*time_since_last_spawn >= respawn_interval) {
-        printf("Time %.2f seconds vs respawn %.2f.\n", *time_since_last_spawn,
-            respawn_interval);
         refill_food(zappy);
         *time_since_last_spawn = 0.0;
     }

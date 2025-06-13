@@ -102,12 +102,11 @@ int start_protocol(zappy_t *server);
 /* client.c */
 bool process_new_client(const char *team_name, int fd, zappy_t *server);
 team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server);
-int get_next_free_id(zappy_t *server);
 void check_player_status(zappy_t *zappy);
 
 /* init_map.c */
 void init_game(zappy_t *server);
-void distribute_resources(zappy_t *z);
+int distribute_resources(zappy_t *z);
 
 /* init_team.c */
 void init_teams(zappy_t *server);
@@ -196,7 +195,10 @@ int right_message(player_t *player);
 int handle_connect_nbr(player_t *player, char *command, zappy_t *zappy);
 int handle_eject(player_t *player, char *command, zappy_t *zappy);
 
+/* fork */
 int handle_fork(player_t *player, char *command, zappy_t *zappy);
+int handle_fork_end(player_t *player, zappy_t *zappy);
+
 int print_look_server(player_t *player);
 
 /* Incantation handler */
@@ -254,8 +256,11 @@ int plv(zappy_t *zappy, graph_net_t *graphic, char *message);
 int pin(zappy_t *zappy, graph_net_t *graphic, char *message);
 int sgt(zappy_t *zappy, graph_net_t *graphic, char *message);
 int sst(zappy_t *zappy, graph_net_t *graphic, char *message);
-player_t *get_player_by_id(game_t *game, int player_id);
 int send_bct_message(graph_net_t *graphic, int x, int y,
     inventory_t *inventory);
 
+/* player_id.c */
+player_t *get_player_by_id(game_t *game, int player_id);
+int get_next_free_id(zappy_t *server);
+void verify_player_id(zappy_t *zappy, player_t *player);
 #endif /* !ZAPPY_H_ */

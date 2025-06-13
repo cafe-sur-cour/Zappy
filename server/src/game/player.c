@@ -13,40 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 
-/* This sub-function check the current id agains the other */
-static int loop_thru_players(player_t *current_player, int highest_id)
-{
-    while (current_player != NULL) {
-        if (current_player->id > highest_id)
-            highest_id = current_player->id;
-        current_player = current_player->next;
-    }
-    return highest_id;
-}
 
-/* This function returns the highest free id for a player */
-int get_next_free_id(zappy_t *server)
-{
-    int highest_id = 0;
-    team_t *current_team = server->game->teams;
-    player_t *current_player = NULL;
-
-    while (current_team != NULL) {
-        current_player = current_team->players;
-        highest_id = loop_thru_players(current_player, highest_id);
-        current_team = current_team->next;
-    }
-    return highest_id + 1;
-}
-
-/* This function call the next id to get player id */
-static void verify_player_id(zappy_t *zappy, player_t *player)
-{
-    if (player->id == -1) {
-        player->id = get_next_free_id(zappy);
-        send_player_connect(zappy, player);
-    }
-}
 
 /* This function updates player food consumption based on time */
 static void update_player_food(player_t *player, zappy_t *zappy)
@@ -66,38 +33,26 @@ static void update_player_food(player_t *player, zappy_t *zappy)
     }
 }
 
-static player_t *loop_tru_players(team_t *team, int player_id)
-{
-    player_t *current_player = team->players;
-
-    while (current_player) {
-        if (current_player->id == player_id) {
-            return current_player;
-        }
-        current_player = current_player->next;
-    }
-    return NULL;
-}
-
-player_t *get_player_by_id(game_t *game, int player_id)
-{
-    team_t *current_team = game->teams;
-    player_t *result = NULL;
-
-    while (current_team) {
-        result = loop_tru_players(current_team, player_id);
-        if (result)
-            return result;
-        current_team = current_team->next;
-    }
-    error_message("Player not found.");
-    return NULL;
-}
-
 /* This function checks if a player is dead from starvation */
 static bool is_player_dead(player_t *player)
 {
     return (player->food_timer <= 0 && player->inventory->nbFood <= 0);
+}
+
+void remove_player_from_alive_teamate(zappy_t *zappy, player_t *player)
+{
+    team_t *current_team = zappy->game->teams;
+    char *team_name = player->team;
+
+    while (current_team != NULL) {
+        if (strcmp(current_team->name, team_name) == 0) {
+            break;
+        }
+        current_team = current_team->next;
+    }
+    if (current_team->nbPlayerAlive > 0) {
+        current_team->nbPlayerAlive--;
+    }
 }
 
 /* This function handles player death */
@@ -106,6 +61,7 @@ static void handle_player_death(zappy_t *zappy, player_t *player, team_t *team)
     player_t *current = NULL;
 
     write_message(player->network->fd, "dead\n");
+    remove_player_from_alive_teamate(zappy, player);
     send_player_death(zappy, player);
     if (team->players == player) {
         team->players = player->next;

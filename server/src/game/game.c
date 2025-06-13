@@ -106,26 +106,28 @@ static int *get_needed_amount_of_ressources(float *density, int mapValue,
 }
 
 /* This function distrbute the ressources on the tiles */
-void distribute_resources(zappy_t *z)
+int distribute_resources(zappy_t *z)
 {
     int mapValue = z->params->x * z->params->y;
     float density[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
-    int *needed_count = NULL;
     tiles_t *shuffled_tiles = shuffle_fisher(z->params->x, z->params->y);
     int tile_index = 0;
     int *pos = NULL;
+    int is_upt = 0;
+    int *needed_count = get_needed_amount_of_ressources(density, mapValue, z);
 
-    needed_count = get_needed_amount_of_ressources(density, mapValue, z);
     if (shuffled_tiles == NULL || needed_count == NULL)
         exit(84);
     for (int type = 0; type < 7; type++) {
         for (int count = 0; count < needed_count[type]; count++) {
             pos = distrib_tiles(&tile_index, shuffled_tiles, mapValue);
             z->game->map = set_tile(pos[0], pos[1], z->game->map, type);
+            is_upt = 1;
             free(pos);
         }
     }
     free(shuffled_tiles);
+    return is_upt;
 }
 
 static map_t *malloc_tiles(int width, int height,
