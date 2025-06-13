@@ -461,10 +461,13 @@ void Map::drawBroadcastingPlayers()
             continue;
         }
 
+        Vector3f interpolatedPosition = getPlayerInterpolatedPosition(playerNumber,
+            playerInfo.x, playerInfo.y);
+
         Vector3f position = {
-            static_cast<float>(playerInfo.x * zappy::gui::POSITION_MULTIPLIER),
+            interpolatedPosition.x,
             getOffset(DisplayPriority::PLAYER, playerInfo.x, playerInfo.y) + 0.3f,
-            static_cast<float>(playerInfo.y * zappy::gui::POSITION_MULTIPLIER)
+            interpolatedPosition.z
         };
 
         for (int ring = 0; ring < NUM_RINGS; ++ring) {
