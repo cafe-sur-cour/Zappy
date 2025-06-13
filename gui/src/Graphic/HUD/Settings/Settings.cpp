@@ -121,7 +121,7 @@ Settings::Settings(
     this->_settingsContainer->addSliderPercent(
         "slider_music",
         5.f, yPos, 90.f, 16.f,
-        0.f, 100.f, 50.f, "Volume Music:",
+        0.f, 100.f, this->_audio->getMusicVolumeLevel(), "Volume Music:",
         [this](float nbr) {
             this->_musicLevel = nbr;
         }
@@ -131,7 +131,7 @@ Settings::Settings(
     this->_settingsContainer->addSliderPercent(
         "slider_click",
         5.f, yPos, 90.f, 16.f,
-        0.f, 100.f, 50.f, "Volume SFX:",
+        0.f, 100.f, this->_audio->getSFXVolumeLevel(), "Volume SFX:",
         [this](float nbr) {
             this->_sfxLevel = nbr;
         }
