@@ -949,7 +949,8 @@ void HUD::updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode came
         bottomContainer->getElement("player_info_ritual"));
     if (ritualElem) {
         ritualElem->setText("Ritual: " + std::string(inRitual ? "Yes" : "No"));
-        ritualElem->setColor(inRitual ? Color32{255, 215, 0, 255} : Color32{220, 220, 220, 255});
+        ritualElem->setColor(inRitual ? Color32{255, 215, 0, 255} :
+                                        Color32{220, 220, 220, 255});
     }
 
     auto posElem = std::dynamic_pointer_cast<Text>(
