@@ -21,6 +21,7 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
       _resetCameraFunc(resetCameraFunc)
 {
     _help = std::make_shared<Help>(display, audio);
+    _settings = std::make_shared<Settings>(display, audio);
     initDefaultLayout(15.0f, 20.0f);
     initExitButton();
     initSettingsButton();
@@ -45,6 +46,9 @@ void HUD::draw()
     if (_help && _help->isVisible()) {
         _help->draw();
     }
+    if (this->_settings && this->_settings->isVisible()) {
+        this->_settings->draw();
+    }
 }
 
 void HUD::update()
@@ -55,6 +59,10 @@ void HUD::update()
 
     if (_help) {
         _help->update();
+    }
+
+    if (this->_settings) {
+        this->_settings->update();
     }
 
     updateTeamPlayersDisplay(_gameInfos);
@@ -114,6 +122,10 @@ void HUD::handleResize(int oldWidth, int oldHeight, int newWidth, int newHeight)
 
     if (_help) {
         _help->handleResize(oldWidth, oldHeight, newWidth, newHeight);
+    }
+
+    if (this->_settings) {
+        this->_settings->handleResize(oldWidth, oldHeight, newWidth, newHeight);
     }
 }
 
@@ -235,8 +247,11 @@ void HUD::initSettingsButton()
         15.0f, 30.0f,
         70.0f, 15.0f,
         "SETTINGS",
-        []() {
-            // Placeholder for settings functionality
+        [this]() {
+            if (this->_settings && !this->_settings->isVisible() &&
+                !this->_help->isVisible()) {
+                this->_settings->show();
+            }
         },
         {60, 60, 240, 255},
         {100, 100, 255, 255},
@@ -257,8 +272,8 @@ void HUD::initHelpButton()
         70.0f, 15.0f,
         "HELP",
         [this]() {
-            if (_help && !_help->isVisible()) {
-                _help->show();
+            if (this->_help && !this->_help->isVisible() && !this->_settings->isVisible()) {
+                this->_help->show();
             }
         },
         {60, 240, 60, 255},

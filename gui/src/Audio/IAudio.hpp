@@ -14,9 +14,15 @@ class IAudio {
     public:
         virtual ~IAudio() = default;
 
+        virtual float getSFXVolumeLevel() = 0;
+        virtual float getMusicVolumeLevel() = 0;
+
+        virtual void setSFXVolumeLevel(float) = 0;
+        virtual void setMusicVolumeLevel(float) = 0;
+
         virtual bool loadSound(const std::string& id, const std::string& filepath) = 0;
 
-        virtual void playSound(const std::string& id, float volume = 1.0f) = 0;
+        virtual void playSound(const std::string& id, float volume) = 0;
         virtual void stopSound(const std::string& id) = 0;
         virtual bool isSoundPlaying(const std::string& id) const = 0;
 
