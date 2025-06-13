@@ -809,41 +809,43 @@ void HUD::initPlayerInventoryDisplay(int playerId)
     );
 }
 
-std::string HUD::_camModeToText(zappy::gui::CameraMode cameraMode)
+std::string HUD::_camModeToText(zappy::gui::CameraMode cameraMode, bool isGamePadAvailable)
 {
+    std::string changeCamKey = "";
+    changeCamKey = isGamePadAvailable ? "LB" : "TAB";
     switch (cameraMode)
     {
     case zappy::gui::CameraMode::FREE:
-        return "Free";
+        return "Free\nChange camera mod: " + changeCamKey;
     case zappy::gui::CameraMode::PLAYER:
-        return "Player";
+        return "Player\nChange camera mod: " + changeCamKey;
     case zappy::gui::CameraMode::TARGETED:
-        return "Targeted";
+        return "Targeted\nChange camera mod: " + changeCamKey;
     default:
-        return "Unknown";
+        return "Unknown\nChange camera mod: " + changeCamKey;
     }
-    return "Unknown";
+    return "Unknown\nChange camera mod: " + changeCamKey;
 }
 
 std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAvailable)
 {
-    if (!isGamePadAvailable) {
+    if (isGamePadAvailable) {
         switch (cameraMode)
         {
         case zappy::gui::CameraMode::FREE:
-            return "UP | DOWN | RIGHT | LEFT = Change camera direction\n\n"
-                "Z | Q | S | D = Move camera\n";
+            return "Right joystick = Change camera direction\n\n"
+                "Left joystick = Move camera x and z\n"
+                "RT | LT = Move camera y\n";
         case zappy::gui::CameraMode::PLAYER:
             return "UP | DOWN = Next / Previous player\n\n"
-                "RIGHT | LEFT = Change camera direction";
+                "Right joystick = Change camera direction";
         case zappy::gui::CameraMode::TARGETED:
-            return "UP | DOWN | RIGHT | LEFT = Rotate camera around map origin\n\n"
-                    "MouseWheel = Zoom / Unzoom\n";
+            return "Right joystick = Rotate camera around map origin\n\n"
+                    "RT | LT = Zoom / Unzoom\n";
         default:
             return "Unknown";
         }
     }
-    // TODO(NOA): Demander à Eliott
     switch (cameraMode)
     {
     case zappy::gui::CameraMode::FREE:
@@ -854,7 +856,7 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
             "RIGHT | LEFT = Change camera direction";
     case zappy::gui::CameraMode::TARGETED:
         return "UP | DOWN | RIGHT | LEFT = Rotate camera around map origin\n\n"
-            "RT | LT = Zoom / Unzoom";
+            "RT | LT = Zoom / Unzoom\n";
     default:
         return "Unknown";
     }
@@ -869,7 +871,7 @@ void HUD::updateHelpInformationHUD(zappy::gui::CameraMode cameraMode)
 
     auto camInfoElem = std::dynamic_pointer_cast<Text>(
         bottomContainer->getElement("cam_info_mode"));
-    auto strCamMode = this->_camModeToText(cameraMode);
+    auto strCamMode = this->_camModeToText(cameraMode, this->_display->isGamepadAvailable());
     if (camInfoElem && camInfoElem->getText() != "Camera mod: " + strCamMode) {
         camInfoElem->setText("Camera mod: " + strCamMode);
         return;

@@ -90,7 +90,7 @@ class HUD {
     private:
         void _initHelpInformation();
 
-        std::string _camModeToText(zappy::gui::CameraMode);
+        std::string _camModeToText(zappy::gui::CameraMode, bool isGamePadAvailable);
 
         std::string _camKeyHelp(zappy::gui::CameraMode, bool isGamePadAvailable);
 
