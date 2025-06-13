@@ -23,7 +23,7 @@ TESTS 	    =   tests_accept.c						\
 				tests_errors.c						\
 				tests_free.c						\
 				tests_get_objects.c					\
-				tests_grapClients.C					\
+				tests_grapClients.c					\
 				tests_gui_incantation.c				\
 				tests_guiMessage.c					\
 				tests_handler_elem.c				\
