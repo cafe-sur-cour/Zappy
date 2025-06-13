@@ -21,6 +21,8 @@ Audio::Audio()
     loadSound("click", "gui/assets/sounds/click.wav");
     loadSound("clickPlayer", "gui/assets/sounds/playerClick.wav");
     loadSound("collect", "gui/assets/sounds/collect.wav");
+    loadSound("win", "gui/assets/sounds/win.wav");
+    loadSound("loose", "gui/assets/sounds/loose.wav");
 }
 
 Audio::~Audio()
