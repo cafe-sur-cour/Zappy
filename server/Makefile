@@ -82,7 +82,7 @@ OBJ 		= 	$(SRC:.c=.o)
 
 INCLUDES 	= 	-I./include
 
-CFLAGS 		=	-Wall -Wextra -Werror -Wshadow -g
+CFLAGS 		=	-Wall -Wextra -Werror -Wshadow
 
 LIBS 		= -L./ -lmy -lnetwork -lm
 
