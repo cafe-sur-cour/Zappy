@@ -68,6 +68,7 @@ class GameInfos : public Subject {
         const std::vector<zappy::structs::Egg> getEggs() const;
 
         void setGameOver(const std::string &winningTeam);
+        void playDefeatSound(const std::string &teamName);
         std::pair<bool, std::string> isGameOver() const;
 
     private:
