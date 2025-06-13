@@ -24,6 +24,27 @@ enum class DisplayPriority {
     ROCK = 4,
 };
 
+struct PlayerRotationState {
+    float currentRotation;
+    float targetRotation;
+    bool isRotating;
+    std::chrono::steady_clock::time_point lastUpdateTime;
+
+    PlayerRotationState() : currentRotation(0.0f), targetRotation(0.0f),
+                    isRotating(false), lastUpdateTime(std::chrono::steady_clock::now()) {}
+};
+
+struct PlayerPositionState {
+    Vector3f currentPosition;
+    Vector3f targetPosition;
+    bool isMoving;
+    std::chrono::steady_clock::time_point lastUpdateTime;
+
+    PlayerPositionState() : currentPosition({0.0f, 0.0f, 0.0f}),
+                    targetPosition({0.0f, 0.0f, 0.0f}),
+                    isMoving(false), lastUpdateTime(std::chrono::steady_clock::now()) {}
+};
+
 class Map {
     public:
         Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<IDisplay> display);
@@ -36,10 +57,15 @@ class Map {
         void drawRock(int x, int y, const zappy::structs::Tile &tile);
         void drawFood(int x, int y, const zappy::structs::Tile &tile);
         void drawPlayers(int x, int y);
+        void drawAllPlayers();
         void drawEggs(int x, int y);
         Color32 getTeamColor(const std::string &teamName);
 
         float getOffset(DisplayPriority priority, int x, int y, size_t stackIndex = 0);
+        void updatePlayerRotations();
+        float getPlayerInterpolatedRotation(int playerId, int serverOrientation);
+        void updatePlayerPositions();
+        Vector3f getPlayerInterpolatedPosition(int playerId, int serverX, int serverY);
 
     private:
         std::shared_ptr<GameInfos> _gameInfos;
@@ -49,6 +75,8 @@ class Map {
         int _colorIndex = 0;
 
         std::unordered_map<int, std::chrono::steady_clock::time_point> _broadcastStartTimes;
+        std::unordered_map<int, PlayerRotationState> _playerRotations;
+        std::unordered_map<int, PlayerPositionState> _playerPositions;
 
         static constexpr float BASE_HEIGHT_TILE = 0.0f;
         static constexpr float BASE_HEIGHT_FOOD = 0.2f;
@@ -60,10 +88,14 @@ class Map {
         static constexpr float EGG_HEIGHT = 0.3f;
         static constexpr float PLAYER_HEIGHT = 1.1f;
 
-        void drawOrientationArrow(const Vector3f &position, int orientation,
-            float playerHeight);
         void drawTorus(const Vector3f &position, float radius, float thickness,
             int radialSegments, Color32 color);
+        float orientationToRotation(int orientation);
+        float normalizeAngle(float angle);
+        float getShortestAngleDifference(float from, float to);
+        Vector3f calculatePlayerWorldPosition(int x, int y);
+        float getDistance(const Vector3f& from, const Vector3f& to);
+        Vector3f lerpVector3f(const Vector3f& from, const Vector3f& to, float t);
 };
 
 #endif /* !MAP_HPP_ */
