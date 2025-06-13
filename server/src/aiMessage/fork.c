@@ -46,7 +46,7 @@ int handle_fork(player_t *player, char *command, zappy_t *zappy)
     int pos[2] = {player->posX, player->posY};
     egg_t *new = NULL;
 
-    if (strcmp(command, "fork") != 0) {
+    if (strcmp(command, "fork\n") != 0) {
         error_message("Invalid command for fork handling.");
         return -1;
     }
@@ -56,5 +56,6 @@ int handle_fork(player_t *player, char *command, zappy_t *zappy)
         return -1;
     }
     push_back_egg(zappy, new);
+    send_player_laying_egg(zappy, player);
     return 0;
 }

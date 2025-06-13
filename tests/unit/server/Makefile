@@ -21,6 +21,7 @@ TESTS 	    =   tests_accept.c						\
 				tests_client.c						\
 				tests_connect.c						\
 				tests_errors.c						\
+				tests_fork.c						\
 				tests_free.c						\
 				tests_get_objects.c					\
 				tests_grapClients.c					\
