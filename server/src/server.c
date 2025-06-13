@@ -27,8 +27,10 @@ static void fill_elements(zappy_t *zappy)
 
 static zappy_t *set_zappy_bas(zappy_t *zappy)
 {
-    if (bind_socket(zappy->network->sockfd, zappy->params->port) == -1)
-        return free_zappy(zappy);
+    if (bind_socket(zappy->network->sockfd, zappy->params->port) == -1) {
+        free_zappy(zappy);
+        exit(84);
+    }
     if (listen_socket(zappy->network->sockfd,
         zappy->params->nb_client) == -1) {
         close(zappy->network->sockfd);
