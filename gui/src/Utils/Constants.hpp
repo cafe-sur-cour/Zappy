@@ -162,6 +162,9 @@ namespace zappy::gui {
     inline const float PLAYER_ROTATION_SPEED = 720.0f;
     inline const float ROTATION_INTERPOLATION_THRESHOLD = 1.0f;
 
+    inline const float PLAYER_MOVEMENT_SPEED = 8.0f;
+    inline const float MOVEMENT_INTERPOLATION_THRESHOLD = 0.05f;
+
     enum class CameraMode {
         FREE = 0,
         TARGETED = 1,
