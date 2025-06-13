@@ -80,6 +80,8 @@ Settings::Settings(
         30.0f, 30.0f,
         Color32{50, 50, 50, 240}
     );
+    this->_musicLevel = this->_audio->getMusicVolumeLevel();
+    this->_sfxLevel = this->_audio->getSFXVolumeLevel();
 
     this->_settingsContainer->setRelativePosition(
         15.0f, 0.0f,
@@ -121,7 +123,7 @@ Settings::Settings(
     this->_settingsContainer->addSliderPercent(
         "slider_music",
         5.f, yPos, 90.f, 16.f,
-        0.f, 100.f, 50.f, "Volume Music:",
+        0.f, 100.f, this->_audio->getMusicVolumeLevel(), "Volume Music:",
         [this](float nbr) {
             this->_musicLevel = nbr;
         }
@@ -131,7 +133,7 @@ Settings::Settings(
     this->_settingsContainer->addSliderPercent(
         "slider_click",
         5.f, yPos, 90.f, 16.f,
-        0.f, 100.f, 50.f, "Volume SFX:",
+        0.f, 100.f, this->_audio->getSFXVolumeLevel(), "Volume SFX:",
         [this](float nbr) {
             this->_sfxLevel = nbr;
         }

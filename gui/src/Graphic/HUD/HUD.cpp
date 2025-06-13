@@ -868,14 +868,17 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
         {
         case zappy::gui::CameraMode::FREE:
             return "Right joystick = Change camera direction\n\n"
-                "Left joystick = Move camera x and z\n"
-                "RT | LT = Move camera y\n";
+                     "Left joystick = Move camera x and z\n"
+                     "RT | LT = Move camera y\n\n"
+                     "H = Toggle HUD\n";
         case zappy::gui::CameraMode::PLAYER:
             return "UP | DOWN = Next / Previous player\n\n"
-                "Right joystick = Change camera direction";
+                     "Right joystick = Change camera direction\n\n"
+                     "H = Toggle HUD\n";
         case zappy::gui::CameraMode::TARGETED:
             return "Right joystick = Rotate camera around map origin\n\n"
-                    "RT | LT = Zoom / Unzoom\n";
+                     "RT | LT = Zoom / Unzoom\n\n"
+                     "H = Toggle HUD\n";
         default:
             return "Unknown";
         }
@@ -884,13 +887,16 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
     {
     case zappy::gui::CameraMode::FREE:
         return "Z | Q | S | D = Move camera\n\n"
-            "UP | DOWN | RIGHT | LEFT = Change camera direction\n";
+                 "UP | DOWN | RIGHT | LEFT = Change camera direction\n\n"
+                 "H = Toggle HUD\n";
     case zappy::gui::CameraMode::PLAYER:
         return "UP | DOWN = Next / Previous player\n\n"
-            "RIGHT | LEFT = Change camera direction";
+                 "RIGHT | LEFT = Change camera direction\n\n"
+                 "H = Toggle HUD\n";
     case zappy::gui::CameraMode::TARGETED:
         return "UP | DOWN | RIGHT | LEFT = Rotate camera around map origin\n\n"
-            "RT | LT = Zoom / Unzoom\n";
+                 "RT | LT = Zoom / Unzoom\n\n"
+                 "H = Toggle HUD\n";
     default:
         return "Unknown";
     }

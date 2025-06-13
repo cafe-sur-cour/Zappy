@@ -16,6 +16,7 @@ enum Key {
     DOWN,
     RIGHT,
     LEFT,
+    H,
     GM_PD_LEFT_SHOULDER,
     GM_PD_RIGHT_SHOULDER,
     GM_PD_LEFT_TRIGGER,
@@ -24,6 +25,7 @@ enum Key {
     GM_PD_DOWN,
     GM_PD_AXIS_RIGHT_X,
     GM_PD_AXIS_RIGHT_Y,
+    GM_PD_H,
     MOUSE_LEFT,
     MOUSE_RIGHT,
 };

@@ -112,6 +112,10 @@ void GUI::update()
             switchToPreviousPlayer();
     }
 
+    if (this->_display->isKeyReleased(this->_display->getKeyId(H)) ||
+        this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_H)))
+        this->_isHUDVisible = !this->_isHUDVisible;
+
     updateCamera();
     handlePlayerClicks();
     this->_hud->updateTeamPlayersDisplay(this->_gameInfos);
@@ -177,11 +181,10 @@ void GUI::draw()
             this->_display->drawCubeWires(center, size.x, size.y, size.z, CYELLOW);
         }
     }
-
     this->_display->end3DMode();
-
-    _hud->draw();
-
+    if (this->_isHUDVisible) {
+        this->_hud->draw();
+    }
     this->_display->endDrawing();
 }
 
