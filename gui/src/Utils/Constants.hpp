@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include "HelpText.hpp"
+#include "../IDisplay.hpp"
 
 namespace zappy::constants {
 
@@ -146,7 +147,6 @@ namespace zappy::gui {
     inline const float GAMEPAD_DEADZONE = 0.2f;
     inline const float POSITION_MULTIPLIER = 2.2f;
 
-    inline const float PLAYER_SCALE = 0.005f;
     inline const float EGG_SCALE = 1.0f;
     inline const float FOOD_SCALE = 0.005f;
     inline const float FOOD_FLOAT_AMPLITUDE = 0.05f;
@@ -170,6 +170,19 @@ namespace zappy::gui {
         TARGETED = 1,
         PLAYER = 2,
         NB_MODES = 3,
+    };
+
+
+    struct PlayerModelInfo {
+        std::string name;
+        std::string modelPath;
+        Vector3f center;
+        Vector3f scale;
+    };
+
+    inline const std::vector<PlayerModelInfo> PLAYER_MODELS_INFO = {
+        {"playerLvl1", "gui/assets/models/playerLvl1.glb", {0.0f, -75.0f, 0.0f}, {0.005f, 0.005f, 0.005f}},
+        {"playerLvl2", "gui/assets/models/playerLvl2.glb", {0.0f, -0.5f, 0.0f}, {0.25f, 0.25f, 0.25f}}
     };
 }
 
