@@ -43,6 +43,9 @@ class Text : public AUIElement {
 
         void setSize(float width, float height) override;
 
+        float getWidth() const;
+        void setX(float x);
+
     private:
         std::string _text;
         float _fontSize;
