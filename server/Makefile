@@ -62,6 +62,7 @@ SRC 		=	src/params.c										\
 				src/receiveMessage/pollin_handler.c					\
 				src/receiveMessage/loop_thru_command.c				\
 				src/receiveMessage/queu_hanlder.c					\
+				src/aiMessage/end_incantation.c 					\
 				src/aiMessage/forward.c								\
 				src/aiMessage/right.c								\
 				src/aiMessage/left.c								\
