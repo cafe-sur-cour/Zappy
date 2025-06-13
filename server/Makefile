@@ -25,6 +25,7 @@ SRC 		=	src/params.c										\
 				src/game/game.c										\
 				src/game/init_egg.c									\
 				src/game/player.c									\
+				src/game/player_id.c 								\
 				src/game/graphic_client.c							\
 				src/game/handle_crystal.c 							\
 				src/game/handle_food.c         						\

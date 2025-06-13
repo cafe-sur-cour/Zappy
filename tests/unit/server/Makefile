@@ -69,6 +69,7 @@ SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/game/handle_remove.c 					\
 				../../../server/src/game/init_egg.c							\
 				../../../server/src/game/player.c							\
+				../../../server/src/game/player_id.c 						\
 				../../../server/src/game/get_ids_player_tile.c 				\
 				../../../server/src/game/init_team.c 						\
 				../../../server/src/game/food_refiil.c 						\
