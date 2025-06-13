@@ -2,7 +2,7 @@
 ** EPITECH PROJECT, 2025
 ** Tests
 ** File description:
-** msz
+** tna
 */
 
 #include <criterion/criterion.h>
@@ -185,17 +185,17 @@ static zappy_t *default_zappy(void)
 
 // Test for bct command
 
-Test(mct, valid_command, .init = redirect_all_std)
+Test(tna, valid_command)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "mct\n";
+    char message[] = "tna\n";
     FILE *fp;
     char buffer[4096] = {0};
     size_t total_read = 0;
     size_t n;
 
     cr_assert_not_null(zappy);
-    int result = mct(zappy, zappy->graph, message);
+    int result = tna(zappy, zappy->graph, message);
     cr_assert_eq(result, 0);
     fp = fopen("gui_socket", "r");
     cr_assert_not_null(fp, "Impossible d'ouvrir le fichier pour lecture.");
@@ -205,40 +205,33 @@ Test(mct, valid_command, .init = redirect_all_std)
     fclose(fp);
 
     const char *expected =
-        "bct 0 0 2 3 1 1 0 0 5\n"
-        "bct 0 1 2 3 1 1 0 0 5\n"
-        "bct 0 2 2 3 1 1 0 0 5\n"
-        "bct 1 0 2 3 1 1 0 0 5\n"
-        "bct 1 1 2 3 1 1 0 0 5\n"
-        "bct 1 2 2 3 1 1 0 0 5\n"
-        "bct 2 0 2 3 1 1 0 0 5\n"
-        "bct 2 1 2 3 1 1 0 0 5\n"
-        "bct 2 2 2 3 1 1 0 0 5\n";
+        "tna Team1\n"
+        "tna Team2\n";
     cr_assert_str_eq(buffer, expected, "Le contenu du fichier ne correspond pas à ce qui est attendu.");
 }
 
 
-Test(mct, invalid_command_format, .init = redirect_all_std)
+Test(tna, invalid_command_format, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "mct prout\n";
+    char message[] = "tna prout\n";
     int result;
 
     cr_assert_not_null(zappy);
-    result = mct(zappy, zappy->graph, message);
+    result = tna(zappy, zappy->graph, message);
     cr_assert_eq(result, -1);
     remove("gui_socket");
 }
 
-Test(mct, invalid_file_descriptor, .init = redirect_all_std)
+Test(tna, invalid_file_descriptor, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "mct\n";
+    char message[] = "tna\n";
     int result;
 
     cr_assert_not_null(zappy);
     zappy->graph->fd = -1;
-    result = mct(zappy, zappy->graph, message);
+    result = tna(zappy, zappy->graph, message);
     cr_assert_eq(result, -1);
     remove("gui_socket");
 }
