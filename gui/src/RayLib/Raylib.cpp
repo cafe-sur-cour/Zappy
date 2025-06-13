@@ -262,7 +262,8 @@ RayCollision3D Raylib::getRayCollisionSphere(Ray3D ray, Vector3f center, float r
                      {ray.direction.x, ray.direction.y, ray.direction.z}};
     Vector3 raylibCenter = {center.x, center.y, center.z};
 
-    RayCollision collision = this->_raylib->getRayCollisionSphere(raylibRay, raylibCenter, radius);
+    RayCollision collision = this->_raylib->getRayCollisionSphere(raylibRay,
+        raylibCenter, radius);
     return {collision.hit, collision.distance,
             {collision.point.x, collision.point.y, collision.point.z},
             {collision.normal.x, collision.normal.y, collision.normal.z}};
