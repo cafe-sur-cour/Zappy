@@ -34,7 +34,17 @@ class CameraManager {
         void setGameInfos(std::shared_ptr<GameInfos> gameInfos);
         void setMapInstance(std::shared_ptr<Map> map);
 
+        float getCameraMovingSpeed();
+        void setCameraMovingSpeed(float);
+        float getCameraRotaSpeed();
+        void setCameraRotaSpeed(float);
+        float getCameraZoomSpeed();
+        void setCameraZoomSpeed(float);
+
     private:
+        float _cameraMovingSpeed = 7.5f;
+        float _cameraRotaSpeed = 2.0f;
+        float _cameraZoomSpeed = 120.0f;
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<Map> _map;

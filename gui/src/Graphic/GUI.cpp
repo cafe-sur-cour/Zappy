@@ -54,12 +54,8 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
     this->_display->setTargetFPS(zappy::gui::FPS);
     this->_audio = std::make_shared<Audio>();
     this->_map = std::make_unique<Map>(_gameInfos, this->_display);
-    this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio,
-        [this]() {
-            this->switchCameraMode(zappy::gui::CameraMode::FREE);
-        });
 
-    _cameraManager = std::make_unique<CameraManager>(this->_display);
+    _cameraManager = std::make_shared<CameraManager>(this->_display);
     _cameraManager->setGameInfos(_gameInfos);
     _cameraManager->setMapInstance(std::shared_ptr<Map>(_map.get(), [](Map*){}));
     const auto& mapSize = _gameInfos->getMapSize();
@@ -70,6 +66,10 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
     };
     _cameraManager->setMapCenter(mapCenter);
     _cameraManager->setMapSize(mapSize.first, mapSize.second);
+    this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio, _cameraManager,
+    [this]() {
+        this->switchCameraMode(zappy::gui::CameraMode::FREE);
+    });
 
     initModels();
 }

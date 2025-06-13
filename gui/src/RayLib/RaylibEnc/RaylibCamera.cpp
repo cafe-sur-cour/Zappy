@@ -49,10 +49,10 @@ void RayLibEnc::updateCamera(int mode)
     UpdateCamera(&_camera, mode);
 }
 
-void RayLibEnc::updateCameraFreeMode()
+void RayLibEnc::updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed)
 {
     float deltaTime = getFrameTime();
-    float moveSpeed = zappy::gui::CAMERA_SPEED * deltaTime;
+    float moveSpeed = camMovingSpeed * deltaTime;
     float rotationSpeed = zappy::gui::CAMERA_SENSITIVITY;
 
     Vector3 forward = Vector3Subtract(_camera.target, _camera.position);
@@ -141,7 +141,7 @@ void RayLibEnc::updateCameraFreeMode()
 
     if (IsKeyDown(KEY_RIGHT)) {
         Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
-        float rotAngle = zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        float rotAngle = camRotaSpeed * deltaTime;
 
         float cosRotAngle = cosf(rotAngle);
         float sinRotAngle = sinf(rotAngle);
@@ -155,7 +155,7 @@ void RayLibEnc::updateCameraFreeMode()
 
     if (IsKeyDown(KEY_LEFT)) {
         Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
-        float rotAngle = -zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        float rotAngle = -camRotaSpeed * deltaTime;
 
         float cosRotAngle = cosf(rotAngle);
         float sinRotAngle = sinf(rotAngle);
@@ -169,7 +169,7 @@ void RayLibEnc::updateCameraFreeMode()
 
     if (IsKeyDown(KEY_UP)) {
         Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
-        float rotAngle = zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        float rotAngle = camRotaSpeed * deltaTime;
 
         Vector3 rightVec = Vector3CrossProduct(viewDir, _camera.up);
         rightVec = Vector3Normalize(rightVec);
@@ -182,7 +182,7 @@ void RayLibEnc::updateCameraFreeMode()
 
     if (IsKeyDown(KEY_DOWN)) {
         Vector3 viewDir = Vector3Subtract(_camera.target, _camera.position);
-        float rotAngle = -zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        float rotAngle = -camRotaSpeed * deltaTime;
 
         Vector3 rightVec = Vector3CrossProduct(viewDir, _camera.up);
         rightVec = Vector3Normalize(rightVec);
