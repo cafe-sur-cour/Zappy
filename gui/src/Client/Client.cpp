@@ -35,6 +35,8 @@ Client::Client(int ac, const char *const *av)
         std::cerr << "No gui lib found" << std::endl;
         exit(84);
     }
+    _guiObserver = std::make_shared<GuiObserver>(std::shared_ptr<GUI>(_gui.get(), [](GUI*){}));
+    _gameInfos->addObserver(_guiObserver);
     _gui->run();
 }
 

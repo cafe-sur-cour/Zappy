@@ -25,6 +25,7 @@ class GUI {
         ~GUI();
 
         void run();
+        void refresh();
 
         int getWindowWidth() const;
         int getWindowHeight() const;

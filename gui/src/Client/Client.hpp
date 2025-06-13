@@ -16,6 +16,8 @@
 #include "../Game/GameInfos.hpp"
 #include "../Graphic/GUI.hpp"
 #include "MsgHandler.hpp"
+#include "../Observer/GuiObserver.hpp"
+#include "../Observer/IObserver.hpp"
 
 class Client {
     public:
@@ -31,6 +33,7 @@ class Client {
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<MsgHandler> _msgHandler;
         std::unique_ptr<GUI> _gui;
+        std::shared_ptr<GuiObserver> _guiObserver;
 };
 
 #endif /* !CLIENT_HPP_ */
