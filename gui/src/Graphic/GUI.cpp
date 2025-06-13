@@ -10,6 +10,7 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
+#include <limits>
 #include "GUI.hpp"
 #include "../Exceptions/Exceptions.hpp"
 #include "../DLLoader/LoaderType.hpp"
@@ -18,7 +19,8 @@
 #include "../Utils/GamepadConstants.hpp"
 
 GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
-    : _isRunning(false), _gameInfos(gameInfos), _backgroundLoaded(false), _skyboxLoaded(false), _hoveredPlayerId(-1)
+    : _isRunning(false), _gameInfos(gameInfos), _backgroundLoaded(false),
+        _skyboxLoaded(false), _hoveredPlayerId(-1)
 {
     this->_dlLoader = DLLoader<std::shared_ptr<IDisplay>>();
     if (lib.empty())
@@ -441,7 +443,8 @@ int GUI::getPlayerUnderMouse() const
 
 BoundingBox3D GUI::getPlayerBoundingBox(const zappy::structs::Player& player) const
 {
-    Vector3f playerPos = _map->getPlayerInterpolatedPosition(player.number, player.x, player.y);
+    Vector3f playerPos = _map->getPlayerInterpolatedPosition(player.number, player.x,
+        player.y);
 
     size_t stackIndex = 0;
     const auto& allPlayers = _gameInfos->getPlayers();
@@ -453,7 +456,8 @@ BoundingBox3D GUI::getPlayerBoundingBox(const zappy::structs::Player& player) co
         }
     }
 
-    playerPos.y = _map->getOffset(DisplayPriority::PLAYER, player.x, player.y, stackIndex) + 0.3f;
+    playerPos.y = _map->getOffset(DisplayPriority::PLAYER, player.x, player.y,
+        stackIndex) + 0.3f;
 
     const float boxWidth = 1.0f;
     const float boxHeight = 1.0f;
