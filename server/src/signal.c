@@ -24,12 +24,24 @@ void handle_sigint(int sig)
     *get_running_state() = 0;
 }
 
+void handle_sigpipe(int sig)
+{
+    (void)sig;
+    error_message("Broken pipe detected - client disconnected");
+}
+
 void setup_signal(void)
 {
     struct sigaction sa;
+    struct sigaction sa_pipe;
 
     sa.sa_handler = handle_sigint;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
     sigaction(SIGINT, &sa, NULL);
+
+    sa_pipe.sa_handler = handle_sigpipe;
+    sigemptyset(&sa_pipe.sa_mask);
+    sa_pipe.sa_flags = 0;
+    sigaction(SIGPIPE, &sa_pipe, NULL);
 }
