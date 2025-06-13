@@ -15,6 +15,10 @@
 #include <iostream>
 #include <chrono>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 #include "Map.hpp"
 
 Map::Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<IDisplay> display)
@@ -41,6 +45,8 @@ Color32 Map::getTeamColor(const std::string &teamName)
 
 void Map::draw()
 {
+    updatePlayerRotations();
+
     auto tiles = _gameInfos->getTiles();
 
     for (const auto &tile : tiles) {
@@ -97,57 +103,13 @@ void Map::drawPlayers(int x, int y)
         };
 
         Color32 teamColor = getTeamColor(playersOnTile[i]->teamName);
-        float rotationAngle = 0.0f;
-        int direction = playersOnTile[i]->orientation - 1;
-
-        if (direction < 0) direction = 0;
-        switch (direction) {
-            case 0: rotationAngle = 180.0f; break;
-            case 1: rotationAngle = 90.0f; break;
-            case 2: rotationAngle = 0.0f; break;
-            case 3: rotationAngle = 270.0f; break;
-        }
+        float rotationAngle = getPlayerInterpolatedRotation(playersOnTile[i]->number,
+            playersOnTile[i]->orientation);
 
         this->_display->drawModelEx("player", position, {0.0f, 1.0f, 0.0f},
             rotationAngle, {zappy::gui::PLAYER_SCALE, zappy::gui::PLAYER_SCALE,
                 zappy::gui::PLAYER_SCALE}, teamColor);
-        drawOrientationArrow(position, playersOnTile[i]->orientation,
-            cylinderHeight);
     }
-}
-
-void Map::drawOrientationArrow(const Vector3f &position, int orientation, float playerHeight)
-{
-    float arrowLength = 0.35f;
-    float arrowWidth = 0.15f;
-    float arrowHeadSize = 0.2f;
-
-    Vector3f arrowPos = position;
-    arrowPos.y += playerHeight / 2 + 0.15f;
-    Vector3f start = arrowPos;
-    Vector3f end = arrowPos;
-
-    int direction = orientation - 1;
-    if (direction < 0) direction = 0;
-
-    switch (direction) {
-        case 0: end.z -= arrowLength; break;
-        case 1: end.x += arrowLength; break;
-        case 2: end.z += arrowLength; break;
-        case 3: end.x -= arrowLength; break;
-    }
-    this->_display->drawCylinderEx(start, end, 0.05f, 0.05f, 8, CRED);
-
-    Vector3f coneStart = end;
-    Vector3f coneEnd;
-
-    switch (direction) {
-        case 0: coneEnd = {end.x, end.y, end.z - arrowHeadSize}; break;
-        case 1: coneEnd = {end.x + arrowHeadSize, end.y, end.z}; break;
-        case 2: coneEnd = {end.x, end.y, end.z + arrowHeadSize}; break;
-        case 3: coneEnd = {end.x - arrowHeadSize, end.y, end.z}; break;
-    }
-    this->_display->drawCylinderEx(coneStart, coneEnd, arrowWidth, 0.0f, 8, CRED);
 }
 
 void Map::drawEggs(int x, int y)
@@ -573,4 +535,101 @@ void Map::drawIncantations()
                 highlight2Color);
         }
     }
+}
+
+float Map::orientationToRotation(int orientation)
+{
+    switch (orientation) {
+        case 1: return 180.0f;
+        case 2: return 90.0f;
+        case 3: return 0.0f;
+        case 4: return 270.0f;
+        default: return 0.0f;
+    }
+}
+
+float Map::normalizeAngle(float angle)
+{
+    while (angle < 0.0f) angle += 360.0f;
+    while (angle >= 360.0f) angle -= 360.0f;
+    return angle;
+}
+
+float Map::getShortestAngleDifference(float from, float to)
+{
+    float diff = normalizeAngle(to - from);
+    if (diff > 180.0f)
+        diff -= 360.0f;
+    return diff;
+}
+
+void Map::updatePlayerRotations()
+{
+    auto now = std::chrono::steady_clock::now();
+    const auto& players = _gameInfos->getPlayers();
+
+    for (const auto& player : players) {
+        int playerId = player.number;
+        float targetRotation = orientationToRotation(player.orientation);
+
+        if (_playerRotations.find(playerId) == _playerRotations.end()) {
+            _playerRotations[playerId] = PlayerRotationState();
+            _playerRotations[playerId].currentRotation = targetRotation;
+            _playerRotations[playerId].targetRotation = targetRotation;
+            _playerRotations[playerId].lastUpdateTime = now;
+            continue;
+        }
+
+        PlayerRotationState& rotState = _playerRotations[playerId];
+
+        if (std::abs(normalizeAngle(rotState.targetRotation) - normalizeAngle(targetRotation))
+            > zappy::gui::ROTATION_INTERPOLATION_THRESHOLD) {
+            rotState.targetRotation = targetRotation;
+            rotState.isRotating = true;
+        }
+
+        if (rotState.isRotating) {
+            auto deltaTime =
+                std::chrono::duration<float>(now - rotState.lastUpdateTime).count();
+            float angleDiff = getShortestAngleDifference(rotState.currentRotation,
+                rotState.targetRotation);
+
+            if (std::abs(angleDiff) < zappy::gui::ROTATION_INTERPOLATION_THRESHOLD) {
+                rotState.currentRotation = rotState.targetRotation;
+                rotState.isRotating = false;
+            } else {
+                float rotationStep = zappy::gui::PLAYER_ROTATION_SPEED * deltaTime;
+                if (angleDiff > 0)
+                    rotState.currentRotation += std::min(rotationStep, angleDiff);
+                else
+                    rotState.currentRotation += std::max(-rotationStep, angleDiff);
+                rotState.currentRotation = normalizeAngle(rotState.currentRotation);
+            }
+        }
+
+        rotState.lastUpdateTime = now;
+    }
+
+    auto it = _playerRotations.begin();
+    while (it != _playerRotations.end()) {
+        bool playerExists = std::any_of(players.begin(), players.end(),
+            [&](const zappy::structs::Player& p) { return p.number == it->first; });
+
+        if (!playerExists)
+            it = _playerRotations.erase(it);
+        else
+            ++it;
+    }
+}
+
+float Map::getPlayerInterpolatedRotation(int playerId, int serverOrientation)
+{
+    updatePlayerRotations();
+
+    auto it = _playerRotations.find(playerId);
+    if (it != _playerRotations.end()) {
+        return it->second.currentRotation;
+    }
+
+    return orientationToRotation(serverOrientation);
 }

@@ -24,6 +24,16 @@ enum class DisplayPriority {
     ROCK = 4,
 };
 
+struct PlayerRotationState {
+    float currentRotation;
+    float targetRotation;
+    bool isRotating;
+    std::chrono::steady_clock::time_point lastUpdateTime;
+
+    PlayerRotationState() : currentRotation(0.0f), targetRotation(0.0f),
+                    isRotating(false), lastUpdateTime(std::chrono::steady_clock::now()) {}
+};
+
 class Map {
     public:
         Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<IDisplay> display);
@@ -40,6 +50,8 @@ class Map {
         Color32 getTeamColor(const std::string &teamName);
 
         float getOffset(DisplayPriority priority, int x, int y, size_t stackIndex = 0);
+        void updatePlayerRotations();
+        float getPlayerInterpolatedRotation(int playerId, int serverOrientation);
 
     private:
         std::shared_ptr<GameInfos> _gameInfos;
@@ -49,6 +61,7 @@ class Map {
         int _colorIndex = 0;
 
         std::unordered_map<int, std::chrono::steady_clock::time_point> _broadcastStartTimes;
+        std::unordered_map<int, PlayerRotationState> _playerRotations;
 
         static constexpr float BASE_HEIGHT_TILE = 0.0f;
         static constexpr float BASE_HEIGHT_FOOD = 0.2f;
@@ -60,10 +73,11 @@ class Map {
         static constexpr float EGG_HEIGHT = 0.3f;
         static constexpr float PLAYER_HEIGHT = 1.1f;
 
-        void drawOrientationArrow(const Vector3f &position, int orientation,
-            float playerHeight);
         void drawTorus(const Vector3f &position, float radius, float thickness,
             int radialSegments, Color32 color);
+        float orientationToRotation(int orientation);
+        float normalizeAngle(float angle);
+        float getShortestAngleDifference(float from, float to);
 };
 
 #endif /* !MAP_HPP_ */
