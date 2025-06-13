@@ -195,7 +195,10 @@ int right_message(player_t *player);
 int handle_connect_nbr(player_t *player, char *command, zappy_t *zappy);
 int handle_eject(player_t *player, char *command, zappy_t *zappy);
 
+/* fork */
 int handle_fork(player_t *player, char *command, zappy_t *zappy);
+int handle_fork_end(player_t *player, zappy_t *zappy);
+
 int print_look_server(player_t *player);
 
 /* Incantation handler */

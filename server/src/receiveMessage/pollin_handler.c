@@ -46,6 +46,10 @@ static int handle_cooldown(player_t *player, zappy_t *zappy)
             && strcmp(player->current_action, "Incantation") == 0) {
             write_end_incantation(player, zappy);
         }
+        if (player->remaining_cooldown == 0 && player->current_action != NULL
+            && strcmp(player->current_action, "Fork") == 0) {
+            handle_fork_end(player, zappy);
+        }
         if (player->remaining_cooldown == 0 && player->is_busy)
             player->is_busy = false;
         return 1;
