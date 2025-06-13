@@ -25,6 +25,7 @@ class Settings {
         float _cameraZoomSpeed;
         std::shared_ptr<Containers> _settingsContainer;
         bool _visible;
+
     public:
         bool isVisible() const;
 
@@ -38,7 +39,11 @@ class Settings {
 
         void handleResize(int oldWidth, int oldHeight, int newWidth, int newHeight);
 
-        Settings(std::shared_ptr<IDisplay> display, std::shared_ptr<IAudio> audio, std::shared_ptr<CameraManager> camera);
+        Settings(
+            std::shared_ptr<IDisplay> display,
+            std::shared_ptr<IAudio> audio,
+            std::shared_ptr<CameraManager> camera
+        );
         ~Settings();
 };
 
