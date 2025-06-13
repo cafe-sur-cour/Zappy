@@ -106,3 +106,13 @@ void AContainers::updatePositionFromRelative()
     _bounds.width = (screenWidth * _relativePos.widthPercent) / 100.0f;
     _bounds.height = (screenHeight * _relativePos.heightPercent) / 100.0f;
 }
+
+float AContainers::getWidth() const
+{
+    return _bounds.width;
+}
+
+float AContainers::getHeight() const
+{
+    return _bounds.height;
+}
