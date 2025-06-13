@@ -153,7 +153,6 @@ class Containers : public AContainers {
             Color32 tint
         );
 
-        // Nouvelle fonction pour ajouter une image avec le même style que addButton
         std::shared_ptr<ImageButton> addImageButton(
             const std::string& id,
             float x, float y,
