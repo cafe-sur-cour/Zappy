@@ -65,6 +65,23 @@ typedef struct IntRect {
     int height;
 } IntRect;
 
+typedef struct Ray3D {
+    Vector3f position;
+    Vector3f direction;
+} Ray3D;
+
+typedef struct RayCollision3D {
+    bool hit;
+    float distance;
+    Vector3f point;
+    Vector3f normal;
+} RayCollision3D;
+
+typedef struct BoundingBox3D {
+    Vector3f min;
+    Vector3f max;
+} BoundingBox3D;
+
 #define COLOR(r, g, b) Color32{ r, g, b, 255 }
 #define CLIGHTGRAY COLOR(200, 200, 200)
 #define CBLACK COLOR(0, 0, 0)
@@ -140,6 +157,16 @@ class IDisplay {
         virtual float measureText(const std::string& text, float fontSize) const = 0;
 
         virtual bool checkCollisionPointRec(Vector2f point, FloatRect rec) = 0;
+
+        virtual Ray3D getMouseRay(Vector2f mousePosition) = 0;
+        virtual RayCollision3D getRayCollisionBox(Ray3D ray, BoundingBox3D box) = 0;
+        virtual RayCollision3D getRayCollisionSphere(Ray3D ray, Vector3f center,
+            float radius) = 0;
+        virtual bool checkCollisionBoxes(BoundingBox3D box1, BoundingBox3D box2) = 0;
+
+        virtual Ray3D getMouseRayFromCurrent() = 0;
+        virtual BoundingBox3D createBoundingBox(Vector3f center, Vector3f size) = 0;
+        virtual BoundingBox3D createBoundingBoxFromMinMax(Vector3f min, Vector3f max) = 0;
 
         virtual void beginDrawing() = 0;
         virtual void endDrawing() = 0;

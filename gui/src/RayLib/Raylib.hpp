@@ -75,6 +75,15 @@ class Raylib : public IDisplay {
 
         virtual bool checkCollisionPointRec(Vector2f point, FloatRect rec);
 
+        virtual Ray3D getMouseRay(Vector2f mousePosition);
+        virtual RayCollision3D getRayCollisionBox(Ray3D ray, BoundingBox3D box);
+        virtual RayCollision3D getRayCollisionSphere(Ray3D ray, Vector3f center, float radius);
+        virtual bool checkCollisionBoxes(BoundingBox3D box1, BoundingBox3D box2);
+
+        virtual Ray3D getMouseRayFromCurrent();
+        virtual BoundingBox3D createBoundingBox(Vector3f center, Vector3f size);
+        virtual BoundingBox3D createBoundingBoxFromMinMax(Vector3f min, Vector3f max);
+
         virtual void beginScissorMode(IntRect);
         virtual void endScissorMode();
 

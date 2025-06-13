@@ -10,6 +10,7 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
+#include <limits>
 #include "GUI.hpp"
 #include "../Exceptions/Exceptions.hpp"
 #include "../DLLoader/LoaderType.hpp"
@@ -18,7 +19,8 @@
 #include "../Utils/GamepadConstants.hpp"
 
 GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
-    : _isRunning(false), _gameInfos(gameInfos), _backgroundLoaded(false), _skyboxLoaded(false)
+    : _isRunning(false), _gameInfos(gameInfos), _backgroundLoaded(false),
+        _skyboxLoaded(false), _hoveredPlayerId(-1)
 {
     this->_dlLoader = DLLoader<std::shared_ptr<IDisplay>>();
     if (lib.empty())
@@ -111,6 +113,7 @@ void GUI::update()
     }
 
     updateCamera();
+    handlePlayerClicks();
     this->_hud->updateTeamPlayersDisplay(this->_gameInfos);
     this->_hud->updatePlayerInventoryDisplay(this->_cameraManager->getPlayerId(),
         this->_cameraMode);
@@ -146,6 +149,29 @@ void GUI::draw()
     }
 
     _map->draw();
+
+    if (_hoveredPlayerId >= 0) {
+        const auto& players = _gameInfos->getPlayers();
+        auto playerIt = std::find_if(players.begin(), players.end(),
+            [this](const zappy::structs::Player& player) {
+                return player.number == _hoveredPlayerId;
+            });
+
+        if (playerIt != players.end()) {
+            BoundingBox3D playerBox = getPlayerBoundingBox(*playerIt);
+            Vector3f center = {
+                (playerBox.min.x + playerBox.max.x) / 2.0f,
+                (playerBox.min.y + playerBox.max.y) / 2.0f,
+                (playerBox.min.z + playerBox.max.z) / 2.0f
+            };
+            Vector3f size = {
+                playerBox.max.x - playerBox.min.x,
+                playerBox.max.y - playerBox.min.y,
+                playerBox.max.z - playerBox.min.z
+            };
+            this->_display->drawCubeWires(center, size.x, size.y, size.z, CYELLOW);
+        }
+    }
 
     this->_display->end3DMode();
 
@@ -380,4 +406,75 @@ void GUI::initModels()
     if (!this->_display->loadModel("egg", "gui/assets/models/egg.glb", {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load egg model."
                   << colors::RESET << std::endl;
+}
+
+void GUI::handlePlayerClicks()
+{
+    _hoveredPlayerId = getPlayerUnderMouse();
+
+    if (this->_display->isMouseButtonPressed(this->_display->getKeyId(MOUSE_LEFT))) {
+        if (_hoveredPlayerId >= 0) {
+            setPlayerToFollow(_hoveredPlayerId);
+            switchCameraMode(zappy::gui::CameraMode::PLAYER);
+            _audio->playSound("clickPlayer", 100.0f);
+        }
+    }
+}
+
+int GUI::getPlayerUnderMouse() const
+{
+    Vector2f mousePos = this->_display->getMousePosition();
+    Ray3D mouseRay = this->_display->getMouseRay(mousePos);
+
+    const auto& players = _gameInfos->getPlayers();
+    float closestDistance = std::numeric_limits<float>::max();
+    int closestPlayerId = -1;
+
+    for (const auto& player : players) {
+        BoundingBox3D playerBox = getPlayerBoundingBox(player);
+        RayCollision3D collision = this->_display->getRayCollisionBox(mouseRay, playerBox);
+
+        if (collision.hit && collision.distance < closestDistance) {
+            closestDistance = collision.distance;
+            closestPlayerId = player.number;
+        }
+    }
+    return closestPlayerId;
+}
+
+BoundingBox3D GUI::getPlayerBoundingBox(const zappy::structs::Player& player) const
+{
+    Vector3f playerPos = _map->getPlayerInterpolatedPosition(player.number, player.x,
+        player.y);
+
+    size_t stackIndex = 0;
+    const auto& allPlayers = _gameInfos->getPlayers();
+    for (const auto& otherPlayer : allPlayers) {
+        if (otherPlayer.number != player.number &&
+            otherPlayer.x == player.x && otherPlayer.y == player.y &&
+            otherPlayer.number < player.number) {
+            stackIndex++;
+        }
+    }
+
+    playerPos.y = _map->getOffset(DisplayPriority::PLAYER, player.x, player.y,
+        stackIndex) + 0.3f;
+
+    const float boxWidth = 1.0f;
+    const float boxHeight = 1.0f;
+    const float boxDepth = 1.0f;
+
+    Vector3f min = {
+        playerPos.x - boxWidth / 2.0f,
+        playerPos.y - boxHeight / 2.0f,
+        playerPos.z - boxDepth / 2.0f
+    };
+
+    Vector3f max = {
+        playerPos.x + boxWidth / 2.0f,
+        playerPos.y + boxHeight / 2.0f,
+        playerPos.z + boxDepth / 2.0f
+    };
+
+    return {min, max};
 }

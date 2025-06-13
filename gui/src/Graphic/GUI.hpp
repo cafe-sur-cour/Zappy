@@ -48,6 +48,9 @@ class GUI {
         bool playerExists(int playerId) const;
 
         void initModels();
+        void handlePlayerClicks();
+        int getPlayerUnderMouse() const;
+        BoundingBox3D getPlayerBoundingBox(const zappy::structs::Player& player) const;
 
         std::string _currentLibLoaded;
         bool _isRunning;
@@ -66,6 +69,7 @@ class GUI {
         zappy::gui::CameraMode _cameraMode;
         bool _backgroundLoaded;
         bool _skyboxLoaded;
+        int _hoveredPlayerId;
 };
 
 #endif /* !GUI_HPP_ */
