@@ -56,7 +56,6 @@ class Map {
         void drawTile(int x, int y, const zappy::structs::Tile &tile);
         void drawRock(int x, int y, const zappy::structs::Tile &tile);
         void drawFood(int x, int y, const zappy::structs::Tile &tile);
-        void drawPlayers(int x, int y);
         void drawAllPlayers();
         void drawEggs(int x, int y);
         Color32 getTeamColor(const std::string &teamName);

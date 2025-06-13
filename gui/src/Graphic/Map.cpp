@@ -81,43 +81,6 @@ void Map::drawTile(int x, int y, const zappy::structs::Tile &tile)
         angle, {0.9f, 0.9f, 0.9f}, CWHITE);
 }
 
-void Map::drawPlayers(int x, int y)
-{
-    const auto& players = _gameInfos->getPlayers();
-    std::vector<const zappy::structs::Player*> playersOnTile;
-
-    for (const auto& player : players) {
-        Vector3f interpolatedPos = getPlayerInterpolatedPosition(player.number,
-            player.x, player.y);
-        int currentRenderX = static_cast<int>(std::round(interpolatedPos.x /
-            zappy::gui::POSITION_MULTIPLIER));
-        int currentRenderY = static_cast<int>(std::round(interpolatedPos.z /
-            zappy::gui::POSITION_MULTIPLIER));
-
-        if (currentRenderX == x && currentRenderY == y) {
-            playersOnTile.push_back(&player);
-        }
-    }
-
-    if (playersOnTile.empty())
-        return;
-
-    for (size_t i = 0; i < playersOnTile.size(); ++i) {
-        Vector3f interpolatedPosition = getPlayerInterpolatedPosition(playersOnTile[i]->number,
-            playersOnTile[i]->x, playersOnTile[i]->y);
-
-        interpolatedPosition.y = getOffset(DisplayPriority::PLAYER, x, y, i);
-
-        Color32 teamColor = getTeamColor(playersOnTile[i]->teamName);
-        float rotationAngle = getPlayerInterpolatedRotation(playersOnTile[i]->number,
-            playersOnTile[i]->orientation);
-
-        this->_display->drawModelEx("player", interpolatedPosition, {0.0f, 1.0f, 0.0f},
-            rotationAngle, {zappy::gui::PLAYER_SCALE, zappy::gui::PLAYER_SCALE,
-                zappy::gui::PLAYER_SCALE}, teamColor);
-    }
-}
-
 void Map::drawAllPlayers()
 {
     const auto& players = _gameInfos->getPlayers();
@@ -142,9 +105,19 @@ void Map::drawAllPlayers()
         float rotationAngle = getPlayerInterpolatedRotation(player.number,
             player.orientation);
 
-        this->_display->drawModelEx("player", interpolatedPosition, {0.0f, 1.0f, 0.0f},
-            rotationAngle, {zappy::gui::PLAYER_SCALE, zappy::gui::PLAYER_SCALE,
-                zappy::gui::PLAYER_SCALE}, teamColor);
+        try {
+            std::string playerModel = zappy::gui::PLAYER_MODELS_INFO.at(player.level - 1).name;
+            Vector3f playerScale = zappy::gui::PLAYER_MODELS_INFO.at(player.level - 1).scale;
+
+            this->_display->drawModelEx(playerModel, interpolatedPosition, {0.0f, 1.0f, 0.0f},
+                rotationAngle, playerScale, teamColor);
+        } catch (const std::out_of_range&) {
+            std::string playerModel = zappy::gui::PLAYER_MODELS_INFO.at(0).name;
+            Vector3f playerScale = zappy::gui::PLAYER_MODELS_INFO.at(0).scale;
+
+            this->_display->drawModelEx(playerModel, interpolatedPosition, {0.0f, 1.0f, 0.0f},
+                rotationAngle, playerScale, teamColor);
+        }
     }
 }
 
