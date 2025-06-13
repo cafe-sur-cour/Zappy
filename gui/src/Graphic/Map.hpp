@@ -78,14 +78,19 @@ class Map {
         std::unordered_map<int, PlayerPositionState> _playerPositions;
 
         static constexpr float BASE_HEIGHT_TILE = 0.0f;
+
+        static constexpr float BASE_HEIGHT_PLAYER = 0.0f;
+        static constexpr float PLAYER_HEIGHT = 0.95f;
+
+        static constexpr float BASE_HEIGHT_EGG = 0.0f;
+        static constexpr float EGG_HEIGHT = 0.2f;
+
         static constexpr float BASE_HEIGHT_FOOD = 0.2f;
-        static constexpr float BASE_HEIGHT_ROCK = 0.2f;
-        static constexpr float BASE_HEIGHT_EGG = 0.2f;
-        static constexpr float BASE_HEIGHT_PLAYER = 0.2f;
         static constexpr float FOOD_HEIGHT = 0.3f;
-        static constexpr float ROCK_HEIGHT = 0.3f;
-        static constexpr float EGG_HEIGHT = 0.3f;
-        static constexpr float PLAYER_HEIGHT = 1.1f;
+
+        static constexpr float BASE_HEIGHT_ROCK = 0.1f;
+        static constexpr float ROCK_HEIGHT = 0.7f;
+
 
         void drawTorus(const Vector3f &position, float radius, float thickness,
             int radialSegments, Color32 color);
