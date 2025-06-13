@@ -34,6 +34,14 @@ TESTS 	    =   tests_params.c						\
 				tests_connect.c						\
 				tests_gui_incantation.c				\
 				tests_msz.c							\
+				tests_bct.c							\
+				tests_mct.c							\
+				tests_tna.c							\
+				tests_ppo.c							\
+				tests_plv.c							\
+				tests_pin.c							\
+				tests_sgt.c							\
+				tests_sst.c							\
 				tests_malloc_fails.c				\
 				fake_malloc.c
 
