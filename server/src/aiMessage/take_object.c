@@ -44,11 +44,22 @@ static int remove_crystal_from_tile(zappy_t *zappy, int x, int y, char *name)
             return 0;
         }
     }
+    if (strcmp(name, "deraumere") == 0) {
+        if (zappy->game->map->tiles[x][y].nbDeraumere > 0) {
+            zappy->game->map->tiles[x][y].nbDeraumere--;
+            return 0;
+        }
+    }
     return remove_from_current_tile(zappy, x, y, name);
 }
 
 int remove_element_from_tile(zappy_t *zappy, int x, int y, char *name)
 {
+    if (x < 0 || x >= zappy->game->map->width ||
+        y < 0 || y >= zappy->game->map->height) {
+        fprintf(stderr, "Error: Coordinates (%d,%d) out of bounds\n", x, y);
+        return -1;
+    }
     if (strcmp(name, "food") == 0) {
         if (zappy->game->map->tiles[x][y].nbFood > 0) {
             zappy->game->map->tiles[x][y].nbFood--;
@@ -58,12 +69,6 @@ int remove_element_from_tile(zappy_t *zappy, int x, int y, char *name)
     if (strcmp(name, "linemate") == 0) {
         if (zappy->game->map->tiles[x][y].nbLinemate > 0) {
             zappy->game->map->tiles[x][y].nbLinemate--;
-            return 0;
-        }
-    }
-    if (strcmp(name, "deraumere") == 0) {
-        if (zappy->game->map->tiles[x][y].nbDeraumere > 0) {
-            zappy->game->map->tiles[x][y].nbDeraumere--;
             return 0;
         }
     }
