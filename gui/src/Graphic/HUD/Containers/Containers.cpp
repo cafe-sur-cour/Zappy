@@ -367,3 +367,13 @@ std::shared_ptr<Slider> Containers::addSliderPercent(
 
     return nullptr;
 }
+
+float Containers::getWidth() const
+{
+    return AContainers::getWidth();
+}
+
+float Containers::getHeight() const
+{
+    return AContainers::getHeight();
+}
