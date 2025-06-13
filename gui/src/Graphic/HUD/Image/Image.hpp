@@ -38,7 +38,6 @@ class Image : public AUIElement {
 
         void setSize(float width, float height) override;
 
-        // Enable/disable maintaining aspect ratio when resizing
         void setMaintainAspectRatio(bool maintain);
 
         bool getMaintainAspectRatio() const;
