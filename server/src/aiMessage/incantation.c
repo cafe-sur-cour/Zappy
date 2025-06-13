@@ -136,5 +136,6 @@ int handle_incantation(player_t *player, char *command, zappy_t *zappy)
     }
     (void)command;
     mark_players_incanting(player_list, nb_players, zappy);
+    valid_message("Elevation underway");
     return -2;
 }
