@@ -180,9 +180,7 @@ Test(accept, accept_client_slots_write_failure, .init = redirect_all_std)
     accept_connection_return = 5;
     last_read_message = strdup("team1");
     process_new_client_return = true;
-    
-    // First write (WELCOME) succeeds, second write (slots) fails
-    static int call_count = 0;
+
     write_message_return = 0; // Will be checked in mock
     
     accept_client(zappy);
