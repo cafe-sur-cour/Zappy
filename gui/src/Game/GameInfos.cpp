@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <string>
 #include <mutex>
+#include <chrono>
 
 #include "GameInfos.hpp"
 
@@ -236,13 +237,21 @@ void GameInfos::addPlayerBroadcast(int playerNumber, const std::string &message)
     if (playerNumber < 0 || message.empty())
         return;
 
-    _playersBroadcasting.emplace_back(playerNumber, message);
+    auto currentTime = std::chrono::steady_clock::now();
+    _playersBroadcasting.emplace_back(playerNumber, message, currentTime);
 }
 
-std::vector<std::pair<int, std::string>> GameInfos::getPlayersBroadcasting() const
+const std::vector<std::pair<int, std::string>> GameInfos::getPlayersBroadcasting()
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
-    return _playersBroadcasting;
+
+    std::vector<std::pair<int, std::string>> result;
+    for (const auto& broadcast : _playersBroadcasting) {
+        result.emplace_back(std::get<0>(broadcast), std::get<1>(broadcast));
+    }
+
+    _playersBroadcasting.clear();
+    return result;
 }
 
 void GameInfos::addIncantation(const zappy::structs::Incantation incantation)
@@ -264,6 +273,13 @@ void GameInfos::removeIncantation(int x, int y, int result)
         _incantations.erase(it, _incantations.end());
 
     (void)result;
+}
+
+const std::vector<zappy::structs::Incantation> GameInfos::getIncantations()
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    return _incantations;
 }
 
 void GameInfos::addEgg(const zappy::structs::Egg egg)
@@ -319,4 +335,19 @@ std::pair<bool, std::string> GameInfos::isGameOver() const
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
     return std::make_pair(_gameOver, _winningTeam);
+}
+
+const zappy::structs::Player GameInfos::getPlayer(int playerNumber) const
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    for (const auto &player : _players) {
+        if (player.number == playerNumber)
+            return player;
+    }
+    return zappy::structs::Player();
+}
+
+void GameInfos::notifyStateChange() {
+    notifyObservers();
 }

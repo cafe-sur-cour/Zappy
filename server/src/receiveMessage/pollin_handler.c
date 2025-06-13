@@ -23,6 +23,36 @@ void free_action_request(action_request_t *action)
     }
 }
 
+static void write_end_incantation(player_t *player, zappy_t *zappy)
+{
+    char msg[19];
+
+    if (handle_end_incantation(player, zappy) == 0) {
+        snprintf(msg, 19, "Current level: %d\n", player->level);
+        write_message(player->network->fd, msg);
+    } else {
+        write_message(player->network->fd, "ko\n");
+    }
+    if (player->current_action)
+        free(player->current_action);
+    player->current_action = NULL;
+}
+
+static int handle_cooldown(player_t *player, zappy_t *zappy)
+{
+    if (player->remaining_cooldown > 0) {
+        player->remaining_cooldown--;
+        if (player->remaining_cooldown == 0 && player->current_action != NULL
+            && strcmp(player->current_action, "Incantation") == 0) {
+            write_end_incantation(player, zappy);
+        }
+        if (player->remaining_cooldown == 0 && player->is_busy)
+            player->is_busy = false;
+        return 1;
+    }
+    return 0;
+}
+
 /* This function defines wether the player is occupied or not */
 static void process_player_actions(player_t *player, zappy_t *zappy)
 {
@@ -30,12 +60,8 @@ static void process_player_actions(player_t *player, zappy_t *zappy)
 
     if (!player->pending_actions)
         return;
-    if (player->remaining_cooldown > 0) {
-        player->remaining_cooldown--;
-        if (player->remaining_cooldown == 0 && player->is_busy)
-            player->is_busy = false;
+    if (handle_cooldown(player, zappy) == 1)
         return;
-    }
     if (player->is_busy)
         return;
     pthread_mutex_lock(&player->pending_actions->mutex);
@@ -48,15 +74,17 @@ static void process_player_actions(player_t *player, zappy_t *zappy)
 }
 
 /* This function allows the smart poll to have different timeout */
-static int calculate_poll_timeout(player_t *player)
+static int calculate_poll_timeout(player_t *player, int frequency)
 {
+    int base_timeout = 1000 / frequency;
+
     if (player->is_busy) {
-        return 90;
+        return base_timeout * 2;
     }
     if (player->pending_actions && player->pending_actions->count > 0) {
-        return 20;
+        return base_timeout / 2;
     }
-    return 40;
+    return base_timeout;
 }
 
 /* This function "polls" the message and the queue it */
@@ -67,7 +95,7 @@ static void poll_player_input(player_t *player, zappy_t *zappy)
 
     if (!player || !player->network || player->network->fd < 0)
         return;
-    timeout = calculate_poll_timeout(player);
+    timeout = calculate_poll_timeout(player, zappy->params->freq);
     message = get_message(player->network->fd, timeout);
     if (message) {
         queue_action(player, message, zappy);

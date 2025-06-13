@@ -20,13 +20,83 @@ from src.Logger.Logger import Logger
 
 
 LVL_UPGRADES = {
-    1: {"linemate": 1, "deraumere": 1, "sibur": 0, "mendiane": 0, "phiras": 0, "thystame": 0},
-    2: {"linemate": 1, "deraumere": 1, "sibur": 1, "mendiane": 0, "phiras": 0, "thystame": 0},
-    3: {"linemate": 2, "deraumere": 0, "sibur": 1, "mendiane": 0, "phiras": 2, "thystame": 0},
-    4: {"linemate": 1, "deraumere": 1, "sibur": 2, "mendiane": 0, "phiras": 1, "thystame": 0},
-    5: {"linemate": 1, "deraumere": 2, "sibur": 1, "mendiane": 3, "phiras": 0, "thystame": 0},
-    6: {"linemate": 1, "deraumere": 2, "sibur": 3, "mendiane": 0, "phiras": 1, "thystame": 0},
-    7: {"linemate": 2, "deraumere": 2, "sibur": 2, "mendiane": 2, "phiras": 2, "thystame": 1},
+    1: {
+        "players": 1,
+        "stones": {
+            "linemate": 1,
+            "deraumere": 1,
+            "sibur": 0,
+            "mendiane": 0,
+            "phiras": 0,
+            "thystame": 0
+        }
+    },
+    2: {
+        "players": 2,
+        "stones": {
+            "linemate": 1,
+            "deraumere": 1,
+            "sibur": 1,
+            "mendiane": 0,
+            "phiras": 0,
+            "thystame": 0
+        }
+    },
+    3: {
+        "players": 2,
+        "stones": {
+            "linemate": 2,
+            "deraumere": 0,
+            "sibur": 1,
+            "mendiane": 0,
+            "phiras": 2,
+            "thystame": 0
+        }
+    },
+    4: {
+        "players": 4,
+        "stones": {
+            "linemate": 1,
+            "deraumere": 1,
+            "sibur": 2,
+            "mendiane": 0,
+            "phiras": 1,
+            "thystame": 0
+        }
+    },
+    5: {
+        "players": 4,
+        "stones": {
+            "linemate": 1,
+            "deraumere": 2,
+            "sibur": 1,
+            "mendiane": 3,
+            "phiras": 0,
+            "thystame": 0
+        }
+    },
+    6: {
+        "players": 6,
+        "stones": {
+            "linemate": 1,
+            "deraumere": 2,
+            "sibur": 3,
+            "mendiane": 0,
+            "phiras": 1,
+            "thystame": 0
+        }
+    },
+    7: {
+        "players": 6,
+        "stones": {
+            "linemate": 2,
+            "deraumere": 2,
+            "sibur": 2,
+            "mendiane": 2,
+            "phiras": 2,
+            "thystame": 1
+        }
+    },
 }
 
 
@@ -69,6 +139,14 @@ class Player:
             "phase": "forward",
             "lastCommand": None
         }
+
+        self.canIncant: bool = False
+
+        self.incantationPhase: str = "checkNbPlayers"
+        self.incantationLastCommand: str = None
+
+        self.goToIncantation: bool = False
+        self.incantationDirection: int = 0
 
     def __del__(self):
         try:
@@ -116,13 +194,16 @@ class Player:
         self.y = y
         self.roombaState["targetForward"] = max(x, y)
 
-    def getNeededStonesByPriority(self) -> list[str]:
+    def getNeededStonesByPriority(self) -> list[(str, int)]:
         neededStones = []
-        for stone, quantity in LVL_UPGRADES[self.level].items():
+        if self.level == 8:
+            return neededStones
+        stones: dict[str, int] = LVL_UPGRADES[self.level]["stones"]
+        for stone, quantity in stones.items():
             neededQuantity = quantity - self.inventory.get(stone, 0)
             neededStones.append((neededQuantity, stone))
         neededStones.sort(key=lambda x: x[0], reverse=True)
-        neededStones = [stone for quantity, stone in neededStones if quantity > 0]
+        neededStones = [(stone, quantity) for quantity, stone in neededStones if quantity > 0]
         return neededStones
 
     def dropStonesForSurvival(self) -> None:
@@ -134,21 +215,11 @@ class Player:
                 self.communication.sendSetObject(stone)
                 return
 
-    def getDirectionFromSound(self, direction: int) -> str:
-        if direction == 0:
-            return "self"
-
-        direction_map = {
-            1: "forward",
-            2: "forwardLeft",
-            3: "left",
-            4: "backLeft",
-            5: "back",
-            6: "backRight",
-            7: "right",
-            8: "forwardRight"
-        }
-        return direction_map.get(direction, "unknown")
+    def hasEnoughFoodForIncantation(self) -> bool:
+        nbStones = sum(
+            LVL_UPGRADES[self.level]["stones"].values()
+        )
+        return self.inventory["food"] * 126 >= nbStones * 7 + 300
 
     def roombaAction(self) -> None:
         if self.roombaState["phase"] == "forward":
@@ -161,10 +232,16 @@ class Player:
                 if self.look:
                     if "food" in self.look[0].keys():
                         self.communication.sendTakeObject("food")
+                    tookStones = False
                     neededStones = self.getNeededStonesByPriority()
-                    for stone in neededStones:
-                        if stone in self.look[0].keys():
-                            self.communication.sendTakeObject(stone)
+                    tile = self.look[0]
+                    for stone, quantity in neededStones:
+                        if stone in tile.keys():
+                            tookStones = True
+                            for _ in range(min(quantity, tile[stone])):
+                                self.communication.sendTakeObject(stone)
+                    if tookStones:
+                        self.communication.sendInventory()
                 self.roombaState["lastCommand"] = "take"
 
             elif self.roombaState["lastCommand"] == "take":
@@ -189,18 +266,127 @@ class Player:
                 self.roombaState["lastCommand"] = "left"
                 self.roombaState["phase"] = "forward"
 
+    def incantationAction(self) -> None:
+        if self.incantationPhase == "checkNbPlayers":
+            self.communication.sendLook()
+            self.incantationLastCommand = "look"
+
+        elif self.incantationPhase == "dropStones":
+            if not self.hasEnoughFoodForIncantation():
+                self.canIncant = False
+                self.incantationPhase = "checkNbPlayers"
+                return
+            stones: dict[str, int] = LVL_UPGRADES[self.level]["stones"]
+            for stone, quantity in stones.items():
+                for _ in range(quantity):
+                    self.communication.sendSetObject(stone)
+            self.incantationPhase = "canStartIncantation"
+            self.incantationLastCommand = "set"
+
+        elif self.incantationPhase == "canStartIncantation":
+            self.communication.sendIncantation()
+            self.incantationPhase = "startedIncantation"
+            self.incantationLastCommand = "incantation"
+
+        elif self.incantationPhase == "needMorePlayers":
+            self.broadcaster.broadcastMessage(f"incantation {self.level}")
+            self.incantationPhase = "checkNbPlayers"
+            self.incantationLastCommand = "broadcast"
+
+    def getStepsFromDirection(self) -> list[()]:
+        stepsMap = {
+            1: [
+                self.communication.sendForward
+            ],
+            2: [
+                self.communication.sendForward
+            ],
+            3: [
+                self.communication.sendLeft,
+                self.communication.sendForward
+            ],
+            4: [
+                self.communication.sendRight,
+                self.communication.sendRight,
+                self.communication.sendForward
+            ],
+            5: [
+                self.communication.sendRight,
+                self.communication.sendRight,
+                self.communication.sendForward
+            ],
+            6: [
+                self.communication.sendRight,
+                self.communication.sendRight,
+                self.communication.sendForward
+            ],
+            7: [
+                self.communication.sendRight,
+                self.communication.sendForward
+            ],
+            8: [
+                self.communication.sendForward
+            ]
+        }
+        return stepsMap.get(self.incantationDirection, [])
+
+    def goToIncantationAction(self) -> None:
+        if self.incantationDirection == 0:
+            self.inIncantation = True
+            return
+        steps = self.getStepsFromDirection()
+        for step in steps:
+            step()
+
     def handleResponseInventory(self) -> None:
         self.inventory = self.communication.getInventory() or self.inventory
+        neededStones = self.getNeededStonesByPriority()
+        if not neededStones:
+            self.canIncant = True
 
     def handleResponseLook(self) -> None:
         self.look = self.communication.getLook() or self.look
+        if self.canIncant and self.incantationPhase == "checkNbPlayers":
+            if len(self.look) > 0 and "player" in self.look[0].keys():
+                playerCount = self.look[0]["player"]
+                if playerCount >= LVL_UPGRADES[self.level]["players"]:
+                    self.incantationPhase = "dropStones"
+                else:
+                    self.incantationPhase = "needMorePlayers"
 
     def handleResponseKO(self) -> None:
-        if not self.is_child_process:
+        if not self.canIncant:
             self.logger.error(f"Command '{self.roombaState['lastCommand']}' failed")
+        if self.canIncant:
+            self.logger.error(f"Command '{self.incantationLastCommand}' failed")
+            self.incantationPhase = "checkNbPlayers"
+            self.canIncant = False
+        self.inIncantation = False
+        self.goToIncantation = False
 
     def handleResponseOK(self) -> None:
         return
+
+    def handleResponseElevationUnderway(self) -> None:
+        self.inIncantation = True
+        self.logger.display("Incantation underway, waiting for elevation...")
+
+    def handleResponseCurrentLevel(self, rest: str) -> None:
+        try:
+            new_level = int(rest.strip())
+            if new_level > self.level:
+                self.logger.success(f"Player level increased to {new_level}")
+                self.level = new_level
+                self.canIncant = False
+                self.incantationPhase = "checkNbPlayers"
+                self.goToIncantation = False
+                self.inIncantation = False
+            else:
+                self.logger.error(
+                    f"Unexpected level response: got {new_level}, old level = {self.level}"
+                )
+        except ValueError:
+            self.logger.error(f"Invalid level response: {rest.strip()}")
 
     def handleCommandResponse(self, response: str) -> None:
         switcher = {
@@ -208,12 +394,25 @@ class Player:
             "look": self.handleResponseLook,
             "ko": self.handleResponseKO,
             "ok": self.handleResponseOK,
+            "Elevation underway": self.handleResponseElevationUnderway,
+            "Current level: ": self.handleResponseCurrentLevel,
         }
-        handler = switcher.get(response.strip(), None)
-        if handler:
-            handler()
-        elif not self.is_child_process:
-            self.logger.error(f"Unknown response: {response.strip()}")
+        for key in switcher.keys():
+            if response.startswith(key):
+                rest = response[len(key):].strip()
+                if rest:
+                    switcher[key](rest)
+                else:
+                    switcher[key]()
+                return
+        self.logger.error(f"Unknown response: {response.strip()}")
+
+    def handleMessages(self, direction: int, message: str) -> None:
+        if message.startswith("incantation "):
+            lvl = message.split(" ")[1]
+            if lvl == self.level:
+                self.incantationDirection = direction
+                self.goToIncantation = True
 
     def loop(self) -> None:
         try:
@@ -222,19 +421,28 @@ class Player:
                     data = self.communication.getLastMessage()
                     direction = data[0]
                     message = self.broadcaster.revealMessage(data[1])
-                    if message and not self.is_child_process:
-                        self.logger.display(f"Received message: {message}")
+                    self.handleMessages(direction, message)
 
                 if self.communication.hasResponses():
                     response = self.communication.getLastResponse()
                     if response.strip() == "dead":
+                        self.logger.display("Player died")
                         break
                     self.handleCommandResponse(response)
 
-                if not self.communication.hasPendingCommands():
-                    self.roombaAction()
+                if (
+                    not self.communication.hasPendingCommands() and
+                    not self.inIncantation
+                ):
+                    if self.canIncant:
+                        self.incantationAction()
+                    elif self.goToIncantation:
+                        self.goToIncantationAction()
+                    else:
+                        self.roombaAction()
 
                 sleep(0.1)
+
         except (CommunicationException, SocketException):
             pass
         except KeyboardInterrupt:

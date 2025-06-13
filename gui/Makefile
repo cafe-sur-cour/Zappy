@@ -30,6 +30,8 @@ SRC =	src/Client/Client.cpp \
 		src/Graphic/HUD/Slider/Slider.cpp \
 		src/Graphic/HUD/UIElement/AUIElement.cpp \
 		src/Graphic/HUD/HUD.cpp	\
+		src/Observer/GuiObserver.cpp \
+		src/Observer/Subject.cpp \
 		src/Graphic/HUD/Help/Help.cpp
 
 OBJ = $(SRC:.cpp=.o)
@@ -104,7 +106,7 @@ clean:
 fclean: clean
 	@rm -rf $(NAME)
 	@rm -rf $(UNIT_TESTS)
-	@rm -rf ./lib
+	@rm -rf ./lib/*
 	@rm -rf coverage_report/
 	@rm -rf *.gcda
 	@rm -rf *.gcno

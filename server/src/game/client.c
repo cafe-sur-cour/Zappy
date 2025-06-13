@@ -66,8 +66,12 @@ static inventory_t *init_inventory(void)
 }
 
 /* This function initialize the current player structure */
-static player_t *malloc_player(player_t *player)
+static player_t *malloc_player(void)
 {
+    player_t *player = malloc(sizeof(player_t));
+
+    if (!player)
+        return NULL;
     player->id = -1;
     player->network = malloc(sizeof(network_t));
     if (!player->network) {
@@ -108,11 +112,8 @@ static player_t *set_player_pos(player_t *player, zappy_t *zappy)
 /* This function initialize the current player structure */
 static player_t *init_player(int fd, zappy_t *zappy)
 {
-    player_t *player = malloc(sizeof(player_t));
+    player_t *player = malloc_player();
 
-    if (!player)
-        return NULL;
-    player = malloc_player(player);
     if (!player)
         return NULL;
     player->network->fd = fd;
@@ -122,7 +123,10 @@ static player_t *init_player(int fd, zappy_t *zappy)
     player->pending_actions = init_action_queue();
     player->last_action_time = 0;
     player->is_busy = false;
+    player->current_action = NULL;
     player->remaining_cooldown = 0;
+    player->food_timer = 126;
+    player->last_food_check = time(NULL);
     if (!player->inventory)
         return free_player(player);
     player = set_player_pos(player, zappy);

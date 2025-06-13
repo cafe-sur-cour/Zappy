@@ -22,11 +22,11 @@ static const command_info_t COMMANDS[] = {
     {"Inventory", 1, PRIORITY_HIGH, &handle_inventory},
     {"Broadcast", 7, PRIORITY_MEDIUM, &handle_broadcast},
     {"Connect_nbr", 1, PRIORITY_HIGH, &handle_connect_nbr},
-    {"Fork", 42, PRIORITY_LOW, &handle_fork},
+    {"Fork", 42, PRIORITY_MEDIUM, &handle_fork},
     {"Eject", 7, PRIORITY_MEDIUM, &handle_eject},
     {"Take", 7, PRIORITY_MEDIUM, &handle_take},
     {"Set", 7, PRIORITY_MEDIUM, &handle_set},
-    {"Incantation", 300, PRIORITY_LOW, &handle_incantation},
+    {"Incantation", 300, PRIORITY_MEDIUM, &handle_incantation},
     {NULL, 0, 0, NULL}
 };
 

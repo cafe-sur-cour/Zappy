@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <chrono>
 #include "../Game/GameInfos.hpp"
 #include "../IDisplay.hpp"
 
@@ -29,6 +30,8 @@ class Map {
         ~Map();
 
         void draw();
+        void drawBroadcastingPlayers();
+        void drawIncantations();
         void drawTile(int x, int y, const zappy::structs::Tile &tile);
         void drawRock(int x, int y, const zappy::structs::Tile &tile);
         void drawFood(int x, int y, const zappy::structs::Tile &tile);
@@ -45,6 +48,8 @@ class Map {
         std::vector<Color32> _colors;
         int _colorIndex = 0;
 
+        std::unordered_map<int, std::chrono::steady_clock::time_point> _broadcastStartTimes;
+
         static constexpr float BASE_HEIGHT_TILE = 0.0f;
         static constexpr float BASE_HEIGHT_FOOD = 0.2f;
         static constexpr float BASE_HEIGHT_ROCK = 0.2f;
@@ -57,6 +62,8 @@ class Map {
 
         void drawOrientationArrow(const Vector3f &position, int orientation,
             float playerHeight);
+        void drawTorus(const Vector3f &position, float radius, float thickness,
+            int radialSegments, Color32 color);
 };
 
 #endif /* !MAP_HPP_ */

@@ -80,6 +80,13 @@ typedef struct inventory_s {
     int nbThystame;
 } inventory_t;
 
+/* Definition of the incantation structure */
+typedef struct incantation_s {
+    int levelt_to_reach;
+    int nb_players;
+    inventory_t required_inventory;
+} incantation_t;
+
 
 /* Player struct */
 typedef struct player_s {
@@ -96,6 +103,10 @@ typedef struct player_s {
     time_t last_action_time;
     bool is_busy;
     int remaining_cooldown;
+    char *current_action;
+    /* Food timer for health system */
+    int food_timer;  // Time units until next food consumption
+    time_t last_food_check;  // Last time food was checked
 
     struct player_s *next;
 } player_t;

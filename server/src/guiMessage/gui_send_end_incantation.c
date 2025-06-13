@@ -16,15 +16,15 @@
 /* Here in this function we send the pie message result is ok or ko*/
 int send_end_incantation(zappy_t *zappy, player_t *player, char *result)
 {
-    int xLength = int_str_len(player->posX) + int_str_len(player->posY)
-        + 10;
+    int xLength = int_str_len(player->posX) + int_str_len(player->posY) + 11;
     char *message = malloc(sizeof(char) * xLength);
     graph_net_t *current = zappy->graph;
+    int resultat = (strcmp(result, "ok") == 0) ? 1 : 0;
 
     if (message == NULL)
         return -1;
-    snprintf(message, xLength, "pie %d %d %s\n",
-        player->posX, player->posY, result);
+    snprintf(message, xLength, "pie %d %d %d\n",
+        player->posX, player->posY, resultat);
     if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", message);
     while (current != NULL) {

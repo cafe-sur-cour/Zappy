@@ -10,44 +10,36 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
-#include <filesystem>
 #include "GUI.hpp"
+#include "../Exceptions/Exceptions.hpp"
+#include "../DLLoader/LoaderType.hpp"
 #include "../Audio/Audio.hpp"
 #include "../Utils/Constants.hpp"
 #include "../Utils/GamepadConstants.hpp"
 
-std::string GUI::_getFirstSharedLibInFolder(const std::string &libPath)
-{
-    try {
-        for (const auto &entry : std::filesystem::directory_iterator(libPath)) {
-            if (entry.path().extension() == ".so") {
-                return entry.path().string();
-            }
-        }
-    } catch (const std::filesystem::filesystem_error &e) {
-        std::cerr << "Error accessing directory: " << e.what() << std::endl;
-    }
-    return "";
-}
-
-GUI::GUI(std::shared_ptr<GameInfos> gameInfos) : _isRunning(false),
-    _gameInfos(gameInfos)
+GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
+    : _isRunning(false), _gameInfos(gameInfos), _backgroundLoaded(false), _skyboxLoaded(false)
 {
     this->_dlLoader = DLLoader<std::shared_ptr<IDisplay>>();
-    auto lib = this->_getFirstSharedLibInFolder("./gui/lib/");
-    if (lib.empty()) {
-        std::cerr << "NO lib found in the lib folder" << std::endl;
-        exit(84);
-    }
+    if (lib.empty())
+        throw Exceptions::ModuleError(lib + ": Lib input empty");
     this->_dlLoader.Open(lib.c_str());
-    if (!this->_dlLoader.getHandler()) {
-        std::cerr << "Failed to open library: " << dlerror() << std::endl;
-        exit(84);
-    }
+    if (!this->_dlLoader.getHandler())
+        throw Exceptions::ModuleError(lib + ": Failed to open library: " +
+            std::string(dlerror()));
     using CreateFunc = std::shared_ptr<IDisplay>(*)();
-    CreateFunc create = reinterpret_cast<CreateFunc>(this->_dlLoader.Symbol("create"));
-    this->_display = create();
+    using GetTypeFunc = ModuleType_t(*)();
 
+    GetTypeFunc getTypeFunc = reinterpret_cast<GetTypeFunc>(this->_dlLoader.Symbol("getType"));
+    if (!getTypeFunc || getTypeFunc() != ModuleType_t::DISPLAY_MODULE)
+        throw Exceptions::ModuleError(lib + ": Not a valid module");
+
+    CreateFunc createFunc = reinterpret_cast<CreateFunc>(this->_dlLoader.Symbol("create"));
+    if (!createFunc)
+        throw Exceptions::ModuleError(lib + ": No create symbole found in the shared lib");
+    this->_display = createFunc();
+
+    std::cout << lib + ": Module GUI Found" << std::endl;
     _cameraMode = zappy::gui::CameraMode::FREE;
     auto monitorSize = this->_display->getMonitorSize();
     this->_windowWidth = monitorSize.x;
@@ -119,9 +111,16 @@ void GUI::update()
     }
 
     updateCamera();
-    _hud->updateTeamPlayersDisplay(_gameInfos);
-    _hud->updatePlayerInventoryDisplay(_cameraManager->getPlayerId(), _cameraMode);
-    _hud->update();
+    this->_hud->updateTeamPlayersDisplay(this->_gameInfos);
+    this->_hud->updatePlayerInventoryDisplay(this->_cameraManager->getPlayerId(),
+        this->_cameraMode);
+    this->_hud->updateHelpInformationHUD(this->_cameraMode);
+    this->_hud->update();
+}
+
+void GUI::refresh()
+{
+    update();
 }
 
 bool GUI::isRunning()
@@ -135,10 +134,19 @@ void GUI::draw()
         return;
 
     this->_display->beginDrawing();
-    this->_display->clearBackground(CRAYWHITE);
+
+    this->_display->clearBackground(Color32{255, 255, 255, 255});
+
+    this->_display->drawSimpleSkybox();
 
     this->_display->begin3DMode();
+
+    if (_skyboxLoaded) {
+        this->_display->drawSkybox("skybox");
+    }
+
     _map->draw();
+
     this->_display->end3DMode();
 
     _hud->draw();
@@ -309,6 +317,22 @@ void GUI::switchToPreviousPlayer()
 
 void GUI::initModels()
 {
+    if (this->_display->loadSkybox("skybox", "gui/assets/sprite/skybox/skybox.png")) {
+        std::cout << colors::T_GREEN << "[INFO] Successfully loaded skybox texture."
+                << colors::RESET << std::endl;
+        _skyboxLoaded = true;
+    } else {
+        std::cout << colors::T_RED << "[ERROR] Failed to load skybox texture."
+                << colors::RESET << std::endl;
+        if (!_backgroundLoaded) {
+            if (!this->_display->loadTexture("background", "gui/assets/sprite/background.png"))
+                std::cout << colors::T_RED << "[ERROR] Failed to load background texture."
+                        << colors::RESET << std::endl;
+            else
+                _backgroundLoaded = true;
+        }
+    }
+
     if (!this->_display->loadModel("player", "gui/assets/models/fall_guy.glb",
         {0.0f, -75.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load player model."
@@ -323,7 +347,37 @@ void GUI::initModels()
         std::cout << colors::T_RED << "[ERROR] Failed to load food model."
                   << colors::RESET << std::endl;
 
-    if (!this->_display->loadModel("rock", "gui/assets/models/rock.glb", {0.0f, 0.0f, 0.0f}))
-        std::cout << colors::T_RED << "[ERROR] Failed to load rock model."
+    if (!this->_display->loadModel("linemate", "gui/assets/models/soccerball.glb",
+        {0.0f, 0.0f, 0.0f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load linemate model."
+                  << colors::RESET << std::endl;
+
+    if (!this->_display->loadModel("deraumere", "gui/assets/models/beachball.glb",
+        {0.0f, 0.0f, 0.0f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load deraumere model."
+                  << colors::RESET << std::endl;
+
+    if (!this->_display->loadModel("sibur", "gui/assets/models/basketball.glb",
+        {0.0f, 0.0f, 0.0f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load sibur model."
+                  << colors::RESET << std::endl;
+
+    if (!this->_display->loadModel("mendiane", "gui/assets/models/bowlingball.glb",
+        {0.0f, 0.0f, 0.0f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load mendiane model."
+                  << colors::RESET << std::endl;
+
+    if (!this->_display->loadModel("phiras", "gui/assets/models/eightball.glb",
+        {0.0f, 0.0f, 0.0f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load phiras model."
+                  << colors::RESET << std::endl;
+
+    if (!this->_display->loadModel("thystame", "gui/assets/models/tennisball.glb",
+        {0.0f, 0.0f, 0.0f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load thystame model."
+                  << colors::RESET << std::endl;
+
+    if (!this->_display->loadModel("egg", "gui/assets/models/egg.glb", {0.0f, 0.0f, 0.0f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load egg model."
                   << colors::RESET << std::endl;
 }

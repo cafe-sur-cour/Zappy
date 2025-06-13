@@ -21,10 +21,11 @@
 
 class GUI {
     public:
-        explicit GUI(std::shared_ptr<GameInfos> gameInfos);
+        GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &libPath);
         ~GUI();
 
         void run();
+        void refresh();
 
         int getWindowWidth() const;
         int getWindowHeight() const;
@@ -40,7 +41,6 @@ class GUI {
         void switchToPreviousPlayer();
 
     private:
-        std::string _getFirstSharedLibInFolder(const std::string &libPath = "./lib/");
         void updateCamera();
         virtual void update();
         virtual void draw();
@@ -64,6 +64,8 @@ class GUI {
         int _windowHeight;
 
         zappy::gui::CameraMode _cameraMode;
+        bool _backgroundLoaded;
+        bool _skyboxLoaded;
 };
 
 #endif /* !GUI_HPP_ */

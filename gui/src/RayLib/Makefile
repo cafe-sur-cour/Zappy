@@ -8,7 +8,7 @@
 NAME = libZappyRayLib.so
 
 SRC =	Raylib.cpp	\
-		entryPoint.cpp	\
+		entryPoint.cpp
 
 CXX = g++
 

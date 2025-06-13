@@ -104,6 +104,8 @@ bool process_new_client(const char *team_name, int fd, zappy_t *server);
 team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server);
 int get_next_free_id(zappy_t *server);
 void check_player_status(zappy_t *zappy);
+void update_player_food_timer(player_t *player, zappy_t *zappy);
+bool is_player_starving(player_t *player);
 
 /* init_map.c */
 void init_game(zappy_t *server);
@@ -192,7 +194,19 @@ int handle_eject(player_t *player, char *command, zappy_t *zappy);
 int handle_fork(player_t *player, char *command, zappy_t *zappy);
 int print_look_server(player_t *player);
 
+/* Incantation handler */
 int handle_incantation(player_t *player, char *command, zappy_t *zappy);
+int check_player_on_tile(player_t *player, zappy_t *zappy);
+void increase_level_player(int *player_list, int nb_players, zappy_t *zappy);
+int *get_player_on_tile_id(int posX, int posY, zappy_t *zappy, int nb_players);
+int handle_end_incantation(player_t *player, zappy_t *zappy);
+int get_nb_player_on_tile(int posX, int posY, zappy_t *zappy, int level);
+void mark_players_incanting(int *player_list, int nb_players, zappy_t *zappy);
+void remove_crystal_from_tiles(int posX, int posY, int level, zappy_t *zappy);
+int validate_and_get_players(player_t *player, zappy_t *zappy,
+    int **player_list);
+
+
 int handle_inventory(player_t *player, char *command, zappy_t *zappy);
 int inventory_message(player_t *player);
 int print_inventory_server(player_t *player, int len);
