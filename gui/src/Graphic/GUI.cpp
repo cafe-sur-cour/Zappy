@@ -140,8 +140,6 @@ void GUI::draw()
 
     this->_display->clearBackground(Color32{255, 255, 255, 255});
 
-    this->_display->drawSimpleSkybox();
-
     this->_display->begin3DMode();
 
     if (_skyboxLoaded) {
@@ -350,7 +348,7 @@ void GUI::switchToPreviousPlayer()
 
 void GUI::initModels()
 {
-    if (this->_display->loadSkybox("skybox", "gui/assets/sprite/skybox/skybox.png")) {
+    if (this->_display->loadSkybox("skybox", "gui/assets/sprite/skybox/skybox.jpg")) {
         std::cout << colors::T_GREEN << "[INFO] Successfully loaded skybox texture."
                 << colors::RESET << std::endl;
         _skyboxLoaded = true;
