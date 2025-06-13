@@ -14,12 +14,11 @@
 
 Audio::Audio()
 {
-    loadSound("main_theme", "gui/assets/sounds/main_theme.wav");
-    setSoundLooping("main_theme", true);
-    playSound("main_theme", 50.0f);
-
-    loadSound("click", "gui/assets/sounds/click.wav");
-    loadSound("clickPlayer", "gui/assets/sounds/playerClick.wav");
+    this->Audio::loadSound("main_theme", "gui/assets/sounds/main_theme.wav");
+    this->Audio::setSoundLooping("main_theme", true);
+    this->Audio::playSound("main_theme", this->Audio::getMusicVolumeLevel());
+    this->Audio::loadSound("click", "gui/assets/sounds/click.wav");
+    this->Audio::loadSound("clickPlayer", "gui/assets/sounds/playerClick.wav");
 }
 
 Audio::~Audio()
@@ -30,6 +29,27 @@ Audio::~Audio()
         }
     }
 }
+
+float Audio::getSFXVolumeLevel() {
+    return this->_levelSFX;
+}
+
+float Audio::getMusicVolumeLevel() {
+    return this->_levelMusic;
+}
+
+void Audio::setSFXVolumeLevel(float level) {
+    this->_levelSFX = level;
+    for (const auto &s : this->_sfxId)
+        this->setSoundVolume(s, this->_levelSFX);
+}
+
+void Audio::setMusicVolumeLevel(float level) {
+    this->_levelMusic = level;
+    for (const auto &s : this->_musicId)
+        this->setSoundVolume(s, this->_levelMusic);
+}
+
 
 bool Audio::loadSound(const std::string& id, const std::string& filepath)
 {
@@ -56,7 +76,17 @@ void Audio::playSound(const std::string& id, float volume)
         return;
     }
     it->second->stop();
-    it->second->setVolume(volume);
+    auto musicIt = std::find(this->_musicId.begin(), this->_musicId.end(), id);
+    if (musicIt != this->_musicId.end())
+        it->second->setVolume(this->_levelMusic);
+    else {
+        auto sfxIt = std::find(this->_sfxId.begin(), this->_sfxId.end(), id);
+        if (sfxIt != this->_sfxId.end())
+            it->second->setVolume(this->_levelSFX);
+        else {
+            it->second->setVolume(volume);
+        }
+    }
     it->second->play();
 }
 
