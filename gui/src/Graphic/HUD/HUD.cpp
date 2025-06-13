@@ -29,6 +29,10 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
     initTeamPlayersDisplay(_gameInfos);
     initTpsSlider(_gameInfos, _display, _audio);
     this->_initHelpInformation();
+    createMessageContainer();
+
+    if (_gameInfos)
+        _gameInfos->addObserver(std::shared_ptr<IObserver>(this, [](IObserver*) {}));
 }
 
 HUD::~HUD()
@@ -59,6 +63,7 @@ void HUD::update()
 
     updateTeamPlayersDisplay(_gameInfos);
     updateTpsSlider(_gameInfos);
+    updateGameMessages();
 }
 
 std::shared_ptr<Containers> HUD::addContainer(
@@ -1080,4 +1085,188 @@ bool HUD::isPlayerInIncantation(int playerId) const
     }
 
     return false;
+}
+
+void HUD::createMessageContainer()
+{
+    if (_containers.find("message_container") != _containers.end()) {
+        return;
+    }
+
+    int screenWidth = _display->getScreenSize().x;
+    int screenHeight = _display->getScreenSize().y;
+
+    float containerWidth = screenWidth * 0.5f;
+    float containerHeight = screenHeight * 0.15f;
+    float containerX = (screenWidth - containerWidth) / 2.0f;
+    float containerY = screenHeight * 0.1f;
+
+    Color32 backgroundColor = {0, 0, 0, 180};
+
+    addContainer("message_container", containerX, containerY,
+                containerWidth, containerHeight, backgroundColor);
+}
+
+void HUD::displayWinMessage(const std::string& teamName)
+{
+    try {
+        createMessageContainer();
+
+        std::string msgId = "win_message_" + std::to_string(
+            std::chrono::steady_clock::now().time_since_epoch().count());
+        std::string message = "Team: " + teamName + " WINS!";
+
+        auto container = getContainer("message_container");
+        if (container) {
+            try {
+                for (auto& msg : _gameMessages) {
+                    container->removeElement(msg.id);
+                }
+                _gameMessages.clear();
+            } catch (const std::exception& e) {
+                std::cout << colors::T_RED << "[ERROR] Exception clearing messages: "
+                          << e.what() << colors::RESET << std::endl;
+            }
+
+            Color32 winColor = {0, 255, 0, 255};
+
+            try {
+                float fontSize = container->getHeight() * 0.4f;
+                auto textElement = container->addTextPercent(
+                    msgId, 50.0f, 50.0f, message, fontSize, winColor);
+
+                if (textElement) {
+                    float textWidth = textElement->getWidth();
+                    float containerWidth = container->getWidth();
+                    float textX = (containerWidth - textWidth) / 2.0f;
+                    textElement->setX(textX);
+                }
+
+                _gameMessages.push_back({
+                    msgId,
+                    message,
+                    winColor,
+                    std::chrono::steady_clock::now(),
+                    MESSAGE_DURATION
+                });
+            } catch (const std::exception& e) {
+                std::cout << colors::T_RED << "[ERROR] Exception adding win message: "
+                          << e.what() << colors::RESET << std::endl;
+            }
+        }
+
+        std::cout << colors::T_GREEN << "[HUD] Displaying win message for team: "
+                << teamName << colors::RESET << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << colors::T_RED << "[ERROR] Exception in displayWinMessage: "
+                  << e.what() << colors::RESET << std::endl;
+    } catch (...) {
+        std::cout << colors::T_RED << "[ERROR] Unknown exception in displayWinMessage"
+                  << colors::RESET << std::endl;
+    }
+}
+
+void HUD::displayLoseMessage(const std::string& teamName)
+{
+    try {
+        createMessageContainer();
+
+        std::string msgId = "lose_message_" + std::to_string(
+            std::chrono::steady_clock::now().time_since_epoch().count());
+        std::string message = "Team: " + teamName + " LOSES!";
+
+        auto container = getContainer("message_container");
+        if (container) {
+            try {
+                for (auto& msg : _gameMessages) {
+                    container->removeElement(msg.id);
+                }
+                _gameMessages.clear();
+            } catch (const std::exception& e) {
+                std::cout << colors::T_RED << "[ERROR] Exception clearing messages: "
+                          << e.what() << colors::RESET << std::endl;
+            }
+
+            Color32 loseColor = {255, 0, 0, 255};
+
+            try {
+                float fontSize = container->getHeight() * 0.4f;
+                auto textElement = container->addTextPercent(
+                    msgId, 50.0f, 50.0f, message, fontSize, loseColor);
+
+                if (textElement) {
+                    float textWidth = textElement->getWidth();
+                    float containerWidth = container->getWidth();
+                    float textX = (containerWidth - textWidth) / 2.0f;
+                    textElement->setX(textX);
+                }
+
+                _gameMessages.push_back({
+                    msgId,
+                    message,
+                    loseColor,
+                    std::chrono::steady_clock::now(),
+                    MESSAGE_DURATION
+                });
+            } catch (const std::exception& e) {
+                std::cout << colors::T_RED << "[ERROR] Exception adding lose message: "
+                          << e.what() << colors::RESET << std::endl;
+            }
+        }
+
+        std::cout << colors::T_RED << "[HUD] Displaying lose message for team: "
+                << teamName << colors::RESET << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << colors::T_RED << "[ERROR] Exception in displayLoseMessage: "
+                  << e.what() << colors::RESET << std::endl;
+    } catch (...) {
+        std::cout << colors::T_RED << "[ERROR] Unknown exception in displayLoseMessage"
+                  << colors::RESET << std::endl;
+    }
+}
+
+void HUD::updateGameMessages()
+{
+    auto currentTime = std::chrono::steady_clock::now();
+    auto container = getContainer("message_container");
+
+    if (!container || _gameMessages.empty()) {
+        return;
+    }
+
+    auto it = _gameMessages.begin();
+    while (it != _gameMessages.end()) {
+        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+            currentTime - it->startTime).count();
+
+        if (elapsed >= it->duration) {
+            container->removeElement(it->id);
+            it = _gameMessages.erase(it);
+        } else {
+            if (elapsed > it->duration - 1.0f) {
+                float alpha = 255.0f * (1.0f - (elapsed - (it->duration - 1.0f)));
+                if (auto textElem = std::dynamic_pointer_cast<Text>(
+                    container->getElement(it->id))) {
+                    Color32 color = it->color;
+                    color.a = static_cast<unsigned char>(alpha);
+                    textElem->setColor(color);
+                }
+            }
+            ++it;
+        }
+    }
+}
+
+void HUD::onGameEvent(GameEventType eventType, const std::string& teamName)
+{
+    switch (eventType) {
+        case GameEventType::TEAM_WIN:
+            displayWinMessage(teamName);
+            break;
+        case GameEventType::TEAM_DEFEAT:
+            displayLoseMessage(teamName);
+            break;
+        default:
+            break;
+    }
 }
