@@ -149,6 +149,13 @@ void GUI::draw()
     }
 
     _map->draw();
+    float offset = 0.0f;
+    for (auto &playerModel : zappy::gui::PLAYER_MODELS_INFO) {
+        this->_display->drawModelEx(
+            playerModel.name, {offset, -5.0f, 0.0f}, {0.0f, 1.0f, 0.0f},
+            playerModel.rotation, playerModel.scale, CWHITE);
+        offset += 1.0f;
+    }
 
     if (_hoveredPlayerId >= 0) {
         const auto& players = _gameInfos->getPlayers();
