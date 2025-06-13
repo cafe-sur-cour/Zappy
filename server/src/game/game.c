@@ -85,21 +85,15 @@ static map_t *set_tile(int x, int y, map_t *map, int type)
     return map;
 }
 
-
-/* This function distrbute the ressources on the tiles */
-void distribute_resources(zappy_t *z)
+static int *get_needed_amount_of_ressources(float *density, int mapValue,
+    zappy_t *z)
 {
-    int mapValue = z->params->x * z->params->y;
-    float density[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
     int required_count[7];
     int current_count[7];
-    int needed_count[7];
-    tiles_t *shuffled_tiles = shuffle_fisher(z->params->x, z->params->y);
-    int tile_index = 0;
-    int *pos = NULL;
+    int *needed_count = malloc(sizeof(int) * 7);
 
-    if (shuffled_tiles == NULL)
-        exit(84);
+    if (needed_count == NULL)
+        return NULL;
     for (int i = 0; i < 7; i++)
         required_count[i] = (int)(mapValue * density[i]);
     count_current_resources(z, current_count);
@@ -108,6 +102,22 @@ void distribute_resources(zappy_t *z)
         if (needed_count[i] < 0)
             needed_count[i] = 0;
     }
+    return needed_count;
+}
+
+/* This function distrbute the ressources on the tiles */
+void distribute_resources(zappy_t *z)
+{
+    int mapValue = z->params->x * z->params->y;
+    float density[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
+    int *needed_count = NULL;
+    tiles_t *shuffled_tiles = shuffle_fisher(z->params->x, z->params->y);
+    int tile_index = 0;
+    int *pos = NULL;
+
+    needed_count = get_needed_amount_of_ressources(density, mapValue, z);
+    if (shuffled_tiles == NULL || needed_count == NULL)
+        exit(84);
     for (int type = 0; type < 7; type++) {
         for (int count = 0; count < needed_count[type]; count++) {
             pos = distrib_tiles(&tile_index, shuffled_tiles, mapValue);
@@ -151,25 +161,6 @@ static map_t *create_map(int width, int height)
     }
     map = malloc_tiles(width, height, map);
     return map;
-}
-
-static void init_teams(zappy_t *server)
-{
-    team_t *current = server->game->teams;
-
-    for (int i = 0; i < server->params->nb_team; i++) {
-        current = malloc(sizeof(team_t));
-        if (!current) {
-            error_message("Failed to allocate memory for team structure.");
-            exit(84);
-        }
-        current->name = strdup(server->params->teams[i]);
-        current->nbPlayers = 0;
-        current->nbPlayerAlive = 0;
-        current->players = NULL;
-        current->next = server->game->teams;
-        server->game->teams = current;
-    }
 }
 
 void init_game(zappy_t *zappy)

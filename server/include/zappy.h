@@ -109,6 +109,8 @@ void check_player_status(zappy_t *zappy);
 void init_game(zappy_t *server);
 void distribute_resources(zappy_t *z);
 
+/* init_team.c */
+void init_teams(zappy_t *server);
 
 /* accept.c */
 int accept_client(zappy_t *server);
