@@ -182,7 +182,8 @@ namespace zappy::gui {
 
     inline const std::vector<PlayerModelInfo> PLAYER_MODELS_INFO = {
         {"playerLvl1", "gui/assets/models/playerLvl1.glb", {0.0f, -75.0f, 0.0f}, {0.005f, 0.005f, 0.005f}},
-        {"playerLvl2", "gui/assets/models/playerLvl2.glb", {0.0f, -0.5f, 0.0f}, {0.25f, 0.25f, 0.25f}}
+        {"playerLvl2", "gui/assets/models/playerLvl2.glb", {0.0f, -0.5f, 0.0f}, {0.25f, 0.25f, 0.25f}},
+        {"playerLvl3", "gui/assets/models/playerLvl3.glb", {0.0f, 20.0f, 0.0f}, {0.0045f, 0.0045f, 0.0045f}}
     };
 }
 
