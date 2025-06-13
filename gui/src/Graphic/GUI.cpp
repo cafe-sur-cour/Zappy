@@ -359,10 +359,7 @@ void GUI::initModels()
         }
     }
 
-    if (!this->_display->loadModel("player", "gui/assets/models/fall_guy.glb",
-        {0.0f, -75.0f, 0.0f}))
-        std::cout << colors::T_RED << "[ERROR] Failed to load player model."
-                  << colors::RESET << std::endl;
+    initPlayers();
 
     if (!this->_display->loadModel("platform", "gui/assets/models/tile.glb",
         {0.0f, 0.25f, 0.0f}))
@@ -406,6 +403,16 @@ void GUI::initModels()
     if (!this->_display->loadModel("egg", "gui/assets/models/egg.glb", {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load egg model."
                   << colors::RESET << std::endl;
+}
+
+void GUI::initPlayers()
+{
+    for (auto &playerModelInfo : zappy::gui::PLAYER_MODELS_INFO) {
+        if (!this->_display->loadModel(playerModelInfo.name,
+            playerModelInfo.modelPath, playerModelInfo.center))
+            std::cout << colors::T_RED << "[ERROR] Failed to load model: "
+                      << playerModelInfo.name << colors::RESET << std::endl;
+    }
 }
 
 void GUI::handlePlayerClicks()
