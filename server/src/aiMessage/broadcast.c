@@ -78,17 +78,25 @@ static int broadcast_text(player_t *source, player_t *dest, char *text)
     return 0;
 }
 
+static int send_broadcast(team_t *team, player_t *source, char *text)
+{
+    if (team->players != source) {
+        if (broadcast_text(source, team->players, text) == -1) {
+            return -1;
+        }
+    }
+    return 0;
+}
+
 static int broadcast_to_team(team_t *team, player_t *source, char *text)
 {
     player_t *save_player = team->players;
 
     (void)text;
     while (team->players) {
-        if (team->players != source) {
-            if (broadcast_text(source, team->players, text) == -1) {
-                team->players = save_player;
-                return -1;
-            }
+        if (send_broadcast(team, source, text) == -1) {
+            team->players = save_player;
+            return -1;
         }
         team->players = team->players->next;
     }
