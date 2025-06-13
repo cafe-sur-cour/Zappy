@@ -448,8 +448,9 @@ std::shared_ptr<Image> Containers::addImagePercent(
     Color32 tint
 )
 {
-    auto image = addImagePercent(id, xPercent, yPercent, widthPercent, heightPercent, imagePath);
-    
+    auto image = addImagePercent(id, xPercent, yPercent, widthPercent, heightPercent,
+        imagePath);
+
     if (image)
         image->setTint(tint);
 
@@ -464,7 +465,8 @@ std::shared_ptr<ImageButton> Containers::addImageButton(
     std::function<void()> callback
 )
 {
-    auto imageButton = std::make_shared<ImageButton>(this->_display, _audio, x, y, width, height, imagePath, callback);
+    auto imageButton = std::make_shared<ImageButton>(this->_display, _audio, x, y, width,
+        height, imagePath, callback);
 
     if (addElement(id, imageButton))
         return imageButton;
@@ -481,7 +483,8 @@ std::shared_ptr<ImageButton> Containers::addImageButton(
     Color32 tint
 )
 {
-    auto imageButton = std::make_shared<ImageButton>(this->_display, _audio, x, y, width, height, imagePath, callback);
+    auto imageButton = std::make_shared<ImageButton>(this->_display, _audio, x, y, width,
+        height, imagePath, callback);
     imageButton->setTint(tint);
 
     if (addElement(id, imageButton))
@@ -503,7 +506,8 @@ std::shared_ptr<ImageButton> Containers::addImageButtonPercent(
     float width = widthImage;
     float height = heightImage;
 
-    auto imageButton = std::make_shared<ImageButton>(this->_display, _audio, x, y, width, height, imagePath, callback);
+    auto imageButton = std::make_shared<ImageButton>(this->_display, _audio, x, y, width,
+        height, imagePath, callback);
 
     imageButton->setRelativePosition(xPercent, yPercent, widthImage, heightImage);
 
@@ -522,8 +526,9 @@ std::shared_ptr<ImageButton> Containers::addImageButtonPercent(
     Color32 tint
 )
 {
-    auto imageButton = addImageButtonPercent(id, xPercent, yPercent, widthPercent, heightPercent, imagePath, callback);
-    
+    auto imageButton = addImageButtonPercent(id, xPercent, yPercent, widthPercent,
+        heightPercent, imagePath, callback);
+
     if (imageButton)
         imageButton->setTint(tint);
 

@@ -6,8 +6,9 @@
 */
 
 #include "Settings.hpp"
-
 #include <iostream>
+#include <string>
+#include <memory>
 #include "Utils/HelpText.hpp"
 
 void Settings::show()

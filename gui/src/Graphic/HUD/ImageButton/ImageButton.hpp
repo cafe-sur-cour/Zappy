@@ -8,6 +8,8 @@
 #pragma once
 
 #include <functional>
+#include <string>
+#include <memory>
 #include "../Image/Image.hpp"
 #include "../../../Audio/IAudio.hpp"
 

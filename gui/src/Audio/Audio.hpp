@@ -11,18 +11,17 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <vector>
 #include <SFML/Audio.hpp>
 #include "IAudio.hpp"
 
 class Audio : public IAudio {
-
     private:
         std::vector<std::string> _musicId = {"main_theme"};
         std::vector<std::string> _sfxId = {"click"};
         std::map<std::string, std::unique_ptr<sf::Music>> _sounds;
-        float _levelSFX= 1.f;
-        float _levelMusic= 50.f;
-
+        float _levelSFX = 1.f;
+        float _levelMusic = 50.f;
 
     public:
         Audio();

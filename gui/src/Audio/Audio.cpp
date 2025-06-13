@@ -39,13 +39,13 @@ float Audio::getMusicVolumeLevel() {
 
 void Audio::setSFXVolumeLevel(float level) {
     this->_levelSFX = level;
-    for (const auto &s: this->_sfxId)
+    for (const auto &s : this->_sfxId)
         this->setSoundVolume(s, this->_levelSFX);
 }
 
 void Audio::setMusicVolumeLevel(float level) {
     this->_levelMusic = level;
-    for (const auto &s: this->_musicId)
+    for (const auto &s : this->_musicId)
         this->setSoundVolume(s, this->_levelMusic);
 }
 

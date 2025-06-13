@@ -5,6 +5,8 @@
 ** ImageButton
 */
 
+#include <string>
+#include <memory>
 #include "ImageButton.hpp"
 
 ImageButton::ImageButton(
@@ -24,32 +26,28 @@ ImageButton::ImageButton(
 
 void ImageButton::update()
 {
-    Image::update(); // Appeler l'update de la classe parent
-    
-    if (!_visible)
+    this->Image::update();
+    if (!this->_visible)
         return;
-    
     Vector2f mousePoint = _display->getMousePosition();
-    _isHovered = contains(mousePoint.x, mousePoint.y);
-    
-    bool wasPressed = _isPressed;
-    _isPressed = _isHovered && _display->isMouseButtonDown(
-        _display->getKeyId(MOUSE_LEFT));
-    
-    if (wasPressed && !_isPressed && _isHovered && _callback) {
-        if (_audio) {
-            _audio->playSound("click", this->_audio->getSFXVolumeLevel());
+    this->_isHovered = contains(mousePoint.x, mousePoint.y);
+    bool wasPressed = this->_isPressed;
+    this->_isPressed = this->_isHovered && this->_display->isMouseButtonDown(
+        this->_display->getKeyId(MOUSE_LEFT));
+    if (wasPressed && !this->_isPressed && this->_isHovered && this->_callback) {
+        if (this->_audio) {
+            this->_audio->playSound("click", this->_audio->getSFXVolumeLevel());
         }
-        _callback();
+        this->_callback();
     }
 }
 
 void ImageButton::setCallback(std::function<void()> callback)
 {
-    _callback = callback;
+    this->_callback = callback;
 }
 
 std::function<void()> ImageButton::getCallback() const
 {
-    return _callback;
+    return this->_callback;
 }

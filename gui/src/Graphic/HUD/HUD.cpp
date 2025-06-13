@@ -248,9 +248,11 @@ void HUD::initSettingsButton()
         70.0f, 15.0f,
         "SETTINGS",
         [this]() {
-            if (this->_settings && !this->_settings->isVisible() && !this->_help->isVisible()) {
+            if (this->_settings && !this->_settings->isVisible() &&
+                !this->_help->isVisible()) {
                 this->_settings->show();
-            }        },
+            }
+        },
         {60, 60, 240, 255},
         {100, 100, 255, 255},
         {40, 40, 200, 255},

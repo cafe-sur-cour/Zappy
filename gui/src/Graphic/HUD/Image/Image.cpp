@@ -16,7 +16,7 @@ Image::Image(
     const std::string& imagePath
 ) : AUIElement(display, x, y, width, height),
     _imagePath(imagePath),
-    _tint({255, 255, 255, 255}), // White tint (no color modification)
+    _tint({255, 255, 255, 255}),
     _maintainAspectRatio(true),
     _imageLoaded(false)
 {
@@ -25,24 +25,22 @@ Image::Image(
 
 void Image::draw()
 {
-    if (!_visible)
+    if (!this->_visible)
         return;
 
-    if (_imageLoaded) {
-        // Draw the actual texture using the display interface
-        this->_display->drawTextureScaled(_imagePath, _bounds.x, _bounds.y, _bounds.width, _bounds.height, _tint);
+    if (this->_imageLoaded) {
+        this->_display->drawTextureScaled(this->_imagePath, this->_bounds.x, this->_bounds.y,
+            this->_bounds.width, this->_bounds.height, this->_tint);
     } else {
-        // Draw placeholder rectangle with a different color to indicate missing image
         Color32 placeholderColor = {200, 200, 200, 128};
-        this->_display->drawRectangleRec(_bounds, placeholderColor);
-        
-        // Draw "No Image" text in the center
-        float fontSize = _bounds.height * 0.2f;
+        this->_display->drawRectangleRec(this->_bounds, placeholderColor);
+
+        float fontSize = this->_bounds.height * 0.2f;
         std::string placeholderText = "No Image";
         float textWidth = this->_display->measureText(placeholderText, fontSize);
-        float textX = _bounds.x + (_bounds.width - textWidth) * 0.5f;
-        float textY = _bounds.y + (_bounds.height - fontSize) * 0.5f;
-        
+        float textX = this->_bounds.x + (this->_bounds.width - textWidth) * 0.5f;
+        float textY = this->_bounds.y + (this->_bounds.height - fontSize) * 0.5f;
+
         Color32 textColor = {100, 100, 100, 255};
         this->_display->drawText(placeholderText, textX, textY, fontSize, textColor);
     }
@@ -50,72 +48,61 @@ void Image::draw()
 
 void Image::update()
 {
-    if (!_visible)
+    if (!this->_visible)
         return;
-    
-    // Images typically don't need complex update logic
-    // But this can be extended for animations, hover effects, etc.
 }
 
 void Image::setImagePath(const std::string& imagePath)
 {
-    if (_imagePath != imagePath) {
-        _imagePath = imagePath;
+    if (this->_imagePath != imagePath) {
+        this->_imagePath = imagePath;
         loadImage();
     }
 }
 
 std::string Image::getImagePath() const
 {
-    return _imagePath;
+    return this->_imagePath;
 }
 
 void Image::setTint(Color32 tint)
 {
-    _tint = tint;
+    this->_tint = tint;
 }
 
 Color32 Image::getTint() const
 {
-    return _tint;
+    return this->_tint;
 }
 
 void Image::setSize(float width, float height)
 {
-    if (_maintainAspectRatio) {
-        // Calculate aspect ratio and adjust dimensions accordingly
-        // This is a simplified version - you might want more sophisticated logic
-        float aspectRatio = _bounds.width / _bounds.height;
+    if (this->_maintainAspectRatio) {
+        float aspectRatio = this->_bounds.width / this->_bounds.height;
         float newAspectRatio = width / height;
-        
-        if (newAspectRatio > aspectRatio) {
-            // Width is too large, adjust it
+        if (newAspectRatio > aspectRatio)
             width = height * aspectRatio;
-        } else {
-            // Height is too large, adjust it
+        else
             height = width / aspectRatio;
-        }
     }
-    
     AUIElement::setSize(width, height);
 }
 
 void Image::setMaintainAspectRatio(bool maintain)
 {
-    _maintainAspectRatio = maintain;
+    this->_maintainAspectRatio = maintain;
 }
 
 bool Image::getMaintainAspectRatio() const
 {
-    return _maintainAspectRatio;
+    return this->_maintainAspectRatio;
 }
 
 void Image::loadImage()
 {
-    // Load the texture using the display interface
-    if (!_imagePath.empty()) {
-        _imageLoaded = this->_display->loadTexture(_imagePath, _imagePath);
+    if (!this->_imagePath.empty()) {
+        this->_imageLoaded = this->_display->loadTexture(this->_imagePath, this->_imagePath);
     } else {
-        _imageLoaded = false;
+        this->_imageLoaded = false;
     }
 }
