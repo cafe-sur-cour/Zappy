@@ -11,19 +11,36 @@
 #include <string>
 #include <mutex>
 #include <chrono>
-
+#include <iostream>
 #include "GameInfos.hpp"
 
 GameInfos::GameInfos(std::shared_ptr<ICommunication> communication) :
     _mapWidth(0),
     _mapHeight(0),
-    _gameOver(false)
+    _gameOver(false),
+    _currentCameraMode(zappy::gui::CameraMode::FREE),
+    _currentPlayerFocus(-1)
 {
     _communication = communication;
 }
 
 GameInfos::~GameInfos()
 {
+}
+
+void GameInfos::setAudio(std::shared_ptr<IAudio> audio)
+{
+    _audio = audio;
+}
+
+void GameInfos::setCurrentCameraMode(zappy::gui::CameraMode cameraMode)
+{
+    _currentCameraMode = cameraMode;
+}
+
+void GameInfos::setCurrentPlayerFocus(int playerId)
+{
+    _currentPlayerFocus = playerId;
 }
 
 void GameInfos::setMapSize(int width, int height)
@@ -213,9 +230,16 @@ void GameInfos::updatePlayerResourceAction(int playerNumber, int resourceId, boo
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
 
-    (void)isCollecting;
     if (playerNumber < 0 || resourceId < 0 || resourceId > 6)
         return;
+
+    if (isCollecting && _audio) {
+        if (_currentCameraMode == zappy::gui::CameraMode::PLAYER) {
+            if (playerNumber == _currentPlayerFocus) {
+                _audio->playSound("collect", 100.0f);
+            }
+        }
+    }
 }
 
 void GameInfos::updatePlayerFork(int playerNumber)
