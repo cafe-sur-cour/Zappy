@@ -121,6 +121,9 @@ class Containers : public AContainers {
             Color32 color = CBLACK
         );
 
+        float getWidth() const;
+        float getHeight() const;
+
     private:
         std::shared_ptr<IAudio> _audio;
         std::unordered_map<std::string, std::shared_ptr<IUIElement>> _elements;
