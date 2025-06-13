@@ -40,16 +40,34 @@ static void push_back_egg(zappy_t *zappy, egg_t *new)
     zappy->game->map->currentEggs = save;
 }
 
+static int team_allows_connection(player_t *player, zappy_t *zappy)
+{
+    team_t *current_team = zappy->game->teams;
+    char *team_name = player->team;
+
+    while (current_team) {
+        if (strcmp(current_team->name, team_name) == 0) {
+            break;
+        }
+        current_team = current_team->next;
+    }
+    if (current_team->nbPlayerAlive < zappy->params->nb_client)
+        return 0;
+    return -1;
+}
+
 int handle_fork(player_t *player, char *command, zappy_t *zappy)
 {
     int id = get_nb_eggs(zappy);
     int pos[2] = {player->posX, player->posY};
     egg_t *new = NULL;
 
-    if (strcmp(command, "fork\n") != 0) {
+    if (strcmp(command, "Fork") != 0) {
         error_message("Invalid command for fork handling.");
         return -1;
     }
+    if (team_allows_connection(player, zappy) == -1)
+        return -1;
     new = add_egg_node(id, pos, player->team, player->id);
     if (!new) {
         error_message("Failed to create a new egg.");
