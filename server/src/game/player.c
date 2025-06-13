@@ -9,6 +9,7 @@
 #include "game.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 /* This sub-function check the current id agains the other */

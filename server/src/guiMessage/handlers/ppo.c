@@ -13,11 +13,11 @@
 
 static int send_ppo_message(graph_net_t *graphic, player_t *player)
 {
-    int size = 13 + int_str_len(player->id) + int_str_len(player->posX) +
+    int size = 10 + int_str_len(player->id) + int_str_len(player->posX) +
         int_str_len(player->posY);
     char buffer[size];
 
-    snprintf(buffer, size, "ppo #%d %d %d %d\n",
+    snprintf(buffer, size + 1, "ppo #%d %d %d %d\n",
         player->id, player->posX, player->posY, player->direction);
     return write_message(graphic->fd, buffer);
 }
@@ -36,5 +36,7 @@ int ppo(zappy_t *zappy, graph_net_t *graphic, char *message)
         return -1;
     }
     player = get_player_by_id(zappy->game, player_id);
+    if (!player)
+        return -1;
     return send_ppo_message(graphic, player);
 }
