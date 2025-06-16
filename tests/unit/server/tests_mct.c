@@ -188,7 +188,7 @@ static zappy_t *default_zappy(void)
 Test(mct, valid_command, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "mct\n";
+    char message[] = "mct";
     FILE *fp;
     char buffer[4096] = {0};
     size_t total_read = 0;

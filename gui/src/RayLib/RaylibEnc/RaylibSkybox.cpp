@@ -9,45 +9,53 @@
 #include <cmath>
 #include <string>
 #include "RayLibEnc.hpp"
+#include "raylib.h"
+#include "raymath.h"
+#include "rlgl.h"
 
 bool RayLibEnc::loadSkybox(const std::string& id, const std::string& filepath)
 {
-    Texture2D texture = LoadTexture(filepath.c_str());
+    Mesh mesh = GenMeshSphere(1.0f, 64, 32);
+
+    for (int i = 0; i < mesh.vertexCount * 3; i++) {
+        mesh.normals[i] = -mesh.normals[i];
+    }
+
+    for (int i = 0; i < mesh.vertexCount; i++) {
+        float x = mesh.vertices[3*i];
+        float y = mesh.vertices[3*i + 1];
+        float z = mesh.vertices[3*i + 2];
+
+        float theta = atan2f(y, x);
+        float phi = asinf(z);
+
+        float u = (theta + PI) / (2.0f * PI);
+        float v = (phi + PI/2.0f) / PI;
+
+        mesh.texcoords[2*i] = u;
+        mesh.texcoords[2*i + 1] = 1.0f - v;
+    }
+
+    Model skyboxSphere = LoadModelFromMesh(mesh);
+    Texture texture = LoadTexture(filepath.c_str());
+
     if (texture.id == 0) {
-        std::cout << "Failed to load skybox texture " << filepath << std::endl;
-        return false;
+        std::cout << "Warning: Could not load skybox texture, using default" << std::endl;
+        Image img = GenImageGradientRadial(512, 512, 0.0f, SKYBLUE, BLUE);
+        texture = LoadTextureFromImage(img);
+        UnloadImage(img);
     }
 
-    Mesh cube = GenMeshCube(10000.0f, 10000.0f, 10000.0f);
+    skyboxSphere.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
+    SetTextureWrap(texture, TEXTURE_WRAP_CLAMP);
+    skyboxSphere.materials[0].maps[MATERIAL_MAP_DIFFUSE].color = WHITE;
 
-    for (int i = 0; i < cube.vertexCount; i++) {
-        Vector3 v = *reinterpret_cast<Vector3*>(&cube.vertices[i*3]);
-        float length = std::sqrt(v.x*v.x + v.y*v.y + v.z*v.z);
-        if (length > 0) {
-            v.x /= length;
-            v.y /= length;
-            v.z /= length;
-        }
+    ModelData skyboxData;
+    skyboxData.model = skyboxSphere;
+    skyboxData.animationCount = 0;
+    skyboxData.center = {0.0f, 0.0f, 0.0f};
 
-        cube.texcoords[i*2] = (v.x + 1.0f)/2.0f;
-        cube.texcoords[i*2 + 1] = (v.y + 1.0f)/2.0f;
-    }
-
-    Model skybox = LoadModelFromMesh(cube);
-
-    skybox.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture;
-
-    skybox.materials[0].shader = LoadShader(
-        "gui/assets/shaders/skybox.vs",
-        "gui/assets/shaders/skybox.fs"
-    );
-
-    ModelData modelData;
-    modelData.model = skybox;
-    modelData.animationCount = 0;
-    modelData.center = {0.0f, 0.0f, 0.0f};
-
-    _models[id] = modelData;
+    _models[id] = skyboxData;
     _textures[id] = texture;
     return true;
 }
@@ -62,5 +70,8 @@ void RayLibEnc::drawSkybox(const std::string& id)
 
     Vector3 position = _camera.position;
 
-    DrawModel(it->second.model, position, 1.0f, WHITE);
+    rlDisableBackfaceCulling();
+    DrawModelEx(it->second.model, position,
+        {1.0f, 0.0f, 0.0f}, 90.0f, {500.0f, 500.0f, 500.0f}, WHITE);
+    rlEnableBackfaceCulling();
 }

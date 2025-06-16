@@ -19,13 +19,16 @@
 #include "../../Audio/IAudio.hpp"
 #include "../../Utils/Constants.hpp"
 #include "Help/Help.hpp"
+#include "Settings/Settings.hpp"
 #include "../../IDisplay.hpp"
 #include "../../Observer/IObserver.hpp"
+#include "Graphic/Camera/CameraManager.hpp"
 
 class HUD : public IObserver {
     public:
         HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
             std::shared_ptr<IAudio> audio,
+            std::shared_ptr<CameraManager>,
             std::function<void()> resetCameraFunc = nullptr);
 
         ~HUD();
@@ -161,7 +164,9 @@ class HUD : public IObserver {
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<IAudio> _audio;
+        std::shared_ptr<CameraManager> _camera;
         std::shared_ptr<Help> _help;
+        std::shared_ptr<Settings> _settings;
         std::function<void()> _resetCameraFunc;
         std::vector<GameMessage> _gameMessages;
         static constexpr float MESSAGE_DURATION = 5.0f;

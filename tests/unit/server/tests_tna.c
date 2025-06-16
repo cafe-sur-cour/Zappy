@@ -188,7 +188,7 @@ static zappy_t *default_zappy(void)
 Test(tna, valid_command)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "tna\n";
+    char message[] = "tna";
     FILE *fp;
     char buffer[4096] = {0};
     size_t total_read = 0;

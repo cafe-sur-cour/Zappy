@@ -27,6 +27,21 @@ static bool valid_team_name(const char *team_name, zappy_t *zappy)
     return false;
 }
 
+static void send_player_connect_to_gui(zappy_t *zappy, graph_net_t *fd)
+{
+    team_t *current_team = zappy->game->teams;
+    player_t *current_player = NULL;
+
+    while (current_team != NULL) {
+        current_player = current_team->players;
+        while (current_player != NULL) {
+            send_player_connect_to_specific_gui(fd, current_player);
+            current_player = current_player->next;
+        }
+        current_team = current_team->next;
+    }
+}
+
 /* This function check if the name is graphic if not it verify the team name */
 bool process_new_client(const char *team_name, int fd, zappy_t *zappy)
 {
@@ -40,6 +55,7 @@ bool process_new_client(const char *team_name, int fd, zappy_t *zappy)
         send_entrie_map(zappy);
         send_team_name(zappy);
         send_entire_egg_list(zappy);
+        send_player_connect_to_gui(zappy, zappy->graph);
         valid_message("New graphic client connected.");
         return true;
     }

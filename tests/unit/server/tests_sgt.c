@@ -175,7 +175,7 @@ static zappy_t *default_zappy(void)
 Test(sgt, valid_command, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
-    char message[] = "sgt\n";
+    char message[] = "sgt";
     FILE *fp = fopen("gui_socket", "r");
     char buffer[100];
     int result;

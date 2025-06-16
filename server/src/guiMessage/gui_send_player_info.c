@@ -12,6 +12,24 @@
 #include <string.h>
 #include <stdlib.h>
 
+int send_player_connect_to_specific_gui(graph_net_t *fd, player_t *p)
+{
+    int xLenght = int_str_len(p->id) + int_str_len(p->posX) + int_str_len(
+        p->posY) + int_str_len(p->level) + int_str_len(p->direction) +
+        strlen(p->team) + 12;
+    char *message = malloc(sizeof(char) * xLenght);
+
+    if (!message)
+        return -1;
+    snprintf(message, xLenght, "pnw #%d %d %d %d %d %s\n", p->id, p->posX,
+        p->posY, p->direction, p->level, p->team);
+    if (write_message(fd->fd, message) == -1) {
+        return -1;
+    }
+    free(message);
+    return 0;
+}
+
 /* This function sends the Connection player PNW */
 int send_player_connect(zappy_t *zappy, player_t *p)
 {

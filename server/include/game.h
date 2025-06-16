@@ -105,8 +105,8 @@ typedef struct player_s {
     int remaining_cooldown;
     char *current_action;
     /* Food timer for health system */
-    int food_timer;  // Time units until next food consumption
-    time_t last_food_check;  // Last time food was checked
+    int food_timer;  /* Time units until next food consumption */
+    time_t last_food_check;  /* Last time food was checked */
 
     struct player_s *next;
 } player_t;

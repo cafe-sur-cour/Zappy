@@ -18,6 +18,8 @@
 #include "../Button/Button.hpp"
 #include "../Text/Text.hpp"
 #include "../Slider/Slider.hpp"
+#include "../Image/Image.hpp"
+#include "../ImageButton/ImageButton.hpp"
 #include "../../../Audio/IAudio.hpp"
 #include "../../../IDisplay.hpp"
 
@@ -120,9 +122,72 @@ class Containers : public AContainers {
             float fontSizePercent = 5.0f,
             Color32 color = CBLACK
         );
+        std::shared_ptr<Image> addImage(
+            const std::string& id,
+            float x, float y,
+            float width, float height,
+            const std::string& imagePath
+        );
 
-        float getWidth() const;
-        float getHeight() const;
+        std::shared_ptr<Image> addImage(
+            const std::string& id,
+            float x, float y,
+            float width, float height,
+            const std::string& imagePath,
+            Color32 tint
+        );
+
+        std::shared_ptr<Image> addImagePercent(
+            const std::string& id,
+            float xPercent, float yPercent,
+            float widthPercent, float heightPercent,
+            const std::string& imagePath
+        );
+
+        std::shared_ptr<Image> addImagePercent(
+            const std::string& id,
+            float xPercent, float yPercent,
+            float widthPercent, float heightPercent,
+            const std::string& imagePath,
+            Color32 tint
+        );
+
+        std::shared_ptr<ImageButton> addImageButton(
+            const std::string& id,
+            float x, float y,
+            float width, float height,
+            const std::string& imagePath,
+            std::function<void()> callback
+        );
+
+        std::shared_ptr<ImageButton> addImageButton(
+            const std::string& id,
+            float x, float y,
+            float width, float height,
+            const std::string& imagePath,
+            std::function<void()> callback,
+            Color32 tint
+        );
+
+        std::shared_ptr<ImageButton> addImageButtonPercent(
+            const std::string& id,
+            float xPercent, float yPercent,
+            float widthPercent, float heightPercent,
+            const std::string& imagePath,
+            std::function<void()> callback
+        );
+
+        std::shared_ptr<ImageButton> addImageButtonPercent(
+            const std::string& id,
+            float xPercent, float yPercent,
+            float widthPercent, float heightPercent,
+            const std::string& imagePath,
+            std::function<void()> callback,
+            Color32 tint
+        );
+
+                float getWidth() const;
+                float getHeight() const;
 
     private:
         std::shared_ptr<IAudio> _audio;

@@ -25,11 +25,14 @@ SRC 		=	src/params.c										\
 				src/game/game.c										\
 				src/game/init_egg.c									\
 				src/game/player.c									\
+				src/game/player_id.c 								\
 				src/game/graphic_client.c							\
 				src/game/handle_crystal.c 							\
 				src/game/handle_food.c         						\
 				src/game/handle_remove.c 							\
+				src/game/food_refiil.c 								\
 				src/game/get_ids_player_tile.c 						\
+				src/game/init_team.c 								\
 				src/free.c											\
 				src/algo.c											\
 				src/accept.c										\

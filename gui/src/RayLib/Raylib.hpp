@@ -69,7 +69,7 @@ class Raylib : public IDisplay {
 
         virtual float getFrameTime();
 
-        virtual void updateCameraFreeMode();
+        virtual void updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed);
 
         virtual float measureText(const std::string& text, float fontSize) const;
 

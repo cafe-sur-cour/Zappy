@@ -14,7 +14,8 @@
 static int send_mct_message(int i, graph_net_t *graphic, zappy_t *zappy)
 {
     for (int j = 0; j < zappy->game->map->height; j++) {
-        if (send_bct_message(graphic, i, j, &zappy->game->map->tiles[i][j]) == -1)
+        if (send_bct_message(graphic, i, j,
+            &zappy->game->map->tiles[i][j]) == -1)
             return -1;
     }
     return 0;
@@ -22,7 +23,7 @@ static int send_mct_message(int i, graph_net_t *graphic, zappy_t *zappy)
 
 int mct(zappy_t *zappy, graph_net_t *graphic, char *message)
 {
-    if (strcmp(message, "mct\n") != 0) {
+    if (strcmp(message, "mct") != 0) {
         error_message("Invalid mct message format.");
         return -1;
     }

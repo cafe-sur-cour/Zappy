@@ -14,10 +14,11 @@
 int send_bct_message(graph_net_t *graphic, int x, int y,
     inventory_t *inventory)
 {
-    int size = 14 + int_str_len(x) + int_str_len(y) + int_str_len(inventory->nbFood) +
-        int_str_len(inventory->nbLinemate) + int_str_len(inventory->nbDeraumere) +
-        int_str_len(inventory->nbSibur) + int_str_len(inventory->nbMendiane) +
-        int_str_len(inventory->nbPhiras) + int_str_len(inventory->nbThystame);
+    int size = 14 + int_str_len(x) + int_str_len(y) +
+        int_str_len(inventory->nbFood) + int_str_len(inventory->nbLinemate) +
+        int_str_len(inventory->nbDeraumere) + int_str_len(inventory->nbSibur)
+        + int_str_len(inventory->nbMendiane) + int_str_len(inventory->nbPhiras)
+        + int_str_len(inventory->nbThystame);
     char buffer[size];
 
     snprintf(buffer, size, "bct %d %d %d %d %d %d %d %d %d\n",
@@ -32,11 +33,11 @@ int bct(zappy_t *zappy, graph_net_t *graphic, char *message)
     int x = 0;
     int y = 0;
 
-    if (strlen(message) < 8) {
+    if (strlen(message) < 7) {
         error_message("Invalid bct message format.");
         return -1;
     }
-    if (sscanf(message, "bct %d %d\n", &x, &y) != 2) {
+    if (sscanf(message, "bct %d %d", &x, &y) != 2) {
         error_message("Invalid bct pattern.");
         return -1;
     }

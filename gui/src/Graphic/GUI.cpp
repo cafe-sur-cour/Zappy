@@ -55,12 +55,8 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
     this->_audio = std::make_shared<Audio>();
     this->_gameInfos->setAudio(this->_audio);
     this->_map = std::make_unique<Map>(_gameInfos, this->_display);
-    this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio,
-        [this]() {
-            this->switchCameraMode(zappy::gui::CameraMode::FREE);
-        });
 
-    _cameraManager = std::make_unique<CameraManager>(this->_display);
+    _cameraManager = std::make_shared<CameraManager>(this->_display);
     _cameraManager->setGameInfos(_gameInfos);
     _cameraManager->setMapInstance(std::shared_ptr<Map>(_map.get(), [](Map*){}));
     const auto& mapSize = _gameInfos->getMapSize();
@@ -71,6 +67,10 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
     };
     _cameraManager->setMapCenter(mapCenter);
     _cameraManager->setMapSize(mapSize.first, mapSize.second);
+    this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio, _cameraManager,
+    [this]() {
+        this->switchCameraMode(zappy::gui::CameraMode::FREE);
+    });
 
     initModels();
 }
@@ -113,6 +113,10 @@ void GUI::update()
             switchToPreviousPlayer();
     }
 
+    if (this->_display->isKeyReleased(this->_display->getKeyId(H)) ||
+        this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_H)))
+        this->_isHUDVisible = !this->_isHUDVisible;
+
     updateCamera();
     handlePlayerClicks();
     this->_hud->updateTeamPlayersDisplay(this->_gameInfos);
@@ -141,8 +145,6 @@ void GUI::draw()
 
     this->_display->clearBackground(Color32{255, 255, 255, 255});
 
-    this->_display->drawSimpleSkybox();
-
     this->_display->begin3DMode();
 
     if (_skyboxLoaded) {
@@ -150,6 +152,13 @@ void GUI::draw()
     }
 
     _map->draw();
+    float offset = 0.0f;
+    for (auto &playerModel : zappy::gui::PLAYER_MODELS_INFO) {
+        this->_display->drawModelEx(
+            playerModel.name, {offset, -5.0f, 0.0f}, {0.0f, 1.0f, 0.0f},
+            playerModel.rotation, playerModel.scale, CWHITE);
+        offset += 1.0f;
+    }
 
     if (_hoveredPlayerId >= 0) {
         const auto& players = _gameInfos->getPlayers();
@@ -173,11 +182,10 @@ void GUI::draw()
             this->_display->drawCubeWires(center, size.x, size.y, size.z, CYELLOW);
         }
     }
-
     this->_display->end3DMode();
-
-    _hud->draw();
-
+    if (this->_isHUDVisible) {
+        this->_hud->draw();
+    }
     this->_display->endDrawing();
 }
 
@@ -346,7 +354,7 @@ void GUI::switchToPreviousPlayer()
 
 void GUI::initModels()
 {
-    if (this->_display->loadSkybox("skybox", "gui/assets/sprite/skybox/skybox.png")) {
+    if (this->_display->loadSkybox("skybox", "gui/assets/sprite/skybox/skybox.jpg")) {
         std::cout << colors::T_GREEN << "[INFO] Successfully loaded skybox texture."
                 << colors::RESET << std::endl;
         _skyboxLoaded = true;
@@ -362,10 +370,7 @@ void GUI::initModels()
         }
     }
 
-    if (!this->_display->loadModel("player", "gui/assets/models/fall_guy.glb",
-        {0.0f, -75.0f, 0.0f}))
-        std::cout << colors::T_RED << "[ERROR] Failed to load player model."
-                  << colors::RESET << std::endl;
+    initPlayers();
 
     if (!this->_display->loadModel("platform", "gui/assets/models/tile.glb",
         {0.0f, 0.25f, 0.0f}))
@@ -409,6 +414,16 @@ void GUI::initModels()
     if (!this->_display->loadModel("egg", "gui/assets/models/egg.glb", {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load egg model."
                   << colors::RESET << std::endl;
+}
+
+void GUI::initPlayers()
+{
+    for (auto &playerModelInfo : zappy::gui::PLAYER_MODELS_INFO) {
+        if (!this->_display->loadModel(playerModelInfo.name,
+            playerModelInfo.modelPath, playerModelInfo.center))
+            std::cout << colors::T_RED << "[ERROR] Failed to load model: "
+                      << playerModelInfo.name << colors::RESET << std::endl;
+    }
 }
 
 void GUI::handlePlayerClicks()

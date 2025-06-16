@@ -16,6 +16,7 @@ enum Key {
     DOWN,
     RIGHT,
     LEFT,
+    H,
     GM_PD_LEFT_SHOULDER,
     GM_PD_RIGHT_SHOULDER,
     GM_PD_LEFT_TRIGGER,
@@ -24,6 +25,7 @@ enum Key {
     GM_PD_DOWN,
     GM_PD_AXIS_RIGHT_X,
     GM_PD_AXIS_RIGHT_Y,
+    GM_PD_H,
     MOUSE_LEFT,
     MOUSE_RIGHT,
 };
@@ -152,7 +154,7 @@ class IDisplay {
 
         virtual float getFrameTime() = 0;
 
-        virtual void updateCameraFreeMode() = 0;
+        virtual void updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed) = 0;
 
         virtual float measureText(const std::string& text, float fontSize) const = 0;
 

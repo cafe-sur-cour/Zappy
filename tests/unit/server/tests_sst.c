@@ -172,7 +172,7 @@ static zappy_t *default_zappy(void)
 
 // Test for sst command
 
-Test(sst, valid_command)
+Test(sst, valid_command, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
     char message[] = "sst 80\n";
