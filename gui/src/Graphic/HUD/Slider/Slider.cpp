@@ -103,7 +103,6 @@ void Slider::update()
             _isDragging = false;
         }
     }
-
 }
 
 void Slider::setValue(float value)
