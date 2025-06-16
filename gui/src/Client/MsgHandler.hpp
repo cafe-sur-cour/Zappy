@@ -33,6 +33,7 @@ class MsgHandler {
 
     protected:
         void messageLoop();
+        void securityActualization();
 
         void handleMessage(const std::string& message);
         bool handleWelcomeMessage(const std::string& message);

@@ -27,11 +27,11 @@ int ppo(zappy_t *zappy, graph_net_t *graphic, char *message)
     player_t *player = NULL;
     int player_id = 0;
 
-    if (strlen(message) < 7) {
+    if (strlen(message) < 6) {
         error_message("Invalid ppo message format.");
         return -1;
     }
-    if (sscanf(message, "ppo #%d\n", &player_id) != 1) {
+    if (sscanf(message, "ppo #%d", &player_id) != 1) {
         error_message("Invalid ppo pattern.");
         return -1;
     }

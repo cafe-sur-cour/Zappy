@@ -1059,7 +1059,11 @@ void HUD::initTpsSlider(
         1.0f, 250.0f, gameInfos->getTimeUnit(),
         "Frequency (TPS): ",
         [gameInfos, display, audio](float value) {
-            gameInfos->setTimeUnit(static_cast<int>(value), true);
+            static bool firstCall = true;
+
+            if (firstCall)
+                gameInfos->setTimeUnit(static_cast<int>(value), true);
+            firstCall = false;
         }
     );
 }
