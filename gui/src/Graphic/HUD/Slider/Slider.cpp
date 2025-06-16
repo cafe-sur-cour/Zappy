@@ -95,8 +95,10 @@ void Slider::update()
 
     if (_isDragging) {
         if (_display->isMouseButtonDown(this->_display->getKeyId(MOUSE_LEFT))) {
+            int oldValue = _value;
             updateValueFromMousePosition(mousePos.x);
-            _onValueChanged(_value);
+            if (oldValue != _value)
+                _onValueChanged(_value);
         } else {
             _isDragging = false;
         }
