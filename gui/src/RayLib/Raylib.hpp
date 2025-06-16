@@ -125,6 +125,9 @@ class Raylib : public IDisplay {
         virtual void drawText(const std::string& text, float x, float y, float fontSize,
             Color32 color);
 
+        virtual void drawTextEx(const std::string& text, float x, float y, float fontSize,
+            float spacing, Color32 color);
+
         virtual void drawCircle(float centerX, float centerY, float radius,
             Color32 color);
         virtual void drawCircleLines(float centerX, float centerY,
@@ -133,6 +136,8 @@ class Raylib : public IDisplay {
         virtual void drawRectangleRec(FloatRect rec, Color32 color);
 
         virtual bool loadTexture(const std::string& id, const std::string& filepath);
+
+        virtual bool loadFont(const std::string& id, const std::string& filepath);
 
         virtual void drawTexture(const std::string& id, float x, float y,
             Color32 tint = CWHITE);

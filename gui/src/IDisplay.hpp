@@ -215,9 +215,14 @@ class IDisplay {
         virtual void drawText(const std::string& text, float x, float y, float fontSize,
             Color32 color) = 0;
 
+        virtual void drawTextEx(const std::string& text, float x, float y, float fontSize,
+            float spacing, Color32 color) = 0;
+
         virtual void drawRectangleRec(FloatRect rec, Color32 color) = 0;
 
         virtual bool loadTexture(const std::string& id, const std::string& filepath) = 0;
+
+        virtual bool loadFont(const std::string& id, const std::string& filepath) = 0;
 
         virtual void drawTexture(const std::string& id, float x, float y,
             Color32 tint = CWHITE) = 0;
