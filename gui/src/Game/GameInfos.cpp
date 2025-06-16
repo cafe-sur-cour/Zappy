@@ -216,7 +216,7 @@ void GameInfos::updatePlayerExpulsion(int playerNumber)
 void GameInfos::updatePlayerDeath(int playerNumber)
 {
     try {
-        std::lock_guard<std::mutex> lock(_dataMutex);
+        std::unique_lock<std::mutex> lock(_dataMutex);
 
         if (playerNumber < 0)
             return;
