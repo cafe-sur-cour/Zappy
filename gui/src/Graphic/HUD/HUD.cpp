@@ -1086,11 +1086,7 @@ void HUD::initTpsSlider(
         1.0f, 250.0f, gameInfos->getTimeUnit(),
         "Frequency (TPS): ",
         [gameInfos, display, audio](float value) {
-            static bool firstCall = true;
-
-            if (firstCall)
-                gameInfos->setTimeUnit(static_cast<int>(value), true);
-            firstCall = false;
+            gameInfos->setTimeUnit(static_cast<int>(value), true);
         }
     );
 }
@@ -1110,7 +1106,7 @@ void HUD::updateTpsSlider(std::shared_ptr<GameInfos> gameInfos)
     static std::chrono::steady_clock::time_point lastUpdateTime;
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     std::chrono::duration<float> elapsed = now - lastUpdateTime;
-    if (elapsed.count() < 2.0f)
+    if (elapsed.count() < 5.0f)
         return;
 
     lastUpdateTime = now;
