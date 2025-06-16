@@ -257,6 +257,7 @@ int plv(zappy_t *zappy, graph_net_t *graphic, char *message);
 int pin(zappy_t *zappy, graph_net_t *graphic, char *message);
 int sgt(zappy_t *zappy, graph_net_t *graphic, char *message);
 int sst(zappy_t *zappy, graph_net_t *graphic, char *message);
+int kil(zappy_t *zappy, graph_net_t *graphic, char *message);
 int send_bct_message(graph_net_t *graphic, int x, int y,
     inventory_t *inventory);
 

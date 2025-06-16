@@ -18,6 +18,8 @@ int helper(void)
 {
     printf("USAGE: ./zappy_server -p port -x width -y height ");
     printf("-n name1 name2 ... -c clientsNb -f freq\n");
+    printf("Max number of teams: 8\n");
+    printf("Max number of clients per team: 10\n");
     return 84;
 }
 

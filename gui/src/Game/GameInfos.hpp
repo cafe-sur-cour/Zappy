@@ -43,6 +43,7 @@ class GameInfos : public Subject {
         const std::vector<std::string> getTeamNames() const;
 
         void addPlayer(const zappy::structs::Player player);
+        void killPlayer(int playerNumber);
         void updatePlayerPosition(int playerNumber, int x, int y);
         void updatePlayerOrientation(int playerNumber, int orientation);
         void updatePlayerLevel(int playerNumber, int level);

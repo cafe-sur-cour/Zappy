@@ -432,7 +432,8 @@ void HUD::clearPlayerInventoryElements()
         "inventory_title",
         "inventory_separator",
         "inventory_food", "inventory_linemate", "inventory_deraumere", "inventory_sibur",
-        "inventory_mendiane", "inventory_phiras", "inventory_thystame"
+        "inventory_mendiane", "inventory_phiras", "inventory_thystame",
+        "kill_player_button"
     };
 
     for (const auto& id : elementIds) {
@@ -845,6 +846,20 @@ void HUD::initPlayerInventoryDisplay(int playerId)
         7.0f,
         {255, 20, 147, 255}
     );
+
+    bottomContainer->addButtonPercent(
+        "kill_player_button",
+        87.5f, 6.5f,
+        5.0f, 10.0f,
+        "KILL",
+        [this]() {
+            _gameInfos->killPlayer(0);
+        },
+        {200, 50, 50, 255},
+        {255, 80, 80, 255},
+        {150, 30, 30, 255},
+        {255, 255, 255, 255}
+    );
 }
 
 std::string HUD::_camModeToText(zappy::gui::CameraMode cameraMode, bool isGamePadAvailable)
@@ -944,6 +959,14 @@ void HUD::updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode came
     if (player.number <= 0) {
         clearPlayerInventoryElements();
         return;
+    }
+
+    auto killButton = std::dynamic_pointer_cast<Button>(
+        bottomContainer->getElement("kill_player_button"));
+    if (killButton) {
+        killButton->setCallback([this, playerId]() {
+            _gameInfos->killPlayer(playerId);
+        });
     }
 
     auto titleElem = bottomContainer->getElement("player_info_title");
@@ -1060,14 +1083,10 @@ void HUD::initTpsSlider(
 
     tpsContainer->addSliderPercent(
         "tps_slider", 5.0f, 15.0f, 150.0f, 100.0f,
-        1.0f, 250.0f, gameInfos->getTimeUnit(),
+        1.0f, 1000.0f, gameInfos->getTimeUnit(),
         "Frequency (TPS): ",
         [gameInfos, display, audio](float value) {
-            static bool firstCall = true;
-
-            if (firstCall)
-                gameInfos->setTimeUnit(static_cast<int>(value), true);
-            firstCall = false;
+            gameInfos->setTimeUnit(static_cast<int>(value), true);
         }
     );
 }
@@ -1087,7 +1106,7 @@ void HUD::updateTpsSlider(std::shared_ptr<GameInfos> gameInfos)
     static std::chrono::steady_clock::time_point lastUpdateTime;
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     std::chrono::duration<float> elapsed = now - lastUpdateTime;
-    if (elapsed.count() < 2.0f)
+    if (elapsed.count() < 5.0f)
         return;
 
     lastUpdateTime = now;
