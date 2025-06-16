@@ -61,6 +61,7 @@ SRC 		=	src/params.c										\
 				src/guiMessage/handlers/pin.c						\
 				src/guiMessage/handlers/sgt.c						\
 				src/guiMessage/handlers/sst.c						\
+				src/guiMessage/handlers/kil.c						\
 				src/receiveMessage/action_handler.c					\
 				src/receiveMessage/pollin_handler.c					\
 				src/receiveMessage/loop_thru_command.c				\
