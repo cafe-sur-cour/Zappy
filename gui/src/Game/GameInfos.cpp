@@ -246,7 +246,7 @@ void GameInfos::updatePlayerDeath(int playerNumber)
 
             if (remainingPlayers == 0 && !_gameOver) {
                 std::string eliminatedTeam = teamName;
-                lock.~lock_guard();
+                lock.unlock();
                 playDefeatSound(eliminatedTeam);
                 return;
             }
