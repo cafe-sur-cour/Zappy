@@ -123,6 +123,8 @@ void GUI::update()
         this->_cameraMode);
     this->_hud->updateHelpInformationHUD(this->_cameraMode);
     this->_hud->update();
+
+    this->_audio->playNextTheme(_audio->getMusicVolumeLevel());
 }
 
 void GUI::refresh()
