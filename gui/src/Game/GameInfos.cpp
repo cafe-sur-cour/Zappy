@@ -411,6 +411,9 @@ void GameInfos::playDefeatSound(const std::string &teamName)
         if (_audio) {
             _audio->playSound("loose", 100.0f);
         }
+
+        std::cout << colors::T_RED << "[INFO] Team " << teamName << " has been eliminated"
+                  << colors::RESET << std::endl;
     } catch (const std::exception& e) {
         std::cout << colors::T_RED << "[ERROR] Exception in playDefeatSound: "
                   << e.what() << colors::RESET << std::endl;
