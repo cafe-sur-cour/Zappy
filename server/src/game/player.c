@@ -93,6 +93,21 @@ static void check_player_health_status(zappy_t *zappy,
     }
 }
 
+static void check_winning_condition(zappy_t *zappy, team_t *current)
+{
+    player_t *player = current->players;
+    int nb_at_eight = 0;
+
+    while (player != NULL) {
+        if (player->level >= 8) {
+            nb_at_eight++;
+        }
+        player = player->next;
+    }
+    if (nb_at_eight >= 6)
+        send_end_game(zappy, current->name);
+}
+
 /* Loop thru the player to check health and connection updates */
 void check_player_status(zappy_t *zappy)
 {
@@ -102,5 +117,6 @@ void check_player_status(zappy_t *zappy)
     for (current = zappy->game->teams; current != NULL;
         current = current->next) {
         check_player_health_status(zappy, current, next_player);
+        check_winning_condition(zappy, current);
     }
 }

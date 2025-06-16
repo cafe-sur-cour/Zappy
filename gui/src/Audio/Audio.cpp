@@ -11,17 +11,21 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <random>
+#include <chrono>
+#include <algorithm>
 
 Audio::Audio()
 {
     this->Audio::loadSound("main_theme", "gui/assets/sounds/main_theme.wav");
-    this->Audio::setSoundLooping("main_theme", true);
-    this->Audio::playSound("main_theme", this->Audio::getMusicVolumeLevel());
+    this->Audio::loadSound("main_theme2", "gui/assets/sounds/main_theme2.wav");
     this->Audio::loadSound("click", "gui/assets/sounds/click.wav");
     this->Audio::loadSound("clickPlayer", "gui/assets/sounds/playerClick.wav");
     this->Audio::loadSound("collect", "gui/assets/sounds/collect.wav");
     this->Audio::loadSound("win", "gui/assets/sounds/win.wav");
     this->Audio::loadSound("loose", "gui/assets/sounds/loose.wav");
+
+    this->Audio::playMainTheme(this->_levelMusic);
 }
 
 Audio::~Audio()
@@ -135,4 +139,28 @@ void Audio::setSoundVolume(const std::string& id, float volume)
     }
 
     it->second->setVolume(volume);
+}
+
+void Audio::playMainTheme(float volume)
+{
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::mt19937 rng(seed);
+    std::uniform_int_distribution<size_t> dist(0, _musicId.size() - 1);
+    _themeIndex = dist(rng);
+    const std::string& themeId = _musicId[_themeIndex];
+
+    this->setSoundLooping(themeId, false);
+    this->playSound(themeId, volume);
+}
+
+void Audio::playNextTheme(float volume)
+{
+    if (isSoundPlaying(_musicId[_themeIndex]))
+        return;
+
+    _themeIndex = (_themeIndex + 1) % _musicId.size();
+    const std::string& nextThemeId = _musicId[_themeIndex];
+
+    this->setSoundLooping(nextThemeId, false);
+    this->playSound(nextThemeId, volume);
 }
