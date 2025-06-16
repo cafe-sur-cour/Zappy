@@ -171,7 +171,7 @@ bool MsgHandler::handleSgtMessage(const std::string& message)
 
     {
         std::lock_guard<std::mutex> lock(_gameInfosMutex);
-        _gameInfos->setTimeUnit(timeUnit);
+        _gameInfos->setTimeUnit(timeUnit, false);
     }
 
     std::cout << colors::T_YELLOW << "[INFO] Time unit set to: " << timeUnit
@@ -975,7 +975,7 @@ bool MsgHandler::handleSstMessage(const std::string& message)
 
     {
         std::lock_guard<std::mutex> lock(_gameInfosMutex);
-        _gameInfos->setTimeUnit(timeUnit);
+        _gameInfos->setTimeUnit(timeUnit, false);
     }
 
     std::cout << colors::T_YELLOW << "[INFO] Time unit modified to: " << timeUnit
