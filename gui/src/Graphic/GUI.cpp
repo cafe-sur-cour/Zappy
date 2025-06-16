@@ -54,12 +54,6 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
     this->_display->setTargetFPS(zappy::gui::FPS);
     this->_audio = std::make_shared<Audio>();
     this->_gameInfos->setAudio(this->_audio);
-
-    if (!this->_display->loadFont("default", zappy::gui::CUSTOM_FONT_PATH)) {
-        std::cout << colors::T_RED << "[WARNING] Failed to load custom font: "
-                  << zappy::gui::CUSTOM_FONT_PATH << ". Using default font."
-                  << colors::RESET << std::endl;
-    }
     this->_map = std::make_unique<Map>(_gameInfos, this->_display);
 
     _cameraManager = std::make_shared<CameraManager>(this->_display);
@@ -158,6 +152,8 @@ void GUI::draw()
     if (_skyboxLoaded) {
         this->_display->drawSkybox("skybox");
     }
+
+    _map->draw();
 
     if (_hoveredPlayerId >= 0) {
         const auto& players = _gameInfos->getPlayers();
