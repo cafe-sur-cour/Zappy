@@ -1083,7 +1083,7 @@ void HUD::initTpsSlider(
 
     tpsContainer->addSliderPercent(
         "tps_slider", 5.0f, 15.0f, 150.0f, 100.0f,
-        1.0f, 250.0f, gameInfos->getTimeUnit(),
+        1.0f, 1000.0f, gameInfos->getTimeUnit(),
         "Frequency (TPS): ",
         [gameInfos, display, audio](float value) {
             static bool firstCall = true;
