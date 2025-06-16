@@ -33,11 +33,11 @@ int bct(zappy_t *zappy, graph_net_t *graphic, char *message)
     int x = 0;
     int y = 0;
 
-    if (strlen(message) < 8) {
+    if (strlen(message) < 7) {
         error_message("Invalid bct message format.");
         return -1;
     }
-    if (sscanf(message, "bct %d %d\n", &x, &y) != 2) {
+    if (sscanf(message, "bct %d %d", &x, &y) != 2) {
         error_message("Invalid bct pattern.");
         return -1;
     }

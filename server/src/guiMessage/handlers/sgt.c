@@ -22,7 +22,7 @@ static int send_sgt_message(graph_net_t *graphic, int time)
 
 int sgt(zappy_t *zappy, graph_net_t *graphic, char *message)
 {
-    if (strcmp(message, "sgt\n") != 0) {
+    if (strcmp(message, "sgt") != 0) {
         error_message("Invalid sgt message format.");
         return -1;
     }

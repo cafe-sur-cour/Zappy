@@ -23,7 +23,7 @@ static int send_tna_message(graph_net_t *graphic, char const *team_name)
 
 int tna(zappy_t *zappy, graph_net_t *graphic, char *message)
 {
-    if (strcmp(message, "tna\n") != 0) {
+    if (strcmp(message, "tna") != 0) {
         error_message("Invalid mct message format.");
         return -1;
     }

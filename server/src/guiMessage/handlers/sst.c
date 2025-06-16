@@ -33,11 +33,11 @@ int sst(zappy_t *zappy, graph_net_t *graphic, char *message)
 {
     int new_freq = 0;
 
-    if (strlen(message) < 6) {
+    if (strlen(message) < 5) {
         error_message("Invalid sst message format.");
         return -1;
     }
-    if (sscanf(message, "sst %d\n", &new_freq) != 1) {
+    if (sscanf(message, "sst %d", &new_freq) != 1) {
         error_message("Invalid sst pattern.");
         return -1;
     }

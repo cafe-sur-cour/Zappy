@@ -25,11 +25,11 @@ int plv(zappy_t *zappy, graph_net_t *graphic, char *message)
     player_t *player = NULL;
     int player_id = 0;
 
-    if (strlen(message) < 7) {
+    if (strlen(message) < 6) {
         error_message("Invalid plv message format.");
         return -1;
     }
-    if (sscanf(message, "plv #%d\n", &player_id) != 1) {
+    if (sscanf(message, "plv #%d", &player_id) != 1) {
         error_message("Invalid plv pattern.");
         return -1;
     }

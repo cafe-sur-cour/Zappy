@@ -18,7 +18,7 @@ int msz(zappy_t *zappy, graph_net_t *graphic, char *message)
     int size = 7 + int_str_len(x) + int_str_len(y);
     char buffer[size];
 
-    if (strcmp(message, "msz\n") != 0) {
+    if (strcmp(message, "msz") != 0) {
         error_message("Invalid msz message format.");
         return -1;
     }
