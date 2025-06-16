@@ -12,6 +12,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 static void apply_torus_world(player_t *player, zappy_t *zappy)
 {
@@ -96,7 +97,7 @@ int handle_eject(player_t *player, char *command, zappy_t *zappy)
     int n = 0;
     int result = 0;
 
-    if (strcmp(command, "eject\n") != 0) {
+    if (strcmp(command, "Eject") != 0) {
         error_message("Invalid command for eject handling.");
         return -1;
     }
