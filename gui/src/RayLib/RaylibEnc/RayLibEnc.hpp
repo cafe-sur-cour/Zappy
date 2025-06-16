@@ -147,9 +147,19 @@ class RayLibEnc {
         // 2D Drawing methods
         void drawRectangleRec(Rectangle rec, Color color);
         void drawText(const std::string& text, float x, float y, float fontSize, Color color);
+        void drawTextEx(const std::string& text, float x, float y, float fontSize,
+            float spacing, Color color);
         void drawCircle(float centerX, float centerY, float radius, Color color);
         void drawCircleLines(float centerX, float centerY, float radius, Color color);
         float measureText(const std::string& text, float fontSize) const;
+        float measureTextEx(const std::string& text, float fontSize, float spacing) const;
+
+        // Font methods
+        bool loadFont(const std::string& id, const std::string& filepath);
+        void unloadFont(const std::string& id);
+        bool hasFontLoaded(const std::string& id) const;
+        Font getFont(const std::string& id) const;
+        void unloadAllFonts();
 
     private:
         bool _isInitialized;
@@ -167,6 +177,7 @@ class RayLibEnc {
         std::map<std::string, Texture2D> _textures;
         std::map<std::string, Sound> _sounds;
         std::map<std::string, Music> _musics;
+        std::map<std::string, Font> _fonts;
 };
 
 #endif /* !RAYLIBEnc_HPP_ */
