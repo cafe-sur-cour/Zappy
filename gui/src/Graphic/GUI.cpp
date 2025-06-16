@@ -379,7 +379,8 @@ void GUI::initModels()
         }
     }
 
-    if (!this->_display->loadModel("forest", "gui/assets/models/forest.glb", {0.0f, 0.0f, 0.0f}))
+    if (!this->_display->loadModel("forest", "gui/assets/models/forest.glb",
+        {0.0f, 0.0f, 0.0f}))
         std::cout << colors::T_RED << "[ERROR] Failed to load forest model."
                 << colors::RESET << std::endl;
     else
