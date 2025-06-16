@@ -71,6 +71,7 @@ class GUI {
         bool _isHUDVisible = true;
         bool _backgroundLoaded;
         bool _skyboxLoaded;
+        bool _forestLoaded;
         int _hoveredPlayerId;
 };
 
