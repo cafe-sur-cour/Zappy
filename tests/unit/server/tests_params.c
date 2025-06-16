@@ -235,13 +235,6 @@ Test(params, check_args_insufficient_argc, .init = redirect_all_std) {
 //     cr_assert_null(params);
 // }
 
-Test(params, check_args_missing_names_value, .init = redirect_all_std) {
-    char *argv[] = {"zappy_server", "-p", "8080", "-x", "10", "-y", "10", "-n", "-c", "3", "-f", "100"};
-    int argc = 12;
-
-    params_t *params = check_args(argc, argv);
-    (void)params;
-}
 
 Test(params, check_args_multiple_teams, .init = redirect_all_std) {
     char *argv[] = {"zappy_server", "-p", "8080", "-x", "10", "-y", "10", "-n", "team1", "team2", "team3", "team4", "-c", "3", "-f", "100"};

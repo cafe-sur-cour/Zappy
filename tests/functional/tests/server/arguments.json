@@ -94,7 +94,7 @@
             "name": "Server: Invalid client_nb (zero)",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "4251", "-x", "100", "-y", "100", "-n", "team1", "team2", "-c", "0", "-f", "10"],
-            "expected_output": "CONTAINS - Number of clients must be a positive integer.",
+            "expected_output": "CONTAINS - Number of clients must be betwwen 1 and 10.",
             "expected_return": 84
         },
         {
