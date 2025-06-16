@@ -89,3 +89,8 @@ void Text::setX(float x)
 {
     _bounds.x = x;
 }
+
+void Text::setY(float y)
+{
+    _bounds.y = y;
+}
