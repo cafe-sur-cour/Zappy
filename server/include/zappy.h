@@ -138,6 +138,7 @@ int send_egg_connect(zappy_t *zappy, egg_t *currentEgg);
 int send_player_connect(zappy_t *zappy, player_t *player);
 int send_player_pos(zappy_t *zappy, player_t *player);
 int send_player_level(zappy_t *zappy, player_t *player);
+int send_player_connect_to_specific_gui(graph_net_t *fd, player_t *p);
 int send_player_inventory(zappy_t *zappy, player_t *player);
 int send_player_expelled(zappy_t *zappy, player_t *player);
 int send_broadcast_to_all(zappy_t *zappy, const char *message);
