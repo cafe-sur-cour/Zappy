@@ -94,8 +94,6 @@ class HUD : public IObserver {
 
         void displayWinMessage(const std::string& teamName);
 
-        void displayLoseMessage(const std::string& teamName);
-
         void updateGameMessages();
 
         void update() override;
