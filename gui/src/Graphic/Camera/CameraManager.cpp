@@ -64,7 +64,7 @@ void CameraManager::updateCamera(zappy::gui::CameraMode mode)
 
 void CameraManager::updateCameraFreeMode()
 {
-    this->_display->updateCameraFreeMode();
+    this->_display->updateCameraFreeMode(this->_cameraMovingSpeed, this->_cameraRotaSpeed);
 }
 
 void CameraManager::updateCameraTargetMode()
@@ -110,8 +110,7 @@ void CameraManager::updateCameraTargetMode()
 
     float wheelMove = this->_display->getMouseWheelMove();
     if (wheelMove != 0) {
-        const float baseZoomSpeed = 120.0f;
-        float zoomSpeed = baseZoomSpeed * deltaTime;
+        float zoomSpeed = this->_cameraZoomSpeed * deltaTime;
         _targetDistance -= wheelMove * zoomSpeed;
 
         if (_targetDistance < 5.0f) _targetDistance = 5.0f;
@@ -123,19 +122,19 @@ void CameraManager::updateCameraTargetMode()
     bool isZoomingOut = this->_display->isGamepadButtonDown(
         this->_display->getKeyId(GM_PD_LEFT_TRIGGER));
     if (isZoomingIn) {
-        _targetDistance -= zappy::gui::CAMERA_SPEED * deltaTime;
+        _targetDistance -= this->_cameraMovingSpeed * deltaTime;
         if (_targetDistance < 5.0f) _targetDistance = 5.0f;
     }
     if (isZoomingOut) {
-        _targetDistance += zappy::gui::CAMERA_SPEED * deltaTime;
+        _targetDistance += this->_cameraMovingSpeed * deltaTime;
         if (_targetDistance > 100.0f) _targetDistance = 100.0f;
     }
 
     if (this->_display->isKeyDown(this->_display->getKeyId(RIGHT)))
-        _targetAngleXZ += zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        _targetAngleXZ += this->_cameraRotaSpeed * deltaTime;
 
     if (this->_display->isKeyDown(this->_display->getKeyId(LEFT)))
-        _targetAngleXZ -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        _targetAngleXZ -= this->_cameraRotaSpeed * deltaTime;
 
     if (this->_display->isGamepadAvailable()) {
         float rightStickX = this->_display->getGamepadAxisMovement(
@@ -156,12 +155,12 @@ void CameraManager::updateCameraTargetMode()
     }
 
     if (this->_display->isKeyDown(this->_display->getKeyId(UP))) {
-        _targetAngleY += zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        _targetAngleY += this->_cameraRotaSpeed * deltaTime;
         if (_targetAngleY > 1.5f) _targetAngleY = 1.5f;
     }
 
     if (this->_display->isKeyDown(this->_display->getKeyId(DOWN))) {
-        _targetAngleY -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        _targetAngleY -= this->_cameraRotaSpeed * deltaTime;
         if (_targetAngleY < 0.1f) _targetAngleY = 0.1f;
     }
 
@@ -292,10 +291,10 @@ void CameraManager::updateCameraPlayerMode()
 
     float deltaTime = this->_display->getFrameTime();
     if (this->_display->isKeyDown(this->_display->getKeyId(RIGHT)))
-        _playerAngleXZ += zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        _playerAngleXZ += this->_cameraRotaSpeed * deltaTime;
 
     if (this->_display->isKeyDown(this->_display->getKeyId(LEFT)))
-        _playerAngleXZ -= zappy::gui::CAMERA_ROTATE_SPEED_KEY * deltaTime;
+        _playerAngleXZ -= this->_cameraRotaSpeed * deltaTime;
 
     if (this->_display->isGamepadAvailable()) {
         float rightStickX = this->_display->getGamepadAxisMovement(
@@ -334,4 +333,28 @@ void CameraManager::setMapSize(int width, int height)
 void CameraManager::setMapInstance(std::shared_ptr<Map> map)
 {
     _map = map;
+}
+
+float CameraManager::getCameraMovingSpeed() {
+    return this->_cameraMovingSpeed;
+}
+
+void CameraManager::setCameraMovingSpeed(float speed) {
+    this->_cameraMovingSpeed = speed;
+}
+
+float CameraManager::getCameraRotaSpeed() {
+    return this->_cameraRotaSpeed;
+}
+
+void CameraManager::setCameraRotaSpeed(float speed) {
+    this->_cameraRotaSpeed = speed;
+}
+
+float CameraManager::getCameraZoomSpeed() {
+    return this->_cameraZoomSpeed;
+}
+
+void CameraManager::setCameraZoomSpeed(float speed) {
+    this->_cameraZoomSpeed = speed;
 }

@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include "HelpText.hpp"
+#include "../IDisplay.hpp"
 
 namespace zappy::constants {
 
@@ -139,14 +140,11 @@ namespace zappy::gui {
 
     inline const std::string WINDOW_TITLE = "Zappy GUI";
     inline const int FPS = 120;
-    inline const float CAMERA_SPEED = 7.5f;
     inline const float CAMERA_SENSITIVITY = 0.001f;
-    inline const float CAMERA_ROTATE_SPEED_KEY = 2.0f;
     inline const float GAMEPAD_STICK_SENSITIVITY = 3.0f;
     inline const float GAMEPAD_DEADZONE = 0.2f;
     inline const float POSITION_MULTIPLIER = 2.2f;
 
-    inline const float PLAYER_SCALE = 0.005f;
     inline const float EGG_SCALE = 1.0f;
     inline const float FOOD_SCALE = 0.005f;
     inline const float FOOD_FLOAT_AMPLITUDE = 0.05f;
@@ -170,6 +168,34 @@ namespace zappy::gui {
         TARGETED = 1,
         PLAYER = 2,
         NB_MODES = 3,
+    };
+
+
+    struct PlayerModelInfo {
+        std::string name;
+        std::string modelPath;
+        Vector3f center;
+        Vector3f scale;
+        float rotation;
+    };
+
+    inline const std::vector<PlayerModelInfo> PLAYER_MODELS_INFO = {
+        {"playerLvl1", "gui/assets/models/playerLvl1.glb",
+            {0.0f, -75.0f, 0.0f}, {0.005f, 0.005f, 0.005f}, 0.0f},
+        {"playerLvl2", "gui/assets/models/playerLvl2.glb",
+            {0.0f, -0.5f, 0.0f}, {0.25f, 0.25f, 0.25f}, 0.0f},
+        {"playerLvl3", "gui/assets/models/playerLvl3.glb",
+            {0.0f, 20.0f, 0.0f}, {0.0045f, 0.0045f, 0.0045f}, 0.0f},
+        {"playerLvl4", "gui/assets/models/playerLvl4.glb",
+            {0.0f, 0.0025f, 0.0f}, {40.0f, 40.0f, 40.0f}, 35.0f},
+        {"playerLvl5", "gui/assets/models/playerLvl5.glb",
+            {8.0f, -1.8f, 0.0f}, {0.2f, 0.2f, 0.2f}, 0.0f},
+        {"playerLvl6", "gui/assets/models/playerLvl6.glb",
+            {0.0f, 20.0f, 0.0f}, {0.009f, 0.009f, 0.009f}, 0.0f},
+        {"playerLvl7", "gui/assets/models/playerLvl7.glb",
+            {0.0f, 0.4f, 0.0f}, {0.25f, 0.25f, 0.25f}, 0.0f},
+        {"playerLvl8", "gui/assets/models/playerLvl8.glb",
+            {0.0f, 1.0f, 0.0f}, {0.085, 0.085f, 0.085f}, 0.0f}
     };
 }
 

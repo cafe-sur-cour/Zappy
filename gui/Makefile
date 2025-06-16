@@ -28,11 +28,14 @@ SRC =	src/Client/Client.cpp \
 		src/Graphic/HUD/Containers/AContainers.cpp \
 		src/Graphic/HUD/Text/Text.cpp \
 		src/Graphic/HUD/Slider/Slider.cpp \
+		src/Graphic/HUD/Image/Image.cpp \
+		src/Graphic/HUD/ImageButton/ImageButton.cpp \
 		src/Graphic/HUD/UIElement/AUIElement.cpp \
 		src/Graphic/HUD/HUD.cpp	\
 		src/Observer/GuiObserver.cpp \
 		src/Observer/Subject.cpp \
-		src/Graphic/HUD/Help/Help.cpp
+		src/Graphic/HUD/Help/Help.cpp \
+		src/Graphic/HUD/Settings/Settings.cpp
 
 OBJ = $(SRC:.cpp=.o)
 

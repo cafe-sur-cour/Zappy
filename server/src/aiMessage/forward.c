@@ -63,6 +63,11 @@ int forward_message(player_t *player, params_t *params)
     void (*move_functions[4])(player_t *, int) = {
         &move_top, &move_right, &move_bottom, &move_left};
 
+    if (player->posX < 0 || player->posY < 0 ||
+        player->posX >= params->x || player->posY >= params->y) {
+        error_message("Player position is out of bounds.");
+        return -1;
+    }
     for (int i = 0; i < 4; i++) {
         if (direction == directions[i]) {
             move_functions[i](player, params->y);

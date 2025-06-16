@@ -48,6 +48,7 @@ class GUI {
         bool playerExists(int playerId) const;
 
         void initModels();
+        void initPlayers();
         void handlePlayerClicks();
         int getPlayerUnderMouse() const;
         BoundingBox3D getPlayerBoundingBox(const zappy::structs::Player& player) const;
@@ -61,12 +62,13 @@ class GUI {
         std::unique_ptr<Map> _map;
         std::unique_ptr<HUD> _hud;
         std::shared_ptr<IAudio> _audio;
-        std::unique_ptr<CameraManager> _cameraManager;
+        std::shared_ptr<CameraManager> _cameraManager;
 
         int _windowWidth;
         int _windowHeight;
 
         zappy::gui::CameraMode _cameraMode;
+        bool _isHUDVisible = true;
         bool _backgroundLoaded;
         bool _skyboxLoaded;
         int _hoveredPlayerId;

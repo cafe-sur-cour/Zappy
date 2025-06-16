@@ -48,7 +48,8 @@ TESTS 	    =   tests_accept.c						\
 				tests_sgt.c							\
 				tests_sst.c							\
 				tests_tna.c							\
-				fake_malloc.c
+				fake_malloc.c						\
+				tests_team.c
 
 SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/algo.c									\
@@ -62,13 +63,16 @@ SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/signal.c								\
 				../../../server/src/game/client.c							\
 				../../../server/src/game/game.c								\
-				../../../server/src/game/get_ids_player_tile.c				\
 				../../../server/src/game/graphic_client.c					\
 				../../../server/src/game/handle_crystal.c 					\
 				../../../server/src/game/handle_food.c						\
 				../../../server/src/game/handle_remove.c 					\
 				../../../server/src/game/init_egg.c							\
 				../../../server/src/game/player.c							\
+				../../../server/src/game/player_id.c 						\
+				../../../server/src/game/get_ids_player_tile.c 				\
+				../../../server/src/game/init_team.c 						\
+				../../../server/src/game/food_refiil.c 						\
 				../../../server/src/network/accept_connection.c				\
 				../../../server/src/network/buffer.c						\
 				../../../server/src/network/close.c							\
