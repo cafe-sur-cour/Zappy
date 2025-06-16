@@ -138,6 +138,16 @@ void GameInfos::addPlayer(const zappy::structs::Player player)
     }
 }
 
+void GameInfos::killPlayer(int playerNumber)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    if (playerNumber < 0)
+        return;
+
+    _communication->sendMessage("kil #" + std::to_string(playerNumber) + "\n");
+}
+
 void GameInfos::updatePlayerPosition(int playerNumber, int x, int y)
 {
     std::lock_guard<std::mutex> lock(_dataMutex);

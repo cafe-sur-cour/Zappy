@@ -120,7 +120,7 @@ void MsgHandler::securityActualization()
             _communication->sendMessage("pin #" + std::to_string(player.number) + "\n");
         }
     } catch (const Exceptions::NetworkException& e) {
-        std::cerr << colors::T_RED << "[ERROR] Network exception during security actualization: "
+        std::cerr << colors::T_RED << "[ERROR] Network exception: "
                   << e.what() << colors::RESET << std::endl;
     }
 }
