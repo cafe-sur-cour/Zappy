@@ -45,6 +45,7 @@ class Text : public AUIElement {
 
         float getWidth() const;
         void setX(float x);
+        void setY(float y);
 
     private:
         std::string _text;
