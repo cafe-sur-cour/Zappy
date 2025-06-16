@@ -13,6 +13,7 @@
 #include <chrono>
 #include <iostream>
 #include "GameInfos.hpp"
+#include "../Exceptions/Exceptions.hpp"
 
 GameInfos::GameInfos(std::shared_ptr<ICommunication> communication) :
     _mapWidth(0),
@@ -58,10 +59,16 @@ void GameInfos::setTimeUnit(int timeUnit, bool sendToServer)
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
 
-    if (sendToServer)
-        _communication->sendMessage("sst " + std::to_string(timeUnit) + "\n");
-    else
+    if (sendToServer) {
+        try {
+            _communication->sendMessage("sst " + std::to_string(timeUnit) + "\n");
+        } catch (const Exceptions::NetworkException& e) {
+            std::cerr << colors::T_RED << "[ERROR] Network exception: "
+                      << e.what() << colors::RESET << std::endl;
+        }
+    } else {
         _timeUnit = timeUnit;
+    }
 }
 
 int GameInfos::getTimeUnit() const
@@ -145,7 +152,12 @@ void GameInfos::killPlayer(int playerNumber)
     if (playerNumber < 0)
         return;
 
-    _communication->sendMessage("kil #" + std::to_string(playerNumber) + "\n");
+    try {
+        _communication->sendMessage("kil #" + std::to_string(playerNumber) + "\n");
+    } catch (const Exceptions::NetworkException& e) {
+        std::cerr << colors::T_RED << "[ERROR] Network exception: "
+                  << e.what() << colors::RESET << std::endl;
+    }
 }
 
 void GameInfos::updatePlayerPosition(int playerNumber, int x, int y)
