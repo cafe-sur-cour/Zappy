@@ -53,6 +53,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
     _isRunning = this->_display->isWindowReady();
     this->_display->setTargetFPS(zappy::gui::FPS);
     this->_audio = std::make_shared<Audio>();
+    this->_gameInfos->setAudio(this->_audio);
     this->_map = std::make_unique<Map>(_gameInfos, this->_display);
 
     _cameraManager = std::make_shared<CameraManager>(this->_display);
@@ -257,6 +258,7 @@ void GUI::switchCameraMode(zappy::gui::CameraMode mode)
     }
 
     _cameraMode = mode;
+    _gameInfos->setCurrentCameraMode(_cameraMode);
 }
 
 void GUI::switchCameraModeNext()
@@ -271,6 +273,7 @@ void GUI::switchCameraModeNext()
 void GUI::setPlayerToFollow(int playerId)
 {
     _cameraManager->setPlayerId(playerId);
+    _gameInfos->setCurrentPlayerFocus(playerId);
     if (_cameraMode == zappy::gui::CameraMode::PLAYER) {
         _hud->initPlayerInventoryDisplay(playerId);
     }

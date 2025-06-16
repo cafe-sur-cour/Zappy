@@ -1030,9 +1030,6 @@ bool MsgHandler::handleSegMessage(const std::string& message)
         std::lock_guard<std::mutex> lock(_gameInfosMutex);
         _gameInfos->setGameOver(teamName);
     }
-
-    std::cout << colors::T_GREEN << "[GAME OVER] Team " << teamName
-              << " has won the game!" << colors::RESET << std::endl;
     return true;
 }
 

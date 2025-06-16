@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
+#include <string>
 
 #include "ISubject.hpp"
 
@@ -23,6 +24,9 @@ class Subject : public ISubject {
         void removeObserver(std::shared_ptr<IObserver> observer) override;
 
         void notifyObservers() override;
+
+        void notifyGameEvent(GameEventType eventType, const std::string& teamName);
+
     private:
         std::vector<std::weak_ptr<IObserver>> _observers;
 };

@@ -21,6 +21,9 @@ Audio::Audio()
     this->Audio::loadSound("main_theme2", "gui/assets/sounds/main_theme2.wav");
     this->Audio::loadSound("click", "gui/assets/sounds/click.wav");
     this->Audio::loadSound("clickPlayer", "gui/assets/sounds/playerClick.wav");
+    this->Audio::loadSound("collect", "gui/assets/sounds/collect.wav");
+    this->Audio::loadSound("win", "gui/assets/sounds/win.wav");
+    this->Audio::loadSound("loose", "gui/assets/sounds/loose.wav");
 
     this->Audio::playMainTheme(this->_levelMusic);
 }
