@@ -1055,8 +1055,10 @@ bool MsgHandler::handleSmgMessage(const std::string& message)
         return false;
     }
 
-    std::cout << colors::T_CYAN << "[SERVER MESSAGE] " << serverMessage
-              << colors::RESET << std::endl;
+    {
+        std::lock_guard<std::mutex> lock(_gameInfosMutex);
+        _gameInfos->addServerMessage(serverMessage);
+    }
     return true;
 }
 

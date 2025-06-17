@@ -466,3 +466,15 @@ const zappy::structs::Player GameInfos::getPlayer(int playerNumber) const
 void GameInfos::notifyStateChange() {
     notifyObservers();
 }
+
+void GameInfos::addServerMessage(const std::string &message)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+    _serverMessages.push_back(message);
+}
+
+const std::vector<std::string> GameInfos::getServerMessages() const
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+    return _serverMessages;
+}
