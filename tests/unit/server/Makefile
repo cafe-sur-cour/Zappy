@@ -49,7 +49,8 @@ TESTS 	    =   tests_accept.c						\
 				tests_sst.c							\
 				tests_tna.c							\
 				fake_malloc.c						\
-				tests_team.c
+				tests_team.c						\
+				tests_eject.c
 
 SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/algo.c									\

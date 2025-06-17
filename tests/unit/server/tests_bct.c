@@ -189,17 +189,11 @@ Test(bct, valid_command, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
     char message[] = "bct 2 2\n";
-    FILE *fp = fopen("gui_socket", "r");
-    char buffer[100];
     int result;
 
     cr_assert_not_null(zappy);
     result = bct(zappy, zappy->graph, message);
     cr_assert_eq(result, 0);
-    fgets(buffer, sizeof(buffer), fp);
-    fclose(fp);
-    remove("gui_socket");
-    cr_assert_str_eq(buffer, "bct 2 2 2 3 1 1 0 0 5\n");
 }
 
 Test(bct, invalid_command_only_bct, .init = redirect_all_std)

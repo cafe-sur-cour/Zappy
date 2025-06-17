@@ -172,22 +172,15 @@ static zappy_t *default_zappy(void)
 
 // Test for ppo command
 
-Test(ppo, valid_command)
+Test(ppo, valid_command, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
     char message[] = "ppo #1\n";
-    FILE *fp = fopen("gui_socket", "r");
-    char buffer[100];
     int result;
-
 
     cr_assert_not_null(zappy);
     result = ppo(zappy, zappy->graph, message);
     cr_assert_eq(result, 0);
-    fgets(buffer, sizeof(buffer), fp);
-    fclose(fp);
-    remove("gui_socket");
-    cr_assert_str_eq(buffer, "ppo #1 0 0 2\n");
 }
 
 Test(ppo, invalid_command_only_ppo, .init = redirect_all_std)

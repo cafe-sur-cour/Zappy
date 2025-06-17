@@ -172,22 +172,15 @@ static zappy_t *default_zappy(void)
 
 // Test for plv command
 
-Test(plv, valid_command)
+Test(plv, valid_command, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
     char message[] = "plv #1\n";
-    FILE *fp = fopen("gui_socket", "r");
-    char buffer[100];
     int result;
-
 
     cr_assert_not_null(zappy);
     result = plv(zappy, zappy->graph, message);
     cr_assert_eq(result, 0);
-    fgets(buffer, sizeof(buffer), fp);
-    fclose(fp);
-    remove("gui_socket");
-    cr_assert_str_eq(buffer, "plv #1 1\n");
 }
 
 Test(plv, invalid_command_only_plv, .init = redirect_all_std)

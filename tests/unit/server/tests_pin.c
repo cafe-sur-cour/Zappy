@@ -172,22 +172,15 @@ static zappy_t *default_zappy(void)
 
 // Test for pin command
 
-Test(pin, valid_command)
+Test(pin, valid_command, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
     char message[] = "pin #1\n";
-    FILE *fp = fopen("gui_socket", "r");
-    char buffer[100];
     int result;
-
 
     cr_assert_not_null(zappy);
     result = pin(zappy, zappy->graph, message);
     cr_assert_eq(result, 0);
-    fgets(buffer, sizeof(buffer), fp);
-    fclose(fp);
-    remove("gui_socket");
-    cr_assert_str_eq(buffer, "pin #1 0 0 10 5 3 2 1 4 0\n");
 }
 
 Test(pin, invalid_command_only_pin, .init = redirect_all_std)

@@ -410,6 +410,8 @@ Test(gui_egg_death, send_egg_death_success, .init = redirect_all_std)
 Test(gui_send_map_data, send_map_data_success, .init = redirect_all_std)
 {
     zappy_t *zappy = create_test_zappy();
+    zappy->params->x = 10;
+    zappy->params->y = 10;
     zappy->game->map->width = 10;
     zappy->game->map->height = 10;
 
