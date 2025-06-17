@@ -50,7 +50,9 @@ TESTS 	    =   tests_accept.c						\
 				tests_tna.c							\
 				fake_malloc.c						\
 				tests_team.c						\
-				tests_eject.c
+				tests_eject.c						\
+				tests_broadcast.c					\
+				tests_kil.c
 
 SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/algo.c									\
