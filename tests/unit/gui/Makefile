@@ -40,13 +40,13 @@ SRC =	../../../gui/src/Client/Client.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
-# Coverage objects (compiled with coverage flags)
 COV_OBJ = $(SRC:.cpp=_cov.o)
 
 TEST_SRC = main_test.cpp \
 		   CLI/CLI_test.cpp \
 		   Exceptions/Exceptions_test.cpp \
 		   Client/Client_test.cpp \
+		   Client/MsgHandler_test.cpp \
 		   Communication/Communication_test.cpp \
 
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
@@ -122,7 +122,7 @@ coverage: tests_run
 tests_run: libs $(COV_OBJ) $(TEST_OBJ)
 	@echo -e "$(BLUE)ᒥ🧪ᒧ Compiling Google Test unit tests...$(NC)"
 	$(CC) -o $(UNIT_TESTS) $(COV_OBJ) $(TEST_OBJ) $(CFLAGS_COVERAGE) $(INCLUDES) \
-		$(LIBS) -lgtest -lgtest_main
+		$(LIBS) -lgtest -lgtest_main -lgmock -lgmock_main
 	@echo -e "$(GREEN)ᒥ✅ᒧ Unit tests compiled! Running...$(NC)"
 	./$(UNIT_TESTS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ All tests completed!$(NC)"
