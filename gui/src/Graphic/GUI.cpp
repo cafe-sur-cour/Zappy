@@ -53,6 +53,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
     _isRunning = this->_display->isWindowReady();
     this->_display->setTargetFPS(zappy::gui::FPS);
     this->_audio = std::make_shared<Audio>();
+    this->_gameInfos->setAudio(this->_audio);
     this->_map = std::make_unique<Map>(_gameInfos, this->_display);
 
     _cameraManager = std::make_shared<CameraManager>(this->_display);
@@ -64,6 +65,9 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
         static_cast<float>(mapSize.first - 1) / 2.0f, 0.0f,
         static_cast<float>(mapSize.second - 1) / 2.0f
     };
+
+    float mapScale = std::max(mapSize.first, mapSize.second) * 0.5f;
+    mapCenter.y = mapScale * 0.2f;
     _cameraManager->setMapCenter(mapCenter);
     _cameraManager->setMapSize(mapSize.first, mapSize.second);
     this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio, _cameraManager,
@@ -123,6 +127,8 @@ void GUI::update()
         this->_cameraMode);
     this->_hud->updateHelpInformationHUD(this->_cameraMode);
     this->_hud->update();
+
+    this->_audio->playNextTheme(_audio->getMusicVolumeLevel());
 }
 
 void GUI::refresh()
@@ -150,14 +156,15 @@ void GUI::draw()
         this->_display->drawSkybox("skybox");
     }
 
+    const auto& mapSize = _gameInfos->getMapSize();
+    float forestX = static_cast<float>(mapSize.first) * 2.0f + 20.0f;
+    float forestZ = static_cast<float>(mapSize.second) * 2.0f + 20.0f;
+
+    this->_display->drawModelEx(
+        "forest", {forestX, -5.0f, forestZ}, {0.0f, 90.0f, 0.0f},
+        -135.0f, {1.0f, 1.0f, 1.0f}, CWHITE);
+
     _map->draw();
-    float offset = 0.0f;
-    for (auto &playerModel : zappy::gui::PLAYER_MODELS_INFO) {
-        this->_display->drawModelEx(
-            playerModel.name, {offset, -5.0f, 0.0f}, {0.0f, 1.0f, 0.0f},
-            playerModel.rotation, playerModel.scale, CWHITE);
-        offset += 1.0f;
-    }
 
     if (_hoveredPlayerId >= 0) {
         const auto& players = _gameInfos->getPlayers();
@@ -231,6 +238,9 @@ void GUI::switchCameraMode(zappy::gui::CameraMode mode)
             static_cast<float>(mapSize.second - 1) / 2.0f
         };
 
+        float mapScale = std::max(mapSize.first, mapSize.second) * 0.5f;
+        mapCenter.y = mapScale * 0.2f;
+
         _cameraManager->setMapCenter(mapCenter);
         _cameraManager->initTargetPositionFromCurrentCamera();
     }
@@ -255,6 +265,7 @@ void GUI::switchCameraMode(zappy::gui::CameraMode mode)
     }
 
     _cameraMode = mode;
+    _gameInfos->setCurrentCameraMode(_cameraMode);
 }
 
 void GUI::switchCameraModeNext()
@@ -269,6 +280,7 @@ void GUI::switchCameraModeNext()
 void GUI::setPlayerToFollow(int playerId)
 {
     _cameraManager->setPlayerId(playerId);
+    _gameInfos->setCurrentPlayerFocus(playerId);
     if (_cameraMode == zappy::gui::CameraMode::PLAYER) {
         _hud->initPlayerInventoryDisplay(playerId);
     }
@@ -366,6 +378,14 @@ void GUI::initModels()
                 _backgroundLoaded = true;
         }
     }
+
+    if (!this->_display->loadModel("forest", "gui/assets/models/forest.glb",
+        {0.0f, 0.0f, 0.0f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load forest model."
+                << colors::RESET << std::endl;
+    else
+        std::cout << colors::T_GREEN << "[INFO] Successfully loaded forest model."
+                << colors::RESET << std::endl;
 
     initPlayers();
 

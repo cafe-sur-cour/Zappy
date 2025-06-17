@@ -6,6 +6,7 @@
 */
 
 #include <memory>
+#include <string>
 
 #include "Subject.hpp"
 
@@ -29,6 +30,19 @@ void Subject::notifyObservers() {
         [](const std::weak_ptr<IObserver>& weak_obs) {
             if (auto obs = weak_obs.lock()) {
                 obs->update();
+                return false;
+            }
+            return true;
+        }),
+    _observers.end());
+}
+
+void Subject::notifyGameEvent(GameEventType eventType, const std::string& teamName) {
+    _observers.erase(
+    std::remove_if(_observers.begin(), _observers.end(),
+        [eventType, &teamName](const std::weak_ptr<IObserver>& weak_obs) {
+            if (auto obs = weak_obs.lock()) {
+                obs->onGameEvent(eventType, teamName);
                 return false;
             }
             return true;

@@ -418,6 +418,16 @@ std::shared_ptr<Slider> Containers::addSliderPercent(
     return nullptr;
 }
 
+float Containers::getWidth() const
+{
+    return AContainers::getWidth();
+}
+
+float Containers::getHeight() const
+{
+    return AContainers::getHeight();
+}
+
 std::shared_ptr<Image> Containers::addImagePercent(
     const std::string& id,
     float xPercent, float yPercent,

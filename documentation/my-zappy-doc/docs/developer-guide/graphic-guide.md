@@ -84,6 +84,17 @@ void MyCustomDisplay::drawText(const std::string& text, float x, float y,
                                float fontSize, Color32 color) {
     // Render text at specified screen coordinates
     // Handle font sizing and color
+    // Should support custom font loading via loadFont method
+}
+
+void MyCustomDisplay::drawTextEx(const std::string& text, float x, float y, 
+                                 float fontSize, float spacing, Color32 color) {
+    // Extended text rendering with custom spacing
+}
+
+bool MyCustomDisplay::loadFont(const std::string& id, const std::string& filepath) {
+    // Load custom font from file and store with given ID
+    // Return true on success, false on failure
 }
 
 void MyCustomDisplay::drawRectangleRec(FloatRect rec, Color32 color) {

@@ -79,3 +79,18 @@ void Text::setSize(float width, float height)
 
     _bounds.width = this->_display->measureText(_text, _fontSize);
 }
+
+float Text::getWidth() const
+{
+    return _bounds.width;
+}
+
+void Text::setX(float x)
+{
+    _bounds.x = x;
+}
+
+void Text::setY(float y)
+{
+    _bounds.y = y;
+}

@@ -110,6 +110,10 @@ static bool check_names_flag(int argc, char **argv, params_t *params)
         return true;
     }
     names_count = count_names(argc, argv, pos + 1);
+    if (names_count < 1 || names_count > 8) {
+        error_message("Number of teams must be between 1 and 8.");
+        return true;
+    }
     return check_name(argv[pos],
         (const char **) &argv[pos + 1], names_count, params) == 0;
 }

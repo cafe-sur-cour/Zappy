@@ -60,10 +60,6 @@ class Slider : public AUIElement {
         Color32 _handleColor;
         Color32 _textColor;
 
-        float _lastChangeTime;
-        bool _hasUnnotifiedChange;
-        float _lastNotifiedValue;
-
         void updateValueFromMousePosition(float mouseX);
         float getHandlePosition() const;
         bool isMouseOverHandle(float mouseX, float mouseY) const;

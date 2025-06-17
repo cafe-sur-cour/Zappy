@@ -22,6 +22,9 @@ class IAudio {
 
         virtual bool loadSound(const std::string& id, const std::string& filepath) = 0;
 
+        virtual void playMainTheme(float volume) = 0;
+        virtual void playNextTheme(float volume) = 0;
+
         virtual void playSound(const std::string& id, float volume) = 0;
         virtual void stopSound(const std::string& id) = 0;
         virtual bool isSoundPlaying(const std::string& id) const = 0;

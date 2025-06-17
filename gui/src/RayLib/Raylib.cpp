@@ -392,6 +392,13 @@ void Raylib::drawText(const std::string &text, float x, float y, float fontSize,
         {color.r, color.g, color.b, color.a});
 }
 
+void Raylib::drawTextEx(const std::string &text, float x, float y, float fontSize,
+    float spacing, Color32 color)
+{
+    return this->_raylib->drawTextEx(text, x, y, fontSize, spacing,
+        {color.r, color.g, color.b, color.a});
+}
+
 void Raylib::drawRectangleRec(FloatRect frect, Color32 color)
 {
     Rectangle rect = {frect.x, frect.y, frect.width, frect.height};
@@ -516,4 +523,9 @@ void Raylib::drawSkybox(const std::string& id)
 void Raylib::drawSimpleSkybox()
 {
     this->_raylib->drawSimpleSkybox();
+}
+
+bool Raylib::loadFont(const std::string& id, const std::string& filepath)
+{
+    return this->_raylib->loadFont(id, filepath);
 }

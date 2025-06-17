@@ -122,7 +122,6 @@ class Containers : public AContainers {
             float fontSizePercent = 5.0f,
             Color32 color = CBLACK
         );
-
         std::shared_ptr<Image> addImage(
             const std::string& id,
             float x, float y,
@@ -186,6 +185,9 @@ class Containers : public AContainers {
             std::function<void()> callback,
             Color32 tint
         );
+
+                float getWidth() const;
+                float getHeight() const;
 
     private:
         std::shared_ptr<IAudio> _audio;

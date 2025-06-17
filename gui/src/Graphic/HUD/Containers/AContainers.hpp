@@ -41,6 +41,9 @@ class AContainers : public IContainers {
 
         void updatePositionFromRelative();
 
+        float getWidth() const;
+        float getHeight() const;
+
     protected:
         std::shared_ptr<IDisplay> _display;
         FloatRect _bounds;

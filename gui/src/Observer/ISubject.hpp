@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 #include "IObserver.hpp"
 
 class ISubject {
@@ -18,6 +19,7 @@ class ISubject {
         virtual void addObserver(std::shared_ptr<IObserver> observer) = 0;
         virtual void removeObserver(std::shared_ptr<IObserver> observer) = 0;
         virtual void notifyObservers() = 0;
+        virtual void notifyGameEvent(GameEventType eventType, const std::string& teamName) = 0;
 
     protected:
         std::vector<std::weak_ptr<IObserver>> _observers;

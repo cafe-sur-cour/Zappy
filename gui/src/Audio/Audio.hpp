@@ -17,11 +17,12 @@
 
 class Audio : public IAudio {
     private:
-        std::vector<std::string> _musicId = {"main_theme"};
+        std::vector<std::string> _musicId = {"main_theme", "main_theme2"};
         std::vector<std::string> _sfxId = {"click", "clickPlayer"};
         std::map<std::string, std::unique_ptr<sf::Music>> _sounds;
         float _levelSFX = 75.f;
         float _levelMusic = 50.f;
+        int _themeIndex = 0;
 
     public:
         Audio();
@@ -34,6 +35,9 @@ class Audio : public IAudio {
         void setMusicVolumeLevel(float);
 
         bool loadSound(const std::string& id, const std::string& filepath);
+
+        void playMainTheme(float volume);
+        void playNextTheme(float volume);
 
         void playSound(const std::string& id, float volume);
         void stopSound(const std::string& id);

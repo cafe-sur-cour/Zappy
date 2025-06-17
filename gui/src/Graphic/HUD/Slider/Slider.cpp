@@ -32,10 +32,7 @@ Slider::Slider(
     _trackColor({200, 200, 200, 255}),
     _fillColor({100, 150, 255, 255}),
     _handleColor({255, 255, 255, 255}),
-    _textColor({255, 255, 255, 255}),
-    _lastChangeTime(0.0f),
-    _hasUnnotifiedChange(false),
-    _lastNotifiedValue(initialValue)
+    _textColor({255, 255, 255, 255})
 {
     _value = std::max(_minValue, std::min(_maxValue, _value));
 }
@@ -98,34 +95,19 @@ void Slider::update()
 
     if (_isDragging) {
         if (_display->isMouseButtonDown(this->_display->getKeyId(MOUSE_LEFT))) {
+            int oldValue = _value;
             updateValueFromMousePosition(mousePos.x);
+            if (oldValue != _value)
+                _onValueChanged(_value);
         } else {
             _isDragging = false;
-        }
-    }
-
-    if (_hasUnnotifiedChange) {
-        _lastChangeTime += _display->getFrameTime();
-        if (_lastChangeTime >= 0.5f) {
-            if (_onValueChanged && _value != _lastNotifiedValue) {
-                _onValueChanged(_value);
-                _lastNotifiedValue = _value;
-            }
-            _hasUnnotifiedChange = false;
-            _lastChangeTime = 0.0f;
         }
     }
 }
 
 void Slider::setValue(float value)
 {
-    float oldValue = _value;
     _value = std::max(_minValue, std::min(_maxValue, value));
-
-    if (_value != oldValue) {
-        _lastChangeTime = 0.0f;
-        _hasUnnotifiedChange = true;
-    }
 }
 
 float Slider::getValue() const

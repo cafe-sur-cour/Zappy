@@ -31,6 +31,9 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
     initTeamPlayersDisplay(_gameInfos);
     initTpsSlider(_gameInfos, _display, _audio);
     this->_initHelpInformation();
+
+    if (_gameInfos)
+        _gameInfos->addObserver(std::shared_ptr<IObserver>(this, [](IObserver*) {}));
 }
 
 HUD::~HUD()
@@ -68,6 +71,7 @@ void HUD::update()
 
     updateTeamPlayersDisplay(_gameInfos);
     updateTpsSlider(_gameInfos);
+    updateGameMessages();
 }
 
 std::shared_ptr<Containers> HUD::addContainer(
@@ -428,7 +432,8 @@ void HUD::clearPlayerInventoryElements()
         "inventory_title",
         "inventory_separator",
         "inventory_food", "inventory_linemate", "inventory_deraumere", "inventory_sibur",
-        "inventory_mendiane", "inventory_phiras", "inventory_thystame"
+        "inventory_mendiane", "inventory_phiras", "inventory_thystame",
+        "kill_player_button"
     };
 
     for (const auto& id : elementIds) {
@@ -841,6 +846,20 @@ void HUD::initPlayerInventoryDisplay(int playerId)
         7.0f,
         {255, 20, 147, 255}
     );
+
+    bottomContainer->addButtonPercent(
+        "kill_player_button",
+        87.5f, 6.5f,
+        5.0f, 10.0f,
+        "KILL",
+        [this]() {
+            _gameInfos->killPlayer(0);
+        },
+        {200, 50, 50, 255},
+        {255, 80, 80, 255},
+        {150, 30, 30, 255},
+        {255, 255, 255, 255}
+    );
 }
 
 std::string HUD::_camModeToText(zappy::gui::CameraMode cameraMode, bool isGamePadAvailable)
@@ -940,6 +959,14 @@ void HUD::updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode came
     if (player.number <= 0) {
         clearPlayerInventoryElements();
         return;
+    }
+
+    auto killButton = std::dynamic_pointer_cast<Button>(
+        bottomContainer->getElement("kill_player_button"));
+    if (killButton) {
+        killButton->setCallback([this, playerId]() {
+            _gameInfos->killPlayer(playerId);
+        });
     }
 
     auto titleElem = bottomContainer->getElement("player_info_title");
@@ -1056,14 +1083,10 @@ void HUD::initTpsSlider(
 
     tpsContainer->addSliderPercent(
         "tps_slider", 5.0f, 15.0f, 150.0f, 100.0f,
-        1.0f, 250.0f, gameInfos->getTimeUnit(),
+        1.0f, 1000.0f, gameInfos->getTimeUnit(),
         "Frequency (TPS): ",
         [gameInfos, display, audio](float value) {
-            static bool firstCall = true;
-
-            if (firstCall)
-                gameInfos->setTimeUnit(static_cast<int>(value), true);
-            firstCall = false;
+            gameInfos->setTimeUnit(static_cast<int>(value), true);
         }
     );
 }
@@ -1083,7 +1106,7 @@ void HUD::updateTpsSlider(std::shared_ptr<GameInfos> gameInfos)
     static std::chrono::steady_clock::time_point lastUpdateTime;
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     std::chrono::duration<float> elapsed = now - lastUpdateTime;
-    if (elapsed.count() < 2.0f)
+    if (elapsed.count() < 5.0f)
         return;
 
     lastUpdateTime = now;
@@ -1106,4 +1129,134 @@ bool HUD::isPlayerInIncantation(int playerId) const
     }
 
     return false;
+}
+
+void HUD::createMessageContainer()
+{
+    if (_containers.find("message_container") != _containers.end()) {
+        _containers.erase("message_container");
+    }
+
+    int screenWidth = _display->getScreenSize().x;
+    int screenHeight = _display->getScreenSize().y;
+
+    float containerWidth = screenWidth * 0.3f;
+    float containerHeight = screenHeight * 0.2f;
+    float containerX = (screenWidth - containerWidth) / 2.0f;
+    float containerY = (screenHeight - containerHeight) / 2.0f;
+
+    Color32 backgroundColor = {0, 0, 0, 180};
+
+    auto container = addContainer("message_container", containerX, containerY,
+                containerWidth, containerHeight, backgroundColor);
+
+    if (container) {
+        float xPercent = (containerX / screenWidth) * 100.0f;
+        float yPercent = (containerY / screenHeight) * 100.0f;
+        float widthPercent = (containerWidth / screenWidth) * 100.0f;
+        float heightPercent = (containerHeight / screenHeight) * 100.0f;
+
+        container->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
+    }
+}
+
+void HUD::displayWinMessage(const std::string& teamName)
+{
+    try {
+        createMessageContainer();
+
+        std::string msgId = "win_message_" + std::to_string(
+            std::chrono::steady_clock::now().time_since_epoch().count());
+        std::string message = "Team " + teamName + " WINS!";
+
+        auto container = getContainer("message_container");
+        if (container) {
+            try {
+                for (auto& msg : _gameMessages) {
+                    container->removeElement(msg.id);
+                }
+                _gameMessages.clear();
+            } catch (const std::exception& e) {
+                std::cout << colors::T_RED << "[ERROR] Exception clearing messages: "
+                          << e.what() << colors::RESET << std::endl;
+            }
+
+            Color32 winColor = {50, 255, 50, 255};
+
+            try {
+                float fontSize = 30.0f;
+
+                auto titleElement = container->addTextPercent(
+                    "win_title", 20.0f, 25.0f, "VICTORY!", fontSize, winColor);
+
+                auto teamElement = container->addTextPercent(
+                    msgId, 20.0f, 50.0f, message, fontSize - 5.0f, winColor);
+
+                _gameMessages.push_back({
+                    msgId,
+                    message,
+                    winColor,
+                    std::chrono::steady_clock::now(),
+                    MESSAGE_DURATION * 2
+                });
+            } catch (const std::exception& e) {
+                std::cout << colors::T_RED << "[ERROR] Exception adding win message: "
+                          << e.what() << colors::RESET << std::endl;
+            }
+        }
+    } catch (const std::exception& e) {
+        std::cout << colors::T_RED << "[ERROR] Exception in displayWinMessage: "
+                  << e.what() << colors::RESET << std::endl;
+    } catch (...) {
+        std::cout << colors::T_RED << "[ERROR] Unknown exception in displayWinMessage"
+                  << colors::RESET << std::endl;
+    }
+}
+
+
+void HUD::updateGameMessages()
+{
+    auto currentTime = std::chrono::steady_clock::now();
+    auto container = getContainer("message_container");
+
+    if (!container || _gameMessages.empty()) {
+        return;
+    }
+
+    auto it = _gameMessages.begin();
+    while (it != _gameMessages.end()) {
+        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
+            currentTime - it->startTime).count();
+
+        if (elapsed >= it->duration) {
+            container->removeElement(it->id);
+            it = _gameMessages.erase(it);
+        } else {
+            if (elapsed > it->duration - 1.0f) {
+                float alpha = 255.0f * (1.0f - (elapsed - (it->duration - 1.0f)));
+                if (auto textElem = std::dynamic_pointer_cast<Text>(
+                    container->getElement(it->id))) {
+                    Color32 color = it->color;
+                    color.a = static_cast<unsigned char>(alpha);
+                    textElem->setColor(color);
+                }
+            }
+            ++it;
+        }
+    }
+
+    if (_gameMessages.empty() && container) {
+        _containers.erase("message_container");
+    }
+}
+
+void HUD::onGameEvent(GameEventType eventType, const std::string& teamName)
+{
+    switch (eventType) {
+        case GameEventType::TEAM_WIN:
+            displayWinMessage(teamName);
+            break;
+        default:
+            break;
+    }
 }
