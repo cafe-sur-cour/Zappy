@@ -330,7 +330,7 @@ class Player:
 
     def handleResponseElevationUnderway(self) -> None:
         self.inIncantation = True
-        self.logger.display("Incantation underway, waiting for elevation...")
+        self.logger.display("Elevation underway, waiting for result...")
 
     def handleResponseCurrentLevel(self, rest: str) -> None:
         try:
@@ -374,7 +374,9 @@ class Player:
             try:
                 lvl = int(message.split(" ")[1].strip())
             except ValueError:
-                self.logger.error(f"lvl in incantation message is not an int (received {lvl})")
+                self.logger.error(
+                    f"Level in incantation message is not an int (received {lvl})"
+                )
             if lvl == self.level:
                 self.incantationDirection = direction
                 self.goToIncantation = True
@@ -386,7 +388,8 @@ class Player:
                     data = self.communication.getLastMessage()
                     direction = data[0]
                     message = self.broadcaster.revealMessage(data[1])
-                    self.handleMessages(direction, message)
+                    if message.strip():
+                        self.handleMessages(direction, message)
 
                 if self.communication.hasResponses():
                     response = self.communication.getLastResponse()
@@ -409,11 +412,11 @@ class Player:
                     else:
                         self.roombaAction()
 
-        except (CommunicationException, SocketException):
-            pass
-        except KeyboardInterrupt:
-            pass
-        except Exception:
-            pass
+        except (CommunicationException, SocketException) as e:
+            self.logger.error(f"Communication exception: {e}")
+        except KeyboardInterrupt as e:
+            self.logger.error(f"Keyboard Interrupt: {e}")
+        except Exception as e:
+            self.logger.error(f"Exception: {e}")
         finally:
             self.communication.stopLoop()
