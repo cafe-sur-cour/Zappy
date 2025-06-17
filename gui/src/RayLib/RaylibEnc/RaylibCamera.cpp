@@ -227,22 +227,22 @@ void RayLibEnc::updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed)
         float leftStickX = getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);
         float leftStickY = getGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
 
-        Vector3 forward = Vector3Subtract(_camera.target, _camera.position);
-        forward = Vector3Normalize(forward);
+        Vector3 tforward = Vector3Subtract(_camera.target, _camera.position);
+        tforward = Vector3Normalize(tforward);
 
-        Vector3 right = Vector3CrossProduct(forward, _camera.up);
-        right = Vector3Normalize(right);
+        Vector3 tright = Vector3CrossProduct(tforward, _camera.up);
+        tright = Vector3Normalize(tright);
 
         if (fabs(leftStickY) > zappy::gui::GAMEPAD_DEADZONE) {
             float moveAmount = -leftStickY * moveSpeed;
-            _camera.position = Vector3Add(_camera.position, Vector3Scale(forward, moveAmount));
-            _camera.target = Vector3Add(_camera.target, Vector3Scale(forward, moveAmount));
+            _camera.position = Vector3Add(_camera.position, Vector3Scale(tforward, moveAmount));
+            _camera.target = Vector3Add(_camera.target, Vector3Scale(tforward, moveAmount));
         }
 
         if (fabs(leftStickX) > zappy::gui::GAMEPAD_DEADZONE) {
             float moveAmount = leftStickX * moveSpeed;
-            _camera.position = Vector3Add(_camera.position, Vector3Scale(right, moveAmount));
-            _camera.target = Vector3Add(_camera.target, Vector3Scale(right, moveAmount));
+            _camera.position = Vector3Add(_camera.position, Vector3Scale(tright, moveAmount));
+            _camera.target = Vector3Add(_camera.target, Vector3Scale(tright, moveAmount));
         }
     }
 }
