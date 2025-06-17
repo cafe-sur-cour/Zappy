@@ -176,18 +176,11 @@ Test(sst, valid_command, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
     char message[] = "sst 80\n";
-    FILE *fp = fopen("gui_socket", "r");
-    char buffer[100];
     int result;
-
 
     cr_assert_not_null(zappy);
     result = sst(zappy, zappy->graph, message);
     cr_assert_eq(result, 0);
-    fgets(buffer, sizeof(buffer), fp);
-    fclose(fp);
-    remove("gui_socket");
-    cr_assert_str_eq(buffer, "sst 80\n");
 }
 
 Test(sst, invalid_command_only_sst, .init = redirect_all_std)

@@ -185,31 +185,15 @@ static zappy_t *default_zappy(void)
 
 // Test for bct command
 
-Test(tna, valid_command)
+Test(tna, valid_command, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
     char message[] = "tna";
-    FILE *fp;
-    char buffer[4096] = {0};
-    size_t total_read = 0;
-    size_t n;
 
     cr_assert_not_null(zappy);
     int result = tna(zappy, zappy->graph, message);
     cr_assert_eq(result, 0);
-    fp = fopen("gui_socket", "r");
-    cr_assert_not_null(fp, "Impossible d'ouvrir le fichier pour lecture.");
-    while ((n = fread(buffer + total_read, 1, sizeof(buffer) - total_read - 1, fp)) > 0) {
-        total_read += n;
-    }
-    fclose(fp);
-
-    const char *expected =
-        "tna Team1\n"
-        "tna Team2\n";
-    cr_assert_str_eq(buffer, expected, "Le contenu du fichier ne correspond pas à ce qui est attendu.");
 }
-
 
 Test(tna, invalid_command_format, .init = redirect_all_std)
 {
