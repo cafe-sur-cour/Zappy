@@ -55,7 +55,11 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
     this->_audio = std::make_shared<Audio>();
     this->_gameInfos->setAudio(this->_audio);
     this->_map = std::make_unique<Map>(_gameInfos, this->_display);
-
+    if (!this->_display->loadFont("default", zappy::gui::CUSTOM_FONT_PATH)) {
+        std::cout << colors::T_RED << "[WARNING] Failed to load custom font: "
+        << zappy::gui::CUSTOM_FONT_PATH << ". Using default font."
+        << colors::RESET << std::endl;
+    }
     _cameraManager = std::make_shared<CameraManager>(this->_display);
     _cameraManager->setGameInfos(_gameInfos);
     _cameraManager->setMapInstance(std::shared_ptr<Map>(_map.get(), [](Map*){}));
