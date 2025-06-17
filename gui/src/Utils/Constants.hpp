@@ -13,7 +13,7 @@
     inline const float FOOD_SCALE = 0.005f;
     inline const float FOOD_FLOAT_AMPLITUDE = 0.05f;
     inline const float FOOD_FLOAT_SPEED = 1.5f;
-
+    inline const std::string CUSTOM_FONT_PATH = "gui/assets/fonts/fall.ttf";
     inline const float ROCK_SCALE = 0.2f;
     inline const float LINEMATE_SCALE = 0.2f;    // soccerball
     inline const float DERAUMERE_SCALE = 0.15f;  // beachball

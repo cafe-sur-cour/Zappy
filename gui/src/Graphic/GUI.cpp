@@ -55,7 +55,11 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
     this->_audio = std::make_shared<Audio>();
     this->_gameInfos->setAudio(this->_audio);
     this->_map = std::make_unique<Map>(_gameInfos, this->_display);
-
+    if (!this->_display->loadFont("default", zappy::gui::CUSTOM_FONT_PATH)) {
+        std::cout << colors::T_RED << "[WARNING] Failed to load custom font: "
+        << zappy::gui::CUSTOM_FONT_PATH << ". Using default font."
+        << colors::RESET << std::endl;
+    }
     _cameraManager = std::make_shared<CameraManager>(this->_display);
     _cameraManager->setGameInfos(_gameInfos);
     _cameraManager->setMapInstance(std::shared_ptr<Map>(_map.get(), [](Map*){}));
@@ -65,6 +69,9 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
         static_cast<float>(mapSize.first - 1) / 2.0f, 0.0f,
         static_cast<float>(mapSize.second - 1) / 2.0f
     };
+
+    float mapScale = std::max(mapSize.first, mapSize.second) * 0.5f;
+    mapCenter.y = mapScale * 0.2f;
     _cameraManager->setMapCenter(mapCenter);
     _cameraManager->setMapSize(mapSize.first, mapSize.second);
     this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio, _cameraManager,
@@ -153,6 +160,14 @@ void GUI::draw()
         this->_display->drawSkybox("skybox");
     }
 
+    const auto& mapSize = _gameInfos->getMapSize();
+    float forestX = static_cast<float>(mapSize.first) * 2.0f + 20.0f;
+    float forestZ = static_cast<float>(mapSize.second) * 2.0f + 20.0f;
+
+    this->_display->drawModelEx(
+        "forest", {forestX, -5.0f, forestZ}, {0.0f, 90.0f, 0.0f},
+        -135.0f, {1.0f, 1.0f, 1.0f}, CWHITE);
+
     _map->draw();
 
     if (_hoveredPlayerId >= 0) {
@@ -226,6 +241,9 @@ void GUI::switchCameraMode(zappy::gui::CameraMode mode)
             static_cast<float>(mapSize.first - 1) / 2.0f, 0.0f,
             static_cast<float>(mapSize.second - 1) / 2.0f
         };
+
+        float mapScale = std::max(mapSize.first, mapSize.second) * 0.5f;
+        mapCenter.y = mapScale * 0.2f;
 
         _cameraManager->setMapCenter(mapCenter);
         _cameraManager->initTargetPositionFromCurrentCamera();
@@ -364,6 +382,14 @@ void GUI::initModels()
                 _backgroundLoaded = true;
         }
     }
+
+    if (!this->_display->loadModel("forest", "gui/assets/models/forest.glb",
+        {0.0f, 0.0f, 0.0f}))
+        std::cout << colors::T_RED << "[ERROR] Failed to load forest model."
+                << colors::RESET << std::endl;
+    else
+        std::cout << colors::T_GREEN << "[INFO] Successfully loaded forest model."
+                << colors::RESET << std::endl;
 
     initPlayers();
 
