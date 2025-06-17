@@ -48,7 +48,8 @@ TEST_SRC = main_test.cpp \
 		   Client/Client_test.cpp \
 		   Client/MsgHandler_test.cpp \
 		   Communication/Communication_test.cpp \
-		   Game/GameInfos_test.cpp
+		   Game/GameInfos_test.cpp \
+		   Camera_manager/Camera_manager_test.cpp \
 
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
