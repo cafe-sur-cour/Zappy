@@ -228,6 +228,16 @@ void Raylib::updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed)
     return this->_raylib->updateCameraFreeMode(camMovingSpeed, camRotaSpeed);
 }
 
+InputType Raylib::getLastInputType() const
+{
+    return this->_raylib->getLastInputType();
+}
+
+void Raylib::updateLastInputType()
+{
+    return this->_raylib->updateLastInputType();
+}
+
 float Raylib::measureText(const std::string& text, float fontSize) const
 {
     return this->_raylib->measureText(text, fontSize);

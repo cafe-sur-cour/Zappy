@@ -12,6 +12,7 @@
 #include <map>
 #include <memory>
 #include "raylib.h"
+#include "../../Utils/InputType.hpp"
 
 class RayLibEnc {
     public:
@@ -84,6 +85,10 @@ class RayLibEnc {
         bool isGamepadButtonDown(int gamepad, int button) const;
         bool isGamepadButtonReleased(int gamepad, int button) const;
         float getGamepadAxisMovement(int gamepad, int axis) const;
+
+        // Input type tracking methods
+        InputType getLastInputType() const;
+        void updateLastInputType();
 
         // Scissor mode methods for clipping
         void beginScissorMode(int x, int y, int width, int height);
@@ -166,6 +171,7 @@ class RayLibEnc {
         Camera3D _camera;
         Vector2 _previousMousePosition;
         bool _isCursorLocked;
+        InputType _lastInputType;
 
         struct ModelData {
             Model model;
