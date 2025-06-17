@@ -40,11 +40,15 @@ SRC =	../../../gui/src/Client/Client.cpp \
 
 OBJ = $(SRC:.cpp=.o)
 
+COV_OBJ = $(SRC:.cpp=_cov.o)
+
 TEST_SRC = main_test.cpp \
 		   CLI/CLI_test.cpp \
 		   Exceptions/Exceptions_test.cpp \
 		   Client/Client_test.cpp \
+		   Client/MsgHandler_test.cpp \
 		   Communication/Communication_test.cpp \
+		   Game/GameInfos_test.cpp
 
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
@@ -80,8 +84,13 @@ libs:
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
+%_cov.o: %.cpp
+	$(CC) $(CFLAGS_COVERAGE) $(INCLUDES) -c $< -o $@
+
 clean:
 	@rm -rf $(OBJ)
+	@rm -rf $(COV_OBJ)
+	@rm -rf $(TEST_OBJ)
 	@rm -rf $(MAIN_OBJ)
 	@make -C ../../../gui/src/Communication clean
 	@make -C ../../../gui/src/RayLib clean
@@ -103,7 +112,7 @@ re: fclean all
 coverage: tests_run
 	@echo -e "$(BLUE)ᒥ📊ᒧ Generating coverage report...$(NC)"
 	@mkdir -p coverage_report
-	@gcovr --root . --exclude tests/ --exclude-unreachable-branches \
+	@gcovr --root ../../../gui/src --exclude=".*test.*" --exclude-unreachable-branches \
 	--merge-mode-functions=merge-use-line-min \
 	--html --html-details -o coverage_report/index.html
 	@echo -e "$(GREEN)ᒥ✅ᒧ Report generated in coverage_report/index.html$(NC)"
@@ -111,10 +120,10 @@ coverage: tests_run
 		coverage_report/index.html &> /dev/null || echo "Please open \
 		coverage_report/index.html in your browser"
 
-tests_run: libs $(SRC) $(TEST_SRC)
+tests_run: libs $(COV_OBJ) $(TEST_OBJ)
 	@echo -e "$(BLUE)ᒥ🧪ᒧ Compiling Google Test unit tests...$(NC)"
-	$(CC) -o $(UNIT_TESTS) $(SRC) $(TEST_SRC) $(CFLAGS_COVERAGE) $(INCLUDES) \
-		$(LIBS) -lgtest -lgtest_main
+	$(CC) -o $(UNIT_TESTS) $(COV_OBJ) $(TEST_OBJ) $(CFLAGS_COVERAGE) $(INCLUDES) \
+		$(LIBS) -lgtest -lgtest_main -lgmock -lgmock_main
 	@echo -e "$(GREEN)ᒥ✅ᒧ Unit tests compiled! Running...$(NC)"
 	./$(UNIT_TESTS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ All tests completed!$(NC)"

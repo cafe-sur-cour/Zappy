@@ -94,8 +94,11 @@ static int *get_needed_amount_of_ressources(float *density, int mapValue,
 
     if (needed_count == NULL)
         return NULL;
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < 7; i++) {
         required_count[i] = (int)(mapValue * density[i]);
+        if (required_count[i] <= 0)
+            required_count[i] = 1;
+    }
     count_current_resources(z, current_count);
     for (int i = 0; i < 7; i++) {
         needed_count[i] = required_count[i] - current_count[i];

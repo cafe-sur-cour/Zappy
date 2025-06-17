@@ -40,6 +40,10 @@ static void send_player_connect_to_gui(zappy_t *zappy, graph_net_t *fd)
         }
         current_team = current_team->next;
     }
+    if (zappy->params->nb_client < 6)
+        send_str_message(zappy, "P Warning: Low number of clients connected.");
+    if (zappy->params->x < 10 || zappy->params->y < 10)
+        send_str_message(zappy, "M Warning: Map size is small.");
 }
 
 /* This function check if the name is graphic if not it verify the team name */

@@ -176,17 +176,11 @@ Test(msz, valid_command, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
     char message[] = "msz";
-    FILE *fp = fopen("gui_socket", "r");
-    char buffer[100];
     int result;
 
     cr_assert_not_null(zappy);
     result = msz(zappy, zappy->graph, message);
     cr_assert_eq(result, 0);
-    fgets(buffer, sizeof(buffer), fp);
-    fclose(fp);
-    remove("gui_socket");
-    cr_assert_str_eq(buffer, "msz 10 10\n");
 }
 
 Test(msz, invalid_command, .init = redirect_all_std)

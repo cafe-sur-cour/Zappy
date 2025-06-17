@@ -59,7 +59,7 @@ functional_tests: $(GUI_NAME) $(SERVER_NAME) $(AI_NAME)
 	@echo -e "$(BLUE)ᒥ🧪ᒧ Running functional tests...$(NC)"
 	@python3 ./tests/functional/Tester.py
 
-tests_run: $(GUI_NAME)
+tests_run:
 	@make tests_run_server
 	@make tests_run_gui
 	@make tests_run_ai
@@ -75,7 +75,7 @@ tests_run_server:
 	@make -C server/src/network
 	@make -C tests/unit/server/ tests_run
 
-coverage: $(GUI_NAME) $(SERVER_NAME) $(AI_NAME)
+coverage:
 	@make coverage_server
 	@make coverage_gui
 	@make coverage_ai
@@ -89,6 +89,8 @@ coverage_gui:
 	@make -C tests/unit/gui/ coverage
 
 coverage_server:
+	@make -C server/lib/my
+	@make -C server/src/network
 	@make -C tests/unit/server/ coverage
 
 .PHONY: all clean fclean re functional_tests tests_run coverage \
