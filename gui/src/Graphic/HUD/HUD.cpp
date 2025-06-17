@@ -30,6 +30,7 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
     initCameraResetButton();
     initTeamPlayersDisplay(_gameInfos);
     initTpsSlider(_gameInfos, _display, _audio);
+    initServerMessagesDisplay(_gameInfos);
     this->_initHelpInformation();
 
     if (_gameInfos)
@@ -72,6 +73,7 @@ void HUD::update()
     updateTeamPlayersDisplay(_gameInfos);
     updateTpsSlider(_gameInfos);
     updateGameMessages();
+    updateServerMessagesDisplay(_gameInfos);
 }
 
 std::shared_ptr<Containers> HUD::addContainer(
@@ -177,6 +179,12 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
                             screenHeight,
                             bottomHeight,
                             bottomHeightPercent);
+
+    auto serverMessagesContainer = createServerMessagesContainer(
+                            screenWidth,
+                            screenHeight,
+                            bottomHeight,
+                            bottomHeightPercent);
 }
 
 void HUD::_initHelpInformation()
@@ -218,6 +226,11 @@ std::shared_ptr<Containers> HUD::getSquareContainer() const
 std::shared_ptr<Containers> HUD::getTpsContainer() const
 {
     return getContainer("tps_container");
+}
+
+std::shared_ptr<Containers> HUD::getServerMessagesContainer() const
+{
+    return getContainer("server_messages_container");
 }
 
 void HUD::initExitButton()
@@ -594,6 +607,60 @@ std::shared_ptr<Containers> HUD::createTpsContainer(
     }
 
     return tpsContainer;
+}
+
+std::shared_ptr<Containers> HUD::createServerMessagesContainer(
+    int screenWidth,
+    int screenHeight,
+    float bottomHeight,
+    float bottomHeightPercent)
+{
+    (void)bottomHeight;
+    (void)bottomHeightPercent;
+    float containerWidth = screenWidth * 0.5f;
+    float containerHeight = screenHeight * 0.4f;
+    float containerX = (screenWidth - containerWidth) / 2.0f;
+    float containerY = (screenHeight - containerHeight) / 2.0f;
+
+    auto serverMessagesContainer = addContainer(
+        "server_messages_container",
+        containerX, containerY,
+        containerWidth, containerHeight,
+        {40, 40, 40, 220}
+    );
+
+    if (serverMessagesContainer) {
+        float xPercent = (containerX / screenWidth) * 100.0f;
+        float yPercent = (containerY / screenHeight) * 100.0f;
+        float widthPercent = (containerWidth / screenWidth) * 100.0f;
+        float heightPercent = (containerHeight / screenHeight) * 100.0f;
+
+        serverMessagesContainer->setRelativePosition(
+            xPercent,
+            yPercent,
+            widthPercent,
+            heightPercent);
+
+        serverMessagesContainer->addButtonPercent(
+            "close_server_messages_button",
+            92.0f, 2.0f,
+            6.0f, 8.0f,
+            "X",
+            [this]() {
+                auto container = this->getServerMessagesContainer();
+                if (!container)
+                    return;
+
+                container->setVisible(false);
+            },
+            {200, 50, 50, 255},
+            {255, 80, 80, 255},
+            {150, 30, 30, 255},
+            {255, 255, 255, 255}
+        );
+    }
+
+    return serverMessagesContainer;
 }
 
 std::pair<float, float> HUD::calculateContentMetrics(
@@ -1114,6 +1181,78 @@ void HUD::updateTpsSlider(std::shared_ptr<GameInfos> gameInfos)
         return;
 
     slider->setValue(static_cast<float>(gameInfos->getTimeUnit()));
+}
+
+void HUD::initServerMessagesDisplay(std::shared_ptr<GameInfos> gameInfos)
+{
+    auto serverMessagesContainer = getServerMessagesContainer();
+    if (!serverMessagesContainer || !gameInfos)
+        return;
+
+    serverMessagesContainer->addTextPercent(
+        "server_messages_popup_title",
+        5.0f, 5.0f,
+        "Server Messages",
+        12.0f,
+        {245, 224, 80, 255}
+    );
+
+    serverMessagesContainer->addTextPercent(
+        "server_messages_separator",
+        5.0f, 15.0f,
+        std::string(80, '-'),
+        3.0f,
+        {150, 150, 150, 200}
+    );
+
+    std::string text = "";
+    const auto& messages = gameInfos->getServerMessages();
+
+    size_t startIndex = messages.size() > 5 ? messages.size() - 5 : 0;
+    for (size_t i = startIndex; i < messages.size(); ++i) {
+        text += messages[i] + "\n";
+    }
+
+    if (text.empty()) {
+        text = "No server messages yet...";
+        serverMessagesContainer->setVisible(false);
+    }
+
+    serverMessagesContainer->addTextPercent(
+        "server_messages_content",
+        5.0f, 20.0f,
+        text,
+        8.0f,
+        {245, 224, 80, 255}
+    );
+}
+
+void HUD::updateServerMessagesDisplay(std::shared_ptr<GameInfos> gameInfos)
+{
+    auto serverMessagesContainer = getServerMessagesContainer();
+    if (!serverMessagesContainer || !gameInfos)
+        return;
+
+    auto contentElem = std::dynamic_pointer_cast<Text>(
+        serverMessagesContainer->getElement("server_messages_content"));
+
+    if (!contentElem)
+        return;
+
+    const auto& messages = gameInfos->getServerMessages();
+    std::string text = "";
+
+    size_t startIndex = messages.size() > 5 ? messages.size() - 5 : 0;
+    for (size_t i = startIndex; i < messages.size(); ++i) {
+        text += messages[i] + "\n";
+    }
+
+    if (text.empty()) {
+        text = "No server messages yet...";
+        serverMessagesContainer->setVisible(false);
+    }
+
+    contentElem->setText(text);
 }
 
 bool HUD::isPlayerInIncantation(int playerId) const
