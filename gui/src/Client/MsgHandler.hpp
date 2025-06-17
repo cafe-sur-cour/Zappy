@@ -31,11 +31,12 @@ class MsgHandler {
         void start();
         void stop();
 
+        void handleMessage(const std::string& message);
+
     protected:
         void messageLoop();
         void securityActualization();
 
-        void handleMessage(const std::string& message);
         bool handleWelcomeMessage(const std::string& message);
         bool handleMszMessage(const std::string& message);
         bool handleBctMessage(const std::string& message);
