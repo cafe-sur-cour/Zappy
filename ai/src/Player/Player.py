@@ -156,7 +156,7 @@ class Player:
 
             elif self.roombaState["lastCommand"] == "look":
                 self.look = self.communication.getLook() or self.look
-                if self.look:
+                if self.look and len(self.look) > 0:
                     if "food" in self.look[0].keys() and not self.roombaState["tookFood"]:
                         self.communication.sendTakeObject("food")
                         self.roombaState["tookFood"] = True
@@ -275,7 +275,7 @@ class Player:
 
         elif self.goToIncantationPhase == "lootTile":
             self.look = self.communication.getLook() or self.look
-            if self.look:
+            if self.look and len(self.look) > 0:
                 if "food" in self.look[0].keys():
                     self.communication.sendTakeObject("food")
             self.goToIncantationPhase = "goToDirection"
@@ -286,12 +286,17 @@ class Player:
                 self.inIncantation = True
                 self.goToIncantation = False
                 return
-            if self.goToIncantationSteps == []:
+            if len(self.goToIncantationSteps) == 0:
                 self.goToIncantationSteps = self.getStepsFromDirection()
-            self.goToIncantationSteps[0]()
-            self.goToIncantationSteps.pop(0)
-            self.goToIncantationLastCommand = "step"
-            if self.goToIncantationSteps == []:
+            if len(self.goToIncantationSteps) > 0:
+                self.goToIncantationSteps[0]()
+                self.goToIncantationSteps.pop(0)
+                self.goToIncantationLastCommand = "step"
+                if len(self.goToIncantationSteps) == 0:
+                    self.incantationDirection = -1
+                    self.goToIncantationPhase = "lookAround"
+            else:
+                self.logger.error("No steps available in goToIncantationSteps")
                 self.incantationDirection = -1
                 self.goToIncantationPhase = "lookAround"
 
@@ -372,11 +377,17 @@ class Player:
         if message.startswith("incantation "):
             lvl = -1
             try:
-                lvl = int(message.split(" ")[1].strip())
-            except ValueError:
+                message_parts = message.split(" ")
+                if len(message_parts) >= 2:
+                    lvl = int(message_parts[1].strip())
+                else:
+                    self.logger.error("Invalid incantation message format")
+                    return
+            except (ValueError, IndexError) as e:
                 self.logger.error(
-                    f"Level in incantation message is not an int (received {lvl})"
+                    f"Error parsing incantation message '{message}': {e}"
                 )
+                return
             if lvl == self.level:
                 self.incantationDirection = direction
                 self.goToIncantation = True
