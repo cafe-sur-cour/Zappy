@@ -201,9 +201,7 @@ class Communication:
 
     def getLastMessage(self) -> tuple[int, str]:
         with self.mutex:
-            if not self.messageQueue:
-                return 0, ""
-            return self.messageQueue.pop(0)
+            return self.messageQueue.pop(0) or (0, "")
 
     def lenResponseQueue(self) -> int:
         with self.mutex:
