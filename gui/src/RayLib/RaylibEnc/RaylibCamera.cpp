@@ -235,7 +235,8 @@ void RayLibEnc::updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed)
 
         if (fabs(leftStickY) > zappy::gui::GAMEPAD_DEADZONE) {
             float moveAmount = -leftStickY * moveSpeed;
-            _camera.position = Vector3Add(_camera.position, Vector3Scale(tforward, moveAmount));
+            _camera.position =
+                Vector3Add(_camera.position, Vector3Scale(tforward, moveAmount));
             _camera.target = Vector3Add(_camera.target, Vector3Scale(tforward, moveAmount));
         }
 
