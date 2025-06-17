@@ -58,9 +58,10 @@ class Communication:
             try:
                 if self.lenRequestQueue() > 0 and self.lenPendingQueue() < 10:
                     with self.mutex:
-                        request = self.requestQueue.pop(0)
-                        self.pendingQueue.append(request)
-                        self.socket.send(request)
+                        if len(self.requestQueue) > 0:  # Double check after acquiring lock
+                            request = self.requestQueue.pop(0)
+                            self.pendingQueue.append(request)
+                            self.socket.send(request)
                 self.receive()
             except SocketException:
                 with self.mutex:
@@ -97,24 +98,27 @@ class Communication:
         if not response.startswith("[") or not response.endswith("]"):
             return None
 
-        look = []
-        items = response[1:-1].split(",")
-        if not items or len(items) == 0:
-            return None
-        for item in items:
-            look.append({})
-            if not item:
-                continue
-            tile = item.strip().split(" ")
-            tile = [d.strip() for d in tile if d and d.strip()]
-            for data in tile:
-                if not data:
+        try:
+            look = []
+            items = response[1:-1].split(",")
+            if not items or len(items) == 0:
+                return None
+            for item in items:
+                look.append({})
+                if not item:
                     continue
-                if data not in look[-1]:
-                    look[-1][data] = 0
-                look[-1][data] += 1
-
-        return look
+                tile = item.strip().split(" ")
+                tile = [d.strip() for d in tile if d and d.strip()]
+                for data in tile:
+                    if not data:
+                        continue
+                    if data not in look[-1]:
+                        look[-1][data] = 0
+                    look[-1][data] += 1
+            return look
+        except (IndexError, KeyError, ValueError) as e:
+            self.logger.error(f"Error parsing look response '{response}': {e}")
+            return None
 
     def handleResponse(self, response: str) -> str:
         if response.startswith("dead"):
@@ -174,8 +178,9 @@ class Communication:
                     data = self.receiveData()
                     if data:
                         self.addResponse(data)
-                        if self.hasPendingCommands():
-                            self.pendingQueue.pop(0)
+                        with self.mutex:
+                            if len(self.pendingQueue) > 0:
+                                self.pendingQueue.pop(0)
         except SocketException:
             raise
         except Exception as e:
@@ -201,7 +206,9 @@ class Communication:
 
     def getLastMessage(self) -> tuple[int, str]:
         with self.mutex:
-            return self.messageQueue.pop(0) or (0, "")
+            if len(self.messageQueue) > 0:
+                return self.messageQueue.pop(0)
+            return (0, "")
 
     def lenResponseQueue(self) -> int:
         with self.mutex:
@@ -217,7 +224,9 @@ class Communication:
 
     def getLastResponse(self) -> str:
         with self.mutex:
-            return self.responseQueue.pop(0) if len(self.responseQueue) > 0 else ""
+            if len(self.responseQueue) > 0:
+                return self.responseQueue.pop(0)
+            return ""
 
     def lenPendingQueue(self) -> int:
         with self.mutex:
