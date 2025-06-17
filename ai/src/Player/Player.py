@@ -60,7 +60,8 @@ class Player:
             "forwardCount": 0,
             "targetForward": 10,
             "phase": "forward",
-            "lastCommand": None
+            "lastCommand": None,
+            "tookFood": False
         }
 
         self.canIncant: bool = False
@@ -156,8 +157,9 @@ class Player:
             elif self.roombaState["lastCommand"] == "look":
                 self.look = self.communication.getLook() or self.look
                 if self.look:
-                    if "food" in self.look[0].keys():
+                    if "food" in self.look[0].keys() and not self.roombaState["tookFood"]:
                         self.communication.sendTakeObject("food")
+                        self.roombaState["tookFood"] = True
                         return
                     tookStones = False
                     neededStones = self.getNeededStonesByPriority()
@@ -169,6 +171,7 @@ class Player:
                             break
                     if tookStones:
                         self.communication.sendInventory()
+                self.roombaState["tookFood"] = False
                 self.roombaState["lastCommand"] = "take"
 
             elif self.roombaState["lastCommand"] == "take":
