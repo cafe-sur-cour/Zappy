@@ -72,6 +72,9 @@ class GameInfos : public Subject {
         void playDefeatSound(const std::string &teamName);
         std::pair<bool, std::string> isGameOver() const;
 
+        void addServerMessage(const std::string &message);
+        const std::vector<std::string> getServerMessages() const;
+
     private:
         int _mapWidth;
         int _mapHeight;
@@ -85,6 +88,7 @@ class GameInfos : public Subject {
             _playersBroadcasting;
         std::vector<zappy::structs::Incantation> _incantations;
         std::vector<zappy::structs::Egg> _eggs;
+        std::vector<std::string> _serverMessages;
 
         bool _gameOver;
         std::string _winningTeam;
