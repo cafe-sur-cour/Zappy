@@ -63,6 +63,7 @@ class Slider : public AUIElement {
         void updateValueFromMousePosition(float mouseX);
         float getHandlePosition() const;
         bool isMouseOverHandle(float mouseX, float mouseY) const;
+        bool isMouseOverTrack(float mouseX, float mouseY) const;
 };
 
 #endif /* !SLIDER_HPP_ */
