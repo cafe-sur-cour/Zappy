@@ -296,7 +296,16 @@ class Player:
                     self.incantationDirection = -1
                     self.goToIncantationPhase = "lookAround"
             else:
-                self.logger.error("No steps available in goToIncantationSteps")
+                # There are no more steps because we want the AI to wander to find food until
+                # another incantation broadcast is sent, but if every AI of the same level
+                # send a broadcast, then every one wants to join the others so there are no
+                # more broadcasts to follow steps. So we need to send a broadcast again or
+                # make the AIs go to roomba mode.
+                self.logger.error(
+                    f"No steps available in goToIncantationSteps, direction: {
+                        self.incantationDirection
+                    }"
+                )
                 self.incantationDirection = -1
                 self.goToIncantationPhase = "lookAround"
 

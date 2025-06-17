@@ -22,7 +22,9 @@ class Hash:
             if len(hex_message) % 2 != 0:
                 raise ValueError("Hex string must have even length")
 
-            encrypted = bytes(int(hex_message[i:i + 2], 16) for i in range(0, len(hex_message), 2))
+            encrypted = bytes(
+                int(hex_message[i:i + 2], 16) for i in range(0, len(hex_message), 2)
+            )
             decrypted = self.simple_xor(encrypted)
             return decrypted.decode()
         except (ValueError, UnicodeDecodeError) as e:
