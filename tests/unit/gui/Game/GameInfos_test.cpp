@@ -6,19 +6,54 @@
 */
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include "../../../../gui/src/Game/GameInfos.hpp"
+
+// Mock for ICommunication
+class MockCommunication : public ICommunication {
+public:
+    MOCK_METHOD(void, sendMessage, (const std::string &message), (override));
+    MOCK_METHOD(bool, hasMessages, (), (const, override));
+    MOCK_METHOD(std::string, popMessage, (), (override));
+    MOCK_METHOD(bool, isConnected, (), (const, override));
+    MOCK_METHOD(void, disconnect, (), (override));
+};
+
+// Mock for IAudio
+class MockAudio : public IAudio {
+public:
+    MOCK_METHOD(float, getSFXVolumeLevel, (), (override));
+    MOCK_METHOD(float, getMusicVolumeLevel, (), (override));
+    MOCK_METHOD(void, setSFXVolumeLevel, (float), (override));
+    MOCK_METHOD(void, setMusicVolumeLevel, (float), (override));
+    MOCK_METHOD(bool, loadSound, (const std::string& id, const std::string& filepath), (override));
+    MOCK_METHOD(void, playMainTheme, (float volume), (override));
+    MOCK_METHOD(void, playNextTheme, (float volume), (override));
+    MOCK_METHOD(void, playSound, (const std::string& id, float volume), (override));
+    MOCK_METHOD(void, stopSound, (const std::string& id), (override));
+    MOCK_METHOD(bool, isSoundPlaying, (const std::string& id), (const, override));
+    MOCK_METHOD(void, setSoundLooping, (const std::string& id, bool looping), (override));
+    MOCK_METHOD(void, setSoundVolume, (const std::string& id, float volume), (override));
+};
 
 class GameInfosTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        gameInfos = std::make_unique<GameInfos>();
+        mockCommunication = std::make_shared<testing::NiceMock<MockCommunication>>();
+        mockAudio = std::make_shared<testing::NiceMock<MockAudio>>();
+        gameInfos = std::make_unique<GameInfos>(mockCommunication);
+        gameInfos->setAudio(mockAudio);
     }
 
     void TearDown() override {
         gameInfos.reset();
+        mockCommunication.reset();
+        mockAudio.reset();
     }
 
     std::unique_ptr<GameInfos> gameInfos;
+    std::shared_ptr<testing::NiceMock<MockCommunication>> mockCommunication;
+    std::shared_ptr<testing::NiceMock<MockAudio>> mockAudio;
 };
 
 // Map size tests
@@ -356,4 +391,11 @@ TEST_F(GameInfosTest, UpdatePlayerFork) {
 
     gameInfos->updatePlayerFork(1);
     SUCCEED();
+}
+
+// Test audio integration
+TEST_F(GameInfosTest, PlayDefeatSound) {
+    EXPECT_CALL(*mockAudio, playSound(testing::_, testing::_)).Times(1);
+
+    gameInfos->playDefeatSound("Team1");
 }
