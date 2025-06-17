@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <utility>
 #include "../../Utils/Constants.hpp"
+#include "../../Utils/InputType.hpp"
 #include "HUD.hpp"
 
 HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
@@ -953,18 +954,18 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
         switch (cameraMode)
         {
         case zappy::gui::CameraMode::FREE:
-            return "Right joystick = Change camera direction\n\n"
+            return "Right joystick = Change camera direction\n"
                      "Left joystick = Move camera x and z\n"
-                     "RT | LT = Move camera y\n\n"
-                     "H = Toggle HUD\n";
+                     "RT | LT = Move camera y\n"
+                     "Select = Toggle HUD\n";
         case zappy::gui::CameraMode::PLAYER:
-            return "UP | DOWN = Next / Previous player\n\n"
-                     "Right joystick = Change camera direction\n\n"
-                     "H = Toggle HUD\n";
+            return "UP | DOWN = Next / Previous player\n"
+                     "Right joystick = Change camera direction\n"
+                     "Select = Toggle HUD\n";
         case zappy::gui::CameraMode::TARGETED:
-            return "Right joystick = Rotate camera around map origin\n\n"
-                     "RT | LT = Zoom / Unzoom\n\n"
-                     "H = Toggle HUD\n";
+            return "Right joystick = Rotate camera around map origin\n"
+                     "RT | LT = Zoom / Unzoom\n"
+                     "Select = Toggle HUD\n";
         default:
             return "Unknown";
         }
@@ -972,16 +973,16 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
     switch (cameraMode)
     {
     case zappy::gui::CameraMode::FREE:
-        return "Z | Q | S | D = Move camera\n\n"
-                 "UP | DOWN | RIGHT | LEFT = Change camera direction\n\n"
+        return "Z | Q | S | D = Move camera\n"
+                 "UP | DOWN | RIGHT | LEFT = Change camera direction\n"
                  "H = Toggle HUD\n";
     case zappy::gui::CameraMode::PLAYER:
-        return "UP | DOWN = Next / Previous player\n\n"
-                 "RIGHT | LEFT = Change camera direction\n\n"
+        return "UP | DOWN = Next / Previous player\n"
+                 "RIGHT | LEFT = Change camera direction\n"
                  "H = Toggle HUD\n";
     case zappy::gui::CameraMode::TARGETED:
-        return "UP | DOWN | RIGHT | LEFT = Rotate camera around map origin\n\n"
-                 "RT | LT = Zoom / Unzoom\n\n"
+        return "UP | DOWN | RIGHT | LEFT = Rotate camera around map origin\n"
+                 "SCROLL = Zoom / Unzoom\n"
                  "H = Toggle HUD\n";
     default:
         return "Unknown";
@@ -995,16 +996,19 @@ void HUD::updateHelpInformationHUD(zappy::gui::CameraMode cameraMode)
     if (!bottomContainer)
         return;
 
+    InputType lastInputType = this->_display->getLastInputType();
+    bool isUsingGamepad = (lastInputType == InputType::GAMEPAD);
+
     auto camInfoElem = std::dynamic_pointer_cast<Text>(
         bottomContainer->getElement("cam_info_mode"));
-    auto strCamMode = this->_camModeToText(cameraMode, this->_display->isGamepadAvailable());
+    auto strCamMode = this->_camModeToText(cameraMode, isUsingGamepad);
     if (camInfoElem && camInfoElem->getText() != "Camera mod: " + strCamMode) {
         camInfoElem->setText("Camera mod: " + strCamMode);
         return;
     }
     auto keyHelp = std::dynamic_pointer_cast<Text>(
         bottomContainer->getElement("help_cam_key"));
-    auto camHelpKey = this->_camKeyHelp(cameraMode, this->_display->isGamepadAvailable());
+    auto camHelpKey = this->_camKeyHelp(cameraMode, isUsingGamepad);
     if (keyHelp && keyHelp->getText() != camHelpKey) {
         keyHelp->setText(camHelpKey);
         return;
