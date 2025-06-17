@@ -61,8 +61,6 @@ class Communication:
                         request = self.requestQueue.pop(0)
                         self.pendingQueue.append(request)
                         self.socket.send(request)
-                else:
-                    sleep(0.1)
                 self.receive()
             except SocketException:
                 with self.mutex:
@@ -221,7 +219,7 @@ class Communication:
 
     def getLastResponse(self) -> str:
         with self.mutex:
-            return self.responseQueue.pop(0) if len(self.responseQueue) else ""
+            return self.responseQueue.pop(0) if len(self.responseQueue) > 0 else ""
 
     def lenPendingQueue(self) -> int:
         with self.mutex:
@@ -234,6 +232,10 @@ class Communication:
     def lenRequestQueue(self) -> int:
         with self.mutex:
             return len(self.requestQueue)
+
+    def hasRequests(self) -> bool:
+        with self.mutex:
+            return len(self.requestQueue) > 0
 
     def playerIsDead(self) -> bool:
         with self.mutex:
