@@ -9,14 +9,9 @@ name: painauchocolat
 
 
 on:
-  push:
-    branches-ignore:
-      - "ga-ignore-*"
   pull_request:
     branches-ignore:
       - "ga-ignore-*"
-    types:
-      - opened
 
 
 env:
