@@ -48,6 +48,9 @@ TEST_SRC = main_test.cpp \
 		   Client/Client_test.cpp \
 		   Client/MsgHandler_test.cpp \
 		   Communication/Communication_test.cpp \
+		   Game/GameInfos_test.cpp \
+		   Game/GameInfos_additional_test.cpp \
+		   Game/GameInfos_observer_test.cpp \
 
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
