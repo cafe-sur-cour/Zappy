@@ -19,7 +19,8 @@
 #include "../../Utils/GamepadConstants.hpp"
 #include "RayLibEnc.hpp"
 
-RayLibEnc::RayLibEnc() : _isInitialized(false), _isCursorLocked(false), _lastInputType(InputType::NONE)
+RayLibEnc::RayLibEnc() : _isInitialized(false), _isCursorLocked(false),
+    _lastInputType(InputType::NONE)
 {
     _camera = {{ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f },
         0.0f, CAMERA_PERSPECTIVE };
@@ -178,7 +179,8 @@ InputType RayLibEnc::getLastInputType() const
 void RayLibEnc::updateLastInputType()
 {
     if (isGamepadAvailable(0)) {
-        for (int button = GAMEPAD_BUTTON_LEFT_FACE_UP; button <= GAMEPAD_BUTTON_RIGHT_THUMB; ++button) {
+        for (int button = GAMEPAD_BUTTON_LEFT_FACE_UP; button <= GAMEPAD_BUTTON_RIGHT_THUMB;
+                ++button) {
             if (isGamepadButtonPressed(0, button) || isGamepadButtonDown(0, button)) {
                 _lastInputType = InputType::GAMEPAD;
                 return;

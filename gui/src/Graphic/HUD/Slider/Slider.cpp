@@ -208,13 +208,13 @@ bool Slider::isMouseOverTrack(float mouseX, float mouseY) const
     float sliderY = _bounds.y + textFontSize + 10.0f;
     float sliderStartX = _bounds.x;
     float trackThickness = _bounds.height * 0.15f;
-    
+
     FloatRect trackRect = {
         sliderStartX,
         sliderY - trackThickness * 0.5f,
         _sliderTrackWidth,
         trackThickness
     };
-    
+
     return _display->checkCollisionPointRec({mouseX, mouseY}, trackRect);
 }
