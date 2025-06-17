@@ -68,7 +68,10 @@ class Player:
         self.incantationPhase: str = "checkNbPlayers"
         self.incantationLastCommand: str = None
 
+        self.goToIncantationPhase: str = "goToDirection"
         self.goToIncantation: bool = False
+        self.goToIncantationSteps: list[()] = []
+        self.goToIncantationLastCommand: str = None
         self.incantationDirection: int = 0
 
     def __del__(self):
@@ -155,14 +158,15 @@ class Player:
                 if self.look:
                     if "food" in self.look[0].keys():
                         self.communication.sendTakeObject("food")
+                        return
                     tookStones = False
                     neededStones = self.getNeededStonesByPriority()
                     tile = self.look[0]
-                    for stone, quantity in neededStones:
+                    for stone, _ in neededStones:
                         if stone in tile.keys():
                             tookStones = True
-                            for _ in range(min(quantity, tile[stone])):
-                                self.communication.sendTakeObject(stone)
+                            self.communication.sendTakeObject(stone)
+                            break
                     if tookStones:
                         self.communication.sendInventory()
                 self.roombaState["lastCommand"] = "take"
@@ -222,7 +226,8 @@ class Player:
                 self.communication.sendForward
             ],
             2: [
-                self.communication.sendForward
+                self.communication.sendForward,
+                self.communication.sendLeft
             ],
             3: [
                 self.communication.sendLeft,
@@ -230,6 +235,8 @@ class Player:
             ],
             4: [
                 self.communication.sendRight,
+                self.communication.sendRight,
+                self.communication.sendForward,
                 self.communication.sendRight,
                 self.communication.sendForward
             ],
@@ -241,6 +248,8 @@ class Player:
             6: [
                 self.communication.sendRight,
                 self.communication.sendRight,
+                self.communication.sendForward,
+                self.communication.sendLeft,
                 self.communication.sendForward
             ],
             7: [
@@ -248,18 +257,40 @@ class Player:
                 self.communication.sendForward
             ],
             8: [
+                self.communication.sendForward,
+                self.communication.sendRight,
                 self.communication.sendForward
             ]
         }
         return stepsMap.get(self.incantationDirection, [])
 
     def goToIncantationAction(self) -> None:
-        if self.incantationDirection == 0:
-            self.inIncantation = True
-            return
-        steps = self.getStepsFromDirection()
-        for step in steps:
-            step()
+        if self.goToIncantationPhase == "lookAround":
+            self.communication.sendLook()
+            self.goToIncantationPhase = "lootTile"
+            self.goToIncantationLastCommand = "look"
+
+        elif self.goToIncantationPhase == "lootTile":
+            self.look = self.communication.getLook() or self.look
+            if self.look:
+                if "food" in self.look[0].keys():
+                    self.communication.sendTakeObject("food")
+            self.goToIncantationPhase = "goToDirection"
+            self.goToIncantationLastCommand = "take"
+
+        elif self.goToIncantationPhase == "goToDirection":
+            if self.incantationDirection == 0:
+                self.inIncantation = True
+                self.goToIncantation = False
+                return
+            if self.goToIncantationSteps == []:
+                self.goToIncantationSteps = self.getStepsFromDirection()
+            self.goToIncantationSteps[0]()
+            self.goToIncantationSteps.pop(0)
+            self.goToIncantationLastCommand = "step"
+            if self.goToIncantationSteps == []:
+                self.incantationDirection = -1
+                self.goToIncantationPhase = "lookAround"
 
     def handleResponseInventory(self) -> None:
         self.inventory = self.communication.getInventory() or self.inventory
@@ -279,13 +310,15 @@ class Player:
 
     def handleResponseKO(self) -> None:
         if not self.canIncant:
-            self.logger.error(f"Command '{self.roombaState['lastCommand']}' failed")
+            self.logger.error(f"Roomba command '{self.roombaState['lastCommand']}' failed")
         if self.canIncant:
-            self.logger.error(f"Command '{self.incantationLastCommand}' failed")
+            self.logger.error(f"Incantation command '{self.incantationLastCommand}' failed")
             self.incantationPhase = "checkNbPlayers"
             self.canIncant = False
+        if self.goToIncantation:
+            self.logger.error(f"Go to incantation command '{self.goToIncantationLastCommand}' failed")
+            self.goToIncantation = False
         self.inIncantation = False
-        self.goToIncantation = False
 
     def handleResponseOK(self) -> None:
         return
@@ -332,7 +365,11 @@ class Player:
 
     def handleMessages(self, direction: int, message: str) -> None:
         if message.startswith("incantation "):
-            lvl = message.split(" ")[1]
+            lvl = -1
+            try:
+                lvl = int(message.split(" ")[1].strip())
+            except ValueError:
+                self.logger.error(f"lvl in incantation message is not an int (received {lvl})")
             if lvl == self.level:
                 self.incantationDirection = direction
                 self.goToIncantation = True
@@ -348,14 +385,17 @@ class Player:
 
                 if self.communication.hasResponses():
                     response = self.communication.getLastResponse()
-                    if response.strip() == "dead":
-                        self.logger.display("Player died")
-                        break
-                    self.handleCommandResponse(response)
+                    if response:
+                        if response.strip() == "dead":
+                            self.logger.display("Player died")
+                            break
+                        self.handleCommandResponse(response)
 
                 if (
+                    not self.communication.hasRequests() and
                     not self.communication.hasPendingCommands() and
-                    not self.inIncantation
+                    not self.inIncantation and
+                    not self.communication.hasResponses()
                 ):
                     if self.canIncant:
                         self.incantationAction()
@@ -364,7 +404,6 @@ class Player:
                     else:
                         self.roombaAction()
 
-                sleep(0.1)
 
         except (CommunicationException, SocketException):
             pass
