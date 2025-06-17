@@ -1250,6 +1250,7 @@ void HUD::updateServerMessagesDisplay(std::shared_ptr<GameInfos> gameInfos)
     if (text.empty()) {
         text = "No server messages yet...";
         serverMessagesContainer->setVisible(false);
+        return;
     }
 
     contentElem->setText(text);
