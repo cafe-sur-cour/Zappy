@@ -1,0 +1,42 @@
+services:
+  jenkins:
+    build: .
+    image: jenkins/jenkins:lts-jdk17
+    container_name: zappipicaca
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_data:/var/jenkins_home
+      - ./setup.yml:/var/jenkins_home/casc_configs/setup.yml
+      - ./job_dsl.groovy:/var/jenkins_home/job_dsl.groovy
+      - ../cppStyleChecker.sh:/usr/local/bin/cppStyleChecker.sh
+      - ../pythonStyleChecker.sh:/usr/local/bin/pythonStyleChecker.sh
+      - ./cStyleChecker.sh:/usr/local/bin/cStyleChecker.sh
+      - ./setup_gui_tests.sh:/var/jenkins_home/setup_gui_tests.sh
+      - ./fix_audio_issues.sh:/var/jenkins_home/fix_audio_issues.sh
+      - ./fix_fork_tests.sh:/var/jenkins_home/fix_fork_tests.sh
+      - ./memory_diagnostics.sh:/var/jenkins_home/memory_diagnostics.sh
+      - ./run_coverage_with_workaround.sh:/var/jenkins_home/run_coverage_with_workaround.sh
+      - ./pipeline_summary.sh:/var/jenkins_home/pipeline_summary.sh
+      - ./pipeline_visualization.sh:/var/jenkins_home/pipeline_visualization.sh
+      - ./pipeline_visualization_simple.sh:/var/jenkins_home/pipeline_visualization_simple.sh
+      - ./plugin_diagnostics.sh:/var/jenkins_home/plugin_diagnostics.sh
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+      - CASC_JENKINS_CONFIG=/var/jenkins_home/casc_configs
+      - DISPLAY=:99
+      - SDL_AUDIODRIVER=dummy
+      - SDL_VIDEODRIVER=dummy
+      - RAYLIB_AUDIO_FLAG=AUDIO_DEVICE_NULL
+      - ALSA_CONFIG_PATH=/dev/null
+      - OPENAL_DRIVER=null
+      - RAYLIB_TEST_FLAGS=--silent
+      - RAYLIB_CONFIG_FLAGS=-DPLATFORM=Desktop -DSHARED=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+      - NO_AUDIO=1
+    env_file:
+      - .env
+
+volumes:
+  jenkins_data:
