@@ -316,7 +316,9 @@ class Player:
             self.incantationPhase = "checkNbPlayers"
             self.canIncant = False
         if self.goToIncantation:
-            self.logger.error(f"Go to incantation command '{self.goToIncantationLastCommand}' failed")
+            self.logger.error(
+                f"Go to incantation command '{self.goToIncantationLastCommand}' failed"
+            )
             self.goToIncantation = False
         self.inIncantation = False
 
@@ -403,7 +405,6 @@ class Player:
                         self.goToIncantationAction()
                     else:
                         self.roombaAction()
-
 
         except (CommunicationException, SocketException):
             pass
