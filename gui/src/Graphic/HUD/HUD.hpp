@@ -61,6 +61,8 @@ class HUD : public IObserver {
 
         std::shared_ptr<Containers> getTpsContainer() const;
 
+        std::shared_ptr<Containers> getServerMessagesContainer() const;
+
         void initExitButton();
 
         void initSettingsButton();
@@ -77,6 +79,10 @@ class HUD : public IObserver {
             std::shared_ptr<IDisplay> raylib, std::shared_ptr<IAudio> audio);
 
         void updateTpsSlider(std::shared_ptr<GameInfos> gameInfos);
+
+        void initServerMessagesDisplay(std::shared_ptr<GameInfos> gameInfos);
+
+        void updateServerMessagesDisplay(std::shared_ptr<GameInfos> gameInfos);
 
         void initPlayerInventoryDisplay(int playerId);
 
@@ -123,6 +129,12 @@ class HUD : public IObserver {
             float bottomHeightPercent);
 
         std::shared_ptr<Containers> createTpsContainer(
+            int screenWidth,
+            int screenHeight,
+            float bottomHeight,
+            float bottomHeightPercent);
+
+        std::shared_ptr<Containers> createServerMessagesContainer(
             int screenWidth,
             int screenHeight,
             float bottomHeight,

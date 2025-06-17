@@ -41,6 +41,9 @@ class CameraManager {
         float getCameraZoomSpeed();
         void setCameraZoomSpeed(float);
 
+        Vector3f calculatePlayerPosition(const zappy::structs::Player& player);
+        Vector3f calculateCameraPosition(const Vector3f& playerPos, float angleXZ);
+
     private:
         float _cameraMovingSpeed = 7.5f;
         float _cameraRotaSpeed = 2.0f;
@@ -62,8 +65,6 @@ class CameraManager {
         bool _isPlayerViewDragging;
 
         void handlePlayerCameraMouseInput();
-        Vector3f calculatePlayerPosition(const zappy::structs::Player& player);
-        Vector3f calculateCameraPosition(const Vector3f& playerPos, float angleXZ);
 };
 
 #endif /* !CAMERA_MANAGER_HPP_ */
