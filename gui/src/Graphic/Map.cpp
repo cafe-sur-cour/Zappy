@@ -14,6 +14,7 @@
 #include <cmath>
 #include <iostream>
 #include <chrono>
+#include <limits>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -97,13 +98,13 @@ void Map::draw(bool performanceMode)
             }
         }
 
-        int fogRangeInTiles = static_cast<int>(zappy::gui::FOG_DISTANCE_MAX / zappy::gui::POSITION_MULTIPLIER) + 2;
+        int fogRangeInTiles = static_cast<int>(zappy::gui::FOG_DISTANCE_MAX /
+            zappy::gui::POSITION_MULTIPLIER) + 2;
 
         for (int y = std::max(0, cameraY - fogRangeInTiles);
              y < std::min(mapHeight, cameraY + fogRangeInTiles + 1); ++y) {
             for (int x = std::max(0, cameraX - fogRangeInTiles);
                  x < std::min(mapWidth, cameraX + fogRangeInTiles + 1); ++x) {
-
                 const auto& tile = _gameInfos->getTileRef(x, y);
 
                 Vector3f tilePosition = {
@@ -181,7 +182,8 @@ void Map::drawAllPlayers()
             player.x, player.y);
 
         if (_performanceMode) {
-            float distanceFromCamera = _display->vector3DDistanceFromCamera(interpolatedPosition);
+            float distanceFromCamera =
+                _display->vector3DDistanceFromCamera(interpolatedPosition);
             if (distanceFromCamera > zappy::gui::FOG_DISTANCE_MAX) {
                 continue;
             }
@@ -574,7 +576,8 @@ void Map::drawBroadcastingPlayers()
             playerInfo.x, playerInfo.y);
 
         if (_performanceMode) {
-            float distanceFromCamera = _display->vector3DDistanceFromCamera(interpolatedPosition);
+            float distanceFromCamera =
+                _display->vector3DDistanceFromCamera(interpolatedPosition);
             if (distanceFromCamera > zappy::gui::FOG_DISTANCE_MAX) {
                 ++it;
                 continue;
@@ -655,7 +658,8 @@ void Map::drawIncantations()
         };
 
         if (_performanceMode) {
-            float distanceFromCamera = _display->vector3DDistanceFromCamera(incantationWorldPos);
+            float distanceFromCamera =
+                _display->vector3DDistanceFromCamera(incantationWorldPos);
             if (distanceFromCamera > zappy::gui::FOG_DISTANCE_MAX) {
                 continue;
             }
