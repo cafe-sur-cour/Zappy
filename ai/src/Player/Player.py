@@ -70,11 +70,13 @@ class Player:
         self.incantationPhase: str = "checkNbPlayers"
         self.incantationLastCommand: str = None
 
-        self.goToIncantationPhase: str = "goToDirection"
-        self.goToIncantation: bool = False
-        self.goToIncantationSteps: list[()] = []
-        self.goToIncantationLastCommand: str = None
-        self.incantationDirection: int = 0
+        self.goToIncantationState: dict = {
+            "status": False,
+            "phase": "goToDirection",
+            "steps": [],
+            "lastCommand": None,
+            "direction": 0,
+        }
 
     def __del__(self):
         try:
@@ -99,7 +101,7 @@ class Player:
             f"Alive: {not self.communication.playerIsDead()}, "
             f"In Incantation: {self.inIncantation};"
             f"Can Incant: {self.canIncant}"
-            f"Going to incantation: {self.goToIncantation}"
+            f"Going to incantation: {self.goToIncantationState["status"]}"
         )
 
     def create_child(self) -> int:
@@ -229,7 +231,12 @@ class Player:
         elif self.incantationPhase == "needMorePlayers":
             self.broadcaster.broadcastMessage(f"incantation {self.level}")
             self.incantationLastCommand = "broadcast"
-            self.incantationPhase = "checkNbPlayers"
+            self.incantationPhase = "waitingForGathering"
+
+        elif self.incantationPhase == "waitingForGathering":
+            self.communication.sendLook()
+            self.incantationLastCommand = "look"
+            self.incantationPhase = "waitForLook"
 
     def getStepsFromDirection(self) -> list[()]:
         stepsMap = {
@@ -274,51 +281,78 @@ class Player:
                 self.communication.sendForward
             ]
         }
-        return stepsMap.get(self.incantationDirection, [])
+        return stepsMap.get(self.goToIncantationState["direction"], [])
 
     def goToIncantationAction(self) -> None:
-        if self.goToIncantationPhase == "lookAround":
-            self.communication.sendLook()
-            self.goToIncantationPhase = "lootTile"
-            self.goToIncantationLastCommand = "look"
+        if self.goToIncantationState["waitingForResponse"]:
+            return
 
-        elif self.goToIncantationPhase == "lootTile":
+        if self.goToIncantationState["phase"] == "goToDirection":
+            if self.goToIncantationState["direction"] == 0:
+                self.goToIncantationState["phase"] = "lookAround"
+                return
+
+            if len(self.goToIncantationState["steps"]) == 0:
+                self.goToIncantationState["steps"] = self.getStepsFromDirection()
+
+            if len(self.goToIncantationState["steps"]) > 0:
+                self.goToIncantationState["steps"][0]()
+                self.goToIncantationState["steps"].pop(0)
+                self.goToIncantationState["lastCommand"] = "step"
+                self.goToIncantationState["waitingForResponse"] = True
+            else:
+                self.goToIncantationState["phase"] = "lookAround"
+
+        elif self.goToIncantationState["phase"] == "lookAround":
+            self.communication.sendLook()
+            self.goToIncantationState["phase"] = "waitForLook"
+            self.goToIncantationState["lastCommand"] = "look"
+            self.goToIncantationState["waitingForResponse"] = True
+
+        elif self.goToIncantationState["phase"] == "lootTile":
             self.look = self.communication.getLook() or self.look
             if self.look and len(self.look) > 0:
                 if "food" in self.look[0].keys():
                     self.communication.sendTakeObject("food")
-            self.goToIncantationPhase = "goToDirection"
-            self.goToIncantationLastCommand = "take"
+                    self.goToIncantationState["lastCommand"] = "take"
+                    self.goToIncantationState["waitingForResponse"] = True
+                    return
+            self.goToIncantationState["phase"] = "waitAtLocation"
+            self.goToIncantationState["lastCommand"] = None
 
-        elif self.goToIncantationPhase == "goToDirection":
-            if self.incantationDirection == 0:
-                self.inIncantation = True
-                self.goToIncantation = False
-                return
-            if len(self.goToIncantationSteps) == 0:
-                self.goToIncantationSteps = self.getStepsFromDirection()
-            if len(self.goToIncantationSteps) > 0:
-                self.goToIncantationSteps[0]()
-                self.goToIncantationSteps.pop(0)
-                self.goToIncantationLastCommand = "step"
-                if len(self.goToIncantationSteps) == 0:
-                    self.incantationDirection = -1
-                    self.goToIncantationPhase = "lookAround"
+        elif self.goToIncantationState["phase"] == "waitAtLocation":
+            self.communication.sendInventory()
+            self.goToIncantationState["lastCommand"] = "inventory"
+            self.goToIncantationState["waitingForResponse"] = True
+
+        elif self.goToIncantationState["phase"] == "checkIfCanIncant":
+            neededStones = self.getNeededStonesByPriority()
+            if not neededStones:
+                self.logger.info("Gathered enough resources, can now incant")
+                self.canIncant = True
+                self.goToIncantationState["status"] = False
+                self.goToIncantationState["steps"] = []
+                self.goToIncantationState["waitingForResponse"] = False
             else:
-                self.incantationDirection = -1
-                self.goToIncantationPhase = "lookAround"
-                self.goToIncantation = False
-                self.incantationPhase = "checkNbPlayers"
-                sleep(randint(1, 10) / 10)
+                self.goToIncantationState["phase"] = "waitAtLocation"
 
     def handleResponseInventory(self) -> None:
         self.inventory = self.communication.getInventory() or self.inventory
-        neededStones = self.getNeededStonesByPriority()
-        if not neededStones:
-            self.canIncant = True
+
+        if self.goToIncantationState["status"] and self.goToIncantationState["lastCommand"] == "inventory":
+            self.goToIncantationState["waitingForResponse"] = False
+            self.goToIncantationState["phase"] = "checkIfCanIncant"
+        else:
+            neededStones = self.getNeededStonesByPriority()
+            if not neededStones:
+                self.canIncant = True
+                self.goToIncantationState["status"] = False
+                self.goToIncantationState["steps"] = []
+                self.goToIncantationState["waitingForResponse"] = False
 
     def handleResponseLook(self) -> None:
         self.look = self.communication.getLook() or self.look
+
         if self.canIncant and self.incantationPhase == "waitForLook":
             if len(self.look) > 0 and "player" in self.look[0].keys():
                 playerCount = self.look[0]["player"]
@@ -326,24 +360,48 @@ class Player:
                     self.incantationPhase = "dropStones"
                 else:
                     self.incantationPhase = "needMorePlayers"
-                self.goToIncantation = False
 
-    def handleResponseKO(self) -> None:
-        if not self.canIncant:
-            self.logger.error(f"Roomba command '{self.roombaState['lastCommand']}' failed")
-        if self.canIncant:
-            self.logger.error(f"Incantation command '{self.incantationLastCommand}' failed")
-            self.incantationPhase = "checkNbPlayers"
-            self.canIncant = False
-        if self.goToIncantation:
-            self.logger.error(
-                f"Go to incantation command '{self.goToIncantationLastCommand}' failed"
-            )
-            self.goToIncantation = False
-        self.inIncantation = False
+        elif self.goToIncantationState["status"] and self.goToIncantationState["lastCommand"] == "look":
+            self.goToIncantationState["waitingForResponse"] = False
+            if self.goToIncantationState["phase"] == "waitForLook":
+                self.goToIncantationState["phase"] = "lootTile"
 
     def handleResponseOK(self) -> None:
-        return
+        if self.goToIncantationState["status"] and self.goToIncantationState["waitingForResponse"]:
+            self.goToIncantationState["waitingForResponse"] = False
+
+            if self.goToIncantationState["lastCommand"] == "step":
+                if len(self.goToIncantationState["steps"]) == 0:
+                    self.goToIncantationState["phase"] = "lookAround"
+            elif self.goToIncantationState["lastCommand"] == "take":
+                self.goToIncantationState["phase"] = "waitAtLocation"
+
+    def handleResponseKO(self) -> None:
+        if self.goToIncantationState["status"]:
+            self.logger.error(
+                f"Go to incantation command '{self.goToIncantationState['lastCommand']}' failed"
+            )
+            self.goToIncantationState["waitingForResponse"] = False
+
+            if self.goToIncantationState["phase"] == "goToDirection":
+                self.goToIncantationState["steps"] = []
+                self.goToIncantationState["phase"] = "lookAround"
+            elif self.goToIncantationState["phase"] in ["waitForLook", "lootTile"]:
+                self.goToIncantationState["phase"] = "waitAtLocation"
+            else:
+                self.logger.warning("Resetting gathering state due to error")
+                self.goToIncantationState["status"] = False
+                self.goToIncantationState["phase"] = "goToDirection"
+                self.goToIncantationState["steps"] = []
+
+        elif self.canIncant:
+            self.logger.error(f"Incantation command '{self.incantationLastCommand}' failed")
+            self.incantationPhase = "checkNbPlayers"
+            if self.incantationLastCommand == "incantation":
+                self.canIncant = False
+                self.inIncantation = False
+        else:
+            self.logger.error(f"Roomba command '{self.roombaState['lastCommand']}' failed")
 
     def handleResponseElevationUnderway(self) -> None:
         self.inIncantation = True
@@ -357,7 +415,8 @@ class Player:
                 self.level = new_level
                 self.canIncant = False
                 self.incantationPhase = "checkNbPlayers"
-                self.goToIncantation = False
+                self.goToIncantationState["status"] = False
+                self.goToIncantationState["steps"] = []
                 self.inIncantation = False
             else:
                 self.logger.error(
@@ -400,9 +459,20 @@ class Player:
                     f"Error parsing incantation message '{message}': {e}"
                 )
                 return
-            if lvl == self.level:
-                self.incantationDirection = direction
-                self.goToIncantation = True
+
+            if (
+                lvl == self.level and 
+                not self.goToIncantationState["status"] and 
+                not self.canIncant and 
+                not self.inIncantation
+            ):
+                self.logger.info(f"Received incantation call for level {lvl}, going to direction {direction}")
+                self.goToIncantationState["direction"] = direction
+                self.goToIncantationState["status"] = True
+                self.goToIncantationState["phase"] = "goToDirection"
+                self.goToIncantationState["steps"] = []
+                self.goToIncantationState["waitingForResponse"] = False
+                self.goToIncantationState["lastCommand"] = None
 
     def loop(self) -> None:
         try:
@@ -423,14 +493,14 @@ class Player:
                         self.handleCommandResponse(response)
 
                 if (
+                    not self.inIncantation and
                     not self.communication.hasRequests() and
                     not self.communication.hasPendingCommands() and
-                    not self.inIncantation and
                     not self.communication.hasResponses()
                 ):
                     if self.canIncant:
                         self.incantationAction()
-                    elif self.goToIncantation:
+                    elif self.goToIncantationState["status"]:
                         self.goToIncantationAction()
                     else:
                         self.roombaAction()
