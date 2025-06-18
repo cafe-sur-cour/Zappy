@@ -105,12 +105,9 @@ void GameInfos::updateTile(const zappy::structs::Tile tile)
     if (tile.x < 0 || tile.y < 0 || tile.x >= _mapWidth || tile.y >= _mapHeight)
         return;
 
-    // Ensure matrix is initialized
-    if (!_matrixInitialized) {
+    if (!_matrixInitialized)
         initializeTileMatrix();
-    }
 
-    // Direct O(1) access to update tile
     _tileMatrix[tile.y][tile.x] = zappy::structs::Tile(
         tile.x, tile.y, tile.food, tile.linemate, tile.deraumere,
         tile.sibur, tile.mendiane, tile.phiras, tile.thystame);
