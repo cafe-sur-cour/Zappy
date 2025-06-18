@@ -201,8 +201,8 @@ TEST_F(GameInfosTest, UpdateTileOutOfBounds) {
     zappy::structs::Tile tile(15, 15, 10, 1, 2, 3, 4, 5, 6);
     gameInfos->updateTile(tile);
 
-    auto tiles = gameInfos->getTiles();
-    EXPECT_EQ(tiles.size(), 0);
+    auto tiles = gameInfos->getTileRef(15, 15);
+    EXPECT_EQ(tiles.x, 0);
 }
 
 TEST_F(GameInfosTest, GetAllTiles) {
@@ -214,9 +214,13 @@ TEST_F(GameInfosTest, GetAllTiles) {
     gameInfos->updateTile(tile1);
     gameInfos->updateTile(tile2);
 
-    auto tiles = gameInfos->getTiles();
+    auto tile_1 = gameInfos->getTileRef(1, 1);
+    auto tile_2 = gameInfos->getTileRef(2, 2);
 
-    EXPECT_EQ(tiles.size(), 2);
+    EXPECT_EQ(tile_1.x, 1);
+    EXPECT_EQ(tile_1.y, 1);
+    EXPECT_EQ(tile_2.x, 2);
+    EXPECT_EQ(tile_2.y, 2);
 }
 
 // Team name tests
