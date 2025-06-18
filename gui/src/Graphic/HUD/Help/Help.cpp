@@ -322,5 +322,119 @@ void Help::initHelpContainer()
         {255, 255, 255, 255}
     );
 
+    const float posYImageItem = 65.0f;
+    const float posYTextItem = 82.0f;
+
+    _helpContainer->addImagePercent(
+        "help_item_food",
+        50.0f, posYImageItem,
+        5.0f, 13.5f,
+        "gui/assets/img/food.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_food",
+        51.5f, posYTextItem,
+        "Food" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_item_linemate",
+        56.0f, posYImageItem+0.1,
+        5.0f, 12.25f,
+        "gui/assets/img/linemate.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_linemate",
+        56.8f, posYTextItem,
+        "Linemate" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_item_deraumere",
+        62.6f, posYImageItem,
+        5.0f, 12.25f,
+        "gui/assets/img/deraumere.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_deraumere",
+        63.2f, posYTextItem,
+        "Deraumere" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_item_sibur",
+        68.9f, posYImageItem,
+        5.0f, 12.25f,
+        "gui/assets/img/sibur.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_sibur",
+        70.4f, posYTextItem,
+        "Sibur" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_item_mendiane",
+        74.9f, posYImageItem,
+        5.0f, 12.25f,
+        "gui/assets/img/mendiane.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_mendiane",
+        75.8f, posYTextItem,
+        "Mendiane" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_item_phiras",
+        80.9f, posYImageItem,
+        5.0f, 12.25f,
+        "gui/assets/img/phiras.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_phiras",
+        81.9f, posYTextItem,
+        "Phiras" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_item_thystame",
+        86.9f, posYImageItem,
+        5.0f, 12.25f,
+        "gui/assets/img/thystame.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_thystame",
+        87.8f, posYTextItem,
+        "Thystame" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_item_egg",
+        93.2f, posYImageItem,
+        4.5f, 12.25f,
+        "gui/assets/img/egg.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_egg",
+        94.8f, posYTextItem,
+        "Egg" , 2.0f,
+        {255, 255, 255, 255}
+    );
     _visible = false;
 }
