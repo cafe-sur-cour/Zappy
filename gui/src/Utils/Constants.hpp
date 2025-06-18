@@ -146,6 +146,8 @@ namespace zappy::gui {
     inline const float GAMEPAD_DEADZONE = 0.2f;
     inline const float POSITION_MULTIPLIER = 2.2f;
 
+    inline const float FOG_DISTANCE_MAX = 60.0f;
+
     inline const float EGG_SCALE = 1.0f;
     inline const float FOOD_SCALE = 0.005f;
     inline const float FOOD_FLOAT_AMPLITUDE = 0.05f;
