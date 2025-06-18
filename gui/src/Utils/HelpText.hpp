@@ -49,6 +49,12 @@ namespace zappy::constants {
         "Resources on the map are represented by different colored objects.\n"
         "Players collect these resources to perform rituals and level up.";
 
+    inline const char *HELP_SECTION_5 =
+        "Level";
+
+    inline const char *HELP_SECTION_6 =
+        "Items";
+
 }  // namespace zappy::constants
 
 #endif /* !HELP_TEXT_HPP_ */

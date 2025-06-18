@@ -82,7 +82,7 @@ void Help::initHelpContainer()
 
     _helpContainer->setRelativePosition(
         15.f, 20.0f,
-        40.0f, 60.0f
+        85.0f, 60.0f
     );
 
     _helpContainer->addTextPercent(
@@ -109,8 +109,8 @@ void Help::initHelpContainer()
 
     _helpContainer->addTextPercent(
         "help_separator",
-        2.0f, 8.0f,
-        std::string(100, '-'),
+        0.0f, 8.0f,
+        std::string(500, '-'),
         1.0f,
         {150, 150, 150, 200}
     );
@@ -187,6 +187,26 @@ void Help::initHelpContainer()
         2.5f,
         {220, 220, 220, 255}
     );
+
+    yPos = 12.f;
+    _helpContainer->addTextPercent(
+        "help_section5_title",
+        75.0f, yPos,
+        zappy::constants::HELP_SECTION_5,
+        3.5f,
+        {230, 230, 120, 255}
+    );
+
+
+    yPos = 60.f;
+    _helpContainer->addTextPercent(
+        "help_section6_title",
+        75.0f, yPos,
+        zappy::constants::HELP_SECTION_6,
+        3.5f,
+        {230, 230, 120, 255}
+    );
+
 
     _visible = false;
 }
