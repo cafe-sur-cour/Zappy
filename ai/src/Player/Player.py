@@ -65,8 +65,8 @@ class Player:
             "tookFood": False,
         }
 
-        self.incantationStatus: dict = {
-            "canIncant": False,
+        self.incantationState: dict = {
+            "status": False,
             "phase": None,
             "lastCommand": None,
         }
@@ -101,7 +101,7 @@ class Player:
             f"Inventory: {self.inventory}, "
             f"Alive: {not self.communication.playerIsDead()}, "
             f"In Incantation: {self.inIncantation};"
-            f"Can Incant: {self.incantationStatus["canIncant"]}"
+            f"Can Incant: {self.incantationState["canIncant"]}"
             f"Going to incantation: {self.goToIncantationState["status"]}"
         )
 
@@ -257,6 +257,12 @@ class Player:
     def handleResponseInventory(self) -> None:
         self.inventory = self.communication.getInventory() or self.inventory
 
+        needStones = len(self.getNeededStonesByPriority()) > 0
+
+        if not needStones:
+            if not self.goToIncantationState["status"]:
+                self.incantationState["status"] = True
+
     def handleResponseLook(self) -> None:
         self.look = self.communication.getLook() or self.look
 
@@ -319,11 +325,10 @@ class Player:
                 )
                 return
             if lvl == self.level:
-                # Can go to incantation spot
-                pass
+                self.goToIncantationState["status"] = True
+                self.incantationState["status"] = False
             else:
-                # Send no i am not
-                pass
+                self.broadcaster.broadcastMessage("not_same_level")
         elif message.startswith("not_same_level"):
             # Continue roaming to gather ressources
             pass
@@ -361,7 +366,12 @@ class Player:
                     not self.communication.hasPendingCommands() and
                     not self.communication.hasResponses()
                 ):
-                    self.roombaAction()
+                    if self.incantationState["status"]:
+                        self.incantationAction()
+                    elif self.goToIncantationState["status"]:
+                        self.goToIncantationAction()
+                    else:
+                        self.roombaAction()
 
         except (CommunicationException, SocketException) as e:
             self.logger.error(f"Communication exception: {e}")
