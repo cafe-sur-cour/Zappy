@@ -107,8 +107,13 @@ void GUI::updateCamera()
 void GUI::update()
 {
     this->_isRunning = this->_display->isOpen();
-    if (_gameInfos->getMapSize().first * _gameInfos->getMapSize().second >= 2500)
+    if (_gameInfos->getMapSize().first * _gameInfos->getMapSize().second >= 2500) {
+        bool wasPerformanceMode = _performanceMode;
         _performanceMode = true;
+
+        if (!wasPerformanceMode && _cameraMode == zappy::gui::CameraMode::TARGETED)
+            switchCameraMode(zappy::gui::CameraMode::FREE);
+    }
 
     if (this->_display->isKeyReleased(this->_display->getKeyId(TAB)) ||
         this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_LEFT_SHOULDER)))
@@ -237,6 +242,9 @@ void GUI::setWindowHeight(int height)
 
 void GUI::switchCameraMode(zappy::gui::CameraMode mode)
 {
+    if (_performanceMode && mode == zappy::gui::CameraMode::TARGETED)
+        return;
+
     if (mode == zappy::gui::CameraMode::TARGETED &&
         _cameraMode != zappy::gui::CameraMode::TARGETED) {
         const auto& mapSize = _gameInfos->getMapSize();
@@ -281,6 +289,12 @@ void GUI::switchCameraModeNext()
     zappy::gui::CameraMode newMode = static_cast<zappy::gui::CameraMode>(
         (static_cast<int>(_cameraMode) + 1) %
             static_cast<int>(zappy::gui::CameraMode::NB_MODES));
+
+    if (_performanceMode && newMode == zappy::gui::CameraMode::TARGETED) {
+        newMode = static_cast<zappy::gui::CameraMode>(
+            (static_cast<int>(newMode) + 1) %
+                static_cast<int>(zappy::gui::CameraMode::NB_MODES));
+    }
 
     switchCameraMode(newMode);
 }
