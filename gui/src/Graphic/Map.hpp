@@ -58,6 +58,7 @@ class Map {
         void drawPerformanceTile(const zappy::structs::Tile &tile);
 
         void drawRock(int x, int y, const zappy::structs::Tile &tile);
+        void drawPerformanceRock(int x, int y, const zappy::structs::Tile &tile);
 
         void drawFood(int x, int y, const zappy::structs::Tile &tile);
         void drawPerformanceFood(int x, int y, const zappy::structs::Tile &tile);

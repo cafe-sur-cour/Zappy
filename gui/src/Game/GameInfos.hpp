@@ -36,8 +36,9 @@ class GameInfos : public Subject {
         int getTimeUnit() const;
 
         void updateTile(const zappy::structs::Tile tile);
-        const std::vector<zappy::structs::Tile> getTiles() const;
         const zappy::structs::Tile getTile(int x, int y) const;
+        const zappy::structs::Tile& getTileRef(int x, int y) const;
+        void initializeTileMatrix();
 
         void updateTeamName(const std::string &teamName);
         const std::vector<std::string> getTeamNames() const;
@@ -82,7 +83,8 @@ class GameInfos : public Subject {
         int _mapHeight;
         int _timeUnit;
 
-        std::vector<zappy::structs::Tile> _tiles;
+        std::vector<std::vector<zappy::structs::Tile>> _tileMatrix;
+        bool _matrixInitialized;
         std::vector<std::string> _teamNames;
         std::vector<zappy::structs::Player> _players;
         std::vector<std::pair<int, bool>> _playersExpulsing;

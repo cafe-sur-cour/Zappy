@@ -474,6 +474,14 @@ int GUI::getPlayerUnderMouse() const
     int closestPlayerId = -1;
 
     for (const auto& player : players) {
+        if (_performanceMode) {
+            Vector3f playerPos = _map->getPlayerInterpolatedPosition(player.number, player.x, player.y);
+            float distanceFromCamera = _display->vector3DDistanceFromCamera(playerPos);
+            if (distanceFromCamera > zappy::gui::FOG_DISTANCE_MAX) {
+                continue;
+            }
+        }
+
         BoundingBox3D playerBox = getPlayerBoundingBox(player);
         RayCollision3D collision = this->_display->getRayCollisionBox(mouseRay, playerBox);
 
