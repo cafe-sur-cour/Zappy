@@ -210,12 +210,96 @@ Run the comprehensive test suite:
 # Unit tests
 make tests_run
 
-# Functional tests  
+# Functional tests
 cd tests/functional
 python3 Tester.py
 ```
 
 **Coverage reports** are automatically generated in `coverage_report/`.
+
+---
+
+## 🤖 Jenkins CI/CD
+
+This project includes a fully configured Jenkins pipeline to automate building, testing, and quality checking.
+
+### 🚀 Getting Started with Jenkins
+
+1. **Start the Jenkins container**:
+   ```bash
+   make jenkins
+   ```
+
+2. **Access the Jenkins interface**:
+   - Open http://localhost:8080 in your browser
+   - Login with credentials (check the `.env` file or ask a team member)
+
+3. **Run the pipeline**:
+   - Navigate to the "Pull Branch from Zappy" job
+   - Enter your branch name (default is "main")
+   - Click "Build"
+
+4. **Stop the Jenkins container**:
+   ```bash
+   make jenkins_stop
+   docker-compose -f jenkins/docker-compose.yml down -v // to remove volumes
+   ```
+
+### 📋 Pipeline Jobs
+
+The CI/CD pipeline consists of the following sequential jobs:
+
+#### 1️⃣ Coding Style Check
+- **Purpose**: Verifies adherence to Epitech coding standards
+- **Components Checked**:
+  - C coding style (`cStyleChecker.sh`)
+  - C++ coding style (`cppStyleChecker.sh`)
+  - Python coding style (`pythonStyleChecker.sh`)
+- **Trigger**: Automatic on each commit or manual execution
+
+#### 2️⃣ Build
+- **Purpose**: Compiles all project components
+- **Steps**:
+  - Build server (`make zappy_server`)
+  - Build GUI (`make zappy_gui`)
+  - Build AI (`make zappy_ai`)
+  - Verify clean/rebuild works (`make clean`, `make fclean`, `make re`)
+- **Trigger**: Automatic after successful style check
+
+#### 3️⃣ Tests
+- **Purpose**: Runs comprehensive test suite with coverage
+- **Features**:
+  - Sets up testing environment (GUI tests, audio configuration)
+  - Runs unit tests with coverage reporting
+  - Fixes common testing issues automatically
+- **Trigger**: Automatic after successful build
+
+#### 4️⃣ Dashboard
+- **Purpose**: Generates reports and visualizations
+- **Outputs**:
+  - Pipeline summary report
+  - Visual pipeline progress representation
+  - Test results and coverage statistics
+- **Trigger**: Automatic after tests (even on failure)
+
+### 🔧 Troubleshooting
+
+If the pipeline fails:
+
+1. **Check the console output** for the failing job
+2. **View artifact reports** for detailed error information
+3. **Run specific diagnostic scripts**:
+   ```bash
+   # From host machine
+   docker exec zappipicaca /var/jenkins_home/plugin_diagnostics.sh
+   docker exec zappipicaca /var/jenkins_home/memory_diagnostics.sh
+   ```
+
+### 📊 Viewing Reports
+
+- Access coverage reports and artifacts from the Jenkins job page
+- Click on "Artifacts" in the left sidebar of a completed job
+- Download and view generated reports locally
 
 ---
 
