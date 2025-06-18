@@ -46,7 +46,6 @@ void queue_action(player_t *player, char *command, zappy_t *zappy)
     action = create_action_request(command, player, zappy->params->freq);
     if (!action)
         return;
-    pthread_mutex_lock(&player->pending_actions->mutex);
     if (!player->pending_actions->head ||
         action->priority < player->pending_actions->head->priority) {
         action->next = player->pending_actions->head;
@@ -56,7 +55,6 @@ void queue_action(player_t *player, char *command, zappy_t *zappy)
     } else
         insert_action_by_priority(player->pending_actions, action);
     player->pending_actions->count++;
-    pthread_mutex_unlock(&player->pending_actions->mutex);
 }
 
 /* This function free's the queue */
@@ -67,14 +65,11 @@ void free_action_queue(action_queue_t *queue)
 
     if (!queue)
         return;
-    pthread_mutex_lock(&queue->mutex);
     current = queue->head;
     while (current) {
         next = current->next;
         free_action_request(current);
         current = next;
     }
-    pthread_mutex_unlock(&queue->mutex);
-    pthread_mutex_destroy(&queue->mutex);
     free(queue);
 }

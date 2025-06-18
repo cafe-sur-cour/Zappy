@@ -49,7 +49,6 @@ typedef struct action_queue_s {
     action_request_t *head;
     action_request_t *tail;
     int count;
-    pthread_mutex_t mutex;
 } action_queue_t;
 
 
