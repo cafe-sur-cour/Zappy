@@ -18,7 +18,7 @@ void count_current_resources(zappy_t *z, int current_count[7])
         current_count[i] = 0;
     for (int y = 0; y < z->game->map->height; y++) {
         for (int x = 0; x < z->game->map->width; x++) {
-            tile = &z->game->map->tiles[y][x];
+            tile = &z->game->map->tiles[x][y];
             current_count[0] += tile->nbFood;
             current_count[1] += tile->nbLinemate;
             current_count[2] += tile->nbDeraumere;

@@ -37,7 +37,7 @@ static void print_tile(zappy_t *zappy, int x, int y)
         printf("Error: Coordinates (%d,%d) out of bounds\n", x, y);
         return;
     }
-    tile = &zappy->game->map->tiles[y][x];
+    tile = &zappy->game->map->tiles[x][y];
     printf("Tile (%d,%d): F:%d L:%d D:%d S:%d M:%d P:%d T:%d\n",
         x, y, tile->nbFood, tile->nbLinemate, tile->nbDeraumere,
         tile->nbSibur, tile->nbMendiane, tile->nbPhiras, tile->nbThystame);
@@ -76,7 +76,7 @@ static int *distrib_tiles(int *tile_index, tiles_t *shuffled_tiles,
 /* This function initialize the tiles of the map */
 static map_t *set_tile(int x, int y, map_t *map, int type)
 {
-    inventory_t *tile = &map->tiles[y][x];
+    inventory_t *tile = &map->tiles[x][y];
     int *counters[] = { &tile->nbFood, &tile->nbLinemate, &tile->nbDeraumere,
         &tile->nbSibur, &tile->nbMendiane, &tile->nbPhiras, &tile->nbThystame};
 
@@ -137,8 +137,8 @@ static map_t *malloc_tiles(int width, int height,
     map_t *map)
 {
     map->currentEggs = NULL;
-    for (int i = 0; i < height; i++) {
-        map->tiles[i] = calloc(width, sizeof(inventory_t));
+    for (int i = 0; i < width; i++) {
+        map->tiles[i] = calloc(height, sizeof(inventory_t));
         if (!map->tiles[i]) {
             error_message("Failed to allocate memory for map row.");
             free_map(map);
@@ -158,7 +158,7 @@ static map_t *create_map(int width, int height)
     }
     map->width = width;
     map->height = height;
-    map->tiles = malloc(sizeof(inventory_t *) * height);
+    map->tiles = malloc(sizeof(inventory_t *) * width);
     if (!map->tiles) {
         error_message("Failed to allocate memory for map tiles.");
         free_map(map);
