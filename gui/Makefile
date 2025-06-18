@@ -111,9 +111,9 @@ fclean: clean
 	@rm -rf $(UNIT_TESTS)
 	@rm -rf ./lib/*
 	@rm -rf coverage_report/
-	@rm -rf *.gcda
-	@rm -rf *.gcno
-	@rm -rf *.gcov
+	@find . -name "*.gcda" -type f -delete
+	@find . -name "*.gcno" -type f -delete
+	@find . -name "*.gcov" -type f -delete
 	@make -C src/Communication fclean
 	@make -C src/RayLib fclean
 	@make -C src/Audio fclean

@@ -125,6 +125,7 @@ int distribute_resources(zappy_t *z)
         for (int count = 0; count < needed_count[type]; count++) {
             pos = distrib_tiles(&tile_index, shuffled_tiles, mapValue);
             z->game->map = set_tile(pos[0], pos[1], z->game->map, type);
+            send_map_tile(z->game->map->tiles, z, pos[0], pos[1]);
             is_upt = 1;
             free(pos);
         }

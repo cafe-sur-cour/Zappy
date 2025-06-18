@@ -40,9 +40,6 @@ void refill_food(zappy_t *zappy)
         error_message("Invalid zappy structure for resource refill.");
         return;
     }
-    is_updated = distribute_resources(zappy);
-    if (is_updated == 0)
-        return;
+    distribute_resources(zappy);
     valid_message("Resources refilled on the map.");
-    send_entrie_map(zappy);
 }
