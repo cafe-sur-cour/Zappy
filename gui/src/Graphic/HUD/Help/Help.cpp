@@ -191,17 +191,17 @@ void Help::initHelpContainer()
     yPos = 12.f;
     _helpContainer->addTextPercent(
         "help_section5_title",
-        72.0f, yPos,
+        50.0f, yPos,
         zappy::constants::HELP_SECTION_5,
         3.5f,
         {230, 230, 120, 255}
     );
 
 
-    yPos = 56.f;
+    yPos = 54.f;
     _helpContainer->addTextPercent(
         "help_section6_title",
-        71.0f, yPos,
+        50.0f, yPos,
         zappy::constants::HELP_SECTION_6,
         3.5f,
         {230, 230, 120, 255}
@@ -220,7 +220,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_model_txt_lvl1",
         51.50f, posYTextLevel,
-        "Niv 1" , 2.0f,
+        "Lvl 1" , 2.0f,
         {255, 255, 255, 255}
     );
 
@@ -234,7 +234,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_model_txt_lvl2",
         57.5f, posYTextLevel,
-        "Niv 2" , 2.0f,
+        "Lvl 2" , 2.0f,
         {255, 255, 255, 255}
     );
 
@@ -248,7 +248,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_model_txt_lvl3",
         63.5f, posYTextLevel,
-        "Niv 3" , 2.0f,
+        "Lvl 3" , 2.0f,
         {255, 255, 255, 255}
     );
 
@@ -262,7 +262,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_model_txt_lvl4",
         69.5f, posYTextLevel,
-        "Niv 4" , 2.0f,
+        "Lvl 4" , 2.0f,
         {255, 255, 255, 255}
     );
 
@@ -276,7 +276,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_model_txt_lvl5",
         75.5f, posYTextLevel,
-        "Niv 5" , 2.0f,
+        "Lvl 5" , 2.0f,
         {255, 255, 255, 255}
     );
 
@@ -290,7 +290,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_model_txt_lvl6",
         81.5f, posYTextLevel,
-        "Niv 6" , 2.0f,
+        "Lvl 6" , 2.0f,
         {255, 255, 255, 255}
     );
 
@@ -304,7 +304,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_model_txt_lvl7",
         87.5f, posYTextLevel,
-        "Niv 7" , 2.0f,
+        "Lvl 7" , 2.0f,
         {255, 255, 255, 255}
     );
 
@@ -318,7 +318,7 @@ void Help::initHelpContainer()
     _helpContainer->addTextPercent(
         "help_model_txt_lvl8",
         93.5f, posYTextLevel,
-        "Niv 8" , 2.0f,
+        "Lvl 8" , 2.0f,
         {255, 255, 255, 255}
     );
 
@@ -362,7 +362,7 @@ void Help::initHelpContainer()
 
     _helpContainer->addTextPercent(
         "help_model_txt_deraumere",
-        63.2f, posYTextItem,
+        62.8f, posYTextItem,
         "Deraumere" , 2.0f,
         {255, 255, 255, 255}
     );
@@ -390,7 +390,7 @@ void Help::initHelpContainer()
 
     _helpContainer->addTextPercent(
         "help_model_txt_mendiane",
-        75.8f, posYTextItem,
+        75.6f, posYTextItem,
         "Mendiane" , 2.0f,
         {255, 255, 255, 255}
     );
@@ -404,7 +404,7 @@ void Help::initHelpContainer()
 
     _helpContainer->addTextPercent(
         "help_model_txt_phiras",
-        81.9f, posYTextItem,
+        82.f, posYTextItem,
         "Phiras" , 2.0f,
         {255, 255, 255, 255}
     );
@@ -418,7 +418,7 @@ void Help::initHelpContainer()
 
     _helpContainer->addTextPercent(
         "help_model_txt_thystame",
-        87.8f, posYTextItem,
+        87.4f, posYTextItem,
         "Thystame" , 2.0f,
         {255, 255, 255, 255}
     );
