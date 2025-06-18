@@ -35,7 +35,6 @@ class MsgHandler {
 
     protected:
         void messageLoop();
-        void securityActualization();
 
         bool handleWelcomeMessage(const std::string& message);
         bool handleMszMessage(const std::string& message);

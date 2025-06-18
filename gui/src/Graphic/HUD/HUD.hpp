@@ -61,6 +61,8 @@ class HUD : public IObserver {
 
         std::shared_ptr<Containers> getTpsContainer() const;
 
+        std::shared_ptr<Containers> getSecurityContainer() const;
+
         std::shared_ptr<Containers> getServerMessagesContainer() const;
 
         void initExitButton();
@@ -129,6 +131,12 @@ class HUD : public IObserver {
             float bottomHeightPercent);
 
         std::shared_ptr<Containers> createTpsContainer(
+            int screenWidth,
+            int screenHeight,
+            float bottomHeight,
+            float bottomHeightPercent);
+
+        std::shared_ptr<Containers> createSecurityContainer(
             int screenWidth,
             int screenHeight,
             float bottomHeight,
