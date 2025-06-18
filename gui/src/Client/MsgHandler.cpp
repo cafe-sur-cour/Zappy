@@ -89,39 +89,6 @@ void MsgHandler::messageLoop()
                 return !_running || _communication->hasMessages();
             });
         }
-
-        securityActualization();
-    }
-}
-
-void MsgHandler::securityActualization()
-{
-    static std::chrono::steady_clock::time_point lastUpdate =
-        std::chrono::steady_clock::now();
-    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-
-    if (now - lastUpdate < std::chrono::seconds(10))
-        return;
-    lastUpdate = now;
-
-    std::cout << colors::T_BLUE << "[INFO] Performing security actualization..."
-              << colors::RESET << std::endl;
-
-    try {
-        std::lock_guard<std::mutex> lock(_mutex);
-        _communication->sendMessage("msz\n");
-        _communication->sendMessage("tna\n");
-        _communication->sendMessage("sgt\n");
-        _communication->sendMessage("mct\n");
-
-        for (const auto& player : _gameInfos->getPlayers()) {
-            _communication->sendMessage("ppo #" + std::to_string(player.number) + "\n");
-            _communication->sendMessage("plv #" + std::to_string(player.number) + "\n");
-            _communication->sendMessage("pin #" + std::to_string(player.number) + "\n");
-        }
-    } catch (const Exceptions::NetworkException& e) {
-        std::cerr << colors::T_RED << "[ERROR] Network exception: "
-                  << e.what() << colors::RESET << std::endl;
     }
 }
 
