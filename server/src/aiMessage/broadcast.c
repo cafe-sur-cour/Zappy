@@ -118,6 +118,9 @@ static int broadcast_to_team(team_t *team, player_t *source, char *text,
 
     (void)text;
     while (team->players) {
+        if (source->id == team->players->id) {
+            team->players = team->players->next;
+        }
         if (send_broadcast(team, source, text, zappy) == -1) {
             team->players = save_player;
             return -1;
@@ -149,7 +152,7 @@ int handle_broadcast(player_t *player, char *command, zappy_t *zappy)
         return -1;
     if (write_message(player->network->fd, "ok\n") == -1)
         return -1;
-    if (send_broadcast_to_all(zappy, command) == -1)
+    if (send_broadcast_to_player(zappy, player, text) == -1)
         return -1;
     return 0;
 }
