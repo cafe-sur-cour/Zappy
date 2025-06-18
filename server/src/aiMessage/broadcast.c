@@ -120,6 +120,7 @@ static int broadcast_to_team(team_t *team, player_t *source, char *text,
     while (team->players) {
         if (source->id == team->players->id) {
             team->players = team->players->next;
+            continue;
         }
         if (send_broadcast(team, source, text, zappy) == -1) {
             team->players = save_player;
