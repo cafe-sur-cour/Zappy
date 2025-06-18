@@ -359,6 +359,20 @@ const std::vector<zappy::structs::Incantation> GameInfos::getIncantations()
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
 
+    _incantations.erase(
+        std::remove_if(_incantations.begin(), _incantations.end(),
+            [this](const zappy::structs::Incantation& inc) {
+                for (int playerNum : inc.players) {
+                    auto it = std::find_if(_players.begin(), _players.end(),
+                        [playerNum](const zappy::structs::Player& p) {
+                            return p.number == playerNum;
+                        });
+                    if (it == _players.end())
+                        return true;
+                }
+                return false;
+            }),
+        _incantations.end());
     return _incantations;
 }
 

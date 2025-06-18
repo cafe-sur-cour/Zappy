@@ -528,6 +528,9 @@ TEST_F(GameInfosAdditionalTest, GetIncantations) {
     zappy::structs::Incantation incantation1(5, 5, 2, players);
     zappy::structs::Incantation incantation2(10, 10, 3, players);
 
+    gameInfos->addPlayer(zappy::structs::Player(1, 5, 5, 1, 3, "Team1"));
+    gameInfos->addPlayer(zappy::structs::Player(2, 10, 10, 2, 4, "Team1"));
+    gameInfos->addPlayer(zappy::structs::Player(3, 15, 15, 3, 5, "Team1"));
     gameInfos->addIncantation(incantation1);
     gameInfos->addIncantation(incantation2);
 
