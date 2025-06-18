@@ -227,8 +227,7 @@ This project includes a fully configured Jenkins pipeline to automate building, 
 
 1. **Start the Jenkins container**:
    ```bash
-   cd jenkins
-   docker-compose up -d
+   make jenkins
    ```
 
 2. **Access the Jenkins interface**:
@@ -239,6 +238,11 @@ This project includes a fully configured Jenkins pipeline to automate building, 
    - Navigate to the "Pull Branch from Zappy" job
    - Enter your branch name (default is "main")
    - Click "Build"
+
+4. **Stop the Jenkins container**:
+   ```bash
+   make jenkins_stop
+   ```
 
 ### 📋 Pipeline Jobs
 

@@ -93,7 +93,13 @@ coverage_server:
 	@make -C server/src/network
 	@make -C tests/unit/server/ coverage
 
+jenkins:
+	@docker-compose -f jenkins/docker-compose.yml up --build -d
+
+jenkins_stop:
+	@docker-compose -f jenkins/docker-compose.yml down
+
 .PHONY: all clean fclean re functional_tests tests_run coverage \
 		tests_run_ai tests_run_gui tests_run_server \
-		coverage_ai coverage_gui coverage_server \
+		coverage_ai coverage_gui coverage_server jenkins jenkins_stop \
 		 $(SERVER_NAME) $(GUI_NAME) $(AI_NAME)
