@@ -191,22 +191,136 @@ void Help::initHelpContainer()
     yPos = 12.f;
     _helpContainer->addTextPercent(
         "help_section5_title",
-        75.0f, yPos,
+        72.0f, yPos,
         zappy::constants::HELP_SECTION_5,
         3.5f,
         {230, 230, 120, 255}
     );
 
 
-    yPos = 60.f;
+    yPos = 56.f;
     _helpContainer->addTextPercent(
         "help_section6_title",
-        75.0f, yPos,
+        71.0f, yPos,
         zappy::constants::HELP_SECTION_6,
         3.5f,
         {230, 230, 120, 255}
     );
 
+    const float posYImageLevel = 25.0f;
+    const float posYTextLevel = 42.0f;
+
+    _helpContainer->addImagePercent(
+        "help_model_lvl1",
+        50.0f, posYImageLevel,
+        5.0f, 15.0f,
+        "gui/assets/img/skinLvl1.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_lvl1",
+        51.50f, posYTextLevel,
+        "Niv 1" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_model_lvl2",
+        56.0f, posYImageLevel,
+        5.0f, 15.0f,
+        "gui/assets/img/skinLvl2.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_lvl2",
+        57.5f, posYTextLevel,
+        "Niv 2" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_model_lvl3",
+        62.0f, posYImageLevel,
+        5.0f, 15.0f,
+        "gui/assets/img/skinLvl3.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_lvl3",
+        63.5f, posYTextLevel,
+        "Niv 3" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_model_lvl4",
+        68.0f, posYImageLevel,
+        5.0f, 15.0f,
+        "gui/assets/img/skinLvl4.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_lvl4",
+        69.5f, posYTextLevel,
+        "Niv 4" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_model_lvl5",
+        74.0f, posYImageLevel,
+        5.0f, 15.0f,
+        "gui/assets/img/skinLvl5.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_lvl5",
+        75.5f, posYTextLevel,
+        "Niv 5" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_model_lvl6",
+        80.0f, posYImageLevel,
+        5.0f, 15.0f,
+        "gui/assets/img/skinLvl6.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_lvl6",
+        81.5f, posYTextLevel,
+        "Niv 6" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_model_lvl7",
+        86.0f, posYImageLevel,
+        5.0f, 15.0f,
+        "gui/assets/img/skinLvl7.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_lvl7",
+        87.5f, posYTextLevel,
+        "Niv 7" , 2.0f,
+        {255, 255, 255, 255}
+    );
+
+    _helpContainer->addImagePercent(
+        "help_model_lvl8",
+        92.0f, posYImageLevel,
+        5.0f, 15.0f,
+        "gui/assets/img/skinLvl8.png"
+    );
+
+    _helpContainer->addTextPercent(
+        "help_model_txt_lvl8",
+        93.5f, posYTextLevel,
+        "Niv 8" , 2.0f,
+        {255, 255, 255, 255}
+    );
 
     _visible = false;
 }

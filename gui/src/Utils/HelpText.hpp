@@ -50,7 +50,7 @@ namespace zappy::constants {
         "Players collect these resources to perform rituals and level up.";
 
     inline const char *HELP_SECTION_5 =
-        "Level";
+        "Levels";
 
     inline const char *HELP_SECTION_6 =
         "Items";
