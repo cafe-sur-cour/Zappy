@@ -72,7 +72,7 @@ static int get_orientation(int dx, int dy)
         return 3;
     if (dx < 0 && dy < 0)
         return 2;
-    return -1;
+    return 0;
 }
 
 int broadcast_text(player_t *source, player_t *dest, char *text,
