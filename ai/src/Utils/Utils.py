@@ -94,6 +94,15 @@ LVL_UPGRADES = {
     },
 }
 
+TOTAL_NEEDED_STONES = {
+    "linemate": 9,
+    "deraumere": 8,
+    "sibur": 10,
+    "mendiane": 5,
+    "phiras": 6,
+    "thystame": 1
+}
+
 
 class Colors:
     BOLD = "\033[1m"
