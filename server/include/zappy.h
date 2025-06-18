@@ -220,6 +220,9 @@ int inventory_message(player_t *player);
 int print_inventory_server(player_t *player, int len);
 
 int handle_broadcast(player_t *player, char *command, zappy_t *zappy);
+int broadcast_text(player_t *source, player_t *dest, char *text,
+    zappy_t *zappy);
+
 int handle_look(player_t *player, char *command, zappy_t *zappy);
 int handle_set(player_t *player, char *command, zappy_t *zappy);
 int handle_take(player_t *player, char *command, zappy_t *zappy);

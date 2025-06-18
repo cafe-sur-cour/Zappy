@@ -68,13 +68,11 @@ static void process_player_actions(player_t *player, zappy_t *zappy)
         return;
     if (player->is_busy)
         return;
-    pthread_mutex_lock(&player->pending_actions->mutex);
     action = dequeue_highest_priority_action(player->pending_actions);
     if (action) {
         execute_action(player, action, zappy);
         free_action_request(action);
     }
-    pthread_mutex_unlock(&player->pending_actions->mutex);
 }
 
 /* This function allows the smart poll to have different timeout */

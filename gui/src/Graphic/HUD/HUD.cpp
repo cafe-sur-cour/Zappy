@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <utility>
 #include "../../Utils/Constants.hpp"
+#include "../../Utils/InputType.hpp"
 #include "HUD.hpp"
 
 HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
@@ -180,6 +181,12 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
                             bottomHeight,
                             bottomHeightPercent);
 
+    auto securityContainer = createSecurityContainer(
+                            screenWidth,
+                            screenHeight,
+                            bottomHeight,
+                            bottomHeightPercent);
+
     auto serverMessagesContainer = createServerMessagesContainer(
                             screenWidth,
                             screenHeight,
@@ -226,6 +233,11 @@ std::shared_ptr<Containers> HUD::getSquareContainer() const
 std::shared_ptr<Containers> HUD::getTpsContainer() const
 {
     return getContainer("tps_container");
+}
+
+std::shared_ptr<Containers> HUD::getSecurityContainer() const
+{
+    return getContainer("security_container");
 }
 
 std::shared_ptr<Containers> HUD::getServerMessagesContainer() const
@@ -609,6 +621,52 @@ std::shared_ptr<Containers> HUD::createTpsContainer(
     return tpsContainer;
 }
 
+std::shared_ptr<Containers> HUD::createSecurityContainer(
+    int screenWidth,
+    int screenHeight,
+    float bottomHeight,
+    float bottomHeightPercent)
+{
+    float containerWidth = 200.0f;
+    float containerHeight = 80.0f;
+    (void)bottomHeight;
+    (void)bottomHeightPercent;
+
+    auto securityContainer = addContainer(
+        "security_container",
+        screenWidth - containerWidth, 125,
+        containerWidth, containerHeight,
+        {40, 40, 40, 200}
+    );
+
+    if (securityContainer) {
+        float widthPercent = (containerWidth / screenWidth) * 100.0f;
+        float heightPercent = (containerHeight / screenHeight) * 100.0f;
+
+        securityContainer->setRelativePosition(
+            100.0f - widthPercent,
+            6.0f,
+            widthPercent,
+            heightPercent);
+
+        securityContainer->addButtonPercent(
+            "security_button",
+            5.0f, 10.0f,
+            90.0f, 80.0f,
+            "SECURITY SYNCHRONIZATION",
+            [this]() {
+                this->_gameInfos->securityActualisation();
+            },
+            {80, 80, 240, 255},
+            {120, 120, 255, 255},
+            {60, 60, 200, 255},
+            {255, 255, 255, 255}
+        );
+    }
+
+    return securityContainer;
+}
+
 std::shared_ptr<Containers> HUD::createServerMessagesContainer(
     int screenWidth,
     int screenHeight,
@@ -953,18 +1011,18 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
         switch (cameraMode)
         {
         case zappy::gui::CameraMode::FREE:
-            return "Right joystick = Change camera direction\n\n"
+            return "Right joystick = Change camera direction\n"
                      "Left joystick = Move camera x and z\n"
-                     "RT | LT = Move camera y\n\n"
-                     "H = Toggle HUD\n";
+                     "RT | LT = Move camera y\n"
+                     "Select = Toggle HUD\n";
         case zappy::gui::CameraMode::PLAYER:
-            return "UP | DOWN = Next / Previous player\n\n"
-                     "Right joystick = Change camera direction\n\n"
-                     "H = Toggle HUD\n";
+            return "UP | DOWN = Next / Previous player\n"
+                     "Right joystick = Change camera direction\n"
+                     "Select = Toggle HUD\n";
         case zappy::gui::CameraMode::TARGETED:
-            return "Right joystick = Rotate camera around map origin\n\n"
-                     "RT | LT = Zoom / Unzoom\n\n"
-                     "H = Toggle HUD\n";
+            return "Right joystick = Rotate camera around map origin\n"
+                     "RT | LT = Zoom / Unzoom\n"
+                     "Select = Toggle HUD\n";
         default:
             return "Unknown";
         }
@@ -972,16 +1030,16 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
     switch (cameraMode)
     {
     case zappy::gui::CameraMode::FREE:
-        return "Z | Q | S | D = Move camera\n\n"
-                 "UP | DOWN | RIGHT | LEFT = Change camera direction\n\n"
+        return "Z | Q | S | D = Move camera\n"
+                 "UP | DOWN | RIGHT | LEFT = Change camera direction\n"
                  "H = Toggle HUD\n";
     case zappy::gui::CameraMode::PLAYER:
-        return "UP | DOWN = Next / Previous player\n\n"
-                 "RIGHT | LEFT = Change camera direction\n\n"
+        return "UP | DOWN = Next / Previous player\n"
+                 "RIGHT | LEFT = Change camera direction\n"
                  "H = Toggle HUD\n";
     case zappy::gui::CameraMode::TARGETED:
-        return "UP | DOWN | RIGHT | LEFT = Rotate camera around map origin\n\n"
-                 "RT | LT = Zoom / Unzoom\n\n"
+        return "UP | DOWN | RIGHT | LEFT = Rotate camera around map origin\n"
+                 "SCROLL = Zoom / Unzoom\n"
                  "H = Toggle HUD\n";
     default:
         return "Unknown";
@@ -995,16 +1053,19 @@ void HUD::updateHelpInformationHUD(zappy::gui::CameraMode cameraMode)
     if (!bottomContainer)
         return;
 
+    InputType lastInputType = this->_display->getLastInputType();
+    bool isUsingGamepad = (lastInputType == InputType::GAMEPAD);
+
     auto camInfoElem = std::dynamic_pointer_cast<Text>(
         bottomContainer->getElement("cam_info_mode"));
-    auto strCamMode = this->_camModeToText(cameraMode, this->_display->isGamepadAvailable());
+    auto strCamMode = this->_camModeToText(cameraMode, isUsingGamepad);
     if (camInfoElem && camInfoElem->getText() != "Camera mod: " + strCamMode) {
         camInfoElem->setText("Camera mod: " + strCamMode);
         return;
     }
     auto keyHelp = std::dynamic_pointer_cast<Text>(
         bottomContainer->getElement("help_cam_key"));
-    auto camHelpKey = this->_camKeyHelp(cameraMode, this->_display->isGamepadAvailable());
+    auto camHelpKey = this->_camKeyHelp(cameraMode, isUsingGamepad);
     if (keyHelp && keyHelp->getText() != camHelpKey) {
         keyHelp->setText(camHelpKey);
         return;

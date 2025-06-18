@@ -51,6 +51,8 @@ void RayLibEnc::updateCamera(int mode)
 
 void RayLibEnc::updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed)
 {
+    updateLastInputType();
+
     float deltaTime = getFrameTime();
     float moveSpeed = camMovingSpeed * deltaTime;
     float rotationSpeed = zappy::gui::CAMERA_SENSITIVITY;

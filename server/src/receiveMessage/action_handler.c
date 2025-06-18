@@ -63,10 +63,6 @@ action_queue_t *init_action_queue(void)
     queue->head = NULL;
     queue->tail = NULL;
     queue->count = 0;
-    if (pthread_mutex_init(&queue->mutex, NULL) != 0) {
-        free(queue);
-        return NULL;
-    }
     return queue;
 }
 

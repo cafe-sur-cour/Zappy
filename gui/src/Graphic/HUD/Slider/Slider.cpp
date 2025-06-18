@@ -90,12 +90,18 @@ void Slider::update()
     if (_display->isMouseButtonPressed(this->_display->getKeyId(MOUSE_LEFT))) {
         if (isMouseOverHandle(mousePos.x, mousePos.y)) {
             _isDragging = true;
+        } else if (isMouseOverTrack(mousePos.x, mousePos.y)) {
+            float oldValue = _value;
+            updateValueFromMousePosition(mousePos.x);
+            if (oldValue != _value)
+                _onValueChanged(_value);
+            _isDragging = true;
         }
     }
 
     if (_isDragging) {
         if (_display->isMouseButtonDown(this->_display->getKeyId(MOUSE_LEFT))) {
-            int oldValue = _value;
+            float oldValue = _value;
             updateValueFromMousePosition(mousePos.x);
             if (oldValue != _value)
                 _onValueChanged(_value);
@@ -194,4 +200,21 @@ bool Slider::isMouseOverHandle(float mouseX, float mouseY) const
 bool Slider::isDragging() const
 {
     return _isDragging;
+}
+
+bool Slider::isMouseOverTrack(float mouseX, float mouseY) const
+{
+    float textFontSize = _bounds.height * 0.3f;
+    float sliderY = _bounds.y + textFontSize + 10.0f;
+    float sliderStartX = _bounds.x;
+    float trackThickness = _bounds.height * 0.15f;
+
+    FloatRect trackRect = {
+        sliderStartX,
+        sliderY - trackThickness * 0.5f,
+        _sliderTrackWidth,
+        trackThickness
+    };
+
+    return _display->checkCollisionPointRec({mouseX, mouseY}, trackRect);
 }

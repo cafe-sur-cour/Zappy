@@ -64,11 +64,13 @@ void CameraManager::updateCamera(zappy::gui::CameraMode mode)
 
 void CameraManager::updateCameraFreeMode()
 {
+    this->_display->updateLastInputType();
     this->_display->updateCameraFreeMode(this->_cameraMovingSpeed, this->_cameraRotaSpeed);
 }
 
 void CameraManager::updateCameraTargetMode()
 {
+    this->_display->updateLastInputType();
     float deltaTime = this->_display->getFrameTime();
 
     if (this->_display->isMouseButtonPressed(this->_display->getKeyId(MOUSE_RIGHT))) {
@@ -271,6 +273,7 @@ Vector3f CameraManager::calculateCameraPosition(const Vector3f& playerPos, float
 
 void CameraManager::updateCameraPlayerMode()
 {
+    this->_display->updateLastInputType();
     if (!_gameInfos || _playerId < 0 || !_map) {
         updateCameraFreeMode();
         return;

@@ -9,6 +9,7 @@
 #define IDISPLAY_HPP_
 #include <utility>
 #include <string>
+#include "Utils/InputType.hpp"
 
 enum Key {
     TAB,
@@ -155,6 +156,9 @@ class IDisplay {
         virtual float getFrameTime() = 0;
 
         virtual void updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed) = 0;
+
+        virtual InputType getLastInputType() const = 0;
+        virtual void updateLastInputType() = 0;
 
         virtual float measureText(const std::string& text, float fontSize) const = 0;
 
