@@ -57,7 +57,7 @@ class Communication:
             try:
                 if self.lenRequestQueue() > 0 and self.lenPendingQueue() < 10:
                     with self.mutex:
-                        if len(self.requestQueue) > 0:  # Double check after acquiring lock
+                        if len(self.requestQueue) > 0:
                             request = self.requestQueue.pop(0)
                             self.pendingQueue.append(request)
                             self.socket.send(request)
