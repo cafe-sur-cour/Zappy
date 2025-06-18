@@ -180,6 +180,12 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
                             bottomHeight,
                             bottomHeightPercent);
 
+    auto securityContainer = createSecurityContainer(
+                            screenWidth,
+                            screenHeight,
+                            bottomHeight,
+                            bottomHeightPercent);
+
     auto serverMessagesContainer = createServerMessagesContainer(
                             screenWidth,
                             screenHeight,
@@ -226,6 +232,11 @@ std::shared_ptr<Containers> HUD::getSquareContainer() const
 std::shared_ptr<Containers> HUD::getTpsContainer() const
 {
     return getContainer("tps_container");
+}
+
+std::shared_ptr<Containers> HUD::getSecurityContainer() const
+{
+    return getContainer("security_container");
 }
 
 std::shared_ptr<Containers> HUD::getServerMessagesContainer() const
@@ -607,6 +618,52 @@ std::shared_ptr<Containers> HUD::createTpsContainer(
     }
 
     return tpsContainer;
+}
+
+std::shared_ptr<Containers> HUD::createSecurityContainer(
+    int screenWidth,
+    int screenHeight,
+    float bottomHeight,
+    float bottomHeightPercent)
+{
+    float containerWidth = 200.0f;
+    float containerHeight = 80.0f;
+    (void)bottomHeight;
+    (void)bottomHeightPercent;
+
+    auto securityContainer = addContainer(
+        "security_container",
+        screenWidth - containerWidth, 125,
+        containerWidth, containerHeight,
+        {40, 40, 40, 200}
+    );
+
+    if (securityContainer) {
+        float widthPercent = (containerWidth / screenWidth) * 100.0f;
+        float heightPercent = (containerHeight / screenHeight) * 100.0f;
+
+        securityContainer->setRelativePosition(
+            100.0f - widthPercent,
+            6.0f,
+            widthPercent,
+            heightPercent);
+
+        securityContainer->addButtonPercent(
+            "security_button",
+            5.0f, 10.0f,
+            90.0f, 80.0f,
+            "SECURITY SYNCHRONIZATION",
+            [this]() {
+                this->_gameInfos->securityActualisation();
+            },
+            {80, 80, 240, 255},
+            {120, 120, 255, 255},
+            {60, 60, 200, 255},
+            {255, 255, 255, 255}
+        );
+    }
+
+    return securityContainer;
 }
 
 std::shared_ptr<Containers> HUD::createServerMessagesContainer(

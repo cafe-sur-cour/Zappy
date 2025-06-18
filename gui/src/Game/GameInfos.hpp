@@ -75,6 +75,8 @@ class GameInfos : public Subject {
         void addServerMessage(const std::string &message);
         const std::vector<std::string> getServerMessages() const;
 
+        void securityActualisation();
+
     private:
         int _mapWidth;
         int _mapHeight;
