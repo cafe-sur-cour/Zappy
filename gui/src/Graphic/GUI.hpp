@@ -72,6 +72,8 @@ class GUI {
         bool _backgroundLoaded;
         bool _skyboxLoaded;
         int _hoveredPlayerId;
+
+        bool _performanceMode = false;
 };
 
 #endif /* !GUI_HPP_ */

@@ -107,6 +107,9 @@ void GUI::updateCamera()
 void GUI::update()
 {
     this->_isRunning = this->_display->isOpen();
+    if (_gameInfos->getMapSize().first * _gameInfos->getMapSize().second >= 2500)
+        _performanceMode = true;
+
     if (this->_display->isKeyReleased(this->_display->getKeyId(TAB)) ||
         this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_LEFT_SHOULDER)))
         switchCameraModeNext();
@@ -156,19 +159,20 @@ void GUI::draw()
 
     this->_display->begin3DMode();
 
-    if (_skyboxLoaded) {
+    if (_skyboxLoaded && !this->_performanceMode)
         this->_display->drawSkybox("skybox");
+
+    if (!this->_performanceMode) {
+        const auto& mapSize = _gameInfos->getMapSize();
+        float forestX = static_cast<float>(mapSize.first) * 2.0f + 20.0f;
+        float forestZ = static_cast<float>(mapSize.second) * 2.0f + 20.0f;
+
+        this->_display->drawModelEx(
+            "forest", {forestX, -5.0f, forestZ}, {0.0f, 90.0f, 0.0f},
+            -135.0f, {1.0f, 1.0f, 1.0f}, CWHITE);
     }
 
-    const auto& mapSize = _gameInfos->getMapSize();
-    float forestX = static_cast<float>(mapSize.first) * 2.0f + 20.0f;
-    float forestZ = static_cast<float>(mapSize.second) * 2.0f + 20.0f;
-
-    this->_display->drawModelEx(
-        "forest", {forestX, -5.0f, forestZ}, {0.0f, 90.0f, 0.0f},
-        -135.0f, {1.0f, 1.0f, 1.0f}, CWHITE);
-
-    _map->draw();
+    _map->draw(_performanceMode);
 
     if (_hoveredPlayerId >= 0) {
         const auto& players = _gameInfos->getPlayers();
