@@ -47,7 +47,7 @@ RUN apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 # Installer les dépendances Python pour les vérificateurs de style
-RUN pip3 install pylint flake8
+RUN pip3 install pylint flake8 pycodestyle cpplint
 
 # Cloner et compiler raylib avec -fPIC et sans audio
 RUN git clone https://github.com/raysan5/raylib.git /tmp/raylib && \
