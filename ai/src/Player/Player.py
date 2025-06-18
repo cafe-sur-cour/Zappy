@@ -7,7 +7,6 @@
 
 import os
 from threading import Thread
-from time import sleep
 
 from src.Broadcaster.Broadcaster import Broadcaster
 from src.Exceptions.Exceptions import (

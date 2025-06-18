@@ -7,7 +7,6 @@
 
 import select
 import threading
-from time import sleep
 
 from .Socket import Socket
 from src.Exceptions.Exceptions import (
