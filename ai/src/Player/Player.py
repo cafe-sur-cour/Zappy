@@ -238,7 +238,8 @@ class Player:
             ],
             2: [
                 self.communication.sendForward,
-                self.communication.sendLeft
+                self.communication.sendLeft,
+                self.communication.sendForward,
             ],
             3: [
                 self.communication.sendLeft,
