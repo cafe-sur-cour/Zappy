@@ -13,12 +13,14 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
-#include "../../Utils/Constants.hpp"
-#include "RayLibEnc.hpp"
 #include "raylib.h"
 #include "raymath.h"
+#include "../../Utils/Constants.hpp"
+#include "../../Utils/GamepadConstants.hpp"
+#include "RayLibEnc.hpp"
 
-RayLibEnc::RayLibEnc() : _isInitialized(false), _isCursorLocked(false)
+RayLibEnc::RayLibEnc() : _isInitialized(false), _isCursorLocked(false),
+    _lastInputType(InputType::NONE)
 {
     _camera = {{ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f },
         0.0f, CAMERA_PERSPECTIVE };
@@ -167,4 +169,55 @@ void RayLibEnc::unloadAllFonts()
         UnloadFont(fontPair.second);
     }
     _fonts.clear();
+}
+
+InputType RayLibEnc::getLastInputType() const
+{
+    return _lastInputType;
+}
+
+void RayLibEnc::updateLastInputType()
+{
+    if (isGamepadAvailable(0)) {
+        for (int button = GAMEPAD_BUTTON_LEFT_FACE_UP; button <= GAMEPAD_BUTTON_RIGHT_THUMB;
+                ++button) {
+            if (isGamepadButtonPressed(0, button) || isGamepadButtonDown(0, button)) {
+                _lastInputType = InputType::GAMEPAD;
+                return;
+            }
+        }
+
+        for (int axis = GAMEPAD_AXIS_LEFT_X; axis <= GAMEPAD_AXIS_RIGHT_Y; ++axis) {
+            float axisValue = getGamepadAxisMovement(0, axis);
+            if (fabs(axisValue) > 0.1f) {
+                _lastInputType = InputType::GAMEPAD;
+                return;
+            }
+        }
+    }
+
+    for (int key = KEY_SPACE; key <= KEY_KB_MENU; ++key) {
+        if (isKeyPressed(key) || isKeyDown(key)) {
+            _lastInputType = InputType::KEYBOARD_MOUSE;
+            return;
+        }
+    }
+
+    for (int button = MOUSE_BUTTON_LEFT; button <= MOUSE_BUTTON_EXTRA; ++button) {
+        if (isMouseButtonPressed(button) || isMouseButtonDown(button)) {
+            _lastInputType = InputType::KEYBOARD_MOUSE;
+            return;
+        }
+    }
+
+    Vector2 mouseDelta = getMouseDelta();
+    if (fabs(mouseDelta.x) > 0.1f || fabs(mouseDelta.y) > 0.1f) {
+        _lastInputType = InputType::KEYBOARD_MOUSE;
+        return;
+    }
+
+    if (fabs(getMouseWheelMove()) > 0.01f) {
+        _lastInputType = InputType::KEYBOARD_MOUSE;
+        return;
+    }
 }

@@ -71,6 +71,9 @@ class Raylib : public IDisplay {
 
         virtual void updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed);
 
+        virtual InputType getLastInputType() const;
+        virtual void updateLastInputType();
+
         virtual float measureText(const std::string& text, float fontSize) const;
 
         virtual bool checkCollisionPointRec(Vector2f point, FloatRect rec);

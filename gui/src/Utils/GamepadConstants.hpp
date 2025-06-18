@@ -13,11 +13,11 @@
     #define GAMEPAD_AXIS_LEFT_Y       1
     #define GAMEPAD_AXIS_RIGHT_X      2
     #define GAMEPAD_AXIS_RIGHT_Y      3
-    #define GAMEPAD_AXIS_LEFT_TRIGGER 4
-    #define GAMEPAD_AXIS_RIGHT_TRIGGER 5
 #endif
 
 #ifndef GAMEPAD_BUTTON_A
+    #define GAMEPAD_AXIS_LEFT_TRIGGER 4
+    #define GAMEPAD_AXIS_RIGHT_TRIGGER 5
     #define GAMEPAD_BUTTON_A          6
     #define GAMEPAD_BUTTON_B          5
     #define GAMEPAD_BUTTON_X          9
