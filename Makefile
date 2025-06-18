@@ -93,8 +93,9 @@ coverage_server:
 	@make -C server/src/network
 	@make -C tests/unit/server/ coverage
 
-jenkins:
+jenkins: jenkins_stop
 	@docker-compose -f jenkins/docker-compose.yml up --build -d
+	@printf "\nᒥ🧪ᒧ Jenkins is running on: http://localhost:8080/\n"
 
 jenkins_stop:
 	@docker-compose -f jenkins/docker-compose.yml down

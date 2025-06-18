@@ -11,7 +11,7 @@ freeStyleJob('Pull Branch from Zappy') {
         dsl {
             text('''
             folder("Branches/\${BRANCH_NAME}") {
-                description('Jobs for branch \${BRANCH_NAME}')
+                description("Jobs for branch \${BRANCH_NAME}")
             }
 
             def scmConfig = {
@@ -33,6 +33,29 @@ freeStyleJob('Pull Branch from Zappy') {
                 }
             }
 
+            // 0. Pull latest code from the branch
+            job("Branches/\${BRANCH_NAME}/0-Pull-Branch") {
+                commonProperties.delegate = delegate
+                commonProperties()
+
+                scm {
+                    scmConfig.delegate = delegate
+                    scmConfig()
+                }
+
+                steps {
+                    shell('echo "\\n\\n==== PULLING LATEST CODE FROM BRANCH ====\\n"')
+                    shell('git pull origin \${BRANCH_NAME}')
+                }
+
+                publishers {
+                    downstream("Branches/\${BRANCH_NAME}/1-Coding-Style-Check", 'SUCCESS')
+                }
+
+                triggers {
+                    scm('* * * * *')
+                }
+            }
             // 1. Coding Style Check Job
             job("Branches/\${BRANCH_NAME}/1-Coding-Style-Check") {
                 commonProperties.delegate = delegate

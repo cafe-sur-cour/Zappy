@@ -242,6 +242,7 @@ This project includes a fully configured Jenkins pipeline to automate building, 
 4. **Stop the Jenkins container**:
    ```bash
    make jenkins_stop
+   docker-compose -f jenkins/docker-compose.yml down -v // to remove volumes
    ```
 
 ### 📋 Pipeline Jobs
