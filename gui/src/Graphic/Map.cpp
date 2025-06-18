@@ -166,7 +166,9 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
         return;
 
     static float timeAccumulator = 0.0f;
-    timeAccumulator += this->_display->getFrameTime();
+    std::pair<int, int> temp = this->_gameInfos->getMapSize();
+    if (temp.first < 40 && temp.second < 40)
+        timeAccumulator += this->_display->getFrameTime();
 
     for (int i = 0; i < tile.food; ++i) {
         float baseHeight = getOffset(DisplayPriority::FOOD, x, y, static_cast<size_t>(i));
@@ -178,10 +180,10 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
             baseHeight + floatOffset,
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
-
-        float rotationAngle = timeAccumulator * 0.50f +
-            static_cast<float>(x * 10 + y * 15 + i * 20);
-
+        float rotationAngle = -1;
+        if (temp.first < 40 && temp.second < 40)
+            rotationAngle = timeAccumulator * 0.50f +
+                static_cast<float>(x * 10 + y * 15 + i * 20);
         this->_display->drawModelEx("food", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
             {zappy::gui::FOOD_SCALE, zappy::gui::FOOD_SCALE, zappy::gui::FOOD_SCALE},
@@ -196,9 +198,11 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
         return;
 
     static float timeAccumulator = 0.0f;
-    timeAccumulator += this->_display->getFrameTime();
-
+    std::pair<int, int> temp = this->_gameInfos->getMapSize();
+    if (temp.first < 40 && temp.second < 40)
+        timeAccumulator += this->_display->getFrameTime();
     int index = 0;
+    float rotationAngle = -1;
 
     for (int i = 0; i < tile.linemate; ++i) {
         Vector3f position = {
@@ -207,9 +211,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        float rotationAngle = timeAccumulator * 0.50f +
-            static_cast<float>(x * 10 + y * 15 + i * 20);
-
+        if (temp.first < 40 && temp.second < 40)
+            rotationAngle = timeAccumulator * 0.50f +
+                static_cast<float>(x * 10 + y * 15 + i * 20);
         this->_display->drawModelEx("linemate", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
             {zappy::gui::LINEMATE_SCALE,
@@ -225,8 +229,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        float rotationAngle = timeAccumulator * 0.50f +
-            static_cast<float>(x * 10 + y * 15 + i * 20);
+        if (temp.first < 40 && temp.second < 40)
+            rotationAngle = timeAccumulator * 0.50f +
+                static_cast<float>(x * 10 + y * 15 + i * 20);
 
         this->_display->drawModelEx("deraumere", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
@@ -243,8 +248,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        float rotationAngle = timeAccumulator * 0.50f +
-            static_cast<float>(x * 10 + y * 15 + i * 20);
+        if (temp.first < 40 && temp.second < 40)
+            rotationAngle = timeAccumulator * 0.50f +
+                static_cast<float>(x * 10 + y * 15 + i * 20);
 
         this->_display->drawModelEx("sibur", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
@@ -259,9 +265,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        float rotationAngle = timeAccumulator * 0.50f +
-            static_cast<float>(x * 10 + y * 15 + i * 20);
-
+        if (temp.first < 40 && temp.second < 40)
+            rotationAngle = timeAccumulator * 0.50f +
+                static_cast<float>(x * 10 + y * 15 + i * 20);
         this->_display->drawModelEx("mendiane", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
             {zappy::gui::MENDIANE_SCALE,
@@ -276,9 +282,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
             getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
-
-        float rotationAngle = timeAccumulator * 0.50f +
-            static_cast<float>(x * 10 + y * 15 + i * 20);
+        if (temp.first < 40 && temp.second < 40)
+            rotationAngle = timeAccumulator * 0.50f +
+                static_cast<float>(x * 10 + y * 15 + i * 20);
 
         this->_display->drawModelEx("phiras", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
@@ -293,8 +299,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        float rotationAngle = timeAccumulator * 0.50f +
-            static_cast<float>(x * 10 + y * 15 + i * 20);
+        if (temp.first < 40 && temp.second < 40)
+            rotationAngle = timeAccumulator * 0.50f +
+                static_cast<float>(x * 10 + y * 15 + i * 20);
 
         this->_display->drawModelEx("thystame", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
