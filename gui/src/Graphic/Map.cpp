@@ -43,18 +43,27 @@ Color32 Map::getTeamColor(const std::string &teamName)
     return _teamColors[teamName];
 }
 
-void Map::draw()
+void Map::draw(bool performanceMode)
 {
+    _performanceMode = performanceMode;
+
     updatePlayerRotations();
     updatePlayerPositions();
 
     auto tiles = _gameInfos->getTiles();
 
     for (const auto &tile : tiles) {
-        drawTile(tile.x, tile.y, tile);
-        drawEggs(tile.x, tile.y);
-        drawFood(tile.x, tile.y, tile);
-        drawRock(tile.x, tile.y, tile);
+        if (!_performanceMode) {
+            drawTile(tile.x, tile.y, tile);
+            drawEggs(tile.x, tile.y);
+            drawFood(tile.x, tile.y, tile);
+            drawRock(tile.x, tile.y, tile);
+        } else {
+            drawPerformanceTile(tile);
+            drawEggs(tile.x, tile.y);
+            drawPerformanceFood(tile.x, tile.y, tile);
+            // drawRock(tile.x, tile.y, tile);
+        }
     }
 
     drawAllPlayers();
@@ -79,6 +88,19 @@ void Map::drawTile(int x, int y, const zappy::structs::Tile &tile)
 
     this->_display->drawModelEx("platform", position, {0.0f, 1.0f, 0.0f},
         angle, {0.9f, 0.9f, 0.9f}, CWHITE);
+}
+
+void Map::drawPerformanceTile(const zappy::structs::Tile &tile)
+{
+    Vector3f position = {
+        static_cast<float>(tile.x * zappy::gui::POSITION_MULTIPLIER),
+        0.0f,
+        static_cast<float>(tile.y * zappy::gui::POSITION_MULTIPLIER)
+    };
+
+    float cubeSize = 2.0f;
+    this->_display->drawCube(position, cubeSize, 0.2f, cubeSize, CPINK);
+    this->_display->drawCubeWires(position, cubeSize, 0.2f, cubeSize, CBLACK);
 }
 
 void Map::drawAllPlayers()
@@ -186,6 +208,23 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
             rotationAngle,
             {zappy::gui::FOOD_SCALE, zappy::gui::FOOD_SCALE, zappy::gui::FOOD_SCALE},
             CWHITE);
+    }
+}
+
+void Map::drawPerformanceFood(int x, int y, const zappy::structs::Tile &tile)
+{
+    if (tile.food <= 0)
+        return;
+
+    for (int i = 0; i < tile.food; ++i) {
+        Vector3f position = {
+            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+            getOffset(DisplayPriority::FOOD, x, y, static_cast<size_t>(i)),
+            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+        };
+
+        float sphereRadius = 0.1f;
+        this->_display->drawSphere(position, sphereRadius, CRED);
     }
 }
 
