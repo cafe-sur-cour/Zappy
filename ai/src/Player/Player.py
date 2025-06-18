@@ -97,7 +97,9 @@ class Player:
             f"Level: {self.level}, "
             f"Inventory: {self.inventory}, "
             f"Alive: {not self.communication.playerIsDead()}, "
-            f"In Incantation: {self.inIncantation}"
+            f"In Incantation: {self.inIncantation};"
+            f"Can Incant: {self.canIncant}"
+            f"Going to incantation: {self.goToIncantation}"
         )
 
     def create_child(self) -> int:
@@ -155,12 +157,13 @@ class Player:
                 self.communication.sendLook()
                 self.roombaState["lastCommand"] = "look"
 
-            elif self.roombaState["lastCommand"] == "look":
+            elif self.roombaState["lastCommand"] in ["look", "take food"]:
                 self.look = self.communication.getLook() or self.look
                 if self.look and len(self.look) > 0:
                     if "food" in self.look[0].keys() and not self.roombaState["tookFood"]:
                         self.communication.sendTakeObject("food")
                         self.roombaState["tookFood"] = True
+                        self.roombaState["lastCommand"] == "take food"
                         return
                     tookStones = False
                     neededStones = self.getNeededStonesByPriority()
@@ -198,9 +201,13 @@ class Player:
                 self.roombaState["phase"] = "forward"
 
     def incantationAction(self) -> None:
-        if self.incantationPhase == "checkNbPlayers":
+        if self.incantationPhase == "waitForLook":
+            return
+
+        elif self.incantationPhase == "checkNbPlayers":
             self.communication.sendLook()
             self.incantationLastCommand = "look"
+            self.incantationPhase = "waitForLook"
 
         elif self.incantationPhase == "dropStones":
             if not self.hasEnoughFoodForIncantation():
@@ -221,8 +228,8 @@ class Player:
 
         elif self.incantationPhase == "needMorePlayers":
             self.broadcaster.broadcastMessage(f"incantation {self.level}")
-            self.incantationPhase = "checkNbPlayers"
             self.incantationLastCommand = "broadcast"
+            self.incantationPhase = "checkNbPlayers"
 
     def getStepsFromDirection(self) -> list[()]:
         stepsMap = {
@@ -311,7 +318,7 @@ class Player:
 
     def handleResponseLook(self) -> None:
         self.look = self.communication.getLook() or self.look
-        if self.canIncant and self.incantationPhase == "checkNbPlayers":
+        if self.canIncant and self.incantationPhase == "waitForLook":
             if len(self.look) > 0 and "player" in self.look[0].keys():
                 playerCount = self.look[0]["player"]
                 if playerCount >= LVL_UPGRADES[self.level]["players"]:
