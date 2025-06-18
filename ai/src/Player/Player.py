@@ -139,21 +139,6 @@ class Player:
         neededStones = [(stone, quantity) for quantity, stone in neededStones if quantity > 0]
         return neededStones
 
-    def dropStonesForSurvival(self) -> None:
-        dropPriority = ["thystame", "phiras", "mendiane", "sibur", "deraumere", "linemate"]
-
-        for stone in dropPriority:
-            if self.inventory.get(stone, 0) > 0:
-                self.logger.info(f"Survival mod critical: drop {stone}")
-                self.communication.sendSetObject(stone)
-                return
-
-    def hasEnoughFoodForIncantation(self) -> bool:
-        nbStones = sum(
-            LVL_UPGRADES[self.level]["stones"].values()
-        )
-        return self.inventory["food"] * 126 >= nbStones * 7 + 300
-
     def roombaAction(self) -> None:
         if self.roombaState["phase"] == "forward":
             if self.roombaState["lastCommand"] in ("left", "forward", None):
@@ -202,6 +187,12 @@ class Player:
                 self.communication.sendLeft()
                 self.roombaState["lastCommand"] = "left"
                 self.roombaState["phase"] = "forward"
+
+    def hasEnoughFoodForIncantation(self) -> bool:
+        nbStones = sum(
+            LVL_UPGRADES[self.level]["stones"].values()
+        )
+        return self.inventory["food"] * 126 >= nbStones * 7 + 300
 
     def incantationAction(self) -> None:
         pass
