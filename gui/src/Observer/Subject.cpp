@@ -9,6 +9,8 @@
 #include <string>
 
 #include "Subject.hpp"
+#include <iostream>
+#include "../Utils/Constants.hpp"
 
 
 void Subject::addObserver(std::shared_ptr<IObserver> observer) {
