@@ -8,6 +8,7 @@
 import os
 from threading import Thread
 from random import randint
+from typing import Callable, List, Any, Union
 
 from src.Broadcaster.Broadcaster import Broadcaster
 from src.Exceptions.Exceptions import (
@@ -193,7 +194,7 @@ class Player:
         elif phase == "updateInventory":
             self.communication.sendInventory()
             self.roombaState["lastCommand"] = "inventory"
-            self.roombaState["phase"] = "checkOnTeammates"
+            self.roombaState["phase"] = "forward"
             self.roombaState["lastPhase"] = "updateInventory"
 
         elif phase == "checkOnTeammates":
@@ -202,10 +203,10 @@ class Player:
                 self.roombaState["lastCommand"] = "broadcast sendInventory"
 
             elif self.roombaState["lastCommand"] == "broadcast sendInventory":
-                if len(self.roombaState["teamInventories"]) >= self.nbConnectedPlayers:
+                if len(self.roombaState["teamInventories"]) + 1 >= self.nbConnectedPlayers:
                     if self.teamHasEnoughStones():
                         self.incantationState["status"] = True
-                        self.roombaState["phase"] = "lookAround"
+                    self.roombaState["phase"] = "forward"
                 else:
                     self.communication.sendGetConnectNbr()
             else:
@@ -243,9 +244,10 @@ class Player:
         return self.inventory["food"] * 126 >= nbStones * 7 + 300
 
     def incantationAction(self) -> None:
-        print("enough ressources")
+        import time
+        time.sleep(0.1)
 
-    def getStepsFromDirection(self) -> list[()]:
+    def getStepsFromDirection(self) -> list[Callable[[], None]]:
         stepsMap = {
             1: [
                 self.communication.sendForward
@@ -294,17 +296,30 @@ class Player:
         pass
 
     def handleResponseInventory(self) -> None:
-        self.inventory = self.communication.getInventory() or self.inventory
+        newInventory = self.communication.getInventory()
+        for item in newInventory.keys():
+            if (
+                item != "food" and
+                newInventory[item] > self.inventory[item] and
+                not self.incantationState["status"] and
+                not self.goToIncantationState["status"] and
+                self.roombaState["phase"] == "updateInventory" and
+                self.nbTeamSlots != -1
+            ):
+                self.roombaState["phase"] = "checkOnTeammates"
+                break
+
+        self.inventory = newInventory or self.inventory
 
         if self.needToBroadcastInventory:
             self.broadcaster.broadcastMessage(
                 "inventory "
-                f"{self.inventory["stones"]["limeate"]},"
-                f"{self.inventory["stones"]["deraumere"]},"
-                f"{self.inventory["stones"]["sibur"]},"
-                f"{self.inventory["stones"]["mendiane"]},"
-                f"{self.inventory["stones"]["phiras"]},"
-                f"{self.inventory["stones"]["thystame"]} "
+                f"{self.inventory["linemate"]},"
+                f"{self.inventory["deraumere"]},"
+                f"{self.inventory["sibur"]},"
+                f"{self.inventory["mendiane"]},"
+                f"{self.inventory["phiras"]},"
+                f"{self.inventory["thystame"]} "
                 f"{self.personalID} {self.senderID}"
             )
             self.needToBroadcastInventory = False
@@ -324,8 +339,8 @@ class Player:
 
     def handleResponseOK(self) -> None:
         if (
-            self.incantationState["status"] == False and
-            self.goToIncantationState["status"] == False
+            not self.incantationState["status"] and
+            not self.goToIncantationState["status"]
         ):
             if self.roombaState["lastPhase"] == "vacuum":
                 self.roombaState["phase"] = "updateInventory"
@@ -348,39 +363,99 @@ class Player:
         except ValueError:
             self.logger.error(f"Invalid level response: {rest.strip()}")
 
-    def handleCommandResponse(self, response: str) -> None:
-        switcher = {
-            "inventory": self.handleResponseInventory,
-            "look": self.handleResponseLook,
-            "ko": self.handleResponseKO,
-            "ok": self.handleResponseOK,
-            "Elevation underway": self.handleResponseElevationUnderway,
-            "Current level: ": self.handleResponseCurrentLevel,
-        }
-        for key in switcher.keys():
-            if response.startswith(key):
-                rest = response[len(key):].strip()
-                if rest:
-                    switcher[key](rest)
-                else:
-                    switcher[key]()
-                return
+    def handleResponseConnectNbr(self, response: str) -> None:
         if (
             not self.incantationState["status"] and
             not self.goToIncantationState["status"] and
-            self.roombaState["lastCommand"] == "Connect_nbr"
+            self.roombaState["phase"] == "checkOnTeammates"
         ):
             try:
                 connectNbr = int(response)
                 self.nbConnectedPlayers = self.nbTeamSlots - connectNbr
+                return
             except ValueError:
-                pass
+                self.logger.error(f"Invalid connect nbr: {response.strip()}")
+
+    def handleCommandResponse(self, response: str) -> None:
+        switcher: list[
+            tuple[
+                Callable[[str], bool] | Callable[[str, str], bool],
+                str,
+                Callable[[], None] | Callable[[str], None],
+                Callable[[str], None | str]
+            ]
+        ] = [
+            (
+                str.startswith,
+                "inventory",
+                self.handleResponseInventory,
+                lambda a: a[len("Current level: "):].strip()
+            ),
+            (
+                str.startswith,
+                "look",
+                self.handleResponseLook,
+                lambda a: a[len("Current level: "):].strip()
+            ),
+            (
+                str.startswith,
+                "ko",
+                self.handleResponseKO,
+                lambda a: None
+            ),
+            (
+                str.startswith,
+                "ok",
+                self.handleResponseOK,
+                lambda a: None
+            ),
+            (
+                str.startswith,
+                "Elevation underway",
+                self.handleResponseElevationUnderway,
+                lambda a: None
+            ),
+            (
+                str.startswith,
+                "Current level: ",
+                self.handleResponseCurrentLevel,
+                lambda a: a[len("Current level: "):].strip()
+            ),
+            (
+                str.isdigit,
+                None,
+                self.handleResponseConnectNbr,
+                lambda a: a.strip()
+            ),
+        ]
+
+        foundSwitch = False
+        for (condition, arg, r, trimer) in switcher:
+            if arg:
+                foundSwitch = condition(response, arg)
+            else:
+                foundSwitch = condition(response)
+            if foundSwitch:
+                param = trimer(response)
+                if param:
+                    r(param)
+                else:
+                    r()
+                return
+
         lastCommand = self.roombaState["lastCommand"]
         if self.incantationState["status"]:
             lastCommand = self.incantationState["lastCommand"]
         elif self.goToIncantationState["status"]:
             lastCommand = self.goToIncantationState["lastCommand"]
         self.logger.error(f"Unknown response to '{lastCommand}': {response.strip()}")
+
+    def handleMessageTeamslots(self, direction: int, rest: str) -> None:
+        try:
+            nbSlots = int(rest.strip())
+            self.nbTeamSlots = nbSlots
+        except ValueError:
+            self.logger.error(f"Invalid number of team slots: {rest.strip()}")
 
     def handleMessageSendInventory(self, direction: int, rest: str) -> None:
         try:
@@ -409,10 +484,10 @@ class Player:
             inventory = data.split(",")
             if len(inventory) != 6:
                 return
-            inventory = map(int, inventory)
+            inventory = list(map(int, inventory))
             self.roombaState["teamInventories"].append(
                 {
-                    "limeate": inventory[0],
+                    "linemate": inventory[0],
                     "deraumere": inventory[1],
                     "sibur": inventory[2],
                     "mendiane": inventory[3],
@@ -427,6 +502,7 @@ class Player:
 
     def handleMessages(self, direction: int, message: str) -> None:
         switcher = {
+            "teamslots ": self.handleMessageTeamslots,
             "sendInventory ": self.handleMessageSendInventory,
             "inventory ": self.handleMessageInventory,
         }
@@ -442,6 +518,8 @@ class Player:
 
     def loop(self) -> None:
         try:
+            if self.nbTeamSlots != -1:
+                self.broadcaster.broadcastMessage(f"teamslots {self.nbTeamSlots}")
             while not self.communication.playerIsDead():
                 if self.communication.hasMessages():
                     data = self.communication.getLastMessage()
