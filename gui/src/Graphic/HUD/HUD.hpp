@@ -174,6 +174,8 @@ class HUD : public IObserver {
                             const std::string& teamId,
                             float yPos, const std::vector<int>& playerNumbers);
 
+        void addIncrementDecrementButtons(std::shared_ptr<Containers> container, int playerId);
+
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
