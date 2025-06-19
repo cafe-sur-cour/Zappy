@@ -92,8 +92,8 @@ class Map {
         static constexpr float BASE_HEIGHT_EGG = 0.0f;
         static constexpr float EGG_HEIGHT = 0.2f;
 
-        static constexpr float BASE_HEIGHT_FOOD = 0.2f;
-        static constexpr float FOOD_HEIGHT = 0.3f;
+        static constexpr float BASE_HEIGHT_FOOD = 0.1f;
+        static constexpr float FOOD_HEIGHT = 0.7f;
 
         static constexpr float BASE_HEIGHT_ROCK = 0.1f;
         static constexpr float ROCK_HEIGHT = 0.7f;
