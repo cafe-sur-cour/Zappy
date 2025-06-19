@@ -89,7 +89,7 @@ class App:
         if self.is_main_process:
             self._cleanup_children()
 
-    def create_new_player(self, nbSlots: int) -> int:
+    def create_new_player(self) -> int:
         pid: int = os.fork()
         if pid < 0:
             return -1
@@ -103,7 +103,6 @@ class App:
                 p.is_child_process = True
                 _, x, y = p.communication.connectToServer()
                 p.setMapSize(x, y)
-                p.setNbSlots(nbSlots)
                 p.startComThread()
                 p.loop()
             except (CommunicationException, SocketException):
@@ -137,7 +136,7 @@ class App:
         for _ in range(slots):
             if not self.running:
                 break
-            child_pid = self.create_new_player(slots)
+            child_pid = self.create_new_player()
             if child_pid > 0:
                 self.childs.append(child_pid)
 
