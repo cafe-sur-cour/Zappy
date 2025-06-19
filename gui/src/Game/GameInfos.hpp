@@ -48,6 +48,8 @@ class GameInfos : public Subject {
         void updatePlayerPosition(int playerNumber, int x, int y);
         void updatePlayerOrientation(int playerNumber, int orientation);
         void updatePlayerLevel(int playerNumber, int level);
+        bool incrementPlayerLevel(int playerNumber);
+        bool decrementPlayerLevel(int playerNumber);
         void updatePlayerInventory(int playerNumber,
             const zappy::structs::Inventory inventory);
         void updatePlayerExpulsion(int playerNumber);
