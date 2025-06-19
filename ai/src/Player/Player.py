@@ -9,6 +9,7 @@ import os
 from threading import Thread
 from random import randint
 from typing import Callable, List, Any, Union
+from time import sleep
 
 from src.Broadcaster.Broadcaster import Broadcaster
 from src.Exceptions.Exceptions import (
@@ -59,6 +60,7 @@ class Player:
         self.y: int = 0
         self.nbTeamSlots: int = -1
         self.nbConnectedPlayers: int = 1
+        self.sentNbSlots: bool = True
 
         self.personalID: int = randint(1, 1000000)
         self.senderID: int = -1
@@ -109,9 +111,9 @@ class Player:
             f"Level: {self.level}, "
             f"Inventory: {self.inventory}, "
             f"Alive: {not self.communication.playerIsDead()}, "
-            f"In Incantation: {self.inIncantation};"
-            f"Can Incant: {self.incantationState["canIncant"]}"
-            f"Going to incantation: {self.goToIncantationState["status"]}"
+            f"In Incantation: {self.inIncantation}; "
+            f"Incantation Status: {self.incantationState['status']}; "
+            f"Going to incantation: {self.goToIncantationState['status']}"
         )
 
     def create_child(self) -> int:
@@ -203,12 +205,17 @@ class Player:
                 self.roombaState["lastCommand"] = "broadcast sendInventory"
 
             elif self.roombaState["lastCommand"] == "broadcast sendInventory":
-                if len(self.roombaState["teamInventories"]) + 1 >= self.nbConnectedPlayers:
+                expectedTeammates = self.nbConnectedPlayers - 1
+                receivedInventories = len(self.roombaState["teamInventories"])
+
+                if receivedInventories >= expectedTeammates:
                     if self.teamHasEnoughStones():
                         self.incantationState["status"] = True
                     self.roombaState["phase"] = "forward"
                 else:
                     self.communication.sendGetConnectNbr()
+                    self.roombaState["lastCommand"] = "Connect_nbr"
+
             else:
                 self.communication.sendGetConnectNbr()
                 self.roombaState["lastCommand"] = "Connect_nbr"
@@ -302,17 +309,19 @@ class Player:
 
     def handleResponseInventory(self) -> None:
         newInventory = self.communication.getInventory()
-        for item in newInventory.keys():
-            if (
-                item != "food" and
-                newInventory[item] > self.inventory[item] and
-                not self.incantationState["status"] and
-                not self.goToIncantationState["status"] and
-                self.roombaState["phase"] == "updateInventory" and
-                self.nbTeamSlots != -1
-            ):
-                self.roombaState["phase"] = "checkOnTeammates"
-                break
+
+        if not self.needToBroadcastInventory:
+            for item in newInventory.keys():
+                if (
+                    item != "food" and
+                    newInventory[item] > self.inventory[item] and
+                    not self.incantationState["status"] and
+                    not self.goToIncantationState["status"] and
+                    self.roombaState["lastPhase"] == "updateInventory" and
+                    self.nbTeamSlots != -1
+                ):
+                    self.roombaState["phase"] = "checkOnTeammates"
+                    break
 
         self.inventory = newInventory or self.inventory
 
@@ -328,19 +337,21 @@ class Player:
                 f"{self.personalID} {self.senderID}"
             )
             self.needToBroadcastInventory = False
-            return
-
-        needStones = len(self.getNeededStonesByPriority()) > 0
-
-        if not needStones:
-            if not self.goToIncantationState["status"]:
-                self.incantationState["status"] = True
 
     def handleResponseLook(self) -> None:
         self.look = self.communication.getLook() or self.look
 
     def handleResponseKO(self) -> None:
-        self.logger.error(f"Roomba command '{self.roombaState['lastCommand']}' failed")
+        lastCommand = self.roombaState["lastCommand"]
+        if self.incantationState["status"]:
+            lastCommand = self.incantationState["lastCommand"]
+        elif self.goToIncantationState["status"]:
+            lastCommand = self.goToIncantationState["lastCommand"]
+
+        self.logger.error(f"Command '{lastCommand}' failed")
+
+        if self.roombaState["phase"] == "checkOnTeammates":
+            self.roombaState["phase"] = "forward"
 
     def handleResponseOK(self) -> None:
         if (
