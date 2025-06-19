@@ -38,10 +38,7 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
     this->_initHelpInformation();
 
     if (_gameInfos) {
-        auto observer_ptr = std::shared_ptr<IObserver>(this, [](IObserver*) {
-        });
-
-        _gameInfos->addObserver(observer_ptr);
+        _gameInfos->addObserver(std::shared_ptr<IObserver>(this, [](IObserver*) {}));
     }
 }
 
