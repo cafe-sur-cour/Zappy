@@ -29,7 +29,7 @@ int plu(zappy_t *zappy, graph_net_t *graphic, char *message)
         error_message("Invalid plu message format.");
         return -1;
     }
-    if (sscanf(message, "plu #%d", &player_id) != 1) {
+    if (sscanf(message, "plu #%d\n", &player_id) != 1) {
         error_message("Invalid plu pattern.");
         return -1;
     }
