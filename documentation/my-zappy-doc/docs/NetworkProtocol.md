@@ -295,7 +295,7 @@ After initial state, server continuously sends:
 - **Malformed commands**: Server ignores and may send error response
 
 ### Resource Numbers
-For `pdr` and `pgt` messages, resource numbers are:
+For `pdr`, `pgt`, and extended commands (`pia`, `pis`, `tar`, `tsr`), resource numbers are:
 - `0`: food
 - `1`: linemate
 - `2`: deraumere
@@ -315,14 +315,23 @@ These additional commands allow the GUI to request specific player actions or mo
 | **Player level up** | `plu #n\n` | Request to increase player #n's level |
 | **Player level down** | `pld #n\n` | Request to decrease player #n's level |
 | **Kill player** | `kil #n\n` | Request to kill player #n |
+| **Player inventory add** | `pia #n i\n` | Request to add resource `i` to player #n's inventory |
+| **Player inventory subtract** | `pis #n i\n` | Request to remove resource `i` from player #n's inventory |
+| **Tile add resource** | `tar X Y i\n` | Request to add resource `i` to tile at position (X, Y) |
+| **Tile subtract resource** | `tsr X Y i\n` | Request to remove resource `i` from tile at position (X, Y) |
 
 #### Usage Context
 - **`plu #n`**: GUI requests the server to artificially increase a player's level (admin/debug feature)
 - **`pld #n`**: GUI requests the server to artificially decrease a player's level (admin/debug feature)
 - **`kil #n`**: GUI requests the server to kill a specific player (admin/debug feature)
+- **`pia #n i`**: GUI requests the server to add a specific resource to a player's inventory (admin/debug feature)
+- **`pis #n i`**: GUI requests the server to remove a specific resource from a player's inventory (admin/debug feature)
+- **`tar X Y i`**: GUI requests the server to add a specific resource to a tile (admin/debug feature)
+- **`tsr X Y i`**: GUI requests the server to remove a specific resource from a tile (admin/debug feature)
 
 #### Implementation Notes
 - These commands extend the standard GUI protocol
 - Typically used for administrative control or debugging purposes
 - May trigger corresponding broadcast messages to other GUI clients
 - Server responds with appropriate confirmation or error messages
+- **Resource ID parameter (`i`)**: Uses the same resource numbering system as `pdr` and `pgt` messages (see Resource Numbers section above)
