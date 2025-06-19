@@ -13,16 +13,20 @@
 
 static void increment_ressource(zappy_t *zappy, int x, int y, int ressource_id)
 {
-    switch (ressource_id) {
-        case 0: add_food(&zappy->game->map->tiles[x][y]); break;
-        case 1: add_linemate(&zappy->game->map->tiles[x][y]); break;
-        case 2: add_deraumere(&zappy->game->map->tiles[x][y]); break;
-        case 3: add_sibur(&zappy->game->map->tiles[x][y]); break;
-        case 4: add_mendiane(&zappy->game->map->tiles[x][y]); break;
-        case 5: add_phiras(&zappy->game->map->tiles[x][y]); break;
-        case 6: add_thystame(&zappy->game->map->tiles[x][y]); break;
-        default: error_message("Invalid resource ID.");
-    }
+    if (ressource_id == 0)
+        add_food(&zappy->game->map->tiles[x][y]);
+    if (ressource_id == 1)
+        add_linemate(&zappy->game->map->tiles[x][y]);
+    if (ressource_id == 2)
+        add_deraumere(&zappy->game->map->tiles[x][y]);
+    if (ressource_id == 3)
+        add_sibur(&zappy->game->map->tiles[x][y]);
+    if (ressource_id == 4)
+        add_mendiane(&zappy->game->map->tiles[x][y]);
+    if (ressource_id == 5)
+        add_phiras(&zappy->game->map->tiles[x][y]);
+    if (ressource_id == 6)
+        add_thystame(&zappy->game->map->tiles[x][y]);
 }
 
 int tar(zappy_t *zappy, graph_net_t *graphic, char *message)

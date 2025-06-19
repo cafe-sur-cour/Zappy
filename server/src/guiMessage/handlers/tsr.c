@@ -13,16 +13,20 @@
 
 static void decrement_ressource(zappy_t *zappy, int x, int y, int ressource_id)
 {
-    switch (ressource_id) {
-        case 0: rm_food(&zappy->game->map->tiles[x][y]); break;
-        case 1: rm_linemate(&zappy->game->map->tiles[x][y]); break;
-        case 2: rm_deraumere(&zappy->game->map->tiles[x][y]); break;
-        case 3: rm_sibur(&zappy->game->map->tiles[x][y]); break;
-        case 4: rm_mendiane(&zappy->game->map->tiles[x][y]); break;
-        case 5: rm_phiras(&zappy->game->map->tiles[x][y]); break;
-        case 6: rm_thystame(&zappy->game->map->tiles[x][y]); break;
-        default: error_message("Invalid resource ID.");
-    }
+    if (ressource_id == 0)
+        rm_food(&zappy->game->map->tiles[x][y]);
+    if (ressource_id == 1)
+        rm_linemate(&zappy->game->map->tiles[x][y]);
+    if (ressource_id == 2)
+        rm_deraumere(&zappy->game->map->tiles[x][y]);
+    if (ressource_id == 3)
+        rm_sibur(&zappy->game->map->tiles[x][y]);
+    if (ressource_id == 4)
+        rm_mendiane(&zappy->game->map->tiles[x][y]);
+    if (ressource_id == 5)
+        rm_phiras(&zappy->game->map->tiles[x][y]);
+    if (ressource_id == 6)
+        rm_thystame(&zappy->game->map->tiles[x][y]);
 }
 
 int tsr(zappy_t *zappy, graph_net_t *graphic, char *message)
