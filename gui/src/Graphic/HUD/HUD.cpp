@@ -126,6 +126,9 @@ void HUD::update()
     updateTeamPlayersDisplay(_gameInfos);
     updateTpsSlider(_gameInfos);
     updateServerMessagesDisplay(_gameInfos);
+
+    if (_selectedTile.first >= 0 && _selectedTile.second >= 0)
+        updateTileResourceDisplay(_selectedTile.first, _selectedTile.second);
 }
 
 std::shared_ptr<Containers> HUD::addContainer(
