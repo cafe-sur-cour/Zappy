@@ -86,14 +86,18 @@ void HUD::draw()
 
         Color32 outlineColor = {0, 0, 0, 255};
 
-        _display->drawText(message, textX - outlineThickness, textY - outlineThickness, fontSize, outlineColor);
+        _display->drawText(message, textX - outlineThickness, textY - outlineThickness,
+            fontSize, outlineColor);
         _display->drawText(message, textX - outlineThickness, textY, fontSize, outlineColor);
-        _display->drawText(message, textX - outlineThickness, textY + outlineThickness, fontSize, outlineColor);
+        _display->drawText(message, textX - outlineThickness, textY + outlineThickness,
+            fontSize, outlineColor);
         _display->drawText(message, textX, textY - outlineThickness, fontSize, outlineColor);
         _display->drawText(message, textX, textY + outlineThickness, fontSize, outlineColor);
-        _display->drawText(message, textX + outlineThickness, textY - outlineThickness, fontSize, outlineColor);
+        _display->drawText(message, textX + outlineThickness, textY - outlineThickness,
+            fontSize, outlineColor);
         _display->drawText(message, textX + outlineThickness, textY, fontSize, outlineColor);
-        _display->drawText(message, textX + outlineThickness, textY + outlineThickness, fontSize, outlineColor);
+        _display->drawText(message, textX + outlineThickness, textY + outlineThickness,
+            fontSize, outlineColor);
 
         _display->drawText(
             message,
