@@ -1892,3 +1892,25 @@ void HUD::clearTileResourceElements()
         bottomContainer->removeElement(id);
     }
 }
+
+bool HUD::isMouseOverHUD() const
+{
+    if (!_display)
+        return false;
+
+    Vector2f mousePos = _display->getMousePosition();
+
+    for (const auto& pair : _containers) {
+        if (pair.second && pair.second->isVisible()) {
+            if (pair.second->contains(mousePos.x, mousePos.y)) {
+                return true;
+            }
+        }
+    }
+
+    if (_help->containsPoint(mousePos.x, mousePos.y) ||
+        _settings->containsPoint(mousePos.x, mousePos.y))
+        return true;
+
+    return false;
+}

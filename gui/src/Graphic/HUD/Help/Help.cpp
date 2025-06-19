@@ -441,3 +441,11 @@ void Help::initHelpContainer()
     );
     _visible = false;
 }
+
+bool Help::containsPoint(float x, float y) const
+{
+    if (!_helpContainer || !_visible)
+        return false;
+
+    return _helpContainer->contains(x, y);
+}
