@@ -52,8 +52,6 @@ class MsgHandler {
         bool handlePdrMessage(const std::string& message);
         bool handlePgtMessage(const std::string& message);
         bool handlePdiMessage(const std::string& message);
-        bool handlePluMessage(const std::string& message);
-        bool handlePldMessage(const std::string& message);
         bool handleEnwMessage(const std::string& message);
         bool handleEboMessage(const std::string& message);
         bool handleEdiMessage(const std::string& message);
