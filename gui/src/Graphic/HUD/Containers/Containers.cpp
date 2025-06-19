@@ -5,10 +5,10 @@
 ** Containers
 */
 
-#include "Containers.hpp"
-#include "../Checkbox/Checkbox.hpp"
 #include <string>
 #include <memory>
+#include "Containers.hpp"
+#include "../Checkbox/Checkbox.hpp"
 
 Containers::Containers(
     std::shared_ptr<IDisplay> display,

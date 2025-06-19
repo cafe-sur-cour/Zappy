@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <string>
+#include <algorithm>
 #include "Checkbox.hpp"
 
 Checkbox::Checkbox(
