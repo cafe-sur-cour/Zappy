@@ -1671,7 +1671,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "+",
         [this]() {
-            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 0);
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 0);
         }
     );
 
@@ -1681,7 +1682,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "-",
         [this]() {
-            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 0);
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 0);
         }
     );
 
@@ -1691,7 +1693,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "+",
         [this]() {
-            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 1);
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 1);
         }
     );
 
@@ -1701,7 +1704,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "-",
         [this]() {
-            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 1);
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 1);
         }
     );
 
@@ -1711,7 +1715,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "+",
         [this]() {
-            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 2);
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 2);
         }
     );
 
@@ -1721,7 +1726,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "-",
         [this]() {
-            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 2);
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 2);
         }
     );
 
@@ -1731,7 +1737,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "+",
         [this]() {
-            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 3);
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 3);
         }
     );
 
@@ -1741,7 +1748,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "-",
         [this]() {
-            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 3);
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 3);
         }
     );
 
@@ -1751,7 +1759,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "+",
         [this]() {
-            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 4);
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 4);
         }
     );
 
@@ -1761,7 +1770,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "-",
         [this]() {
-            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 4);
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 4);
         }
     );
 
@@ -1771,7 +1781,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "+",
         [this]() {
-            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 5);
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 5);
         }
     );
 
@@ -1781,7 +1792,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "-",
         [this]() {
-            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 5);
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 5);
         }
     );
 
@@ -1791,7 +1803,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "+",
         [this]() {
-            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 6);
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 6);
         }
     );
 
@@ -1801,7 +1814,8 @@ void HUD::initTileResourceDisplay()
         2.f, 8.f,
         "-",
         [this]() {
-            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first, this->_selectedTile.second, 6);
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 6);
         }
     );
 }
@@ -1816,7 +1830,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
     if (!titleElem)
         initTileResourceDisplay();
 
-    zappy::structs::Tile tile = _gameInfos->getTile(this->_selectedTile.first, this->_selectedTile.second);
+    zappy::structs::Tile tile = _gameInfos->getTile(this->_selectedTile.first,
+        this->_selectedTile.second);
 
     auto tileResourcesTitle = std::dynamic_pointer_cast<Text>(
         bottomContainer->getElement("tile_resources_title"));
