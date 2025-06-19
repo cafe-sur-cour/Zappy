@@ -113,6 +113,8 @@ class HUD : public IObserver {
         void update() override;
         void onGameEvent(GameEventType eventType, const std::string& teamName) override;
 
+        bool isMouseOverHUD() const;
+
     private:
         void _initHelpInformation();
 
