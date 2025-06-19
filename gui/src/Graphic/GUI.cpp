@@ -544,3 +544,12 @@ BoundingBox3D GUI::getPlayerBoundingBox(const zappy::structs::Player& player) co
 
     return {min, max};
 }
+
+void GUI::handleVictory(const std::string &teamName)
+{
+    if (_hud) {
+        _hud->displayWinMessage(teamName);
+    } else {
+        std::cout << colors::T_RED << "[ERROR] HUD is null in handleVictory" << colors::RESET << std::endl;
+    }
+}
