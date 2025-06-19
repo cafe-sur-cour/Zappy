@@ -129,6 +129,7 @@ int distribute_resources(zappy_t *z)
         }
     }
     free(shuffled_tiles);
+    return 0;
 }
 
 static map_t *malloc_tiles(int width, int height,
