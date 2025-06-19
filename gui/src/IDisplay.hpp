@@ -13,6 +13,7 @@
 
 enum Key {
     TAB,
+    ESC,
     UP,
     DOWN,
     RIGHT,

@@ -14,6 +14,7 @@
 #include <mutex>
 #include <string>
 #include <chrono>
+#include <unordered_map>
 
 #include "../Utils/Constants.hpp"
 #include "../Communication/ICommunication.hpp"
@@ -42,6 +43,10 @@ class GameInfos : public Subject {
 
         void updateTeamName(const std::string &teamName);
         const std::vector<std::string> getTeamNames() const;
+
+        void setTeamVisibility(const std::string &teamName, bool visible);
+        bool isTeamVisible(const std::string &teamName) const;
+        const std::unordered_map<std::string, bool> getTeamVisibilities() const;
 
         void addPlayer(const zappy::structs::Player player);
         void killPlayer(int playerNumber);
@@ -88,6 +93,7 @@ class GameInfos : public Subject {
         std::vector<std::vector<zappy::structs::Tile>> _tileMatrix;
         bool _matrixInitialized;
         std::vector<std::string> _teamNames;
+        std::unordered_map<std::string, bool> _teamVisibilities;
         std::vector<zappy::structs::Player> _players;
         std::vector<std::pair<int, bool>> _playersExpulsing;
         std::vector<std::tuple<int, std::string, std::chrono::steady_clock::time_point>>

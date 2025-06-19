@@ -63,6 +63,8 @@ int Raylib::getKeyId(Key key)
     {
     case TAB:
         return KEY_TAB;
+    case ESC:
+        return KEY_ESCAPE;
     case UP:
         return KEY_UP;
     case DOWN:

@@ -31,6 +31,7 @@ namespace zappy::constants {
         "  - Right mouse button + drag: Rotate camera\n\n"
         "Interface:\n"
         "  - Click on players to see their stats\n"
+        "  - Click on tiles to see their stats\n"
         "  - Use the RESET CAMERA button to return to default view\n"
         "  - Use the Settings button to adjust game settings";
 

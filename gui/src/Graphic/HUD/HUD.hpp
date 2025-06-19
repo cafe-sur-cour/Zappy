@@ -94,6 +94,14 @@ class HUD : public IObserver {
 
         void clearPlayerInventoryElements();
 
+        void setSelectedTile(int x, int y);
+
+        void initTileResourceDisplay();
+
+        void updateTileResourceDisplay(int x, int y);
+
+        void clearTileResourceElements();
+
         zappy::structs::Player getPlayerById(int playerId) const;
 
         bool isPlayerInIncantation(int playerId) const;
@@ -177,4 +185,5 @@ class HUD : public IObserver {
         bool _showVictoryMessage;
         std::string _winningTeam;
         Color32 _victoryColor;
+        std::pair<int, int> _selectedTile;
 };

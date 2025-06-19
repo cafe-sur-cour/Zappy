@@ -23,7 +23,8 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
       _resetCameraFunc(resetCameraFunc),
       _showVictoryMessage(false),
       _winningTeam(""),
-      _victoryColor({0, 127, 255, 255})
+      _victoryColor({0, 127, 255, 255}),
+      _selectedTile(-1, -1)
 {
     _help = std::make_shared<Help>(display, audio);
     _settings = std::make_shared<Settings>(display, audio, camera);
@@ -250,7 +251,7 @@ void HUD::_initHelpInformation()
 
     bottomContainer->addTextPercent(
         "cam_info_mode",
-        2.f, 10.f,
+        1.f, 10.f,
         "Camera mod: NONE",
         7.0f,
         {245, 224, 80, 255}
@@ -258,7 +259,7 @@ void HUD::_initHelpInformation()
 
     bottomContainer->addTextPercent(
         "help_cam_key",
-        2.f, 30.f,
+        1.f, 30.f,
         "NONE",
         7.0f,
         {255, 236, 183, 255}
@@ -417,9 +418,21 @@ void HUD::initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
             yPos += 1.0f;
         }
 
+        sideContainer->addCheckboxPercent(
+            teamId + "_checkbox",
+            2.0f,
+            yPos + 0.2f,
+            8.0f,
+            3.0f,
+            true,
+            [this, teamName](bool checked) {
+                this->_gameInfos->setTeamVisibility(teamName, checked);
+            }
+        );
+
         sideContainer->addTextPercent(
             teamId + "_title",
-            5.0f,
+            12.0f,
             yPos,
             "TEAM: " + teamName,
             3.5f,
@@ -485,6 +498,7 @@ void HUD::clearTeamDisplayElements(std::shared_ptr<Containers> container)
         container->removeElement(idBase + "_title");
         container->removeElement(idBase + "_separator");
         container->removeElement(idBase + "_stats");
+        container->removeElement(idBase + "_checkbox");
 
         for (int j = 0; j < 50; j++) {
             container->removeElement(idBase + "_player_" + std::to_string(j));
@@ -553,7 +567,7 @@ void HUD::addPlayerListText(
     if (!playerNumbers.empty()) {
         container->addTextPercent(
             teamId + "_player_0",
-            10.0f,
+            14.0f,
             yPos,
             playerList,
             2.2f,
@@ -562,7 +576,7 @@ void HUD::addPlayerListText(
     } else {
         container->addTextPercent(
             teamId + "_player_0",
-            10.0f,
+            14.0f,
             yPos,
             playerList,
             2.0f,
@@ -1468,5 +1482,190 @@ void HUD::onGameEvent(GameEventType eventType, const std::string& teamName)
             break;
         default:
             break;
+    }
+}
+
+void HUD::setSelectedTile(int x, int y)
+{
+    if (_selectedTile.first != x || _selectedTile.second != y) {
+        _selectedTile = {x, y};
+
+        if (x >= 0 && y >= 0) {
+            updateTileResourceDisplay(x, y);
+        } else {
+            clearTileResourceElements();
+        }
+    }
+}
+
+void HUD::initTileResourceDisplay()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    clearTileResourceElements();
+
+    bottomContainer->addTextPercent(
+        "tile_resources_title",
+        30.0f, 10.0f,
+        "TILE RESOURCES",
+        8.0f,
+        {255, 255, 255, 255}
+    );
+
+    bottomContainer->addTextPercent(
+        "tile_resources_separator",
+        30.0f, 17.0f,
+        std::string(130, '-'),
+        2.0f,
+        {150, 150, 150, 200}
+    );
+
+    float yPosCol1 = 34.0f;
+    float xPosCol1 = 30.0f;
+
+    bottomContainer->addTextPercent(
+        "tile_resource_food",
+        xPosCol1 + 7.5f, 24.0f,
+        "Food: 0",
+        7.5f,
+        {255, 215, 0, 255}
+    );
+
+    bottomContainer->addTextPercent(
+        "tile_resource_linemate",
+        xPosCol1, yPosCol1,
+        "Linemate: 0",
+        7.0f,
+        {200, 200, 200, 255}
+    );
+    yPosCol1 += 13.0f;
+
+    bottomContainer->addTextPercent(
+        "tile_resource_deraumere",
+        xPosCol1, yPosCol1,
+        "Deraumere: 0",
+        7.0f,
+        {65, 105, 225, 255}
+    );
+    yPosCol1 += 13.0f;
+
+    bottomContainer->addTextPercent(
+        "tile_resource_sibur",
+        xPosCol1, yPosCol1,
+        "Sibur: 0",
+        7.0f,
+        {50, 205, 50, 255}
+    );
+
+    float yPosCol2 = 34.0f;
+    float xPosCol2 = 45.0f;
+
+    bottomContainer->addTextPercent(
+        "tile_resource_mendiane",
+        xPosCol2, yPosCol2,
+        "Mendiane: 0",
+        7.0f,
+        {255, 165, 0, 255}
+    );
+    yPosCol2 += 13.0f;
+
+    bottomContainer->addTextPercent(
+        "tile_resource_phiras",
+        xPosCol2, yPosCol2,
+        "Phiras: 0",
+        7.0f,
+        {138, 43, 226, 255}
+    );
+    yPosCol2 += 13.0f;
+
+    bottomContainer->addTextPercent(
+        "tile_resource_thystame",
+        xPosCol2, yPosCol2,
+        "Thystame: 0",
+        7.0f,
+        {255, 20, 147, 255}
+    );
+}
+
+void HUD::updateTileResourceDisplay(int x, int y)
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer || !_gameInfos)
+        return;
+
+    auto titleElem = bottomContainer->getElement("tile_resources_title");
+    if (!titleElem)
+        initTileResourceDisplay();
+
+    zappy::structs::Tile tile = _gameInfos->getTile(x, y);
+
+    auto tileResourcesTitle = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resources_title"));
+    if (tileResourcesTitle) {
+        tileResourcesTitle->setText("TILE RESOURCES (" + std::to_string(x) + ", "
+        + std::to_string(y) + ")");
+    }
+
+    auto foodElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_food"));
+    if (foodElem) {
+        foodElem->setText("Food: " + std::to_string(tile.food));
+    }
+
+    auto linemateElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_linemate"));
+    if (linemateElem) {
+        linemateElem->setText("Linemate: " + std::to_string(tile.linemate));
+    }
+
+    auto deraumereElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_deraumere"));
+    if (deraumereElem) {
+        deraumereElem->setText("Deraumere: " + std::to_string(tile.deraumere));
+    }
+
+    auto siburElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_sibur"));
+    if (siburElem) {
+        siburElem->setText("Sibur: " + std::to_string(tile.sibur));
+    }
+
+    auto mendianeElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_mendiane"));
+    if (mendianeElem) {
+        mendianeElem->setText("Mendiane: " + std::to_string(tile.mendiane));
+    }
+
+    auto phirasElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_phiras"));
+    if (phirasElem) {
+        phirasElem->setText("Phiras: " + std::to_string(tile.phiras));
+    }
+
+    auto thystameElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_thystame"));
+    if (thystameElem) {
+        thystameElem->setText("Thystame: " + std::to_string(tile.thystame));
+    }
+}
+
+void HUD::clearTileResourceElements()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    std::vector<std::string> elementIds = {
+        "tile_resources_title",
+        "tile_resources_separator",
+        "tile_resource_food", "tile_resource_linemate", "tile_resource_deraumere",
+        "tile_resource_sibur", "tile_resource_mendiane", "tile_resource_phiras",
+        "tile_resource_thystame"
+    };
+
+    for (const auto& id : elementIds) {
+        bottomContainer->removeElement(id);
     }
 }
