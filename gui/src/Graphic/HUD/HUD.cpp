@@ -367,9 +367,22 @@ void HUD::initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
             yPos += 1.0f;
         }
 
+        sideContainer->addCheckboxPercent(
+            teamId + "_checkbox",
+            2.0f,
+            yPos + 0.2f,
+            8.0f,
+            3.0f,
+            true,
+            [teamName](bool checked) {
+                std::cout << "Team " << teamName << " visibility: "
+                         << (checked ? "ON" : "OFF") << std::endl;
+            }
+        );
+
         sideContainer->addTextPercent(
             teamId + "_title",
-            5.0f,
+            12.0f,
             yPos,
             "TEAM: " + teamName,
             3.5f,
@@ -435,6 +448,7 @@ void HUD::clearTeamDisplayElements(std::shared_ptr<Containers> container)
         container->removeElement(idBase + "_title");
         container->removeElement(idBase + "_separator");
         container->removeElement(idBase + "_stats");
+        container->removeElement(idBase + "_checkbox");
 
         for (int j = 0; j < 50; j++) {
             container->removeElement(idBase + "_player_" + std::to_string(j));
@@ -502,7 +516,7 @@ void HUD::addPlayerListText(
     if (!playerNumbers.empty()) {
         container->addTextPercent(
             teamId + "_player_0",
-            10.0f,
+            14.0f,
             yPos,
             playerList,
             2.2f,
@@ -511,7 +525,7 @@ void HUD::addPlayerListText(
     } else {
         container->addTextPercent(
             teamId + "_player_0",
-            10.0f,
+            14.0f,
             yPos,
             playerList,
             2.0f,
