@@ -280,7 +280,7 @@ class Player:
 
                 if receivedResponses >= expectedPlayers:
                     allPlayersHere = all(
-                        response["isHere"] for response in self.incantationState["playerResponses"]
+                        resp["isHere"] for resp in self.incantationState["playerResponses"]
                     )
 
                     if allPlayersHere:
