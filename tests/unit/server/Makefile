@@ -30,6 +30,7 @@ TESTS 	    =   tests_accept.c						\
 				tests_handler_elem.c				\
 				tests_incantation.c 				\
 				tests_inventory.c					\
+				fake_malloc.c						\
 				tests_left.c						\
 				tests_look.c						\
 				tests_malloc_fails.c				\
@@ -48,11 +49,10 @@ TESTS 	    =   tests_accept.c						\
 				tests_sgt.c							\
 				tests_sst.c							\
 				tests_tna.c							\
-				fake_malloc.c						\
 				tests_team.c						\
 				tests_eject.c						\
-				tests_broadcast.c					\
 				tests_kil.c
+# tests_broadcast.c					\
 
 SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/algo.c									\

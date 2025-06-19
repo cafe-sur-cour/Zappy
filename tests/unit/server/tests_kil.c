@@ -438,10 +438,6 @@ Test(kil, team_alive_count_decreases, .init = redirect_all_std)
     
     add_player_to_team(zappy, player1, "team1");
     add_player_to_team(zappy, player2, "team1");
-    
-    team_t *team = zappy->game->teams;
-    int initial_count = team->nbPlayerAlive;
-    
     write_message_return = 0;
     send_player_death_return = 0;
     
@@ -471,8 +467,7 @@ Test(kil, kill_all_players_in_team, .init = redirect_all_std)
     char message2[] = "kil #2";
     int result2 = kil(zappy, NULL, message2);
     cr_assert_eq(result2, 0, "Second kill should succeed");
-    
-    team_t *team = zappy->game->teams;
+
     cleanup_test_data(zappy);
 }
 
@@ -500,29 +495,9 @@ Test(kil, kill_from_different_teams, .init = redirect_all_std)
     cleanup_test_data(zappy);
 }
 
-// Test null pointer scenarios
-Test(kil, null_zappy_pointer, .init = redirect_all_std)
-{
-    char message[] = "kil #1";
-    
-    // This would cause segfault in real implementation
-    // In production, should add null checks
-    // int result = kil(NULL, NULL, message);
-    // cr_assert_eq(result, -1, "Should handle null zappy pointer");
-    
-    // For now, just test that we recognize this as a test case
-    cr_assert(1, "Null pointer test case identified");
-}
-
 Test(kil, null_message_pointer, .init = redirect_all_std)
 {
     zappy_t *zappy = create_test_zappy();
-    
-    // This would cause segfault in real implementation
-    // In production, should add null checks
-    // int result = kil(zappy, NULL, NULL);
-    // cr_assert_eq(result, -1, "Should handle null message pointer");
-    
     cleanup_test_data(zappy);
     cr_assert(1, "Null message test case identified");
 }
