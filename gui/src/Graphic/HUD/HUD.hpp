@@ -102,6 +102,10 @@ class HUD : public IObserver {
 
         void clearTileResourceElements();
 
+        void initFpsDisplay();
+
+        void updateFpsDisplay();
+
         zappy::structs::Player getPlayerById(int playerId) const;
 
         bool isPlayerInIncantation(int playerId) const;

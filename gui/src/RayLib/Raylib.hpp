@@ -68,6 +68,7 @@ class Raylib : public IDisplay {
         virtual void disableCursor();
 
         virtual float getFrameTime();
+        virtual int getFPS();
 
         virtual void updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed);
 

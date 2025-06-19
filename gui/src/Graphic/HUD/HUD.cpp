@@ -126,6 +126,7 @@ void HUD::update()
     updateTeamPlayersDisplay(_gameInfos);
     updateTpsSlider(_gameInfos);
     updateServerMessagesDisplay(_gameInfos);
+    updateFpsDisplay();
 
     if (_selectedTile.first >= 0 && _selectedTile.second >= 0)
         updateTileResourceDisplay(_selectedTile.first, _selectedTile.second);
@@ -246,6 +247,8 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
                             screenHeight,
                             bottomHeight,
                             bottomHeightPercent);
+
+    initFpsDisplay();
 }
 
 void HUD::_initHelpInformation()
@@ -1914,4 +1917,32 @@ bool HUD::isMouseOverHUD() const
         return true;
 
     return false;
+}
+
+void HUD::initFpsDisplay()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    bottomContainer->addTextPercent(
+        "fps_display",
+        96.0f, 35.0f,
+        "FPS: 60", 6.0f,
+        {255, 255, 255, 255}
+    );
+}
+
+void HUD::updateFpsDisplay()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer || !_display)
+        return;
+
+    int fps = _display->getFPS();
+    auto fpsElement = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("fps_display"));
+    if (fpsElement) {
+        fpsElement->setText("FPS: " + std::to_string(fps));
+    }
 }
