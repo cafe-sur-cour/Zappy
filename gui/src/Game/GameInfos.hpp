@@ -98,6 +98,7 @@ class GameInfos : public Subject {
 
         bool _gameOver;
         std::string _winningTeam;
+        bool _victorySoundPlayed;
 
         mutable std::mutex _dataMutex;
 
