@@ -43,11 +43,10 @@ RUN apt-get update && apt-get install -y \
     libopengl-dev \
     liballegro5-dev \
     valgrind && \
+    pip3 install --no-cache-dir --upgrade pip && \
+    pip3 install --no-cache-dir pylint flake8 pycodestyle cpplint && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-# Installer les dépendances Python pour les vérificateurs de style
-RUN pip3 install pylint flake8 pycodestyle cpplint
 
 # Cloner et compiler raylib avec -fPIC et sans audio
 RUN git clone https://github.com/raysan5/raylib.git /tmp/raylib && \

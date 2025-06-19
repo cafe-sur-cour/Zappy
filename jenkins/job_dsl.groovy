@@ -18,7 +18,7 @@ freeStyleJob('Pull Branch from Zappy') {
                 git {
                     remote {
                         url("git@github.com:EpitechPromo2028/B-YEP-400-NAN-4-1-zappy-albane.merian.git")
-                        credentials('my-ssh-key')
+                        credentials("my-ssh-key")
                     }
                     branches("*/\${BRANCH_NAME}")
                 }
@@ -33,29 +33,6 @@ freeStyleJob('Pull Branch from Zappy') {
                 }
             }
 
-            // 0. Pull latest code from the branch
-            job("Branches/\${BRANCH_NAME}/0-Pull-Branch") {
-                commonProperties.delegate = delegate
-                commonProperties()
-
-                scm {
-                    scmConfig.delegate = delegate
-                    scmConfig()
-                }
-
-                steps {
-                    shell('echo "\\n\\n==== PULLING LATEST CODE FROM BRANCH ====\\n"')
-                    shell('git pull origin \${BRANCH_NAME}')
-                }
-
-                publishers {
-                    downstream("Branches/\${BRANCH_NAME}/1-Coding-Style-Check", 'SUCCESS')
-                }
-
-                triggers {
-                    scm('* * * * *')
-                }
-            }
             // 1. Coding Style Check Job
             job("Branches/\${BRANCH_NAME}/1-Coding-Style-Check") {
                 commonProperties.delegate = delegate
@@ -124,64 +101,13 @@ freeStyleJob('Pull Branch from Zappy') {
                 }
 
                 steps {
-                    shell('echo "\\n\\n==== RUNNING PLUGIN DIAGNOSTICS ====\\n"')
-                    shell('chmod +x /var/jenkins_home/plugin_diagnostics.sh')
-                    shell('/var/jenkins_home/plugin_diagnostics.sh')
-                    
-                    shell('echo "\\n\\n==== SETTING UP GUI TEST ENVIRONMENT ====\\n"')
-                    shell('chmod +x /var/jenkins_home/setup_gui_tests.sh')
-                    shell('/var/jenkins_home/setup_gui_tests.sh')
-
-                    shell('echo "\\n\\n==== FIXING AUDIO ISSUES FOR GUI TESTS ====\\n"')
-                    shell('chmod +x /var/jenkins_home/fix_audio_issues.sh')
-                    shell('/var/jenkins_home/fix_audio_issues.sh')
-
-                    shell('echo "\\n\\n==== FIXING FORK TESTS ISSUES ====\\n"')
-                    shell('chmod +x /var/jenkins_home/fix_fork_tests.sh')
-                    shell('/var/jenkins_home/fix_fork_tests.sh')
-
                     shell('echo "\\n\\n==== RUNNING UNIT TESTS WITH COVERAGE ====\\n"')
-                    shell('chmod +x /var/jenkins_home/run_coverage_with_workaround.sh')
-                    shell('/var/jenkins_home/run_coverage_with_workaround.sh')
-
-                    shell('echo "\\n\\n==== GENERATING PIPELINE SUMMARY ====\\n"')
-                    shell('chmod +x /var/jenkins_home/pipeline_summary.sh')
-                    shell('/var/jenkins_home/pipeline_summary.sh > pipeline_summary.txt')
+                    shell('make tests_run')
                 }
 
                 publishers {
                     archiveArtifacts {
                         pattern('coverage/**')
-                        allowEmpty(true)
-                    }
-
-                    downstream("Branches/\${BRANCH_NAME}/4-Dashboard", 'FAILURE')
-                }
-            }
-
-            // 4. Dashboard Job (exécuté après les tests)
-            job("Branches/\${BRANCH_NAME}/4-Dashboard") {
-                commonProperties.delegate = delegate
-                commonProperties()
-
-                triggers {
-                    upstream("Branches/\${BRANCH_NAME}/3-Tests", 'FAILURE')
-                }
-
-                steps {
-                    shell('echo "\\n\\n==== GENERATING PIPELINE DASHBOARD ====\\n"')
-                    shell('chmod +x /var/jenkins_home/pipeline_summary.sh')
-                    shell('/var/jenkins_home/pipeline_summary.sh > pipeline_summary.txt')
-
-                    shell('echo "\\n\\n==== GENERATING VISUAL PIPELINE PROGRESS ====\\n"')
-                    shell('chmod +x /var/jenkins_home/pipeline_visualization.sh')
-                    shell('/var/jenkins_home/pipeline_visualization.sh > pipeline_visualization.txt || /var/jenkins_home/pipeline_visualization_simple.sh > pipeline_visualization.txt')
-                    shell('cat pipeline_visualization.txt')
-                }
-
-                publishers {
-                    archiveArtifacts {
-                        pattern('pipeline_summary.txt, pipeline_visualization.txt')
                         allowEmpty(true)
                     }
                 }
