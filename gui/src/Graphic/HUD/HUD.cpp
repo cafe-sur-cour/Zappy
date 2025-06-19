@@ -86,19 +86,21 @@ void HUD::draw()
 
         Color32 outlineColor = {0, 0, 0, 255};
 
-        _display->drawText(message, textX - outlineThickness, textY - outlineThickness,
-            fontSize, outlineColor);
-        _display->drawText(message, textX - outlineThickness, textY, fontSize, outlineColor);
-        _display->drawText(message, textX - outlineThickness, textY + outlineThickness,
-            fontSize, outlineColor);
-        _display->drawText(message, textX, textY - outlineThickness, fontSize, outlineColor);
-        _display->drawText(message, textX, textY + outlineThickness, fontSize, outlineColor);
-        _display->drawText(message, textX + outlineThickness, textY - outlineThickness,
-            fontSize, outlineColor);
-        _display->drawText(message, textX + outlineThickness, textY, fontSize, outlineColor);
-        _display->drawText(message, textX + outlineThickness, textY + outlineThickness,
-            fontSize, outlineColor);
+        std::vector<std::pair<float, float>> offsets = {
+            {-outlineThickness, -outlineThickness},
+            {-outlineThickness, 0},
+            {-outlineThickness, outlineThickness},
+            {0, -outlineThickness},
+            {0, outlineThickness},
+            {outlineThickness, -outlineThickness},
+            {outlineThickness, 0},
+            {outlineThickness, outlineThickness}
+        };
 
+        for (const auto& offset : offsets) {
+            _display->drawText(message, textX + offset.first, textY + offset.second,
+                fontSize, outlineColor);
+        }
         _display->drawText(
             message,
             textX,
