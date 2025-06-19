@@ -39,5 +39,4 @@ void refill_food(zappy_t *zappy)
         return;
     }
     distribute_resources(zappy);
-    valid_message("Resources refilled on the map.");
 }
