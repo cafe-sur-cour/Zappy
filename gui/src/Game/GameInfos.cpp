@@ -659,7 +659,8 @@ void GameInfos::incrementTileInventoryItem(int x, int y, int resourceId)
         return;
 
     try {
-        _communication->sendMessage("tar " + std::to_string(x) + " " + std::to_string(y) + " " +
+        _communication->sendMessage("tar " + std::to_string(x) + " " +
+                                    std::to_string(y) + " " +
                                     std::to_string(resourceId) + "\n");
     } catch (const Exceptions::NetworkException& e) {
         std::cerr << colors::T_RED << "[ERROR] Network exception: "
@@ -675,7 +676,8 @@ void GameInfos::decrementTileInventoryItem(int x, int y, int resourceId)
         return;
 
     try {
-        _communication->sendMessage("tsr " + std::to_string(x) + " " + std::to_string(y) + " " +
+        _communication->sendMessage("tsr " + std::to_string(x) + " " +
+                                    std::to_string(y) + " " +
                                     std::to_string(resourceId) + "\n");
     } catch (const Exceptions::NetworkException& e) {
         std::cerr << colors::T_RED << "[ERROR] Network exception: "
