@@ -81,6 +81,7 @@ static void disconnect_and_remove_client(zappy_t *zappy, int fd)
 static int poll_graphic_commands(zappy_t *zappy, graph_net_t *current,
     char *buffer)
 {
+    printf("Received command from graphic client: %s\n", buffer);
     for (int i = 0; GRAPHIC_COMMAND[i].command != NULL; i++) {
         if (strncmp(GRAPHIC_COMMAND[i].command, buffer,
             strlen(GRAPHIC_COMMAND[i].command)) == 0)
