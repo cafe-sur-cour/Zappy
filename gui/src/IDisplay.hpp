@@ -19,6 +19,7 @@ enum Key {
     RIGHT,
     LEFT,
     H,
+    C,
     GM_PD_LEFT_SHOULDER,
     GM_PD_RIGHT_SHOULDER,
     GM_PD_LEFT_TRIGGER,
@@ -155,6 +156,7 @@ class IDisplay {
         virtual void disableCursor() = 0;
 
         virtual float getFrameTime() = 0;
+        virtual int getFPS() = 0;
 
         virtual void updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed) = 0;
 

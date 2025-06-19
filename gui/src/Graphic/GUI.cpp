@@ -522,6 +522,9 @@ void GUI::handlePlayerClicks()
     _hoveredPlayerId = getPlayerUnderMouse();
 
     if (this->_display->isMouseButtonPressed(this->_display->getKeyId(MOUSE_LEFT))) {
+        if (_hud && _hud->isMouseOverHUD())
+            return;
+
         if (_hoveredPlayerId >= 0) {
             setPlayerToFollow(_hoveredPlayerId);
             switchCameraMode(zappy::gui::CameraMode::PLAYER);

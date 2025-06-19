@@ -126,6 +126,10 @@ void HUD::update()
     updateTeamPlayersDisplay(_gameInfos);
     updateTpsSlider(_gameInfos);
     updateServerMessagesDisplay(_gameInfos);
+    updateFpsDisplay();
+
+    if (_selectedTile.first >= 0 && _selectedTile.second >= 0)
+        updateTileResourceDisplay(_selectedTile.first, _selectedTile.second);
 }
 
 std::shared_ptr<Containers> HUD::addContainer(
@@ -243,6 +247,8 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
                             screenHeight,
                             bottomHeight,
                             bottomHeightPercent);
+
+    initFpsDisplay();
 }
 
 void HUD::_initHelpInformation()
@@ -523,12 +529,156 @@ void HUD::clearPlayerInventoryElements()
         "inventory_separator",
         "inventory_food", "inventory_linemate", "inventory_deraumere", "inventory_sibur",
         "inventory_mendiane", "inventory_phiras", "inventory_thystame",
+        "inventory_food_button_increment", "inventory_food_button_decrement",
+        "inventory_linemate_button_increment", "inventory_linemate_button_decrement",
+        "inventory_deraumere_button_increment", "inventory_deraumere_button_decrement",
+        "inventory_sibur_button_increment", "inventory_sibur_button_decrement",
+        "inventory_mendiane_button_increment", "inventory_mendiane_button_decrement",
+        "inventory_phiras_button_increment", "inventory_phiras_button_decrement",
+        "inventory_thystame_button_increment", "inventory_thystame_button_decrement",
         "kill_player_button"
     };
 
     for (const auto& id : elementIds) {
         bottomContainer->removeElement(id);
     }
+}
+
+void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, int playerId)
+{
+    if (!container)
+        return;
+
+    Color32 normalColor = {180, 180, 180, 255};
+    Color32 hoverColor = {220, 220, 220, 255};
+    Color32 pressedColor = {150, 150, 150, 255};
+    Color32 textColor = {30, 30, 30, 255};
+
+    container->addButtonPercent("player_level_increment_btn", 58.5f, 59.0f, 1.5f, 10.0f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerLevel(playerId);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "player_level_decrement_btn", 60.5f, 59.0f, 1.5f, 10.0f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerLevel(playerId);
+        }, normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_food_button_increment", 79.8f, 25.5f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 0);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_food_button_decrement", 80.9f, 25.5f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 0);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_linemate_button_increment", 72.8f, 34.0f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 1);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_linemate_button_decrement", 73.9f, 34.0f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 1);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_deraumere_button_increment", 72.8f, 47.0f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 2);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_deraumere_button_decrement", 73.9f, 47.0f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 2);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_sibur_button_increment", 72.8f, 60.0f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 3);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_sibur_button_decrement", 73.9f, 60.0f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 3);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_mendiane_button_increment", 85.8f, 34.0f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 4);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_mendiane_button_decrement", 86.9f, 34.0f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 4);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_phiras_button_increment", 85.8f, 47.0f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 5);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_phiras_button_decrement", 86.9f, 47.0f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 5);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_thystame_button_increment", 85.8f, 60.0f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 6);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_thystame_button_decrement", 86.9f, 60.0f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 6);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
 }
 
 std::vector<int> HUD::getTeamPlayerNumbers(
@@ -917,41 +1067,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
         {220, 220, 220, 255}
     );
 
-    Color32 normalColor = {180, 180, 180, 255};
-    Color32 hoverColor = {220, 220, 220, 255};
-    Color32 pressedColor = {150, 150, 150, 255};
-    Color32 disabledColor = {120, 120, 120, 150};
-    Color32 textColor = {30, 30, 30, 255};
-
-    bool canIncrement = player.level < 8;
-    bottomContainer->addButtonPercent(
-        "player_level_increment_btn",
-        58.5f, 59.0f,
-        1.5f, 10.0f,
-        "+",
-        [this, playerId]() {
-            this->_gameInfos->incrementPlayerLevel(playerId);
-        },
-        canIncrement ? normalColor : disabledColor,
-        canIncrement ? hoverColor : disabledColor,
-        canIncrement ? pressedColor : disabledColor,
-        textColor
-    );
-
-    bool canDecrement = player.level > 1;
-    bottomContainer->addButtonPercent(
-        "player_level_decrement_btn",
-        60.5f, 59.0f,
-        1.5f, 10.0f,
-        "-",
-        [this, playerId]() {
-            this->_gameInfos->decrementPlayerLevel(playerId);
-        },
-        canDecrement ? normalColor : disabledColor,
-        canDecrement ? hoverColor : disabledColor,
-        canDecrement ? pressedColor : disabledColor,
-        textColor
-    );
+    addIncrementDecrementButtons(bottomContainer, playerId);
 
     std::string orientationStr;
     switch (player.orientation) {
@@ -1204,42 +1320,6 @@ void HUD::updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode came
         bottomContainer->getElement("player_info_level"));
     if (levelElem) {
         levelElem->setText("Level: " + std::to_string(player.level));
-
-        Color32 normalColor = {180, 180, 180, 255};
-        Color32 hoverColor = {220, 220, 220, 255};
-        Color32 pressedColor = {150, 150, 150, 255};
-        Color32 disabledColor = {120, 120, 120, 150};
-        Color32 textColor = {30, 30, 30, 255};
-
-        auto incBtn = std::dynamic_pointer_cast<Button>(
-            bottomContainer->getElement("player_level_increment_btn"));
-        if (incBtn) {
-            bool canIncrement = player.level < 8;
-            incBtn->setCallback([this, playerId]() {
-                _gameInfos->incrementPlayerLevel(playerId);
-            });
-            incBtn->setColors(
-                canIncrement ? normalColor : disabledColor,
-                canIncrement ? hoverColor : disabledColor,
-                canIncrement ? pressedColor : disabledColor,
-                textColor
-            );
-        }
-
-        auto decBtn = std::dynamic_pointer_cast<Button>(
-            bottomContainer->getElement("player_level_decrement_btn"));
-        if (decBtn) {
-            bool canDecrement = player.level > 1;
-            decBtn->setCallback([this, playerId]() {
-                _gameInfos->decrementPlayerLevel(playerId);
-            });
-            decBtn->setColors(
-                canDecrement ? normalColor : disabledColor,
-                canDecrement ? hoverColor : disabledColor,
-                canDecrement ? pressedColor : disabledColor,
-                textColor
-            );
-        }
     }
 
     auto teamElem = std::dynamic_pointer_cast<Text>(
@@ -1587,6 +1667,160 @@ void HUD::initTileResourceDisplay()
         7.0f,
         {255, 20, 147, 255}
     );
+
+    bottomContainer->addButtonPercent(
+        "tile_food_increment_btn",
+        32.5f, 24.0f,
+        2.f, 8.f,
+        "+",
+        [this]() {
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 0);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_food_decrement_btn",
+        35.f, 24.0f,
+        2.f, 8.f,
+        "-",
+        [this]() {
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 0);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_linemate_increment_btn",
+        25.f, 35.0f,
+        2.f, 8.f,
+        "+",
+        [this]() {
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 1);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_linemate_decrement_btn",
+        27.5f, 35.0f,
+        2.f, 8.f,
+        "-",
+        [this]() {
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 1);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_deraumere_increment_btn",
+        25.f, 48.0f,
+        2.f, 8.f,
+        "+",
+        [this]() {
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 2);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_deraumere_decrement_btn",
+        27.5f, 48.0f,
+        2.f, 8.f,
+        "-",
+        [this]() {
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 2);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_sibur_increment_btn",
+        25.f, 61.0f,
+        2.f, 8.f,
+        "+",
+        [this]() {
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 3);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_sibur_decrement_btn",
+        27.5f, 61.0f,
+        2.f, 8.f,
+        "-",
+        [this]() {
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 3);
+        }
+    );
+
+        bottomContainer->addButtonPercent(
+        "tile_mendiane_increment_btn",
+        40.f, 35.0f,
+        2.f, 8.f,
+        "+",
+        [this]() {
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 4);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_mendiane_decrement_btn",
+        42.5f, 35.0f,
+        2.f, 8.f,
+        "-",
+        [this]() {
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 4);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_phiras_increment_btn",
+        40.f, 48.0f,
+        2.f, 8.f,
+        "+",
+        [this]() {
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 5);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_phiras_decrement_btn",
+        42.5f, 48.0f,
+        2.f, 8.f,
+        "-",
+        [this]() {
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 5);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_thystame_increment_btn",
+        40.f, 61.0f,
+        2.f, 8.f,
+        "+",
+        [this]() {
+            this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 6);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_thystame_decrement_btn",
+        42.5f, 61.0f,
+        2.f, 8.f,
+        "-",
+        [this]() {
+            this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
+                this->_selectedTile.second, 6);
+        }
+    );
 }
 
 void HUD::updateTileResourceDisplay(int x, int y)
@@ -1599,7 +1833,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
     if (!titleElem)
         initTileResourceDisplay();
 
-    zappy::structs::Tile tile = _gameInfos->getTile(x, y);
+    zappy::structs::Tile tile = _gameInfos->getTile(this->_selectedTile.first,
+        this->_selectedTile.second);
 
     auto tileResourcesTitle = std::dynamic_pointer_cast<Text>(
         bottomContainer->getElement("tile_resources_title"));
@@ -1662,10 +1897,67 @@ void HUD::clearTileResourceElements()
         "tile_resources_separator",
         "tile_resource_food", "tile_resource_linemate", "tile_resource_deraumere",
         "tile_resource_sibur", "tile_resource_mendiane", "tile_resource_phiras",
-        "tile_resource_thystame"
+        "tile_resource_thystame",
+        "tile_food_increment_btn", "tile_food_decrement_btn",
+        "tile_linemate_increment_btn", "tile_linemate_decrement_btn",
+        "tile_deraumere_increment_btn", "tile_deraumere_decrement_btn",
+        "tile_sibur_increment_btn", "tile_sibur_decrement_btn",
+        "tile_mendiane_increment_btn", "tile_mendiane_decrement_btn",
+        "tile_phiras_increment_btn", "tile_phiras_decrement_btn",
+        "tile_thystame_increment_btn", "tile_thystame_decrement_btn",
     };
 
     for (const auto& id : elementIds) {
         bottomContainer->removeElement(id);
+    }
+}
+
+bool HUD::isMouseOverHUD() const
+{
+    if (!_display)
+        return false;
+
+    Vector2f mousePos = _display->getMousePosition();
+
+    for (const auto& pair : _containers) {
+        if (pair.second && pair.second->isVisible()) {
+            if (pair.second->contains(mousePos.x, mousePos.y)) {
+                return true;
+            }
+        }
+    }
+
+    if (_help->containsPoint(mousePos.x, mousePos.y) ||
+        _settings->containsPoint(mousePos.x, mousePos.y))
+        return true;
+
+    return false;
+}
+
+void HUD::initFpsDisplay()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    bottomContainer->addTextPercent(
+        "fps_display",
+        96.0f, 35.0f,
+        "FPS: 60", 6.0f,
+        {255, 255, 255, 255}
+    );
+}
+
+void HUD::updateFpsDisplay()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer || !_display)
+        return;
+
+    int fps = _display->getFPS();
+    auto fpsElement = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("fps_display"));
+    if (fpsElement) {
+        fpsElement->setText("FPS: " + std::to_string(fps));
     }
 }

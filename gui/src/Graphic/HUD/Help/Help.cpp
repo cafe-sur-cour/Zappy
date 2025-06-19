@@ -36,6 +36,9 @@ bool Help::isVisible() const
 
 void Help::update()
 {
+    if (this->_display->isKeyReleased(this->_display->getKeyId(C)))
+        _visible = !_visible;
+
     if (!_visible || !_helpContainer)
         return;
 
@@ -437,4 +440,12 @@ void Help::initHelpContainer()
         {255, 255, 255, 255}
     );
     _visible = false;
+}
+
+bool Help::containsPoint(float x, float y) const
+{
+    if (!_helpContainer || !_visible)
+        return false;
+
+    return _helpContainer->contains(x, y);
 }

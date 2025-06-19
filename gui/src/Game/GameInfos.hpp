@@ -53,8 +53,6 @@ class GameInfos : public Subject {
         void updatePlayerPosition(int playerNumber, int x, int y);
         void updatePlayerOrientation(int playerNumber, int orientation);
         void updatePlayerLevel(int playerNumber, int level);
-        void incrementPlayerLevel(int playerNumber);
-        void decrementPlayerLevel(int playerNumber);
         void updatePlayerInventory(int playerNumber,
             const zappy::structs::Inventory inventory);
         void updatePlayerExpulsion(int playerNumber);
@@ -84,6 +82,12 @@ class GameInfos : public Subject {
         const std::vector<std::string> getServerMessages() const;
 
         void securityActualisation();
+        void incrementPlayerLevel(int playerNumber);
+        void decrementPlayerLevel(int playerNumber);
+        void incrementPlayerInventoryItem(int playerNumber, int resourceId);
+        void decrementPlayerInventoryItem(int playerNumber, int resourceId);
+        void incrementTileInventoryItem(int x, int y, int resourceId);
+        void decrementTileInventoryItem(int x, int y, int resourceId);
 
     private:
         int _mapWidth;

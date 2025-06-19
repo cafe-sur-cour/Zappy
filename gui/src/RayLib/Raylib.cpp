@@ -75,6 +75,8 @@ int Raylib::getKeyId(Key key)
         return KEY_LEFT;
     case H:
         return KEY_H;
+    case C:
+        return KEY_C;
     case GM_PD_H:
         return GAMEPAD_BUTTON_SELECT;
     case GM_PD_LEFT_SHOULDER:
@@ -223,6 +225,11 @@ void Raylib::disableCursor()
 float Raylib::getFrameTime()
 {
     return this->_raylib->getFrameTime();
+}
+
+int Raylib::getFPS()
+{
+    return this->_raylib->getFPS();
 }
 
 void Raylib::updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed)

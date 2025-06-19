@@ -102,6 +102,10 @@ class HUD : public IObserver {
 
         void clearTileResourceElements();
 
+        void initFpsDisplay();
+
+        void updateFpsDisplay();
+
         zappy::structs::Player getPlayerById(int playerId) const;
 
         bool isPlayerInIncantation(int playerId) const;
@@ -112,6 +116,8 @@ class HUD : public IObserver {
 
         void update() override;
         void onGameEvent(GameEventType eventType, const std::string& teamName) override;
+
+        bool isMouseOverHUD() const;
 
     private:
         void _initHelpInformation();
@@ -173,6 +179,8 @@ class HUD : public IObserver {
         void addPlayerListText(std::shared_ptr<Containers> container,
                             const std::string& teamId,
                             float yPos, const std::vector<int>& playerNumbers);
+
+        void addIncrementDecrementButtons(std::shared_ptr<Containers> container, int playerId);
 
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<IDisplay> _display;
