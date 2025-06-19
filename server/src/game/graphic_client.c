@@ -26,6 +26,8 @@ const graphic_pf_t GRAPHIC_COMMAND[] = {
     {"sgt", &sgt},
     {"sst", &sst},
     {"kil", &kil},
+    {"tar", &tar},
+    {"tsr", &tsr},
     {NULL, NULL}
 };
 
