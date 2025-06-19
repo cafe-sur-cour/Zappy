@@ -7,8 +7,7 @@
 
 import os
 from threading import Thread
-from random import randint
-from typing import Callable, List, Any, Union
+from typing import Callable
 from time import sleep
 
 from src.Broadcaster.Broadcaster import Broadcaster
@@ -62,8 +61,8 @@ class Player:
         self.nbConnectedPlayers: int = 1
         self.sentNbSlots: bool = True
 
-        self.personalID: int = randint(1, 1000000)
-        self.senderID: int = -1
+        self.personalID: str = name + "-" + str(os.getpid())
+        self.senderID: str = None
         self.needToBroadcastInventory = False
 
         self.roombaState: dict = {
@@ -470,7 +469,7 @@ class Player:
 
     def handleMessageSendInventory(self, direction: int, rest: str) -> None:
         try:
-            id = int(rest.strip())
+            id = rest.strip()
             if id != self.personalID:
                 self.senderID = id
                 self.needToBroadcastInventory = True
@@ -484,8 +483,8 @@ class Player:
             return
         try:
             data = contents[0]
-            responderID = int(contents[1])
-            demanderID = int(contents[2])
+            responderID = contents[1]
+            demanderID = contents[2]
             if responderID == self.personalID:
                 return
             if demanderID != self.personalID:
