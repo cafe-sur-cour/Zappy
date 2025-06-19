@@ -70,8 +70,18 @@ void RayLibEnc::drawSkybox(const std::string& id)
 
     Vector3 position = _camera.position;
 
+    float timeRotation = GetTime() * 2.5f;
     rlDisableBackfaceCulling();
+
+    Matrix rotationX = MatrixRotateX(90.0f * DEG2RAD);
+    Matrix rotationY = MatrixRotateY(timeRotation * DEG2RAD);
+    Matrix finalRotation = MatrixMultiply(rotationX, rotationY);
+
+    Vector3 axis;
+    float angle;
+    QuaternionToAxisAngle(QuaternionFromMatrix(finalRotation), &axis, &angle);
+
     DrawModelEx(it->second.model, position,
-        {1.0f, 0.0f, 0.0f}, 90.0f, {500.0f, 500.0f, 500.0f}, WHITE);
+        axis, angle * RAD2DEG, {500.0f, 500.0f, 500.0f}, WHITE);
     rlEnableBackfaceCulling();
 }
