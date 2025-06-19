@@ -23,7 +23,7 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
       _resetCameraFunc(resetCameraFunc),
       _showVictoryMessage(false),
       _winningTeam(""),
-      _victoryColor({50, 255, 50, 255})
+      _victoryColor({0, 127, 255, 255})
 {
     _help = std::make_shared<Help>(display, audio);
     _settings = std::make_shared<Settings>(display, audio, camera);
@@ -78,23 +78,27 @@ void HUD::draw()
         int screenHeight = screenDimensions.y;
 
         float fontSize = 60.0f;
+        float outlineThickness = 2.0f;
 
         float textWidth = _display->measureText(message, fontSize);
+        float textX = (screenWidth - textWidth) / 2.0f;
+        float textY = screenHeight / 8.0f - fontSize / 2.0f;
 
-        float padding = 20.0f;
-        FloatRect backgroundRect = {
-            (screenWidth - textWidth) / 2.0f - padding,
-            (screenHeight / 2.0f) - fontSize - padding,
-            textWidth + (padding * 2.0f),
-            fontSize + (padding * 2.0f)
-        };
+        Color32 outlineColor = {0, 0, 0, 255};
 
-        _display->drawRectangleRec(backgroundRect, {0, 0, 0, 200});
+        _display->drawText(message, textX - outlineThickness, textY - outlineThickness, fontSize, outlineColor);
+        _display->drawText(message, textX - outlineThickness, textY, fontSize, outlineColor);
+        _display->drawText(message, textX - outlineThickness, textY + outlineThickness, fontSize, outlineColor);
+        _display->drawText(message, textX, textY - outlineThickness, fontSize, outlineColor);
+        _display->drawText(message, textX, textY + outlineThickness, fontSize, outlineColor);
+        _display->drawText(message, textX + outlineThickness, textY - outlineThickness, fontSize, outlineColor);
+        _display->drawText(message, textX + outlineThickness, textY, fontSize, outlineColor);
+        _display->drawText(message, textX + outlineThickness, textY + outlineThickness, fontSize, outlineColor);
 
         _display->drawText(
             message,
-            (screenWidth - textWidth) / 2.0f,
-            screenHeight / 2.0f - fontSize / 2.0f,
+            textX,
+            textY,
             fontSize,
             _victoryColor
         );
@@ -905,8 +909,8 @@ void HUD::initPlayerInventoryDisplay(int playerId)
     bool canIncrement = player.level < 8;
     bottomContainer->addButtonPercent(
         "player_level_increment_btn",
-        57.5f, 60.0f,
-        1.5f, 8.0f,
+        58.5f, 59.0f,
+        1.5f, 10.0f,
         "+",
         [this, playerId]() {
             this->_gameInfos->incrementPlayerLevel(playerId);
@@ -920,8 +924,8 @@ void HUD::initPlayerInventoryDisplay(int playerId)
     bool canDecrement = player.level > 1;
     bottomContainer->addButtonPercent(
         "player_level_decrement_btn",
-        60.0f, 60.0f,
-        1.5f, 8.0f,
+        60.5f, 59.0f,
+        1.5f, 10.0f,
         "-",
         [this, playerId]() {
             this->_gameInfos->decrementPlayerLevel(playerId);
@@ -1448,7 +1452,7 @@ void HUD::displayWinMessage(const std::string& teamName)
 {
     _showVictoryMessage = true;
     _winningTeam = teamName;
-    _victoryColor = {255, 215, 0, 255};
+    _victoryColor = {0, 127, 255, 255};
 }
 
 void HUD::onGameEvent(GameEventType eventType, const std::string& teamName)
@@ -1457,7 +1461,7 @@ void HUD::onGameEvent(GameEventType eventType, const std::string& teamName)
         case GameEventType::TEAM_WIN:
             _showVictoryMessage = true;
             _winningTeam = teamName;
-            _victoryColor = {255, 215, 0, 255};
+            _victoryColor = {0, 127, 255, 255};
             break;
         default:
             break;
