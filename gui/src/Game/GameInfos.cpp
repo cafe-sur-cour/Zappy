@@ -224,6 +224,54 @@ void GameInfos::updatePlayerLevel(int playerNumber, int level)
     }
 }
 
+bool GameInfos::incrementPlayerLevel(int playerNumber)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    for (auto &player : _players) {
+        if (player.number == playerNumber) {
+            if (player.level < 8) {
+                int newLevel = player.level + 1;
+                player.level = newLevel;
+                try {
+                    _communication->sendMessage("plu #" + std::to_string(playerNumber) + "\n");
+                } catch (const Exceptions::NetworkException& e) {
+                    std::cerr << colors::T_RED << "[ERROR] Network exception: "
+                              << e.what() << colors::RESET << std::endl;
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+    return false;
+}
+
+bool GameInfos::decrementPlayerLevel(int playerNumber)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    for (auto &player : _players) {
+        if (player.number == playerNumber) {
+            if (player.level > 1) {
+                int newLevel = player.level - 1;
+                player.level = newLevel;
+                try {
+                    _communication->sendMessage("pld #" + std::to_string(playerNumber) + "\n");
+                } catch (const Exceptions::NetworkException& e) {
+                    std::cerr << colors::T_RED << "[ERROR] Network exception: "
+                              << e.what() << colors::RESET << std::endl;
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+    return false;
+}
+
 void GameInfos::updatePlayerInventory(int playerNumber,
     const zappy::structs::Inventory inventory)
 {
