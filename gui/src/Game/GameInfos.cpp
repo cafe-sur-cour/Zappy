@@ -232,8 +232,6 @@ bool GameInfos::incrementPlayerLevel(int playerNumber)
     for (auto &player : _players) {
         if (player.number == playerNumber) {
             if (player.level < 8) {
-                int newLevel = player.level + 1;
-                player.level = newLevel;
                 try {
                     _communication->sendMessage("plu #" + std::to_string(playerNumber) + "\n");
                 } catch (const Exceptions::NetworkException& e) {
@@ -256,8 +254,6 @@ bool GameInfos::decrementPlayerLevel(int playerNumber)
     for (auto &player : _players) {
         if (player.number == playerNumber) {
             if (player.level > 1) {
-                int newLevel = player.level - 1;
-                player.level = newLevel;
                 try {
                     _communication->sendMessage("pld #" + std::to_string(playerNumber) + "\n");
                 } catch (const Exceptions::NetworkException& e) {
