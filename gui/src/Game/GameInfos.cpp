@@ -21,6 +21,7 @@ GameInfos::GameInfos(std::shared_ptr<ICommunication> communication) :
     _timeUnit(0),
     _matrixInitialized(false),
     _gameOver(false),
+    _victorySoundPlayed(false),
     _currentCameraMode(zappy::gui::CameraMode::FREE),
     _currentPlayerFocus(-1)
 {
@@ -494,8 +495,9 @@ void GameInfos::setGameOver(const std::string &winningTeam)
         _gameOver = true;
         _winningTeam = winningTeam;
 
-        if (_audio) {
+        if (_audio && !_victorySoundPlayed) {
             _audio->playSound("win", 100.0f);
+            _victorySoundPlayed = true;
         }
     } catch (const std::exception& e) {
         std::cout << colors::T_RED << "[ERROR] Exception in setGameOver: "
