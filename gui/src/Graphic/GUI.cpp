@@ -107,6 +107,14 @@ void GUI::updateCamera()
 void GUI::update()
 {
     this->_isRunning = this->_display->isOpen();
+    if (_gameInfos->getMapSize().first * _gameInfos->getMapSize().second >= 2500) {
+        bool wasPerformanceMode = _performanceMode;
+        _performanceMode = true;
+
+        if (!wasPerformanceMode && _cameraMode == zappy::gui::CameraMode::TARGETED)
+            switchCameraMode(zappy::gui::CameraMode::FREE);
+    }
+
     if (this->_display->isKeyReleased(this->_display->getKeyId(TAB)) ||
         this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_LEFT_SHOULDER)))
         switchCameraModeNext();
@@ -156,19 +164,20 @@ void GUI::draw()
 
     this->_display->begin3DMode();
 
-    if (_skyboxLoaded) {
+    if (_skyboxLoaded && !this->_performanceMode)
         this->_display->drawSkybox("skybox");
+
+    if (!this->_performanceMode) {
+        const auto& mapSize = _gameInfos->getMapSize();
+        float forestX = static_cast<float>(mapSize.first) * 2.0f + 20.0f;
+        float forestZ = static_cast<float>(mapSize.second) * 2.0f + 20.0f;
+
+        this->_display->drawModelEx(
+            "forest", {forestX, -5.0f, forestZ}, {0.0f, 90.0f, 0.0f},
+            -135.0f, {1.0f, 1.0f, 1.0f}, CWHITE);
     }
 
-    const auto& mapSize = _gameInfos->getMapSize();
-    float forestX = static_cast<float>(mapSize.first) * 2.0f + 20.0f;
-    float forestZ = static_cast<float>(mapSize.second) * 2.0f + 20.0f;
-
-    this->_display->drawModelEx(
-        "forest", {forestX, -5.0f, forestZ}, {0.0f, 90.0f, 0.0f},
-        -135.0f, {1.0f, 1.0f, 1.0f}, CWHITE);
-
-    _map->draw();
+    _map->draw(_performanceMode);
 
     if (_hoveredPlayerId >= 0) {
         const auto& players = _gameInfos->getPlayers();
@@ -233,6 +242,9 @@ void GUI::setWindowHeight(int height)
 
 void GUI::switchCameraMode(zappy::gui::CameraMode mode)
 {
+    if (_performanceMode && mode == zappy::gui::CameraMode::TARGETED)
+        return;
+
     if (mode == zappy::gui::CameraMode::TARGETED &&
         _cameraMode != zappy::gui::CameraMode::TARGETED) {
         const auto& mapSize = _gameInfos->getMapSize();
@@ -277,6 +289,12 @@ void GUI::switchCameraModeNext()
     zappy::gui::CameraMode newMode = static_cast<zappy::gui::CameraMode>(
         (static_cast<int>(_cameraMode) + 1) %
             static_cast<int>(zappy::gui::CameraMode::NB_MODES));
+
+    if (_performanceMode && newMode == zappy::gui::CameraMode::TARGETED) {
+        newMode = static_cast<zappy::gui::CameraMode>(
+            (static_cast<int>(newMode) + 1) %
+                static_cast<int>(zappy::gui::CameraMode::NB_MODES));
+    }
 
     switchCameraMode(newMode);
 }
@@ -470,6 +488,15 @@ int GUI::getPlayerUnderMouse() const
     int closestPlayerId = -1;
 
     for (const auto& player : players) {
+        if (_performanceMode) {
+            Vector3f playerPos =
+                _map->getPlayerInterpolatedPosition(player.number, player.x, player.y);
+            float distanceFromCamera = _display->vector3DDistanceFromCamera(playerPos);
+            if (distanceFromCamera > zappy::gui::FOG_DISTANCE_MAX) {
+                continue;
+            }
+        }
+
         BoundingBox3D playerBox = getPlayerBoundingBox(player);
         RayCollision3D collision = this->_display->getRayCollisionBox(mouseRay, playerBox);
 
