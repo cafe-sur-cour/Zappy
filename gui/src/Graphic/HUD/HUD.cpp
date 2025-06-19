@@ -524,6 +524,12 @@ void HUD::clearPlayerInventoryElements()
         "inventory_food", "inventory_linemate", "inventory_deraumere", "inventory_sibur",
         "inventory_mendiane", "inventory_phiras", "inventory_thystame",
         "inventory_food_button_increment", "inventory_food_button_decrement",
+        "inventory_linemate_button_increment", "inventory_linemate_button_decrement",
+        "inventory_deraumere_button_increment", "inventory_deraumere_button_decrement",
+        "inventory_sibur_button_increment", "inventory_sibur_button_decrement",
+        "inventory_mendiane_button_increment", "inventory_mendiane_button_decrement",
+        "inventory_phiras_button_increment", "inventory_phiras_button_decrement",
+        "inventory_thystame_button_increment", "inventory_thystame_button_decrement",
         "kill_player_button"
     };
 
@@ -568,6 +574,102 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
         "inventory_food_button_decrement", 80.9f, 25.5f, 1.0f, 6.5f, "-",
         [this, playerId]() {
             this->_gameInfos->decrementPlayerInventoryItem(playerId, 0);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_linemate_button_increment", 72.8f, 34.0f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 1);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_linemate_button_decrement", 73.9f, 34.0f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 1);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_deraumere_button_increment", 72.8f, 47.0f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 2);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_deraumere_button_decrement", 73.9f, 47.0f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 2);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_sibur_button_increment", 72.8f, 60.0f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 3);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_sibur_button_decrement", 73.9f, 60.0f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 3);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_mendiane_button_increment", 85.8f, 34.0f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 4);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_mendiane_button_decrement", 86.9f, 34.0f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 4);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_phiras_button_increment", 85.8f, 47.0f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 5);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_phiras_button_decrement", 86.9f, 47.0f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 5);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_thystame_button_increment", 85.8f, 60.0f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 6);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_thystame_button_decrement", 86.9f, 60.0f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 6);
         },
         normalColor, hoverColor, pressedColor, textColor
     );
