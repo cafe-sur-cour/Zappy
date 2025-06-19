@@ -131,7 +131,7 @@ class App:
             return FAILURE
 
         player.setMapSize(x, y)
-        player.setNbSlots(slots)
+        player.setNbSlots(slots + 1)
 
         for _ in range(slots):
             if not self.running:

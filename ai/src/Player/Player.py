@@ -248,6 +248,7 @@ class Player:
     def incantationAction(self) -> None:
         import time
         time.sleep(0.1)
+        self.logger.display("incantation action")
 
     def getStepsFromDirection(self) -> list[Callable[[], None]]:
         stepsMap = {
@@ -368,17 +369,12 @@ class Player:
             self.logger.error(f"Invalid level response: {rest.strip()}")
 
     def handleResponseConnectNbr(self, response: str) -> None:
-        if (
-            not self.incantationState["status"] and
-            not self.goToIncantationState["status"] and
-            self.roombaState["phase"] == "checkOnTeammates"
-        ):
-            try:
-                connectNbr = int(response)
-                self.nbConnectedPlayers = self.nbTeamSlots - connectNbr
-                return
-            except ValueError:
-                self.logger.error(f"Invalid connect nbr: {response.strip()}")
+        try:
+            connectNbr = int(response)
+            self.nbConnectedPlayers = self.nbTeamSlots - connectNbr
+            return
+        except ValueError:
+            self.logger.error(f"Invalid connect nbr: {response.strip()}")
 
     def handleCommandResponse(self, response: str) -> None:
         switcher: list[
@@ -523,7 +519,7 @@ class Player:
     def loop(self) -> None:
         try:
             if self.nbTeamSlots != -1:
-                self.broadcaster.broadcastMessage(f"teamslots {self.nbTeamSlots}")
+                self.sentNbSlots = False
             while not self.communication.playerIsDead():
                 if self.communication.hasMessages():
                     data = self.communication.getLastMessage()
@@ -539,6 +535,15 @@ class Player:
                             self.logger.display("Player died")
                             break
                         self.handleCommandResponse(response)
+
+                if not self.sentNbSlots:
+                    if self.nbConnectedPlayers >= self.nbTeamSlots:
+                        self.broadcaster.broadcastMessage(f"teamslots {self.nbTeamSlots}")
+                        self.sentNbSlots = True
+                    else:
+                        self.communication.sendGetConnectNbr()
+                        sleep(0.1)
+                        continue
 
                 if (
                     not self.inIncantation and
