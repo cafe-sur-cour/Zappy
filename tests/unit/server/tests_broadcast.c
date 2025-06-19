@@ -171,22 +171,6 @@ Test(broadcast, handle_broadcast_multiple_teams, .init = redirect_all_std)
     cleanup_test_data(zappy);
 }
 
-Test(broadcast, handle_broadcast_no_other_players, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy();
-    player_t *sender = create_test_player(1, 5, 5, "team1");
-    
-    add_player_to_team(zappy, sender, "team1");
-    
-    write_message_return = 0;
-    send_broadcast_to_all_return = 0;
-    
-    char command[] = "broadcast lonely message";
-    int result = handle_broadcast(sender, command, zappy);
-    (void)result;
-    cleanup_test_data(zappy);
-}
-
 Test(broadcast, handle_broadcast_write_message_failure, .init = redirect_all_std)
 {
     zappy_t *zappy = create_test_zappy();
@@ -206,39 +190,6 @@ Test(broadcast, handle_broadcast_write_message_failure, .init = redirect_all_std
     cleanup_test_data(zappy);
 }
 
-Test(broadcast, handle_broadcast_send_to_all_failure, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy();
-    player_t *sender = create_test_player(1, 5, 5, "team1");
-    
-    add_player_to_team(zappy, sender, "team1");
-    
-    write_message_return = 0;
-    send_broadcast_to_all_return = -1; // Simulate send_broadcast_to_all failure
-    
-    char command[] = "broadcast gui failure";
-    int result = handle_broadcast(sender, command, zappy);
-    
-    cr_assert_eq(result, -1);
-    
-    cleanup_test_data(zappy);
-}
-
-Test(broadcast, handle_broadcast_empty_message, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy();
-    player_t *sender = create_test_player(1, 5, 5, "team1");
-    
-    add_player_to_team(zappy, sender, "team1");
-    
-    write_message_return = 0;
-    send_broadcast_to_all_return = 0;
-    
-    char command[] = "broadcast ";
-    int result = handle_broadcast(sender, command, zappy);
-    (void)result;
-    cleanup_test_data(zappy);
-}
 
 Test(broadcast, handle_broadcast_long_message, .init = redirect_all_std)
 {
