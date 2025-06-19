@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <string>
 #include <limits>
+#include <utility>
 #include "GUI.hpp"
 #include "../Exceptions/Exceptions.hpp"
 #include "../DLLoader/LoaderType.hpp"
