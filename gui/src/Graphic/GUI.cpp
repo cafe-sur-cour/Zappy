@@ -115,8 +115,12 @@ void GUI::update()
             switchCameraMode(zappy::gui::CameraMode::FREE);
     }
 
-    if (this->_display->isKeyReleased(this->_display->getKeyId(ESC)))
-        this->_selectedTile = {-1, -1};
+    if (this->_display->isKeyReleased(this->_display->getKeyId(ESC))) {
+        if (_selectedTile.first != -1 || _selectedTile.second != -1) {
+            this->_selectedTile = {-1, -1};
+            _hud->setSelectedTile(-1, -1);
+        }
+    }
 
     if (this->_display->isKeyReleased(this->_display->getKeyId(TAB)) ||
         this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_LEFT_SHOULDER)))
@@ -602,11 +606,17 @@ void GUI::handleTileClicks()
     std::pair<int, int> hoveredTile = getTileUnderMouse();
 
     if (hoveredTile.first >= 0 && hoveredTile.second >= 0) {
+        std::pair<int, int> previousSelectedTile = _selectedTile;
+
         if (_selectedTile.first == hoveredTile.first &&
             _selectedTile.second == hoveredTile.second)
             _selectedTile = {-1, -1};
         else
             _selectedTile = hoveredTile;
+
+        if (_selectedTile != previousSelectedTile)
+            _hud->setSelectedTile(_selectedTile.first, _selectedTile.second);
+
         _audio->playSound("click", 100.0f);
     }
 }
