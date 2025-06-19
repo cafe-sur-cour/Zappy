@@ -61,7 +61,8 @@ class Player:
         self.nbConnectedPlayers: int = 1
         self.sentNbSlots: bool = True
 
-        self.personalID: str = name + "-" + str(os.getpid())
+        self.pid = os.getpid()
+        self.id: str = name + "-" + str(self.pid)
         self.senderID: str = None
         self.needToBroadcastInventory = False
 
@@ -77,8 +78,9 @@ class Player:
 
         self.incantationState: dict = {
             "status": False,
-            "phase": "checkPlayersLevels",
+            "phase": "sendComeIncant",
             "lastCommand": None,
+            "playerResponses": [],
         }
 
         self.goToIncantationState: dict = {
@@ -200,7 +202,7 @@ class Player:
 
         elif phase == "checkOnTeammates":
             if self.roombaState["lastCommand"] == "Connect_nbr":
-                self.broadcaster.broadcastMessage(f"sendInventory {self.personalID}")
+                self.broadcaster.broadcastMessage(f"sendInventory {self.id}")
                 self.roombaState["lastCommand"] = "broadcast sendInventory"
 
             elif self.roombaState["lastCommand"] == "broadcast sendInventory":
@@ -252,9 +254,52 @@ class Player:
         return self.inventory["food"] * 126 >= nbStones * 7 + 300
 
     def incantationAction(self) -> None:
-        import time
-        time.sleep(0.1)
-        self.logger.display("incantation action")
+        phase = self.incantationState["phase"]
+
+        if phase == "sendComeIncant":
+            self.broadcaster.broadcastMessage(f"comeIncant {self.id}")
+            self.incantationState["lastCommand"] = "broadcast comeIncant"
+            self.incantationState["lastPhase"] = "sendComeIncant"
+            self.incantationState["phase"] = "sendConnectNbr"
+
+        elif phase == "sendConnectNbr":
+            self.communication.sendGetConnectNbr()
+            self.incantationState["lastCommand"] = "Connect_nbr"
+            self.incantationState["lastPhase"] = "sendConnectNbr"
+            self.incantationState["phase"] = "checkNbPlayers"
+
+        elif phase == "checkNbPlayers":
+            if self.incantationState["lastCommand"] == "Connect_nbr":
+                self.broadcaster.broadcastMessage(f"isEveryBodyHere {self.id}")
+                self.incantationState["lastCommand"] = "broadcast isEveryBodyHere"
+                self.incantationState["playerResponses"] = []
+
+            elif self.incantationState["lastCommand"] == "broadcast isEveryBodyHere":
+                expectedPlayers = LVL_UPGRADES[self.level]["players"] - 1
+                receivedResponses = len(self.incantationState["playerResponses"])
+
+                if receivedResponses >= expectedPlayers:
+                    allPlayersHere = all(
+                        response["isHere"] for response in self.incantationState["playerResponses"]
+                    )
+
+                    if allPlayersHere:
+                        self.incantationState["phase"] = "startIncantation"
+                        self.incantationState["lastCommand"] = None
+                    else:
+                        self.incantationState["phase"] = "sendComeIncant"
+                        self.incantationState["lastCommand"] = None
+                        self.incantationState["playerResponses"] = []
+                else:
+                    pass
+
+        elif phase == "startIncantation":
+            self.communication.sendIncantation()
+            self.incantationState["lastCommand"] = "incantation"
+            self.incantationState["phase"] = "waitingForElevation"
+
+        elif phase == "waitingForElevation":
+            pass
 
     def getStepsFromDirection(self) -> list[Callable[[], None]]:
         stepsMap = {
@@ -333,7 +378,7 @@ class Player:
                 f"{self.inventory["mendiane"]},"
                 f"{self.inventory["phiras"]},"
                 f"{self.inventory["thystame"]} "
-                f"{self.personalID} {self.senderID}"
+                f"{self.id} {self.senderID}"
             )
             self.needToBroadcastInventory = False
 
@@ -351,6 +396,13 @@ class Player:
 
         if self.roombaState["phase"] == "checkOnTeammates":
             self.roombaState["phase"] = "forward"
+
+        if self.incantationState["status"] and lastCommand == "incantation":
+            self.logger.error("Incantation failed, resetting incantation state")
+            self.incantationState["status"] = False
+            self.incantationState["phase"] = "sendComeIncant"
+            self.incantationState["lastCommand"] = None
+            self.incantationState["playerResponses"] = []
 
     def handleResponseOK(self) -> None:
         if (
@@ -371,6 +423,10 @@ class Player:
                 self.logger.success(f"Player level increased to {new_level}")
                 self.level = new_level
                 self.inIncantation = False
+                self.incantationState["status"] = False
+                self.incantationState["phase"] = "sendComeIncant"
+                self.incantationState["lastCommand"] = None
+                self.incantationState["playerResponses"] = []
             else:
                 self.logger.error(
                     f"Unexpected level response: got {new_level}, old level = {self.level}"
@@ -382,7 +438,6 @@ class Player:
         try:
             connectNbr = int(response)
             self.nbConnectedPlayers = self.nbTeamSlots - connectNbr
-            return
         except ValueError:
             self.logger.error(f"Invalid connect nbr: {response.strip()}")
 
@@ -468,14 +523,11 @@ class Player:
             self.logger.error(f"Invalid number of team slots: {rest.strip()}")
 
     def handleMessageSendInventory(self, direction: int, rest: str) -> None:
-        try:
-            id = rest.strip()
-            if id != self.personalID:
-                self.senderID = id
-                self.needToBroadcastInventory = True
-                self.communication.sendInventory()
-        except ValueError:
-            self.logger.error(f"Invalid id: {rest.strip()}")
+        id = rest.strip()
+        if id != self.id:
+            self.senderID = id
+            self.needToBroadcastInventory = True
+            self.communication.sendInventory()
 
     def handleMessageInventory(self, direction: int, rest: str) -> None:
         contents = rest.split(" ")
@@ -485,9 +537,9 @@ class Player:
             data = contents[0]
             responderID = contents[1]
             demanderID = contents[2]
-            if responderID == self.personalID:
+            if responderID == self.id:
                 return
-            if demanderID != self.personalID:
+            if demanderID != self.id:
                 return
             if responderID in [inv["id"] for inv in self.roombaState["teamInventories"]]:
                 return
@@ -507,14 +559,91 @@ class Player:
                 }
             )
 
-        except ValueError:
+        except Exception:
             self.logger.error(f"Invalid contents of inventory message: {rest.strip()}")
+
+    def handleMessageComeIncant(self, direction: int, rest: str):
+        id = rest.strip()
+        if id == self.id:
+            return
+        data = id.split("-")
+        if not len(data) == 2:
+            self.logger.error(f"Invalid contents in comeIncant message: {rest.strip()}")
+            return
+        _, nb = data
+        if not nb.isdigit():
+            self.logger.error(f"Invalid contents in comeIncant message: {rest.strip()}")
+            return
+        if self.incantationState["status"] and nb > self.pid:
+            self.incantationState["status"] = False
+            self.goToIncantationState["status"] = True
+            self.goToIncantationState["direction"] = direction
+        elif not self.incantationState["status"]:
+            self.goToIncantationState["status"] = True
+            self.goToIncantationState["direction"] = direction
+
+    def handleMessageIsEveryBodyHere(self, direction: int, rest: str) -> None:
+        id = rest.strip()
+        if id == self.id:
+            return
+        if self.incantationState["status"] or self.goToIncantationState["status"]:
+            self.broadcaster.broadcastMessage(f"iAmHere {self.id} {id}")
+        else:
+            self.broadcaster.broadcastMessage(f"iAmNotHere {self.id} {id}")
+
+    def handleMessageIAmHere(self, direction: int, rest: str) -> None:
+        contents = rest.split(" ")
+        if len(contents) != 2:
+            self.logger.error(f"Invalid contents in iAmHere message: {rest.strip()}")
+            return
+        responderID = contents[0]
+        demanderID = contents[1]
+
+        if responderID == self.id:
+            return
+        if demanderID != self.id:
+            return
+
+        for response in self.incantationState["playerResponses"]:
+            if response["id"] == responderID:
+                return
+
+        self.incantationState["playerResponses"].append({
+            "id": responderID,
+            "isHere": True
+        })
+
+    def handleMessageIAmNotHere(self, direction: int, rest: str) -> None:
+        contents = rest.split(" ")
+        if len(contents) != 2:
+            self.logger.error(f"Invalid contents in iAmNotHere message: {rest.strip()}")
+            return
+        responderID = contents[0]
+        demanderID = contents[1]
+
+        if responderID == self.id:
+            return
+        if demanderID != self.id:
+            return
+
+        for response in self.incantationState["playerResponses"]:
+            if response["id"] == responderID:
+                return
+
+        self.incantationState["playerResponses"].append({
+            "id": responderID,
+            "isHere": False
+        })
 
     def handleMessages(self, direction: int, message: str) -> None:
         switcher = {
             "teamslots ": self.handleMessageTeamslots,
             "sendInventory ": self.handleMessageSendInventory,
             "inventory ": self.handleMessageInventory,
+            "comeIncant ": self.handleMessageComeIncant,
+            "isEveryBodyHere ": self.handleMessageIsEveryBodyHere,
+            "iAmHere ": self.handleMessageIAmHere,
+            "iAmNotHere ": self.handleMessageIAmNotHere,
         }
         for key in switcher.keys():
             if message.startswith(key):
