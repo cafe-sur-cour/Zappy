@@ -253,7 +253,7 @@ void GameInfos::updatePlayerLevel(int playerNumber, int level)
     }
 }
 
-bool GameInfos::incrementPlayerLevel(int playerNumber)
+void GameInfos::incrementPlayerLevel(int playerNumber)
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
 
@@ -265,17 +265,17 @@ bool GameInfos::incrementPlayerLevel(int playerNumber)
                 } catch (const Exceptions::NetworkException& e) {
                     std::cerr << colors::T_RED << "[ERROR] Network exception: "
                               << e.what() << colors::RESET << std::endl;
-                    return false;
+                    return;
                 }
-                return true;
+                return;
             }
-            return false;
+            return;
         }
     }
-    return false;
+    return;
 }
 
-bool GameInfos::decrementPlayerLevel(int playerNumber)
+void GameInfos::decrementPlayerLevel(int playerNumber)
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
 
@@ -287,14 +287,14 @@ bool GameInfos::decrementPlayerLevel(int playerNumber)
                 } catch (const Exceptions::NetworkException& e) {
                     std::cerr << colors::T_RED << "[ERROR] Network exception: "
                               << e.what() << colors::RESET << std::endl;
-                    return false;
+                    return;
                 }
-                return true;
+                return;
             }
-            return false;
+            return;
         }
     }
-    return false;
+    return;
 }
 
 void GameInfos::updatePlayerInventory(int playerNumber,
