@@ -94,6 +94,14 @@ class HUD : public IObserver {
 
         void clearPlayerInventoryElements();
 
+        void setSelectedTile(int x, int y);
+
+        void initTileResourceDisplay();
+
+        void updateTileResourceDisplay(int x, int y);
+
+        void clearTileResourceElements();
+
         zappy::structs::Player getPlayerById(int playerId) const;
 
         bool isPlayerInIncantation(int playerId) const;
@@ -187,5 +195,6 @@ class HUD : public IObserver {
         std::shared_ptr<Settings> _settings;
         std::function<void()> _resetCameraFunc;
         std::vector<GameMessage> _gameMessages;
+        std::pair<int, int> _selectedTile;
         static constexpr float MESSAGE_DURATION = 5.0f;
 };
