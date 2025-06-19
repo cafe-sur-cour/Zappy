@@ -18,3 +18,12 @@ void GuiObserver::update()
         gui->refresh();
     }
 }
+
+void GuiObserver::onGameEvent(GameEventType eventType, const std::string& teamName)
+{
+    if (auto gui = _gui.lock()) {
+        if (eventType == GameEventType::TEAM_WIN) {
+            gui->handleVictory(teamName);
+        }
+    }
+}
