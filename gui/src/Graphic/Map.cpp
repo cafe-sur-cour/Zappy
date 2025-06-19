@@ -443,7 +443,7 @@ void Map::drawPerformanceRock(int x, int y, const zappy::structs::Tile &tile)
         tile.mendiane <= 0 && tile.phiras <= 0 && tile.thystame <= 0)
         return;
 
-    int index = 0;
+    int index = tile.food;
     float sphereRadius = 0.15f;
 
     for (int i = 0; i < tile.linemate + tile.deraumere + tile.sibur + tile.mendiane
