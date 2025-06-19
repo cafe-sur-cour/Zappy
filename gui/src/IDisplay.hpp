@@ -19,6 +19,7 @@ enum Key {
     RIGHT,
     LEFT,
     H,
+    C,
     GM_PD_LEFT_SHOULDER,
     GM_PD_RIGHT_SHOULDER,
     GM_PD_LEFT_TRIGGER,

@@ -36,6 +36,9 @@ bool Help::isVisible() const
 
 void Help::update()
 {
+    if (this->_display->isKeyReleased(this->_display->getKeyId(C)))
+        _visible = !_visible;
+
     if (!_visible || !_helpContainer)
         return;
 
