@@ -53,6 +53,10 @@ class GUI {
         int getPlayerUnderMouse() const;
         BoundingBox3D getPlayerBoundingBox(const zappy::structs::Player& player) const;
 
+        void handleTileClicks();
+        std::pair<int, int> getTileUnderMouse() const;
+        BoundingBox3D getTileBoundingBox(int x, int y) const;
+
         std::string _currentLibLoaded;
         bool _isRunning;
 
@@ -72,6 +76,7 @@ class GUI {
         bool _backgroundLoaded;
         bool _skyboxLoaded;
         int _hoveredPlayerId;
+        std::pair<int, int> _selectedTile;
 
         bool _performanceMode = false;
 };

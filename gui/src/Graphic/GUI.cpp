@@ -20,7 +20,7 @@
 
 GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
     : _isRunning(false), _gameInfos(gameInfos), _backgroundLoaded(false),
-        _skyboxLoaded(false), _hoveredPlayerId(-1)
+        _skyboxLoaded(false), _hoveredPlayerId(-1), _selectedTile({-1, -1})
 {
     this->_dlLoader = DLLoader<std::shared_ptr<IDisplay>>();
     if (lib.empty())
@@ -115,6 +115,9 @@ void GUI::update()
             switchCameraMode(zappy::gui::CameraMode::FREE);
     }
 
+    if (this->_display->isKeyReleased(this->_display->getKeyId(ESC)))
+        this->_selectedTile = {-1, -1};
+
     if (this->_display->isKeyReleased(this->_display->getKeyId(TAB)) ||
         this->_display->isGamepadButtonReleased(this->_display->getKeyId(GM_PD_LEFT_SHOULDER)))
         switchCameraModeNext();
@@ -201,6 +204,22 @@ void GUI::draw()
             this->_display->drawCubeWires(center, size.x, size.y, size.z, CYELLOW);
         }
     }
+
+    if (_selectedTile.first >= 0 && _selectedTile.second >= 0) {
+        BoundingBox3D tileBox = getTileBoundingBox(_selectedTile.first, _selectedTile.second);
+        Vector3f center = {
+            (tileBox.min.x + tileBox.max.x) / 2.0f,
+            (tileBox.min.y + tileBox.max.y) / 2.0f - 0.2f,
+            (tileBox.min.z + tileBox.max.z) / 2.0f
+        };
+        Vector3f size = {
+            tileBox.max.x - tileBox.min.x,
+            tileBox.max.y - tileBox.min.y,
+            tileBox.max.z - tileBox.min.z
+        };
+        this->_display->drawCubeWires(center, size.x, size.y, size.z, CYELLOW);
+    }
+
     this->_display->end3DMode();
     if (this->_isHUDVisible) {
         this->_hud->draw();
@@ -502,6 +521,8 @@ void GUI::handlePlayerClicks()
             setPlayerToFollow(_hoveredPlayerId);
             switchCameraMode(zappy::gui::CameraMode::PLAYER);
             _audio->playSound("clickPlayer", 100.0f);
+        } else {
+            handleTileClicks();
         }
     }
 }
@@ -571,6 +592,84 @@ BoundingBox3D GUI::getPlayerBoundingBox(const zappy::structs::Player& player) co
         playerPos.x + boxWidth / 2.0f,
         playerPos.y + boxHeight / 2.0f,
         playerPos.z + boxDepth / 2.0f
+    };
+
+    return {min, max};
+}
+
+void GUI::handleTileClicks()
+{
+    std::pair<int, int> hoveredTile = getTileUnderMouse();
+
+    if (hoveredTile.first >= 0 && hoveredTile.second >= 0) {
+        if (_selectedTile.first == hoveredTile.first &&
+            _selectedTile.second == hoveredTile.second)
+            _selectedTile = {-1, -1};
+        else
+            _selectedTile = hoveredTile;
+        _audio->playSound("click", 100.0f);
+    }
+}
+
+std::pair<int, int> GUI::getTileUnderMouse() const
+{
+    Vector2f mousePos = this->_display->getMousePosition();
+    Ray3D mouseRay = this->_display->getMouseRay(mousePos);
+
+    auto mapSize = _gameInfos->getMapSize();
+    int mapWidth = mapSize.first;
+    int mapHeight = mapSize.second;
+
+    float closestDistance = std::numeric_limits<float>::max();
+    std::pair<int, int> closestTile = {-1, -1};
+
+    for (int y = 0; y < mapHeight; ++y) {
+        for (int x = 0; x < mapWidth; ++x) {
+            if (_performanceMode) {
+                Vector3f tilePosition = {
+                    static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+                    0.0f,
+                    static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+                };
+                float distanceFromCamera = _display->vector3DDistanceFromCamera(tilePosition);
+                if (distanceFromCamera > zappy::gui::FOG_DISTANCE_MAX) {
+                    continue;
+                }
+            }
+
+            BoundingBox3D tileBox = getTileBoundingBox(x, y);
+            RayCollision3D collision = this->_display->getRayCollisionBox(mouseRay, tileBox);
+
+            if (collision.hit && collision.distance < closestDistance) {
+                closestDistance = collision.distance;
+                closestTile = {x, y};
+            }
+        }
+    }
+    return closestTile;
+}
+
+BoundingBox3D GUI::getTileBoundingBox(int x, int y) const
+{
+    Vector3f tilePosition = {
+        static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+        0.0f,
+        static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+    };
+
+    const float tileSize = 2.0f;
+    const float tileHeight = 0.4f;
+
+    Vector3f min = {
+        tilePosition.x - tileSize / 2.0f,
+        tilePosition.y - tileHeight / 2.0f,
+        tilePosition.z - tileSize / 2.0f
+    };
+
+    Vector3f max = {
+        tilePosition.x + tileSize / 2.0f,
+        tilePosition.y + tileHeight / 2.0f,
+        tilePosition.z + tileSize / 2.0f
     };
 
     return {min, max};
