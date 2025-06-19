@@ -85,10 +85,11 @@ class Player:
 
         self.goToIncantationState: dict = {
             "status": False,
-            "phase": "goToDirection",
+            "newDir": True,
             "steps": [],
             "lastCommand": None,
             "direction": 0,
+            "arrived": False,
         }
 
     def __del__(self):
@@ -347,9 +348,18 @@ class Player:
         return stepsMap.get(self.goToIncantationState["direction"], [])
 
     def goToIncantationAction(self) -> None:
-        import time
-        time.sleep(0.1)
-        self.logger.display("go to incantation action")
+        if self.goToIncantationState["direction"] == 0:
+            self.inIncantation = True
+            self.goToIncantationState["arrived"] = True
+            return
+
+        if self.goToIncantationState["newDir"]:
+            self.goToIncantationState["steps"] = self.getStepsFromDirection()
+        self.goToIncantationState["newDir"] = False
+
+        step = self.goToIncantationState["steps"].pop(0)
+        step()
+        self.goToIncantationState["lastCommand"] = "step"
 
     def handleResponseInventory(self) -> None:
         newInventory = self.communication.getInventory()
@@ -578,15 +588,19 @@ class Player:
             self.incantationState["status"] = False
             self.goToIncantationState["status"] = True
             self.goToIncantationState["direction"] = direction
+            self.goToIncantationState["newDir"] = True
+            self.goToIncantationState["arrived"] = direction == 0
         elif not self.incantationState["status"]:
             self.goToIncantationState["status"] = True
             self.goToIncantationState["direction"] = direction
+            self.goToIncantationState["newDir"] = True
+            self.goToIncantationState["arrived"] = direction == 0
 
     def handleMessageIsEveryBodyHere(self, direction: int, rest: str) -> None:
         id = rest.strip()
         if id == self.id:
             return
-        if self.incantationState["status"] or self.goToIncantationState["status"]:
+        if self.goToIncantationState["status"] and self.goToIncantationState["arrived"]:
             self.broadcaster.broadcastMessage(f"iAmHere {self.id} {id}")
         else:
             self.broadcaster.broadcastMessage(f"iAmNotHere {self.id} {id}")
