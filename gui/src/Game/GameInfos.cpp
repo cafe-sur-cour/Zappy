@@ -650,3 +650,37 @@ void GameInfos::decrementPlayerInventoryItem(int playerNumber, int resourceId)
                   << e.what() << colors::RESET << std::endl;
     }
 }
+
+void GameInfos::incrementTileInventoryItem(int x, int y, int resourceId)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    if (x < 0 || y < 0 || resourceId < 0 || resourceId > 6)
+        return;
+
+    try {
+        _communication->sendMessage("tar " + std::to_string(x) + " " +
+                                    std::to_string(y) + " " +
+                                    std::to_string(resourceId) + "\n");
+    } catch (const Exceptions::NetworkException& e) {
+        std::cerr << colors::T_RED << "[ERROR] Network exception: "
+                  << e.what() << colors::RESET << std::endl;
+    }
+}
+
+void GameInfos::decrementTileInventoryItem(int x, int y, int resourceId)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    if (x < 0 || y < 0 || resourceId < 0 || resourceId > 6)
+        return;
+
+    try {
+        _communication->sendMessage("tsr " + std::to_string(x) + " " +
+                                    std::to_string(y) + " " +
+                                    std::to_string(resourceId) + "\n");
+    } catch (const Exceptions::NetworkException& e) {
+        std::cerr << colors::T_RED << "[ERROR] Network exception: "
+                  << e.what() << colors::RESET << std::endl;
+    }
+}

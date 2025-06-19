@@ -126,6 +126,9 @@ void HUD::update()
     updateTeamPlayersDisplay(_gameInfos);
     updateTpsSlider(_gameInfos);
     updateServerMessagesDisplay(_gameInfos);
+
+    if (_selectedTile.first >= 0 && _selectedTile.second >= 0)
+        updateTileResourceDisplay(_selectedTile.first, _selectedTile.second);
 }
 
 std::shared_ptr<Containers> HUD::addContainer(
@@ -1723,6 +1726,145 @@ void HUD::updateTileResourceDisplay(int x, int y)
     if (thystameElem) {
         thystameElem->setText("Thystame: " + std::to_string(tile.thystame));
     }
+    bottomContainer->addButtonPercent(
+        "tile_food_increment_btn",
+        32.5f, 24.0f,
+        2.f, 8.f,
+        "+",
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 0);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_food_decrement_btn",
+        35.f, 24.0f,
+        2.f, 8.f,
+        "-",
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 0);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_linemate_increment_btn",
+        25.f, 35.0f,
+        2.f, 8.f,
+        "+",
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 1);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_linemate_decrement_btn",
+        27.5f, 35.0f,
+        2.f, 8.f,
+        "-",
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 1);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_deraumere_increment_btn",
+        25.f, 48.0f,
+        2.f, 8.f,
+        "+",
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 2);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_deraumere_decrement_btn",
+        27.5f, 48.0f,
+        2.f, 8.f,
+        "-",
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 2);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_sibur_increment_btn",
+        25.f, 61.0f,
+        2.f, 8.f,
+        "+",
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 3);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_sibur_decrement_btn",
+        27.5f, 61.0f,
+        2.f, 8.f,
+        "-",
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 3);
+        }
+    );
+
+        bottomContainer->addButtonPercent(
+        "tile_mendiane_increment_btn",
+        40.f, 35.0f,
+        2.f, 8.f,
+        "+",
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 4);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_mendiane_decrement_btn",
+        42.5f, 35.0f,
+        2.f, 8.f,
+        "-",
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 4);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_phiras_increment_btn",
+        40.f, 48.0f,
+        2.f, 8.f,
+        "+",
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 5);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_phiras_decrement_btn",
+        42.5f, 48.0f,
+        2.f, 8.f,
+        "-",
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 5);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_thystame_increment_btn",
+        40.f, 61.0f,
+        2.f, 8.f,
+        "+",
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 6);
+        }
+    );
+
+    bottomContainer->addButtonPercent(
+        "tile_thystame_decrement_btn",
+        42.5f, 61.0f,
+        2.f, 8.f,
+        "-",
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 6);
+        }
+    );
 }
 
 void HUD::clearTileResourceElements()
@@ -1736,7 +1878,14 @@ void HUD::clearTileResourceElements()
         "tile_resources_separator",
         "tile_resource_food", "tile_resource_linemate", "tile_resource_deraumere",
         "tile_resource_sibur", "tile_resource_mendiane", "tile_resource_phiras",
-        "tile_resource_thystame"
+        "tile_resource_thystame",
+        "tile_food_increment_btn", "tile_food_decrement_btn",
+        "tile_linemate_increment_btn", "tile_linemate_decrement_btn",
+        "tile_deraumere_increment_btn", "tile_deraumere_decrement_btn",
+        "tile_sibur_increment_btn", "tile_sibur_decrement_btn",
+        "tile_mendiane_increment_btn", "tile_mendiane_decrement_btn",
+        "tile_phiras_increment_btn", "tile_phiras_decrement_btn",
+        "tile_thystame_increment_btn", "tile_thystame_decrement_btn",
     };
 
     for (const auto& id : elementIds) {
