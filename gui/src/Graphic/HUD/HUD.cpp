@@ -483,12 +483,8 @@ std::string HUD::createPlayerListText(const std::vector<int>& playerNumbers)
     if (playerNumbers.empty())
         return "No players";
 
-    std::string playerList = "Players: ";
-    for (size_t j = 0; j < playerNumbers.size(); ++j) {
-        playerList += std::to_string(playerNumbers[j]);
-        if (j < playerNumbers.size() - 1)
-            playerList += ", ";
-    }
+    std::string playerList = "Players: " + std::to_string(playerNumbers.size())
+    + " alive";
     return playerList;
 }
 
