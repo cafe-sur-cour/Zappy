@@ -218,6 +218,8 @@ class Player:
                 self.communication.sendForward()
                 self.roombaState["lastCommand"] = "forward"
                 self.roombaState["forwardCount"] += 1
+                self.roombaState["phase"] = "lookAround"
+                self.roombaState["lastPhase"] = "forward"
 
             else:
                 self.roombaState["forwardCount"] = 0
@@ -293,7 +295,9 @@ class Player:
         return stepsMap.get(self.goToIncantationState["direction"], [])
 
     def goToIncantationAction(self) -> None:
-        pass
+        import time
+        time.sleep(0.1)
+        self.logger.display("go to incantation action")
 
     def handleResponseInventory(self) -> None:
         newInventory = self.communication.getInventory()
@@ -340,10 +344,10 @@ class Player:
     def handleResponseOK(self) -> None:
         if (
             not self.incantationState["status"] and
-            not self.goToIncantationState["status"]
+            not self.goToIncantationState["status"] and
+            self.roombaState["lastPhase"] == "vacuum"
         ):
-            if self.roombaState["lastPhase"] == "vacuum":
-                self.roombaState["phase"] = "updateInventory"
+            self.roombaState["phase"] = "updateInventory"
 
     def handleResponseElevationUnderway(self) -> None:
         self.inIncantation = True
