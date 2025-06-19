@@ -29,6 +29,8 @@ class Settings {
     public:
         bool isVisible() const;
 
+        bool containsPoint(float x, float y) const;
+
         void show();
 
         void hide();
