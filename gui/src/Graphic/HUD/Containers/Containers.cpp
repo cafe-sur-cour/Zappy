@@ -6,6 +6,7 @@
 */
 
 #include "Containers.hpp"
+#include "../Checkbox/Checkbox.hpp"
 #include <string>
 #include <memory>
 
@@ -85,6 +86,7 @@ bool Containers::addElement(const std::string& id, std::shared_ptr<IUIElement> e
     auto slider = std::dynamic_pointer_cast<Slider>(element);
     auto image = std::dynamic_pointer_cast<Image>(element);
     auto imageButton = std::dynamic_pointer_cast<ImageButton>(element);
+    auto checkbox = std::dynamic_pointer_cast<Checkbox>(element);
 
     float xPercent = (elemBounds.x / _bounds.width) * 100.0f;
     float yPercent = (elemBounds.y / _bounds.height) * 100.0f;
@@ -101,6 +103,8 @@ bool Containers::addElement(const std::string& id, std::shared_ptr<IUIElement> e
         image->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
     } else if (imageButton) {
         imageButton->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
+    } else if (checkbox) {
+        checkbox->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
     }
 
     element->setPosition(_bounds.x + elemBounds.x, _bounds.y + elemBounds.y);
@@ -543,4 +547,45 @@ std::shared_ptr<ImageButton> Containers::addImageButtonPercent(
         imageButton->setTint(tint);
 
     return imageButton;
+}
+
+std::shared_ptr<Checkbox> Containers::addCheckbox(
+    const std::string& id,
+    float x, float y,
+    float width, float height,
+    bool initialValue,
+    std::function<void(bool)> callback
+)
+{
+    auto checkbox = std::make_shared<Checkbox>(_display, _audio, x, y, width, height,
+        initialValue, callback);
+
+    if (addElement(id, checkbox))
+        return checkbox;
+
+    return nullptr;
+}
+
+std::shared_ptr<Checkbox> Containers::addCheckboxPercent(
+    const std::string& id,
+    float xPercent, float yPercent,
+    float widthPercent, float heightPercent,
+    bool initialValue,
+    std::function<void(bool)> callback
+)
+{
+    float x = (_bounds.width * xPercent) / 100.0f;
+    float y = (_bounds.height * yPercent) / 100.0f;
+    float width = (_bounds.width * widthPercent) / 100.0f;
+    float height = (_bounds.height * heightPercent) / 100.0f;
+
+    auto checkbox = std::make_shared<Checkbox>(_display, _audio, x, y, width, height,
+        initialValue, callback);
+
+    checkbox->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
+
+    if (addElement(id, checkbox))
+        return checkbox;
+
+    return nullptr;
 }

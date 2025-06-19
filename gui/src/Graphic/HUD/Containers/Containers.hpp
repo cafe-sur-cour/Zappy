@@ -20,6 +20,7 @@
 #include "../Slider/Slider.hpp"
 #include "../Image/Image.hpp"
 #include "../ImageButton/ImageButton.hpp"
+#include "../Checkbox/Checkbox.hpp"
 #include "../../../Audio/IAudio.hpp"
 #include "../../../IDisplay.hpp"
 
@@ -184,6 +185,22 @@ class Containers : public AContainers {
             const std::string& imagePath,
             std::function<void()> callback,
             Color32 tint
+        );
+
+        std::shared_ptr<Checkbox> addCheckbox(
+            const std::string& id,
+            float x, float y,
+            float width, float height,
+            bool initialValue,
+            std::function<void(bool)> callback
+        );
+
+        std::shared_ptr<Checkbox> addCheckboxPercent(
+            const std::string& id,
+            float xPercent, float yPercent,
+            float widthPercent, float heightPercent,
+            bool initialValue,
+            std::function<void(bool)> callback
         );
 
                 float getWidth() const;
