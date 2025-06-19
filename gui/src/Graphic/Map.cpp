@@ -691,7 +691,8 @@ void Map::drawIncantations()
         Color32 incantationColor = {red, green, blue, 70};
 
         for (size_t i = 0; i < incantation.players.size(); ++i) {
-            if (!_gameInfos->isTeamVisible(_gameInfos->getPlayer(incantation.players[i]).teamName))
+            if (!_gameInfos->isTeamVisible(
+                    _gameInfos->getPlayer(incantation.players[i]).teamName))
                 continue;
 
             Vector3f basePosition = {

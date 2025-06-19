@@ -12,6 +12,7 @@
 #include <mutex>
 #include <chrono>
 #include <iostream>
+#include <unordered_map>
 #include "GameInfos.hpp"
 #include "../Exceptions/Exceptions.hpp"
 
