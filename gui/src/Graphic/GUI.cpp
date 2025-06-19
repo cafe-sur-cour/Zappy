@@ -320,19 +320,29 @@ bool GUI::selectFirstAvailablePlayer()
     if (players.empty())
         return false;
 
-    int firstPlayerId = players.front().number;
-    _cameraManager->setPlayerId(firstPlayerId);
-    return true;
+    for (const auto& player : players) {
+        if (_gameInfos->isTeamVisible(player.teamName)) {
+            _cameraManager->setPlayerId(player.number);
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool GUI::playerExists(int playerId) const
 {
     const auto& players = _gameInfos->getPlayers();
 
-    return std::any_of(players.begin(), players.end(),
+    auto playerIt = std::find_if(players.begin(), players.end(),
         [playerId](const zappy::structs::Player& player) {
             return player.number == playerId;
         });
+
+    if (playerIt != players.end())
+        return _gameInfos->isTeamVisible(playerIt->teamName);
+
+    return false;
 }
 
 void GUI::switchToNextPlayer()
@@ -347,7 +357,7 @@ void GUI::switchToNextPlayer()
     int nextPlayerId = -1;
 
     for (const auto& player : players) {
-        if (foundCurrent) {
+        if (foundCurrent && _gameInfos->isTeamVisible(player.teamName)) {
             nextPlayerId = player.number;
             break;
         }
@@ -356,9 +366,18 @@ void GUI::switchToNextPlayer()
         }
     }
 
-    if (nextPlayerId == -1)
-        nextPlayerId = players.front().number;
-    _cameraManager->setPlayerId(nextPlayerId);
+    if (nextPlayerId == -1) {
+        for (const auto& player : players) {
+            if (_gameInfos->isTeamVisible(player.teamName)) {
+                nextPlayerId = player.number;
+                break;
+            }
+        }
+    }
+
+    if (nextPlayerId != -1) {
+        _cameraManager->setPlayerId(nextPlayerId);
+    }
 }
 
 void GUI::switchToPreviousPlayer()
@@ -372,15 +391,24 @@ void GUI::switchToPreviousPlayer()
     int prevPlayerId = -1;
 
     for (const auto& player : players) {
-        if (player.number == currentPlayerId) {
+        if (player.number == currentPlayerId)
             break;
-        }
-        prevPlayerId = player.number;
+
+        if (_gameInfos->isTeamVisible(player.teamName))
+            prevPlayerId = player.number;
     }
 
-    if (prevPlayerId == -1)
-        prevPlayerId = players.back().number;
-    _cameraManager->setPlayerId(prevPlayerId);
+    if (prevPlayerId == -1) {
+        for (auto it = players.rbegin(); it != players.rend(); ++it) {
+            if (_gameInfos->isTeamVisible(it->teamName)) {
+                prevPlayerId = it->number;
+                break;
+            }
+        }
+    }
+
+    if (prevPlayerId != -1)
+        _cameraManager->setPlayerId(prevPlayerId);
 }
 
 void GUI::initModels()
@@ -488,6 +516,9 @@ int GUI::getPlayerUnderMouse() const
     int closestPlayerId = -1;
 
     for (const auto& player : players) {
+        if (!_gameInfos->isTeamVisible(player.teamName))
+            continue;
+
         if (_performanceMode) {
             Vector3f playerPos =
                 _map->getPlayerInterpolatedPosition(player.number, player.x, player.y);

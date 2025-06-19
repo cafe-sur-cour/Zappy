@@ -178,6 +178,9 @@ void Map::drawAllPlayers()
     const auto& players = _gameInfos->getPlayers();
 
     for (const auto& player : players) {
+        if (!_gameInfos->isTeamVisible(player.teamName))
+            continue;
+
         Vector3f interpolatedPosition = getPlayerInterpolatedPosition(player.number,
             player.x, player.y);
 
@@ -232,6 +235,9 @@ void Map::drawEggs(int x, int y)
     std::vector<const zappy::structs::Egg*> eggsOnTile;
 
     for (const auto& egg : eggs) {
+        if (!_gameInfos->isTeamVisible(egg.teamName))
+            continue;
+
         if (egg.x == x && egg.y == y && !egg.hatched) {
             eggsOnTile.push_back(&egg);
         }
@@ -562,6 +568,11 @@ void Map::drawBroadcastingPlayers()
     auto it = _broadcastStartTimes.begin();
     while (it != _broadcastStartTimes.end()) {
         int playerNumber = it->first;
+        if (!_gameInfos->isTeamVisible(_gameInfos->getPlayer(playerNumber).teamName)) {
+            it = _broadcastStartTimes.erase(it);
+            continue;
+        }
+
         auto startTime = it->second;
 
         auto duration =
@@ -680,6 +691,9 @@ void Map::drawIncantations()
         Color32 incantationColor = {red, green, blue, 70};
 
         for (size_t i = 0; i < incantation.players.size(); ++i) {
+            if (!_gameInfos->isTeamVisible(_gameInfos->getPlayer(incantation.players[i]).teamName))
+                continue;
+
             Vector3f basePosition = {
                 static_cast<float>(incantation.x * zappy::gui::POSITION_MULTIPLIER),
                 getOffset(DisplayPriority::PLAYER, incantation.x, incantation.y, i) + 0.4f,
