@@ -243,8 +243,6 @@ class IDisplay {
 
         virtual void drawSkybox(const std::string& id) = 0;
 
-        virtual void drawSimpleSkybox() = 0;
-
         ~IDisplay() = default;
 };
 

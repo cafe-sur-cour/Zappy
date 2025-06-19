@@ -61,8 +61,6 @@ class RayLibEnc {
         Texture2D getTexture(const std::string& id) const;
         void addTexture(const std::string& id, Texture2D texture);
 
-        void drawSimpleSkybox();
-
         // Input methods
         bool isMouseButtonDown(int button) const;
         bool isMouseButtonPressed(int button) const;
@@ -148,6 +146,7 @@ class RayLibEnc {
         // Skybox methods
         bool loadSkybox(const std::string& id, const std::string& filepath);
         void drawSkybox(const std::string& id);
+        Color getDayNightColor(float cycleTime);  // Helper method for day/night cycle colors
 
         // 2D Drawing methods
         void drawRectangleRec(Rectangle rec, Color color);

@@ -155,8 +155,6 @@ class Raylib : public IDisplay {
 
         virtual void drawSkybox(const std::string& id);
 
-        virtual void drawSimpleSkybox();
-
         Raylib();
         ~Raylib() = default;
 };
