@@ -5,6 +5,7 @@
 ** GuiObserver
 */
 
+#include <string>
 #include "GuiObserver.hpp"
 #include "../Graphic/GUI.hpp"
 

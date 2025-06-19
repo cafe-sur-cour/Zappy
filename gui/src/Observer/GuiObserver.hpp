@@ -9,7 +9,7 @@
 #define GUIOBSERVER_HPP_
 
 #include <memory>
-
+#include <string>
 #include "IObserver.hpp"
 
 class GUI;

@@ -1089,8 +1089,8 @@ bool MsgHandler::handlePluMessage(const std::string& message)
     }
 
     if (iss.fail() || prefix != "plu" || playerNumber < 0) {
-        std::cerr << colors::T_RED << "[WARNING] Invalid player level increment format received: "
-                  << message << colors::RESET << std::endl;
+        std::cerr << colors::T_RED << "[WARNING] Invalid player level increment "
+                  << "format received: " << message << colors::RESET << std::endl;
         return false;
     }
 
@@ -1145,8 +1145,8 @@ bool MsgHandler::handlePldMessage(const std::string& message)
     }
 
     if (iss.fail() || prefix != "pld" || playerNumber < 0) {
-        std::cerr << colors::T_RED << "[WARNING] Invalid player level decrement format received: "
-                  << message << colors::RESET << std::endl;
+        std::cerr << colors::T_RED << "[WARNING] Invalid player level decrement "
+                  << "format received: " << message << colors::RESET << std::endl;
         return false;
     }
 

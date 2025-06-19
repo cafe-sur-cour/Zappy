@@ -36,11 +36,9 @@ int pld(zappy_t *zappy, graph_net_t *graphic, char *message)
     player = get_player_by_id(zappy->game, player_id);
     if (!player)
         return -1;
-
     if (player->level > 1) {
         player->level -= 1;
         send_player_level(zappy, player);
     }
-
     return send_plv_message(graphic, player);
 }
