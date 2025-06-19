@@ -20,3 +20,5 @@ zappy_server
 unit_tests
 server/tests/ctest*.c
 *__pycache_*
+yarn.lock
+node_modules
