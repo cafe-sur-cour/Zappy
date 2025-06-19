@@ -11,7 +11,7 @@
 #include "../../../include/network.h"
 #include "../../../include/my.h"
 
-static int send_pin_message(graph_net_t *graphic, player_t *player)
+int send_pin_message(graph_net_t *graphic, player_t *player)
 {
     int size = 16 + int_str_len(player->id) + int_str_len(player->posX) +
         int_str_len(player->posY) + int_str_len(player->inventory->nbFood) +
