@@ -454,6 +454,7 @@ void HUD::clearPlayerInventoryElements()
         "player_info_level", "player_info_team",
         "player_info_id", "player_info_ritual",
         "player_info_position", "player_info_orientation",
+        "player_level_increment_btn", "player_level_decrement_btn",
         "inventory_title",
         "inventory_separator",
         "inventory_food", "inventory_linemate", "inventory_deraumere", "inventory_sibur",
@@ -852,6 +853,42 @@ void HUD::initPlayerInventoryDisplay(int playerId)
         {220, 220, 220, 255}
     );
 
+    Color32 normalColor = {180, 180, 180, 255};
+    Color32 hoverColor = {220, 220, 220, 255};
+    Color32 pressedColor = {150, 150, 150, 255};
+    Color32 disabledColor = {120, 120, 120, 150};
+    Color32 textColor = {30, 30, 30, 255};
+
+    bool canIncrement = player.level < 8;
+    bottomContainer->addButtonPercent(
+        "player_level_increment_btn",
+        57.5f, 60.0f,
+        1.5f, 8.0f,
+        "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerLevel(playerId);
+        },
+        canIncrement ? normalColor : disabledColor,
+        canIncrement ? hoverColor : disabledColor,
+        canIncrement ? pressedColor : disabledColor,
+        textColor
+    );
+
+    bool canDecrement = player.level > 1;
+    bottomContainer->addButtonPercent(
+        "player_level_decrement_btn",
+        60.0f, 60.0f,
+        1.5f, 8.0f,
+        "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerLevel(playerId);
+        },
+        canDecrement ? normalColor : disabledColor,
+        canDecrement ? hoverColor : disabledColor,
+        canDecrement ? pressedColor : disabledColor,
+        textColor
+    );
+
     std::string orientationStr;
     switch (player.orientation) {
         case 1: orientationStr = "North"; break;
@@ -1103,6 +1140,36 @@ void HUD::updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode came
         bottomContainer->getElement("player_info_level"));
     if (levelElem) {
         levelElem->setText("Level: " + std::to_string(player.level));
+
+        Color32 normalColor = {180, 180, 180, 255};
+        Color32 hoverColor = {220, 220, 220, 255};
+        Color32 pressedColor = {150, 150, 150, 255};
+        Color32 disabledColor = {120, 120, 120, 150};
+        Color32 textColor = {30, 30, 30, 255};
+
+        auto incBtn = std::dynamic_pointer_cast<Button>(
+            bottomContainer->getElement("player_level_increment_btn"));
+        if (incBtn) {
+            bool canIncrement = player.level < 8;
+            incBtn->setColors(
+                canIncrement ? normalColor : disabledColor,
+                canIncrement ? hoverColor : disabledColor,
+                canIncrement ? pressedColor : disabledColor,
+                textColor
+            );
+        }
+
+        auto decBtn = std::dynamic_pointer_cast<Button>(
+            bottomContainer->getElement("player_level_decrement_btn"));
+        if (decBtn) {
+            bool canDecrement = player.level > 1;
+            decBtn->setColors(
+                canDecrement ? normalColor : disabledColor,
+                canDecrement ? hoverColor : disabledColor,
+                canDecrement ? pressedColor : disabledColor,
+                textColor
+            );
+        }
     }
 
     auto teamElem = std::dynamic_pointer_cast<Text>(
