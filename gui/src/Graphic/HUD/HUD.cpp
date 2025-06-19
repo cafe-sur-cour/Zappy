@@ -374,9 +374,8 @@ void HUD::initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
             8.0f,
             3.0f,
             true,
-            [teamName](bool checked) {
-                std::cout << "Team " << teamName << " visibility: "
-                         << (checked ? "ON" : "OFF") << std::endl;
+            [this, teamName](bool checked) {
+                this->_gameInfos->setTeamVisibility(teamName, checked);
             }
         );
 
