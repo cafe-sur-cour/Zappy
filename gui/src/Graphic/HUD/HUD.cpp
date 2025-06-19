@@ -532,6 +532,47 @@ void HUD::clearPlayerInventoryElements()
     }
 }
 
+void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, int playerId)
+{
+    if (!container)
+        return;
+
+    Color32 normalColor = {180, 180, 180, 255};
+    Color32 hoverColor = {220, 220, 220, 255};
+    Color32 pressedColor = {150, 150, 150, 255};
+    Color32 textColor = {30, 30, 30, 255};
+
+    container->addButtonPercent("player_level_increment_btn", 58.5f, 59.0f, 1.5f, 10.0f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerLevel(playerId);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "player_level_decrement_btn", 60.5f, 59.0f, 1.5f, 10.0f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerLevel(playerId);
+        }, normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_food_button_increment", 79.8f, 25.5f, 1.0f, 6.5f, "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerInventoryItem(playerId, 0);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+
+    container->addButtonPercent(
+        "inventory_food_button_decrement", 80.9f, 25.5f, 1.0f, 6.5f, "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerInventoryItem(playerId, 0);
+        },
+        normalColor, hoverColor, pressedColor, textColor
+    );
+}
+
 std::vector<int> HUD::getTeamPlayerNumbers(
     const std::string& teamName,
     const std::vector<zappy::structs::Player>& players)
@@ -918,38 +959,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
         {220, 220, 220, 255}
     );
 
-    Color32 normalColor = {180, 180, 180, 255};
-    Color32 hoverColor = {220, 220, 220, 255};
-    Color32 pressedColor = {150, 150, 150, 255};
-    Color32 textColor = {30, 30, 30, 255};
-
-    bottomContainer->addButtonPercent(
-        "player_level_increment_btn",
-        58.5f, 59.0f,
-        1.5f, 10.0f,
-        "+",
-        [this, playerId]() {
-            this->_gameInfos->incrementPlayerLevel(playerId);
-        },
-        normalColor,
-        hoverColor,
-        pressedColor,
-        textColor
-    );
-
-    bottomContainer->addButtonPercent(
-        "player_level_decrement_btn",
-        60.5f, 59.0f,
-        1.5f, 10.0f,
-        "-",
-        [this, playerId]() {
-            this->_gameInfos->decrementPlayerLevel(playerId);
-        },
-        normalColor,
-        hoverColor,
-        pressedColor,
-        textColor
-    );
+    addIncrementDecrementButtons(bottomContainer, playerId);
 
     std::string orientationStr;
     switch (player.orientation) {
@@ -1007,34 +1017,6 @@ void HUD::initPlayerInventoryDisplay(int playerId)
         "Food: " + std::to_string(player.inventory.food),
         7.5f,
         {255, 215, 0, 255}
-    );
-
-    bottomContainer->addButtonPercent(
-        "inventory_food_button_increment",
-        79.8f, 25.5f,
-        1.0f, 6.5f,
-        "+",
-        [this, playerId]() {
-            this->_gameInfos->incrementPlayerInventoryItem(playerId, 0);
-        },
-        normalColor,
-        hoverColor,
-        pressedColor,
-        textColor
-    );
-
-    bottomContainer->addButtonPercent(
-        "inventory_food_button_decrement",
-        80.9f, 25.5f,
-        1.0f, 6.5f,
-        "-",
-        [this, playerId]() {
-            this->_gameInfos->decrementPlayerInventoryItem(playerId, 0);
-        },
-        normalColor,
-        hoverColor,
-        pressedColor,
-        textColor
     );
 
     float yPosCol1 = 34.0f;
