@@ -90,17 +90,17 @@ Color RayLibEnc::getDayNightColor(float cycleTime)
     } else if (cycleTime < 0.8f) {
         float t = (cycleTime - 0.65f) / 0.15f;
         return {
-            (unsigned char)(255),           // R: 255
-            (unsigned char)(255 - t * 155), // G: 255 -> 100
-            (unsigned char)(255 - t * 155), // B: 255 -> 100
+            (unsigned char)(255),            // R: 255
+            (unsigned char)(255 - t * 155),  // G: 255 -> 100
+            (unsigned char)(255 - t * 155),  // B: 255 -> 100
             255
         };
     } else {
         float t = (cycleTime - 0.8f) / 0.2f;
         return {
-            (unsigned char)(255 - t * 235), // R: 255 -> 20
-            (unsigned char)(100 - t * 70),  // G: 100 -> 30
-            (unsigned char)(100 - t * 20),  // B: 100 -> 80
+            (unsigned char)(255 - t * 235),  // R: 255 -> 20
+            (unsigned char)(100 - t * 70),   // G: 100 -> 30
+            (unsigned char)(100 - t * 20),   // B: 100 -> 80
             255
         };
     }
