@@ -7,7 +7,6 @@
 
 import os
 from threading import Thread
-from time import sleep, time
 from random import randint
 
 from src.Broadcaster.Broadcaster import Broadcaster
@@ -201,15 +200,14 @@ class Player:
             if self.roombaState["lastCommand"] == "Connect_nbr":
                 self.broadcaster.broadcastMessage(f"sendInventory {self.personalID}")
                 self.roombaState["lastCommand"] = "broadcast sendInventory"
-                self.roombaState["commandSentTime"] = time()
 
             elif self.roombaState["lastCommand"] == "broadcast sendInventory":
                 if len(self.roombaState["teamInventories"]) >= self.nbConnectedPlayers:
                     if self.teamHasEnoughStones():
                         self.incantationState["status"] = True
                         self.roombaState["phase"] = "lookAround"
-                elif time() - self.roombaState["commandSentTime"] >= 5.0:
-                    self.roombaState["phase"] = "lookAround"
+                else:
+                    self.communication.sendGetConnectNbr()
             else:
                 self.communication.sendGetConnectNbr()
                 self.roombaState["lastCommand"] = "Connect_nbr"
@@ -245,7 +243,7 @@ class Player:
         return self.inventory["food"] * 126 >= nbStones * 7 + 300
 
     def incantationAction(self) -> None:
-        pass
+        print("enough ressources")
 
     def getStepsFromDirection(self) -> list[()]:
         stepsMap = {
