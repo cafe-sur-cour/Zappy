@@ -29,8 +29,6 @@ MsgHandler::MsgHandler(std::shared_ptr<GameInfos> gameInfos,
         {"pnw", std::bind(&MsgHandler::handlePnwMessage, this, std::placeholders::_1)},
         {"ppo", std::bind(&MsgHandler::handlePpoMessage, this, std::placeholders::_1)},
         {"plv", std::bind(&MsgHandler::handlePlvMessage, this, std::placeholders::_1)},
-        {"plu", std::bind(&MsgHandler::handlePluMessage, this, std::placeholders::_1)},
-        {"pld", std::bind(&MsgHandler::handlePldMessage, this, std::placeholders::_1)},
         {"pin", std::bind(&MsgHandler::handlePinMessage, this, std::placeholders::_1)},
         {"pex", std::bind(&MsgHandler::handlePexMessage, this, std::placeholders::_1)},
         {"pbc", std::bind(&MsgHandler::handlePbcMessage, this, std::placeholders::_1)},
@@ -1059,118 +1057,6 @@ bool MsgHandler::handleSbpMessage(const std::string& message)
     }
 
     std::cout << colors::T_RED << "[SERVER] Bad parameters in command"
-              << colors::RESET << std::endl;
-    return true;
-}
-
-bool MsgHandler::handlePluMessage(const std::string& message)
-{
-    if (message.empty())
-        return false;
-
-    std::istringstream iss(message);
-    std::string prefix, playerNumberStr;
-
-    iss >> prefix >> playerNumberStr;
-
-    int playerNumber = -1;
-    if (playerNumberStr.length() > 1 && playerNumberStr[0] == '#') {
-        try {
-            playerNumber = std::stoi(playerNumberStr.substr(1));
-        } catch (const std::exception& e) {
-            std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
-                      << playerNumberStr << colors::RESET << std::endl;
-            return false;
-        }
-    } else {
-        std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
-                  << playerNumberStr << colors::RESET << std::endl;
-        return false;
-    }
-
-    if (iss.fail() || prefix != "plu" || playerNumber < 0) {
-        std::cerr << colors::T_RED << "[WARNING] Invalid player level increment "
-                  << "format received: " << message << colors::RESET << std::endl;
-        return false;
-    }
-
-    const zappy::structs::Player player = _gameInfos->getPlayer(playerNumber);
-    if (player.number <= 0) {
-        std::cerr << colors::T_RED << "[WARNING] Player not found: "
-                  << playerNumber << colors::RESET << std::endl;
-        return false;
-    }
-
-    int newLevel = player.level + 1;
-    if (newLevel > 8) {
-        std::cerr << colors::T_RED << "[WARNING] Player level cannot exceed 8: "
-                  << playerNumber << colors::RESET << std::endl;
-        return false;
-    }
-
-    {
-        std::lock_guard<std::mutex> lock(_gameInfosMutex);
-        _gameInfos->updatePlayerLevel(playerNumber, newLevel);
-    }
-
-    std::cout << colors::T_YELLOW << "[INFO] Player " << playerNumber
-              << " level incremented to " << newLevel
-              << colors::RESET << std::endl;
-    return true;
-}
-
-bool MsgHandler::handlePldMessage(const std::string& message)
-{
-    if (message.empty())
-        return false;
-
-    std::istringstream iss(message);
-    std::string prefix, playerNumberStr;
-
-    iss >> prefix >> playerNumberStr;
-
-    int playerNumber = -1;
-    if (playerNumberStr.length() > 1 && playerNumberStr[0] == '#') {
-        try {
-            playerNumber = std::stoi(playerNumberStr.substr(1));
-        } catch (const std::exception& e) {
-            std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
-                      << playerNumberStr << colors::RESET << std::endl;
-            return false;
-        }
-    } else {
-        std::cerr << colors::T_RED << "[WARNING] Invalid player number format: "
-                  << playerNumberStr << colors::RESET << std::endl;
-        return false;
-    }
-
-    if (iss.fail() || prefix != "pld" || playerNumber < 0) {
-        std::cerr << colors::T_RED << "[WARNING] Invalid player level decrement "
-                  << "format received: " << message << colors::RESET << std::endl;
-        return false;
-    }
-
-    const zappy::structs::Player player = _gameInfos->getPlayer(playerNumber);
-    if (player.number <= 0) {
-        std::cerr << colors::T_RED << "[WARNING] Player not found: "
-                  << playerNumber << colors::RESET << std::endl;
-        return false;
-    }
-
-    int newLevel = player.level - 1;
-    if (newLevel < 1) {
-        std::cerr << colors::T_RED << "[WARNING] Player level cannot go below 1: "
-                  << playerNumber << colors::RESET << std::endl;
-        return false;
-    }
-
-    {
-        std::lock_guard<std::mutex> lock(_gameInfosMutex);
-        _gameInfos->updatePlayerLevel(playerNumber, newLevel);
-    }
-
-    std::cout << colors::T_YELLOW << "[INFO] Player " << playerNumber
-              << " level decremented to " << newLevel
               << colors::RESET << std::endl;
     return true;
 }
