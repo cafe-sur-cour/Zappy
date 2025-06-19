@@ -225,6 +225,11 @@ float Raylib::getFrameTime()
     return this->_raylib->getFrameTime();
 }
 
+int Raylib::getFPS()
+{
+    return this->_raylib->getFPS();
+}
+
 void Raylib::updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed)
 {
     return this->_raylib->updateCameraFreeMode(camMovingSpeed, camRotaSpeed);
