@@ -27,6 +27,7 @@ class GUI {
 
         void run();
         void refresh();
+        void handleVictory(const std::string &teamName);
 
         int getWindowWidth() const;
         int getWindowHeight() const;
