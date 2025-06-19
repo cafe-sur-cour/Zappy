@@ -29,7 +29,7 @@ int pld(zappy_t *zappy, graph_net_t *graphic, char *message)
         error_message("Invalid pld message format.");
         return -1;
     }
-    if (sscanf(message, "pld #%d", &player_id) != 1) {
+    if (sscanf(message, "pld #%d\n", &player_id) != 1) {
         error_message("Invalid pld pattern.");
         return -1;
     }
