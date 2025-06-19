@@ -162,7 +162,7 @@ params_t *check_args(int argc, char **argv)
 
     if (!params)
         return NULL;
-    if (argc < 12) {
+    if (argc < 11) {
         helper();
         return NULL;
     }

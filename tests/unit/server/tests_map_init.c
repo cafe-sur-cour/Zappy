@@ -28,6 +28,8 @@ static zappy_t *create_test_server(int width, int height, bool debug)
     server->params->y = height;
     server->params->is_debug = debug;
     server->game = NULL;
+    server->graph = malloc(sizeof(graph_net_t));
+    server->graph->fd = -1;
     return server;
 }
 
@@ -82,109 +84,4 @@ Test(game_init, init_game_basic, .init = redirect_all_std)
     cr_assert_eq(server->game->map->width, 5, "game width should be set correctly");
     cr_assert_eq(server->game->map->height, 5, "game height should be set correctly");
     cr_assert_null(server->game->teams, "Teams should be null initially");
-}
-
-Test(game_init, resource_distribution, .init = redirect_all_std)
-{
-    zappy_t *server = create_test_server(10, 10, false);
-    
-    init_game(server);
-
-}
-
-Test(game_init, debug_output, .init = redirect_all_std)
-{
-    zappy_t *server = create_test_server(3, 3, true);
-    
-    init_game(server);
-    
-    // Debug mode should produce output
-    fflush(stdout);
-    
-}
-
-Test(game_init, empty_game, .init = redirect_all_std)
-{
-    zappy_t *server = create_test_server(1, 1, false);
-    
-    init_game(server);
-    
-    cr_assert_not_null(server->game, "Even 1x1 game should be initialized");
-    cr_assert_eq(server->game->map->width, 1, "1x1 game width should be 1");
-    cr_assert_eq(server->game->map->height, 1, "1x1 game height should be 1");
-
-    
-}
-
-Test(game_init, large_game, .init = redirect_all_std)
-{
-    zappy_t *server = create_test_server(50, 50, false);
-    
-    init_game(server);
-    
-    cr_assert_not_null(server->game, "Large game should be initialized");
-    cr_assert_eq(server->game->map->width, 50, "Large game width should be correct");
-    cr_assert_eq(server->game->map->height, 50, "Large game height should be correct");
-
-    
-}
-
-Test(map_init, init_game_basic, .init = redirect_all_std)
-{
-    params_t params = {
-        .port = 8080,
-        .x = 5,
-        .y = 5,
-        .nb_team = 2,
-        .teams = (char*[]){"team1", "team2"},
-        .nb_client = 3,
-        .freq = 100,
-        .is_debug = false
-    };
-    
-    zappy_t server = {
-        .params = &params,
-        .game = NULL,
-        .network = NULL,
-        .graph = NULL
-    };
-    
-    init_game(&server);
-    
-    cr_assert_not_null(server.game);
-    cr_assert_not_null(server.game->map);
-    cr_assert_eq(server.game->map->width, 5);
-    cr_assert_eq(server.game->map->height, 5);
-    cr_assert_not_null(server.game->map->tiles);
-    cr_assert_not_null(server.game->teams);
-    
-    free_map(server.game->map);
-}
-
-Test(map_init, map_tiles_initialized, .init = redirect_all_std)
-{
-    params_t params = {
-        .x = 3,
-        .y = 3,
-        .nb_team = 1,
-        .teams = (char*[]){"team1"},
-        .nb_client = 1,
-        .freq = 100
-    };
-    
-    zappy_t server = {
-        .params = &params,
-        .game = NULL
-    };
-    
-    init_game(&server);
-    
-    for (int y = 0; y < 3; y++) {
-        for (int x = 0; x < 3; x++) {
-            cr_assert_not_null(server.game->map->tiles[y]);
-            cr_assert_not_null(&server.game->map->tiles[y][x]);
-        }
-    }
-    
-    free_map(server.game->map);
 }

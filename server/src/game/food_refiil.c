@@ -33,13 +33,10 @@ void count_current_resources(zappy_t *z, int current_count[7])
 /* This function verifys calls the distributin of ressources */
 void refill_food(zappy_t *zappy)
 {
-    int is_updated = 0;
-
     if (!zappy || !zappy->game || !zappy->game->map ||
         !zappy->game->map->tiles) {
         error_message("Invalid zappy structure for resource refill.");
         return;
     }
     distribute_resources(zappy);
-    valid_message("Resources refilled on the map.");
 }
