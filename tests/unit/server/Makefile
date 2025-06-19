@@ -108,6 +108,8 @@ SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/guiMessage/handlers/sst.c				\
 				../../../server/src/guiMessage/handlers/tna.c				\
 				../../../server/src/guiMessage/handlers/kil.c				\
+				../../../server/src/guiMessage/handlers/pld.c				\
+				../../../server/src/guiMessage/handlers/plu.c				\
 				../../../server/src/receiveMessage/action_handler.c			\
 				../../../server/src/receiveMessage/loop_thru_command.c		\
 				../../../server/src/receiveMessage/pollin_handler.c			\

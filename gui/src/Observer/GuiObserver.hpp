@@ -9,7 +9,7 @@
 #define GUIOBSERVER_HPP_
 
 #include <memory>
-
+#include <string>
 #include "IObserver.hpp"
 
 class GUI;
@@ -20,6 +20,7 @@ class GuiObserver : public IObserver {
         virtual ~GuiObserver() = default;
 
         void update() override;
+        void onGameEvent(GameEventType eventType, const std::string& teamName) override;
 
     private:
         std::weak_ptr<GUI> _gui;

@@ -20,7 +20,11 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
          std::shared_ptr<IAudio> audio,
          std::shared_ptr<CameraManager> camera, std::function<void()> resetCameraFunc)
     : _containers(), _display(display), _gameInfos(gameInfos), _audio(audio), _camera(camera),
-      _resetCameraFunc(resetCameraFunc)
+      _resetCameraFunc(resetCameraFunc),
+      _showVictoryMessage(false),
+      _winningTeam(""),
+      _victoryColor({0, 127, 255, 255}),
+      _selectedTile(-1, -1)
 {
     _help = std::make_shared<Help>(display, audio);
     _settings = std::make_shared<Settings>(display, audio, camera);
@@ -34,8 +38,9 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
     initServerMessagesDisplay(_gameInfos);
     this->_initHelpInformation();
 
-    if (_gameInfos)
+    if (_gameInfos) {
         _gameInfos->addObserver(std::shared_ptr<IObserver>(this, [](IObserver*) {}));
+    }
 }
 
 HUD::~HUD()
@@ -46,7 +51,9 @@ HUD::~HUD()
 void HUD::draw()
 {
     for (const auto &pair : _containers) {
-        pair.second->draw();
+        if (pair.first != "message_container") {
+            pair.second->draw();
+        }
     }
 
     if (_help && _help->isVisible()) {
@@ -54,6 +61,51 @@ void HUD::draw()
     }
     if (this->_settings && this->_settings->isVisible()) {
         this->_settings->draw();
+    }
+
+    auto msgContainer = _containers.find("message_container");
+    if (msgContainer != _containers.end() && msgContainer->second->isVisible()) {
+        msgContainer->second->draw();
+    }
+
+    if (_showVictoryMessage && !_winningTeam.empty()) {
+        std::string message = "Team " + _winningTeam + " WINS!";
+
+        Vector2i screenDimensions = _display->getScreenSize();
+        int screenWidth = screenDimensions.x;
+        int screenHeight = screenDimensions.y;
+
+        float fontSize = 60.0f;
+        float outlineThickness = 2.0f;
+
+        float textWidth = _display->measureText(message, fontSize);
+        float textX = (screenWidth - textWidth) / 2.0f;
+        float textY = screenHeight / 8.0f - fontSize / 2.0f;
+
+        Color32 outlineColor = {0, 0, 0, 255};
+
+        std::vector<std::pair<float, float>> offsets = {
+            {-outlineThickness, -outlineThickness},
+            {-outlineThickness, 0},
+            {-outlineThickness, outlineThickness},
+            {0, -outlineThickness},
+            {0, outlineThickness},
+            {outlineThickness, -outlineThickness},
+            {outlineThickness, 0},
+            {outlineThickness, outlineThickness}
+        };
+
+        for (const auto& offset : offsets) {
+            _display->drawText(message, textX + offset.first, textY + offset.second,
+                fontSize, outlineColor);
+        }
+        _display->drawText(
+            message,
+            textX,
+            textY,
+            fontSize,
+            _victoryColor
+        );
     }
 }
 
@@ -73,7 +125,6 @@ void HUD::update()
 
     updateTeamPlayersDisplay(_gameInfos);
     updateTpsSlider(_gameInfos);
-    updateGameMessages();
     updateServerMessagesDisplay(_gameInfos);
 }
 
@@ -200,7 +251,7 @@ void HUD::_initHelpInformation()
 
     bottomContainer->addTextPercent(
         "cam_info_mode",
-        2.f, 10.f,
+        1.f, 10.f,
         "Camera mod: NONE",
         7.0f,
         {245, 224, 80, 255}
@@ -208,7 +259,7 @@ void HUD::_initHelpInformation()
 
     bottomContainer->addTextPercent(
         "help_cam_key",
-        2.f, 30.f,
+        1.f, 30.f,
         "NONE",
         7.0f,
         {255, 236, 183, 255}
@@ -367,9 +418,21 @@ void HUD::initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
             yPos += 1.0f;
         }
 
+        sideContainer->addCheckboxPercent(
+            teamId + "_checkbox",
+            2.0f,
+            yPos + 0.2f,
+            8.0f,
+            3.0f,
+            true,
+            [this, teamName](bool checked) {
+                this->_gameInfos->setTeamVisibility(teamName, checked);
+            }
+        );
+
         sideContainer->addTextPercent(
             teamId + "_title",
-            5.0f,
+            12.0f,
             yPos,
             "TEAM: " + teamName,
             3.5f,
@@ -435,6 +498,7 @@ void HUD::clearTeamDisplayElements(std::shared_ptr<Containers> container)
         container->removeElement(idBase + "_title");
         container->removeElement(idBase + "_separator");
         container->removeElement(idBase + "_stats");
+        container->removeElement(idBase + "_checkbox");
 
         for (int j = 0; j < 50; j++) {
             container->removeElement(idBase + "_player_" + std::to_string(j));
@@ -454,6 +518,7 @@ void HUD::clearPlayerInventoryElements()
         "player_info_level", "player_info_team",
         "player_info_id", "player_info_ritual",
         "player_info_position", "player_info_orientation",
+        "player_level_increment_btn", "player_level_decrement_btn",
         "inventory_title",
         "inventory_separator",
         "inventory_food", "inventory_linemate", "inventory_deraumere", "inventory_sibur",
@@ -483,12 +548,8 @@ std::string HUD::createPlayerListText(const std::vector<int>& playerNumbers)
     if (playerNumbers.empty())
         return "No players";
 
-    std::string playerList = "Players: ";
-    for (size_t j = 0; j < playerNumbers.size(); ++j) {
-        playerList += std::to_string(playerNumbers[j]);
-        if (j < playerNumbers.size() - 1)
-            playerList += ", ";
-    }
+    std::string playerList = "Players: " + std::to_string(playerNumbers.size())
+    + " alive";
     return playerList;
 }
 
@@ -506,7 +567,7 @@ void HUD::addPlayerListText(
     if (!playerNumbers.empty()) {
         container->addTextPercent(
             teamId + "_player_0",
-            10.0f,
+            14.0f,
             yPos,
             playerList,
             2.2f,
@@ -515,7 +576,7 @@ void HUD::addPlayerListText(
     } else {
         container->addTextPercent(
             teamId + "_player_0",
-            10.0f,
+            14.0f,
             yPos,
             playerList,
             2.0f,
@@ -856,6 +917,42 @@ void HUD::initPlayerInventoryDisplay(int playerId)
         {220, 220, 220, 255}
     );
 
+    Color32 normalColor = {180, 180, 180, 255};
+    Color32 hoverColor = {220, 220, 220, 255};
+    Color32 pressedColor = {150, 150, 150, 255};
+    Color32 disabledColor = {120, 120, 120, 150};
+    Color32 textColor = {30, 30, 30, 255};
+
+    bool canIncrement = player.level < 8;
+    bottomContainer->addButtonPercent(
+        "player_level_increment_btn",
+        58.5f, 59.0f,
+        1.5f, 10.0f,
+        "+",
+        [this, playerId]() {
+            this->_gameInfos->incrementPlayerLevel(playerId);
+        },
+        canIncrement ? normalColor : disabledColor,
+        canIncrement ? hoverColor : disabledColor,
+        canIncrement ? pressedColor : disabledColor,
+        textColor
+    );
+
+    bool canDecrement = player.level > 1;
+    bottomContainer->addButtonPercent(
+        "player_level_decrement_btn",
+        60.5f, 59.0f,
+        1.5f, 10.0f,
+        "-",
+        [this, playerId]() {
+            this->_gameInfos->decrementPlayerLevel(playerId);
+        },
+        canDecrement ? normalColor : disabledColor,
+        canDecrement ? hoverColor : disabledColor,
+        canDecrement ? pressedColor : disabledColor,
+        textColor
+    );
+
     std::string orientationStr;
     switch (player.orientation) {
         case 1: orientationStr = "North"; break;
@@ -1107,6 +1204,42 @@ void HUD::updatePlayerInventoryDisplay(int playerId, zappy::gui::CameraMode came
         bottomContainer->getElement("player_info_level"));
     if (levelElem) {
         levelElem->setText("Level: " + std::to_string(player.level));
+
+        Color32 normalColor = {180, 180, 180, 255};
+        Color32 hoverColor = {220, 220, 220, 255};
+        Color32 pressedColor = {150, 150, 150, 255};
+        Color32 disabledColor = {120, 120, 120, 150};
+        Color32 textColor = {30, 30, 30, 255};
+
+        auto incBtn = std::dynamic_pointer_cast<Button>(
+            bottomContainer->getElement("player_level_increment_btn"));
+        if (incBtn) {
+            bool canIncrement = player.level < 8;
+            incBtn->setCallback([this, playerId]() {
+                _gameInfos->incrementPlayerLevel(playerId);
+            });
+            incBtn->setColors(
+                canIncrement ? normalColor : disabledColor,
+                canIncrement ? hoverColor : disabledColor,
+                canIncrement ? pressedColor : disabledColor,
+                textColor
+            );
+        }
+
+        auto decBtn = std::dynamic_pointer_cast<Button>(
+            bottomContainer->getElement("player_level_decrement_btn"));
+        if (decBtn) {
+            bool canDecrement = player.level > 1;
+            decBtn->setCallback([this, playerId]() {
+                _gameInfos->decrementPlayerLevel(playerId);
+            });
+            decBtn->setColors(
+                canDecrement ? normalColor : disabledColor,
+                canDecrement ? hoverColor : disabledColor,
+                canDecrement ? pressedColor : disabledColor,
+                textColor
+            );
+        }
     }
 
     auto teamElem = std::dynamic_pointer_cast<Text>(
@@ -1332,132 +1465,207 @@ bool HUD::isPlayerInIncantation(int playerId) const
     return false;
 }
 
-void HUD::createMessageContainer()
-{
-    if (_containers.find("message_container") != _containers.end()) {
-        _containers.erase("message_container");
-    }
-
-    int screenWidth = _display->getScreenSize().x;
-    int screenHeight = _display->getScreenSize().y;
-
-    float containerWidth = screenWidth * 0.3f;
-    float containerHeight = screenHeight * 0.2f;
-    float containerX = (screenWidth - containerWidth) / 2.0f;
-    float containerY = (screenHeight - containerHeight) / 2.0f;
-
-    Color32 backgroundColor = {0, 0, 0, 180};
-
-    auto container = addContainer("message_container", containerX, containerY,
-                containerWidth, containerHeight, backgroundColor);
-
-    if (container) {
-        float xPercent = (containerX / screenWidth) * 100.0f;
-        float yPercent = (containerY / screenHeight) * 100.0f;
-        float widthPercent = (containerWidth / screenWidth) * 100.0f;
-        float heightPercent = (containerHeight / screenHeight) * 100.0f;
-
-        container->setRelativePosition(xPercent, yPercent, widthPercent, heightPercent);
-    }
-}
-
 void HUD::displayWinMessage(const std::string& teamName)
 {
-    try {
-        createMessageContainer();
-
-        std::string msgId = "win_message_" + std::to_string(
-            std::chrono::steady_clock::now().time_since_epoch().count());
-        std::string message = "Team " + teamName + " WINS!";
-
-        auto container = getContainer("message_container");
-        if (container) {
-            try {
-                for (auto& msg : _gameMessages) {
-                    container->removeElement(msg.id);
-                }
-                _gameMessages.clear();
-            } catch (const std::exception& e) {
-                std::cout << colors::T_RED << "[ERROR] Exception clearing messages: "
-                          << e.what() << colors::RESET << std::endl;
-            }
-
-            Color32 winColor = {50, 255, 50, 255};
-
-            try {
-                float fontSize = 30.0f;
-
-                auto titleElement = container->addTextPercent(
-                    "win_title", 20.0f, 25.0f, "VICTORY!", fontSize, winColor);
-
-                auto teamElement = container->addTextPercent(
-                    msgId, 20.0f, 50.0f, message, fontSize - 5.0f, winColor);
-
-                _gameMessages.push_back({
-                    msgId,
-                    message,
-                    winColor,
-                    std::chrono::steady_clock::now(),
-                    MESSAGE_DURATION * 2
-                });
-            } catch (const std::exception& e) {
-                std::cout << colors::T_RED << "[ERROR] Exception adding win message: "
-                          << e.what() << colors::RESET << std::endl;
-            }
-        }
-    } catch (const std::exception& e) {
-        std::cout << colors::T_RED << "[ERROR] Exception in displayWinMessage: "
-                  << e.what() << colors::RESET << std::endl;
-    } catch (...) {
-        std::cout << colors::T_RED << "[ERROR] Unknown exception in displayWinMessage"
-                  << colors::RESET << std::endl;
-    }
-}
-
-
-void HUD::updateGameMessages()
-{
-    auto currentTime = std::chrono::steady_clock::now();
-    auto container = getContainer("message_container");
-
-    if (!container || _gameMessages.empty()) {
-        return;
-    }
-
-    auto it = _gameMessages.begin();
-    while (it != _gameMessages.end()) {
-        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(
-            currentTime - it->startTime).count();
-
-        if (elapsed >= it->duration) {
-            container->removeElement(it->id);
-            it = _gameMessages.erase(it);
-        } else {
-            if (elapsed > it->duration - 1.0f) {
-                float alpha = 255.0f * (1.0f - (elapsed - (it->duration - 1.0f)));
-                if (auto textElem = std::dynamic_pointer_cast<Text>(
-                    container->getElement(it->id))) {
-                    Color32 color = it->color;
-                    color.a = static_cast<unsigned char>(alpha);
-                    textElem->setColor(color);
-                }
-            }
-            ++it;
-        }
-    }
-
-    if (_gameMessages.empty() && container) {
-        _containers.erase("message_container");
-    }
+    _showVictoryMessage = true;
+    _winningTeam = teamName;
+    _victoryColor = {0, 127, 255, 255};
 }
 
 void HUD::onGameEvent(GameEventType eventType, const std::string& teamName)
 {
     switch (eventType) {
         case GameEventType::TEAM_WIN:
-            displayWinMessage(teamName);
+            _showVictoryMessage = true;
+            _winningTeam = teamName;
+            _victoryColor = {0, 127, 255, 255};
             break;
         default:
             break;
+    }
+}
+
+void HUD::setSelectedTile(int x, int y)
+{
+    if (_selectedTile.first != x || _selectedTile.second != y) {
+        _selectedTile = {x, y};
+
+        if (x >= 0 && y >= 0) {
+            updateTileResourceDisplay(x, y);
+        } else {
+            clearTileResourceElements();
+        }
+    }
+}
+
+void HUD::initTileResourceDisplay()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    clearTileResourceElements();
+
+    bottomContainer->addTextPercent(
+        "tile_resources_title",
+        30.0f, 10.0f,
+        "TILE RESOURCES",
+        8.0f,
+        {255, 255, 255, 255}
+    );
+
+    bottomContainer->addTextPercent(
+        "tile_resources_separator",
+        30.0f, 17.0f,
+        std::string(130, '-'),
+        2.0f,
+        {150, 150, 150, 200}
+    );
+
+    float yPosCol1 = 34.0f;
+    float xPosCol1 = 30.0f;
+
+    bottomContainer->addTextPercent(
+        "tile_resource_food",
+        xPosCol1 + 7.5f, 24.0f,
+        "Food: 0",
+        7.5f,
+        {255, 215, 0, 255}
+    );
+
+    bottomContainer->addTextPercent(
+        "tile_resource_linemate",
+        xPosCol1, yPosCol1,
+        "Linemate: 0",
+        7.0f,
+        {200, 200, 200, 255}
+    );
+    yPosCol1 += 13.0f;
+
+    bottomContainer->addTextPercent(
+        "tile_resource_deraumere",
+        xPosCol1, yPosCol1,
+        "Deraumere: 0",
+        7.0f,
+        {65, 105, 225, 255}
+    );
+    yPosCol1 += 13.0f;
+
+    bottomContainer->addTextPercent(
+        "tile_resource_sibur",
+        xPosCol1, yPosCol1,
+        "Sibur: 0",
+        7.0f,
+        {50, 205, 50, 255}
+    );
+
+    float yPosCol2 = 34.0f;
+    float xPosCol2 = 45.0f;
+
+    bottomContainer->addTextPercent(
+        "tile_resource_mendiane",
+        xPosCol2, yPosCol2,
+        "Mendiane: 0",
+        7.0f,
+        {255, 165, 0, 255}
+    );
+    yPosCol2 += 13.0f;
+
+    bottomContainer->addTextPercent(
+        "tile_resource_phiras",
+        xPosCol2, yPosCol2,
+        "Phiras: 0",
+        7.0f,
+        {138, 43, 226, 255}
+    );
+    yPosCol2 += 13.0f;
+
+    bottomContainer->addTextPercent(
+        "tile_resource_thystame",
+        xPosCol2, yPosCol2,
+        "Thystame: 0",
+        7.0f,
+        {255, 20, 147, 255}
+    );
+}
+
+void HUD::updateTileResourceDisplay(int x, int y)
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer || !_gameInfos)
+        return;
+
+    auto titleElem = bottomContainer->getElement("tile_resources_title");
+    if (!titleElem)
+        initTileResourceDisplay();
+
+    zappy::structs::Tile tile = _gameInfos->getTile(x, y);
+
+    auto tileResourcesTitle = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resources_title"));
+    if (tileResourcesTitle) {
+        tileResourcesTitle->setText("TILE RESOURCES (" + std::to_string(x) + ", "
+        + std::to_string(y) + ")");
+    }
+
+    auto foodElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_food"));
+    if (foodElem) {
+        foodElem->setText("Food: " + std::to_string(tile.food));
+    }
+
+    auto linemateElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_linemate"));
+    if (linemateElem) {
+        linemateElem->setText("Linemate: " + std::to_string(tile.linemate));
+    }
+
+    auto deraumereElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_deraumere"));
+    if (deraumereElem) {
+        deraumereElem->setText("Deraumere: " + std::to_string(tile.deraumere));
+    }
+
+    auto siburElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_sibur"));
+    if (siburElem) {
+        siburElem->setText("Sibur: " + std::to_string(tile.sibur));
+    }
+
+    auto mendianeElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_mendiane"));
+    if (mendianeElem) {
+        mendianeElem->setText("Mendiane: " + std::to_string(tile.mendiane));
+    }
+
+    auto phirasElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_phiras"));
+    if (phirasElem) {
+        phirasElem->setText("Phiras: " + std::to_string(tile.phiras));
+    }
+
+    auto thystameElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("tile_resource_thystame"));
+    if (thystameElem) {
+        thystameElem->setText("Thystame: " + std::to_string(tile.thystame));
+    }
+}
+
+void HUD::clearTileResourceElements()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    std::vector<std::string> elementIds = {
+        "tile_resources_title",
+        "tile_resources_separator",
+        "tile_resource_food", "tile_resource_linemate", "tile_resource_deraumere",
+        "tile_resource_sibur", "tile_resource_mendiane", "tile_resource_phiras",
+        "tile_resource_thystame"
+    };
+
+    for (const auto& id : elementIds) {
+        bottomContainer->removeElement(id);
     }
 }

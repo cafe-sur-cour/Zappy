@@ -12,13 +12,17 @@
 #include <mutex>
 #include <chrono>
 #include <iostream>
+#include <unordered_map>
 #include "GameInfos.hpp"
 #include "../Exceptions/Exceptions.hpp"
 
 GameInfos::GameInfos(std::shared_ptr<ICommunication> communication) :
     _mapWidth(0),
     _mapHeight(0),
+    _timeUnit(0),
+    _matrixInitialized(false),
     _gameOver(false),
+    _victorySoundPlayed(false),
     _currentCameraMode(zappy::gui::CameraMode::FREE),
     _currentPlayerFocus(-1)
 {
@@ -46,8 +50,28 @@ void GameInfos::setCurrentPlayerFocus(int playerId)
 
 void GameInfos::setMapSize(int width, int height)
 {
+    std::lock_guard<std::mutex> lock(_dataMutex);
     _mapWidth = width;
     _mapHeight = height;
+    initializeTileMatrix();
+}
+
+void GameInfos::initializeTileMatrix()
+{
+    if (_mapWidth <= 0 || _mapHeight <= 0)
+        return;
+
+    _tileMatrix.clear();
+    _tileMatrix.resize(_mapHeight);
+
+    for (int y = 0; y < _mapHeight; ++y) {
+        _tileMatrix[y].resize(_mapWidth);
+        for (int x = 0; x < _mapWidth; ++x) {
+            _tileMatrix[y][x] = zappy::structs::Tile(x, y);
+        }
+    }
+
+    _matrixInitialized = true;
 }
 
 std::pair<int, int> GameInfos::getMapSize() const
@@ -83,48 +107,74 @@ void GameInfos::updateTile(const zappy::structs::Tile tile)
     if (tile.x < 0 || tile.y < 0 || tile.x >= _mapWidth || tile.y >= _mapHeight)
         return;
 
-    for (auto &existingTile : _tiles) {
-        if (existingTile.x == tile.x && existingTile.y == tile.y) {
-            existingTile = zappy::structs::Tile(
-                tile.x, tile.y, tile.food, tile.linemate, tile.deraumere,
-                tile.sibur, tile.mendiane, tile.phiras, tile.thystame);
-            return;
-        }
-    }
-    _tiles.push_back(zappy::structs::Tile(
-        tile.x, tile.y, tile.food, tile.linemate, tile.deraumere,
-        tile.sibur, tile.mendiane, tile.phiras, tile.thystame));
-}
+    if (!_matrixInitialized)
+        initializeTileMatrix();
 
-const std::vector<zappy::structs::Tile> GameInfos::getTiles() const
-{
-    std::lock_guard<std::mutex> lock(_dataMutex);
-    return _tiles;
+    _tileMatrix[tile.y][tile.x] = zappy::structs::Tile(
+        tile.x, tile.y, tile.food, tile.linemate, tile.deraumere,
+        tile.sibur, tile.mendiane, tile.phiras, tile.thystame);
 }
 
 const zappy::structs::Tile GameInfos::getTile(int x, int y) const
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
 
-    for (const auto &tile : _tiles) {
-        if (tile.x == x && tile.y == y)
-            return tile;
+    if (x < 0 || y < 0 || x >= _mapWidth || y >= _mapHeight || !_matrixInitialized)
+        return zappy::structs::Tile(x, y);
+
+    return _tileMatrix[y][x];
+}
+
+const zappy::structs::Tile& GameInfos::getTileRef(int x, int y) const
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    if (x < 0 || y < 0 || x >= _mapWidth || y >= _mapHeight || !_matrixInitialized) {
+        static const zappy::structs::Tile defaultTile(0, 0);
+        return defaultTile;
     }
 
-    return zappy::structs::Tile(x, y);
+    return _tileMatrix[y][x];
 }
 
 void GameInfos::updateTeamName(const std::string &teamName)
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
-    if (std::find(_teamNames.begin(), _teamNames.end(), teamName) == _teamNames.end())
+
+    if (std::find(_teamNames.begin(), _teamNames.end(), teamName) == _teamNames.end()) {
         _teamNames.push_back(teamName);
+        _teamVisibilities[teamName] = true;
+    }
 }
 
 const std::vector<std::string> GameInfos::getTeamNames() const
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
     return _teamNames;
+}
+
+void GameInfos::setTeamVisibility(const std::string &teamName, bool visible)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+    _teamVisibilities[teamName] = visible;
+}
+
+bool GameInfos::isTeamVisible(const std::string &teamName) const
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    auto it = _teamVisibilities.find(teamName);
+    if (it != _teamVisibilities.end()) {
+        return it->second;
+    }
+
+    return true;
+}
+
+const std::unordered_map<std::string, bool> GameInfos::getTeamVisibilities() const
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+    return _teamVisibilities;
 }
 
 void GameInfos::addPlayer(const zappy::structs::Player player)
@@ -201,6 +251,50 @@ void GameInfos::updatePlayerLevel(int playerNumber, int level)
             return;
         }
     }
+}
+
+void GameInfos::incrementPlayerLevel(int playerNumber)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    for (auto &player : _players) {
+        if (player.number == playerNumber) {
+            if (player.level < 8) {
+                try {
+                    _communication->sendMessage("plu #" + std::to_string(playerNumber) + "\n");
+                } catch (const Exceptions::NetworkException& e) {
+                    std::cerr << colors::T_RED << "[ERROR] Network exception: "
+                              << e.what() << colors::RESET << std::endl;
+                    return;
+                }
+                return;
+            }
+            return;
+        }
+    }
+    return;
+}
+
+void GameInfos::decrementPlayerLevel(int playerNumber)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    for (auto &player : _players) {
+        if (player.number == playerNumber) {
+            if (player.level > 1) {
+                try {
+                    _communication->sendMessage("pld #" + std::to_string(playerNumber) + "\n");
+                } catch (const Exceptions::NetworkException& e) {
+                    std::cerr << colors::T_RED << "[ERROR] Network exception: "
+                              << e.what() << colors::RESET << std::endl;
+                    return;
+                }
+                return;
+            }
+            return;
+        }
+    }
+    return;
 }
 
 void GameInfos::updatePlayerInventory(int playerNumber,
@@ -425,8 +519,9 @@ void GameInfos::setGameOver(const std::string &winningTeam)
         _gameOver = true;
         _winningTeam = winningTeam;
 
-        if (_audio) {
+        if (_audio && !_victorySoundPlayed) {
             _audio->playSound("win", 100.0f);
+            _victorySoundPlayed = true;
         }
     } catch (const std::exception& e) {
         std::cout << colors::T_RED << "[ERROR] Exception in setGameOver: "
