@@ -12,6 +12,7 @@
 #include <mutex>
 #include <chrono>
 #include <iostream>
+#include <unordered_map>
 #include "GameInfos.hpp"
 #include "../Exceptions/Exceptions.hpp"
 
@@ -138,14 +139,41 @@ const zappy::structs::Tile& GameInfos::getTileRef(int x, int y) const
 void GameInfos::updateTeamName(const std::string &teamName)
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
-    if (std::find(_teamNames.begin(), _teamNames.end(), teamName) == _teamNames.end())
+
+    if (std::find(_teamNames.begin(), _teamNames.end(), teamName) == _teamNames.end()) {
         _teamNames.push_back(teamName);
+        _teamVisibilities[teamName] = true;
+    }
 }
 
 const std::vector<std::string> GameInfos::getTeamNames() const
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
     return _teamNames;
+}
+
+void GameInfos::setTeamVisibility(const std::string &teamName, bool visible)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+    _teamVisibilities[teamName] = visible;
+}
+
+bool GameInfos::isTeamVisible(const std::string &teamName) const
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    auto it = _teamVisibilities.find(teamName);
+    if (it != _teamVisibilities.end()) {
+        return it->second;
+    }
+
+    return true;
+}
+
+const std::unordered_map<std::string, bool> GameInfos::getTeamVisibilities() const
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+    return _teamVisibilities;
 }
 
 void GameInfos::addPlayer(const zappy::structs::Player player)

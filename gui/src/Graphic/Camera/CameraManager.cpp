@@ -290,6 +290,11 @@ void CameraManager::updateCameraPlayerMode()
         return;
     }
 
+    if (!_gameInfos->isTeamVisible(playerIt->teamName)) {
+        updateCameraFreeMode();
+        return;
+    }
+
     handlePlayerCameraMouseInput();
 
     float deltaTime = this->_display->getFrameTime();
