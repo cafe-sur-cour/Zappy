@@ -155,6 +155,8 @@ class Raylib : public IDisplay {
 
         virtual void drawSkybox(const std::string& id);
 
+        virtual float getTime() const;
+
         Raylib();
         ~Raylib() = default;
 };

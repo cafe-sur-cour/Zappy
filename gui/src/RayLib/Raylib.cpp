@@ -543,3 +543,8 @@ bool Raylib::loadFont(const std::string& id, const std::string& filepath)
 {
     return this->_raylib->loadFont(id, filepath);
 }
+
+float Raylib::getTime() const
+{
+    return this->_raylib->getTime();
+}
