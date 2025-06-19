@@ -326,7 +326,7 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
     std::pair<int, int> temp = this->_gameInfos->getMapSize();
     if (temp.first < 40 && temp.second < 40)
         timeAccumulator += this->_display->getFrameTime();
-    int index = 0;
+    int index = tile.food;
     float rotationAngle = -1;
 
     for (int i = 0; i < tile.linemate; ++i) {
