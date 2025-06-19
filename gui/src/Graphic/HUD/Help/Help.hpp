@@ -25,6 +25,8 @@ class Help {
 
         bool isVisible() const;
 
+        bool containsPoint(float x, float y) const;
+
         void update();
 
         void draw();
