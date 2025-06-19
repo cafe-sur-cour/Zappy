@@ -1728,7 +1728,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         32.5f, 24.0f,
         2.f, 8.f,
         "+",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 0);
         }
     );
 
@@ -1737,7 +1738,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         35.f, 24.0f,
         2.f, 8.f,
         "-",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 0);
         }
     );
 
@@ -1746,7 +1748,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         25.f, 35.0f,
         2.f, 8.f,
         "+",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 1);
         }
     );
 
@@ -1755,7 +1758,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         27.5f, 35.0f,
         2.f, 8.f,
         "-",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 1);
         }
     );
 
@@ -1764,7 +1768,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         25.f, 48.0f,
         2.f, 8.f,
         "+",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 2);
         }
     );
 
@@ -1773,7 +1778,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         27.5f, 48.0f,
         2.f, 8.f,
         "-",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 2);
         }
     );
 
@@ -1782,7 +1788,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         25.f, 61.0f,
         2.f, 8.f,
         "+",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 3);
         }
     );
 
@@ -1791,7 +1798,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         27.5f, 61.0f,
         2.f, 8.f,
         "-",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 3);
         }
     );
 
@@ -1800,7 +1808,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         40.f, 35.0f,
         2.f, 8.f,
         "+",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 4);
         }
     );
 
@@ -1809,7 +1818,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         42.5f, 35.0f,
         2.f, 8.f,
         "-",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 4);
         }
     );
 
@@ -1818,7 +1828,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         40.f, 48.0f,
         2.f, 8.f,
         "+",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 5);
         }
     );
 
@@ -1827,7 +1838,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         42.5f, 48.0f,
         2.f, 8.f,
         "-",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 5);
         }
     );
 
@@ -1836,7 +1848,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         40.f, 61.0f,
         2.f, 8.f,
         "+",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->incrementTileInventoryItem(x, y, 6);
         }
     );
 
@@ -1845,7 +1858,8 @@ void HUD::updateTileResourceDisplay(int x, int y)
         42.5f, 61.0f,
         2.f, 8.f,
         "-",
-        [this]() {
+        [this, x, y]() {
+            this->_gameInfos->decrementTileInventoryItem(x, y, 6);
         }
     );
 }

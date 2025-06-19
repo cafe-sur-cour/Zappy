@@ -86,6 +86,8 @@ class GameInfos : public Subject {
         void decrementPlayerLevel(int playerNumber);
         void incrementPlayerInventoryItem(int playerNumber, int resourceId);
         void decrementPlayerInventoryItem(int playerNumber, int resourceId);
+        void incrementTileInventoryItem(int x, int y, int resourceId);
+        void decrementTileInventoryItem(int x, int y, int resourceId);
 
     private:
         int _mapWidth;
