@@ -53,6 +53,8 @@ class GameInfos : public Subject {
         void updatePlayerPosition(int playerNumber, int x, int y);
         void updatePlayerOrientation(int playerNumber, int orientation);
         void updatePlayerLevel(int playerNumber, int level);
+        void incrementPlayerLevel(int playerNumber);
+        void decrementPlayerLevel(int playerNumber);
         void updatePlayerInventory(int playerNumber,
             const zappy::structs::Inventory inventory);
         void updatePlayerExpulsion(int playerNumber);
@@ -102,6 +104,7 @@ class GameInfos : public Subject {
 
         bool _gameOver;
         std::string _winningTeam;
+        bool _victorySoundPlayed;
 
         mutable std::mutex _dataMutex;
 

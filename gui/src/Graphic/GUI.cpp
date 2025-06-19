@@ -602,6 +602,13 @@ BoundingBox3D GUI::getPlayerBoundingBox(const zappy::structs::Player& player) co
     return {min, max};
 }
 
+void GUI::handleVictory(const std::string &teamName)
+{
+    if (_hud) {
+        _hud->displayWinMessage(teamName);
+    }
+}
+
 void GUI::handleTileClicks()
 {
     std::pair<int, int> hoveredTile = getTileUnderMouse();

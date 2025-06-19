@@ -110,8 +110,6 @@ class HUD : public IObserver {
 
         void displayWinMessage(const std::string& teamName);
 
-        void updateGameMessages();
-
         void update() override;
         void onGameEvent(GameEventType eventType, const std::string& teamName) override;
 
@@ -176,16 +174,6 @@ class HUD : public IObserver {
                             const std::string& teamId,
                             float yPos, const std::vector<int>& playerNumbers);
 
-        void createMessageContainer();
-
-        struct GameMessage {
-            std::string id;
-            std::string text;
-            Color32 color;
-            std::chrono::steady_clock::time_point startTime;
-            float duration;
-        };
-
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
@@ -194,7 +182,8 @@ class HUD : public IObserver {
         std::shared_ptr<Help> _help;
         std::shared_ptr<Settings> _settings;
         std::function<void()> _resetCameraFunc;
-        std::vector<GameMessage> _gameMessages;
+        bool _showVictoryMessage;
+        std::string _winningTeam;
+        Color32 _victoryColor;
         std::pair<int, int> _selectedTile;
-        static constexpr float MESSAGE_DURATION = 5.0f;
 };

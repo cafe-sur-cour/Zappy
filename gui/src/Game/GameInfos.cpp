@@ -22,6 +22,7 @@ GameInfos::GameInfos(std::shared_ptr<ICommunication> communication) :
     _timeUnit(0),
     _matrixInitialized(false),
     _gameOver(false),
+    _victorySoundPlayed(false),
     _currentCameraMode(zappy::gui::CameraMode::FREE),
     _currentPlayerFocus(-1)
 {
@@ -252,6 +253,50 @@ void GameInfos::updatePlayerLevel(int playerNumber, int level)
     }
 }
 
+void GameInfos::incrementPlayerLevel(int playerNumber)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    for (auto &player : _players) {
+        if (player.number == playerNumber) {
+            if (player.level < 8) {
+                try {
+                    _communication->sendMessage("plu #" + std::to_string(playerNumber) + "\n");
+                } catch (const Exceptions::NetworkException& e) {
+                    std::cerr << colors::T_RED << "[ERROR] Network exception: "
+                              << e.what() << colors::RESET << std::endl;
+                    return;
+                }
+                return;
+            }
+            return;
+        }
+    }
+    return;
+}
+
+void GameInfos::decrementPlayerLevel(int playerNumber)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    for (auto &player : _players) {
+        if (player.number == playerNumber) {
+            if (player.level > 1) {
+                try {
+                    _communication->sendMessage("pld #" + std::to_string(playerNumber) + "\n");
+                } catch (const Exceptions::NetworkException& e) {
+                    std::cerr << colors::T_RED << "[ERROR] Network exception: "
+                              << e.what() << colors::RESET << std::endl;
+                    return;
+                }
+                return;
+            }
+            return;
+        }
+    }
+    return;
+}
+
 void GameInfos::updatePlayerInventory(int playerNumber,
     const zappy::structs::Inventory inventory)
 {
@@ -474,8 +519,9 @@ void GameInfos::setGameOver(const std::string &winningTeam)
         _gameOver = true;
         _winningTeam = winningTeam;
 
-        if (_audio) {
+        if (_audio && !_victorySoundPlayed) {
             _audio->playSound("win", 100.0f);
+            _victorySoundPlayed = true;
         }
     } catch (const std::exception& e) {
         std::cout << colors::T_RED << "[ERROR] Exception in setGameOver: "
