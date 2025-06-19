@@ -146,7 +146,7 @@ class RayLibEnc {
         // Skybox methods
         bool loadSkybox(const std::string& id, const std::string& filepath);
         void drawSkybox(const std::string& id);
-        Color getDayNightColor(float cycleTime);  // Helper method for day/night cycle colors
+        Color getDayNightColor(float cycleTime);
 
         // 2D Drawing methods
         void drawRectangleRec(Rectangle rec, Color color);
