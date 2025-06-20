@@ -539,12 +539,12 @@ void Raylib::drawSkybox(const std::string& id)
     this->_raylib->drawSkybox(id);
 }
 
-void Raylib::drawSimpleSkybox()
-{
-    this->_raylib->drawSimpleSkybox();
-}
-
 bool Raylib::loadFont(const std::string& id, const std::string& filepath)
 {
     return this->_raylib->loadFont(id, filepath);
+}
+
+float Raylib::getTime() const
+{
+    return this->_raylib->getTime();
 }

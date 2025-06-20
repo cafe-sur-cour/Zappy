@@ -147,6 +147,7 @@ namespace zappy::gui {
     inline const float POSITION_MULTIPLIER = 2.2f;
 
     inline const float FOG_DISTANCE_MAX = 60.0f;
+    inline const float DURATION_DAYNIGHT_CYCLE = 120.0f;
 
     inline const float EGG_SCALE = 1.0f;
     inline const float FOOD_SCALE = 0.005f;
