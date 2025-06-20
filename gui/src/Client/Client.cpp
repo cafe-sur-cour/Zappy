@@ -30,7 +30,7 @@ Client::Client(int ac, const char *const *av)
 
     if (!_communication->isConnected())
         return;
-    this->_tryToCreateGuiWithSharedLibInFolder();
+    this->tryToCreateGuiWithSharedLibInFolder("./gui/lib/");
     if (!this->_gui) {
         std::cerr << "No gui lib found" << std::endl;
         exit(84);
@@ -44,7 +44,7 @@ Client::~Client()
 {
 }
 
-void Client::_tryToCreateGuiWithSharedLibInFolder(const std::string &libPath)
+void Client::tryToCreateGuiWithSharedLibInFolder(const std::string &libPath)
 {
     try {
         for (const auto &entry : std::filesystem::directory_iterator(libPath)) {
