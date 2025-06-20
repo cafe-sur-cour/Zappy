@@ -37,6 +37,14 @@ typedef struct Vector3f {
     float x;
     float y;
     float z;
+
+    bool operator==(const Vector3f& other) const {
+        return x == other.x && y == other.y && z == other.z;
+    }
+
+    bool operator!=(const Vector3f& other) const {
+        return !(*this == other);
+    }
 } Vector3f;
 
 typedef struct Vector2f {

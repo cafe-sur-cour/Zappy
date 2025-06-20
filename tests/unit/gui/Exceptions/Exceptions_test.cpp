@@ -187,3 +187,12 @@ TEST_F(ExceptionsTest, ReceiveExceptionTest) {
     EXPECT_STREQ(exception.what(), expectedMessage.c_str());
     EXPECT_TRUE(dynamic_cast<const Exceptions::NetworkException*>(&exception) != nullptr);
 }
+
+// Test the ModuleException
+TEST_F(ExceptionsTest, ModuleExceptionTest) {
+    std::string errorMessage = "Module initialization failed";
+    Exceptions::ModuleError exception(errorMessage);
+
+    EXPECT_STREQ(exception.what(), exception.what());
+    EXPECT_TRUE(dynamic_cast<const Exceptions::ModuleError*>(&exception) != nullptr);
+}
