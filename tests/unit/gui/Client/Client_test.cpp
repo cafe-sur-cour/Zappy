@@ -301,7 +301,7 @@ TEST_F(ClientTest, TryCreateGuiWithDefaultPath) {
     Client client(argc, argv);
 
     // Should handle default path without throwing
-    EXPECT_NO_THROW(client.tryToCreateGuiWithSharedLibInFolder());
+    EXPECT_NO_THROW(client.tryToCreateGuiWithSharedLibInFolder("./gui/lib/"));
 
     cleanupArgv(argv, argc);
 }
