@@ -300,3 +300,208 @@ TEST_F(CommunicationTest, MultipleRapidDisconnections) {
     
     EXPECT_FALSE(comm.isConnected());
 }
+
+// Test processWrite functionality through message sending behavior
+TEST_F(CommunicationTest, ProcessWriteBehavior) {
+    zappy::structs::Config config = createValidConfig();
+    Communication comm(config);
+
+    EXPECT_TRUE(comm.isConnected());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    ASSERT_TRUE(mockServer->hasClients());
+
+    EXPECT_NO_THROW({
+        comm.sendMessage("Message 1");
+        comm.sendMessage("Message 2");
+        comm.sendMessage("Message 3");
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    SUCCEED();
+}
+
+// Test processWrite with large message buffer
+TEST_F(CommunicationTest, ProcessWriteLargeBuffer) {
+    zappy::structs::Config config = createValidConfig();
+    Communication comm(config);
+
+    EXPECT_TRUE(comm.isConnected());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    ASSERT_TRUE(mockServer->hasClients());
+
+    std::string largeMessage(2048, 'A');
+    EXPECT_NO_THROW({
+        comm.sendMessage(largeMessage);
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    SUCCEED();
+}
+
+// Test processWrite with rapid message sending
+TEST_F(CommunicationTest, ProcessWriteRapidSending) {
+    zappy::structs::Config config = createValidConfig();
+    Communication comm(config);
+
+    EXPECT_TRUE(comm.isConnected());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    ASSERT_TRUE(mockServer->hasClients());
+
+    EXPECT_NO_THROW({
+        for (int i = 0; i < 50; ++i) {
+            comm.sendMessage("Rapid message " + std::to_string(i));
+        }
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    SUCCEED();
+}
+
+// Test processWrite buffer management with empty buffer
+TEST_F(CommunicationTest, ProcessWriteEmptyBuffer) {
+    zappy::structs::Config config = createValidConfig();
+    Communication comm(config);
+
+    EXPECT_TRUE(comm.isConnected());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    ASSERT_TRUE(mockServer->hasClients());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+    EXPECT_TRUE(comm.isConnected());
+}
+
+// Test processWrite partial write scenarios
+TEST_F(CommunicationTest, ProcessWritePartialWrites) {
+    zappy::structs::Config config = createValidConfig();
+    Communication comm(config);
+
+    EXPECT_TRUE(comm.isConnected());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    ASSERT_TRUE(mockServer->hasClients());
+
+    EXPECT_NO_THROW({
+        comm.sendMessage("Short");
+        comm.sendMessage("This is a medium length message that should test buffer handling");
+        comm.sendMessage(std::string(1024, 'X'));
+        comm.sendMessage("Another short one");
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    SUCCEED();
+}
+
+// Test processWrite with message delimiter handling
+TEST_F(CommunicationTest, ProcessWriteDelimiterHandling) {
+    zappy::structs::Config config = createValidConfig();
+    Communication comm(config);
+
+    EXPECT_TRUE(comm.isConnected());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    ASSERT_TRUE(mockServer->hasClients());
+
+    EXPECT_NO_THROW({
+        comm.sendMessage("Message without newline");
+        comm.sendMessage("Message with newline\n");
+        comm.sendMessage("Multiple\nlines\ninside");
+        comm.sendMessage("");
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+    SUCCEED();
+}
+
+// Test processWrite after disconnection
+TEST_F(CommunicationTest, ProcessWriteAfterDisconnection) {
+    zappy::structs::Config config = createValidConfig();
+    Communication comm(config);
+
+    EXPECT_TRUE(comm.isConnected());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    EXPECT_NO_THROW({
+        comm.sendMessage("Message before disconnect");
+    });
+
+    comm.disconnect();
+    EXPECT_FALSE(comm.isConnected());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    SUCCEED();
+}
+
+// Test processWrite buffer persistence across multiple calls
+TEST_F(CommunicationTest, ProcessWriteBufferPersistence) {
+    zappy::structs::Config config = createValidConfig();
+    Communication comm(config);
+
+    EXPECT_TRUE(comm.isConnected());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    ASSERT_TRUE(mockServer->hasClients());
+
+    EXPECT_NO_THROW({
+        for (int i = 0; i < 20; ++i) {
+            comm.sendMessage("Buffer test message " + std::to_string(i) + " with some additional data");
+            if (i % 5 == 0) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+            }
+        }
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    EXPECT_TRUE(comm.isConnected());
+}
+
+// Test processWrite with connection stress
+TEST_F(CommunicationTest, ProcessWriteConnectionStress) {
+    zappy::structs::Config config = createValidConfig();
+    Communication comm(config);
+
+    EXPECT_TRUE(comm.isConnected());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    ASSERT_TRUE(mockServer->hasClients());
+
+    EXPECT_NO_THROW({
+        for (int i = 0; i < 10; ++i) {
+            std::string message = "Stress test message " + std::to_string(i) + " ";
+            message += std::string(512, 'S');
+            comm.sendMessage(message);
+        }
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(800));
+    EXPECT_TRUE(comm.isConnected());
+}
+
+// Test processWrite with mixed message sizes
+TEST_F(CommunicationTest, ProcessWriteMixedMessageSizes) {
+    zappy::structs::Config config = createValidConfig();
+    Communication comm(config);
+
+    EXPECT_TRUE(comm.isConnected());
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    ASSERT_TRUE(mockServer->hasClients());
+
+    EXPECT_NO_THROW({
+        comm.sendMessage("A");
+        comm.sendMessage(std::string(10, 'B'));
+        comm.sendMessage(std::string(100, 'C'));
+        comm.sendMessage(std::string(1000, 'D'));
+        comm.sendMessage("E");
+        comm.sendMessage(std::string(500, 'F'));
+    });
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(600));
+    EXPECT_TRUE(comm.isConnected());
+}
