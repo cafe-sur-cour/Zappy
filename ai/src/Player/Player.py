@@ -357,6 +357,10 @@ class Player:
             self.goToIncantationState["steps"] = self.getStepsFromDirection()
         self.goToIncantationState["newDir"] = False
 
+        if len(self.goToIncantationState["steps"]) == 0:
+            sleep(0.1)
+            return
+
         step = self.goToIncantationState["steps"].pop(0)
         step()
         self.goToIncantationState["lastCommand"] = "step"
