@@ -263,15 +263,17 @@ class Player:
                 self.roombaState["lastPhase"] = "turn"
 
     def hasEnoughFoodForIncantation(self) -> bool:
-        incantation_cost = 300
+        incantationCost = 300
 
-        stones_to_drop = sum(LVL_UPGRADES[self.level]["stones"].values())
-        dropping_cost = stones_to_drop * 7
+        stonesToDrop = sum(LVL_UPGRADES[self.level]["stones"].values())
+        droppingCost = stonesToDrop * 7
 
-        movement_cost = 7 * 5
+        maxLength = (max(self.x, self.y) / 2) * 5
 
-        total_cost = incantation_cost + dropping_cost + movement_cost
-        return self.inventory["food"] * 126 >= total_cost
+        movementCost = 7 * maxLength
+
+        totalCost = incantationCost + droppingCost + movementCost
+        return self.inventory["food"] * 126 >= totalCost
 
     def incantationAction(self) -> None:
         phase = self.incantationState["phase"]
