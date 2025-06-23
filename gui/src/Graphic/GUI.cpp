@@ -142,11 +142,13 @@ void GUI::update()
 
     updateCamera();
     handlePlayerClicks();
-    this->_hud->updateTeamPlayersDisplay(this->_gameInfos);
-    this->_hud->updatePlayerInventoryDisplay(this->_cameraManager->getPlayerId(),
-        this->_cameraMode);
-    this->_hud->updateHelpInformationHUD(this->_cameraMode);
-    this->_hud->update();
+    if (this->_isHUDVisible) {
+        this->_hud->updateTeamPlayersDisplay(this->_gameInfos);
+        this->_hud->updatePlayerInventoryDisplay(this->_cameraManager->getPlayerId(),
+            this->_cameraMode);
+        this->_hud->updateHelpInformationHUD(this->_cameraMode);
+        this->_hud->update();
+    }
 
     this->_audio->playNextTheme(_audio->getMusicVolumeLevel());
 }
