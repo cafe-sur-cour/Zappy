@@ -336,9 +336,14 @@ void HUD::initSettingsButton()
         70.0f, 15.0f,
         "SETTINGS",
         [this]() {
-            if (this->_settings && !this->_settings->isVisible() &&
-                !this->_help->isVisible()) {
-                this->_settings->show();
+            if (this->_settings) {
+                if (this->_settings->isVisible()) {
+                    this->_settings->hide();
+                } else {
+                    if (this->_help && this->_help->isVisible())
+                        this->_help->hide();
+                    this->_settings->show();
+                }
             }
         },
         {60, 60, 240, 255},
@@ -360,8 +365,14 @@ void HUD::initHelpButton()
         70.0f, 15.0f,
         "HELP",
         [this]() {
-            if (this->_help && !this->_help->isVisible() && !this->_settings->isVisible()) {
-                this->_help->show();
+            if (this->_help) {
+                if (this->_help->isVisible()) {
+                    this->_help->hide();
+                } else {
+                    if (this->_settings && this->_settings->isVisible())
+                        this->_settings->hide();
+                    this->_help->show();
+                }
             }
         },
         {60, 240, 60, 255},
