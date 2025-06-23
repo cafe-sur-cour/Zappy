@@ -42,11 +42,18 @@ RUN apt-get update && apt-get install -y \
     libopenal-dev \
     libopengl-dev \
     liballegro5-dev \
-    valgrind && \
-    pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir pylint flake8 pycodestyle cpplint && \
+    valgrind \
+    python3-venv && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Créer et activer un environnement virtuel Python
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Installer les packages Python dans le venv
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir pylint flake8 pycodestyle cpplint
 
 # Cloner et compiler raylib avec -fPIC et sans audio
 RUN git clone https://github.com/raysan5/raylib.git /tmp/raylib && \
