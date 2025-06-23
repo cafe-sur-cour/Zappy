@@ -85,10 +85,6 @@ class App:
         if num_children > 0:
             self.logger.success(f"All AI processes terminated.")
 
-    def __del__(self):
-        if self.is_main_process:
-            self._cleanup_children()
-
     def create_new_player(self) -> int:
         pid: int = os.fork()
         if pid < 0:
