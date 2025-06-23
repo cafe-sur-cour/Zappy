@@ -51,9 +51,9 @@ void Slider::draw()
     std::string valueText = std::to_string(static_cast<int>(_value));
     float valueFontSize = _bounds.height * 0.25f;
     float textWidth = _display->measureText(_text, textFontSize);
-    float valueX = textX + textWidth + 10.0f;
+    float valueX = textX + textWidth + 7.5f;
     float valueY = _bounds.y;
-    _display->drawText(valueText, valueX, valueY, valueFontSize, _textColor);
+    _display->drawText(valueText, valueX, valueY + 2.0f, valueFontSize, _textColor);
 
     float sliderY = _bounds.y + textFontSize + 10.0f;
     float sliderStartX = _bounds.x;
