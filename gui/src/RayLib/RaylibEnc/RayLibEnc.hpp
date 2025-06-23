@@ -173,6 +173,14 @@ class RayLibEnc {
         bool _isCursorLocked;
         InputType _lastInputType;
 
+        static constexpr float FONT_SCALE_FACTOR = 4.0f;
+        static constexpr float FONT_RENDER_SCALE = 0.25f;
+        static constexpr float FONT_SPACING_RATIO = 0.1f;
+
+        float getScaledFontSize(float fontSize) const;
+        float getFontSpacing(float scaledFontSize) const;
+        float getScaledSpacing(float spacing) const;
+
         struct ModelData {
             Model model;
             unsigned int animationCount;

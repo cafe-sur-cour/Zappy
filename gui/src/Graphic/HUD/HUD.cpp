@@ -566,7 +566,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     Color32 pressedColor = {150, 150, 150, 255};
     Color32 textColor = {30, 30, 30, 255};
 
-    container->addButtonPercent("player_level_increment_btn", 58.5f, 59.0f, 1.5f, 10.0f, "+",
+    container->addButtonPercent("player_level_increment_btn", 56.0f, 53.5f, 1.5f, 10.0f, "+",
         [this, playerId]() {
             this->_gameInfos->incrementPlayerLevel(playerId);
         },
@@ -574,14 +574,14 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "player_level_decrement_btn", 60.5f, 59.0f, 1.5f, 10.0f, "-",
+        "player_level_decrement_btn", 58.0f, 53.5f, 1.5f, 10.0f, "-",
         [this, playerId]() {
             this->_gameInfos->decrementPlayerLevel(playerId);
         }, normalColor, hoverColor, pressedColor, textColor
     );
 
     container->addButtonPercent(
-        "inventory_food_button_increment", 79.8f, 25.5f, 1.0f, 6.5f, "+",
+        "inventory_food_button_increment", 79.8f, 16.5f, 1.0f, 6.5f, "+",
         [this, playerId]() {
             this->_gameInfos->incrementPlayerInventoryItem(playerId, 0);
         },
@@ -589,7 +589,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "inventory_food_button_decrement", 80.9f, 25.5f, 1.0f, 6.5f, "-",
+        "inventory_food_button_decrement", 80.9f, 16.5f, 1.0f, 6.5f, "-",
         [this, playerId]() {
             this->_gameInfos->decrementPlayerInventoryItem(playerId, 0);
         },
@@ -597,7 +597,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "inventory_linemate_button_increment", 72.8f, 34.0f, 1.0f, 6.5f, "+",
+        "inventory_linemate_button_increment", 72.8f, 27.5f, 1.0f, 6.5f, "+",
         [this, playerId]() {
             this->_gameInfos->incrementPlayerInventoryItem(playerId, 1);
         },
@@ -605,7 +605,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "inventory_linemate_button_decrement", 73.9f, 34.0f, 1.0f, 6.5f, "-",
+        "inventory_linemate_button_decrement", 73.9f, 27.5f, 1.0f, 6.5f, "-",
         [this, playerId]() {
             this->_gameInfos->decrementPlayerInventoryItem(playerId, 1);
         },
@@ -613,7 +613,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "inventory_deraumere_button_increment", 72.8f, 47.0f, 1.0f, 6.5f, "+",
+        "inventory_deraumere_button_increment", 72.8f, 40.5f, 1.0f, 6.5f, "+",
         [this, playerId]() {
             this->_gameInfos->incrementPlayerInventoryItem(playerId, 2);
         },
@@ -621,7 +621,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "inventory_deraumere_button_decrement", 73.9f, 47.0f, 1.0f, 6.5f, "-",
+        "inventory_deraumere_button_decrement", 73.9f, 40.5f, 1.0f, 6.5f, "-",
         [this, playerId]() {
             this->_gameInfos->decrementPlayerInventoryItem(playerId, 2);
         },
@@ -629,7 +629,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "inventory_sibur_button_increment", 72.8f, 60.0f, 1.0f, 6.5f, "+",
+        "inventory_sibur_button_increment", 72.8f, 53.5f, 1.0f, 6.5f, "+",
         [this, playerId]() {
             this->_gameInfos->incrementPlayerInventoryItem(playerId, 3);
         },
@@ -637,7 +637,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "inventory_sibur_button_decrement", 73.9f, 60.0f, 1.0f, 6.5f, "-",
+        "inventory_sibur_button_decrement", 73.9f, 53.5f, 1.0f, 6.5f, "-",
         [this, playerId]() {
             this->_gameInfos->decrementPlayerInventoryItem(playerId, 3);
         },
@@ -645,7 +645,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "inventory_mendiane_button_increment", 85.8f, 34.0f, 1.0f, 6.5f, "+",
+        "inventory_mendiane_button_increment", 85.8f, 27.5f, 1.0f, 6.5f, "+",
         [this, playerId]() {
             this->_gameInfos->incrementPlayerInventoryItem(playerId, 4);
         },
@@ -653,7 +653,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "inventory_mendiane_button_decrement", 86.9f, 34.0f, 1.0f, 6.5f, "-",
+        "inventory_mendiane_button_decrement", 86.9f, 27.5f, 1.0f, 6.5f, "-",
         [this, playerId]() {
             this->_gameInfos->decrementPlayerInventoryItem(playerId, 4);
         },
@@ -661,7 +661,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "inventory_phiras_button_increment", 85.8f, 47.0f, 1.0f, 6.5f, "+",
+        "inventory_phiras_button_increment", 85.8f, 40.5f, 1.0f, 6.5f, "+",
         [this, playerId]() {
             this->_gameInfos->incrementPlayerInventoryItem(playerId, 5);
         },
@@ -669,7 +669,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "inventory_phiras_button_decrement", 86.9f, 47.0f, 1.0f, 6.5f, "-",
+        "inventory_phiras_button_decrement", 86.9f, 40.5f, 1.0f, 6.5f, "-",
         [this, playerId]() {
             this->_gameInfos->decrementPlayerInventoryItem(playerId, 5);
         },
@@ -677,7 +677,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "inventory_thystame_button_increment", 85.8f, 60.0f, 1.0f, 6.5f, "+",
+        "inventory_thystame_button_increment", 85.8f, 53.5f, 1.0f, 6.5f, "+",
         [this, playerId]() {
             this->_gameInfos->incrementPlayerInventoryItem(playerId, 6);
         },
@@ -685,7 +685,7 @@ void HUD::addIncrementDecrementButtons(std::shared_ptr<Containers> container, in
     );
 
     container->addButtonPercent(
-        "inventory_thystame_button_decrement", 86.9f, 60.0f, 1.0f, 6.5f, "-",
+        "inventory_thystame_button_decrement", 86.9f, 53.5f, 1.0f, 6.5f, "-",
         [this, playerId]() {
             this->_gameInfos->decrementPlayerInventoryItem(playerId, 6);
         },
@@ -1041,7 +1041,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "player_info_title",
-        55.0f, 10.0f,
+        52.5f, 2.5f,
         "PLAYER INFORMATION",
         8.0f,
         {255, 255, 255, 255}
@@ -1049,7 +1049,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "player_info_separator",
-        55.0f, 17.0f,
+        52.5f, 10.0f,
         std::string(70, '-'),
         2.0f,
         {150, 150, 150, 200}
@@ -1057,7 +1057,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "player_info_id",
-        55.0f, 30.0f,
+        52.5f, 27.5f,
         "ID: " + std::to_string(player.number),
         7.0f,
         {220, 220, 220, 255}
@@ -1065,7 +1065,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "player_info_team",
-        55.0f, 45.0f,
+        52.5f, 40.5f,
         "Team: " + player.teamName,
         7.0f,
         {220, 220, 220, 255}
@@ -1073,7 +1073,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "player_info_level",
-        55.0f, 60.0f,
+        52.5f, 53.5f,
         "Level: " + std::to_string(player.level),
         7.0f,
         {220, 220, 220, 255}
@@ -1092,7 +1092,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "player_info_position",
-        65.0f, 30.0f,
+        62.5f, 27.5f,
         "Position: [" + std::to_string(player.x) + ", " + std::to_string(player.y) + "]",
         7.0f,
         {220, 220, 220, 255}
@@ -1100,7 +1100,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "player_info_orientation",
-        65.0f, 45.0f,
+        62.5f, 40.5f,
         "Orientation: " + orientationStr,
         7.0f,
         {220, 220, 220, 255}
@@ -1109,7 +1109,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
     bool inRitual = isPlayerInIncantation(player.number);
     bottomContainer->addTextPercent(
         "player_info_ritual",
-        65.0f, 60.0f,
+        62.5f, 53.5f,
         "Ritual: " + std::string(inRitual ? "Yes" : "No"),
         7.0f,
         inRitual ? Color32{255, 215, 0, 255} : Color32{220, 220, 220, 255}
@@ -1117,7 +1117,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "inventory_title",
-        75.0f, 10.0f,
+        75.0f, 2.5f,
         "INVENTORY",
         8.0f,
         {255, 255, 255, 255}
@@ -1125,7 +1125,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "inventory_separator",
-        75.0f, 17.0f,
+        75.0f, 10.0f,
         std::string(70, '-'),
         2.0f,
         {150, 150, 150, 200}
@@ -1133,13 +1133,13 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addTextPercent(
         "inventory_food",
-        82.0f, 24.0f,
+        82.0f, 15.0f,
         "Food: " + std::to_string(player.inventory.food),
         7.5f,
         {255, 215, 0, 255}
     );
 
-    float yPosCol1 = 34.0f;
+    float yPosCol1 = 27.5f;
     float xPosCol1 = 75.0f;
 
     bottomContainer->addTextPercent(
@@ -1168,7 +1168,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
         {50, 205, 50, 255}
     );
 
-    float yPosCol2 = 34.0f;
+    float yPosCol2 = 27.5f;
     float xPosCol2 = 88.0f;
 
     bottomContainer->addTextPercent(
@@ -1199,7 +1199,7 @@ void HUD::initPlayerInventoryDisplay(int playerId)
 
     bottomContainer->addButtonPercent(
         "kill_player_button",
-        87.5f, 6.5f,
+        87.5f, 2.5f,
         5.0f, 10.0f,
         "KILL",
         [this]() {
@@ -1600,7 +1600,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addTextPercent(
         "tile_resources_title",
-        30.0f, 10.0f,
+        30.0f, 2.5f,
         "TILE RESOURCES",
         8.0f,
         {255, 255, 255, 255}
@@ -1608,18 +1608,18 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addTextPercent(
         "tile_resources_separator",
-        30.0f, 17.0f,
+        30.0f, 10.0f,
         std::string(130, '-'),
         2.0f,
         {150, 150, 150, 200}
     );
 
-    float yPosCol1 = 34.0f;
+    float yPosCol1 = 27.5f;
     float xPosCol1 = 30.0f;
 
     bottomContainer->addTextPercent(
         "tile_resource_food",
-        xPosCol1 + 7.5f, 24.0f,
+        xPosCol1 + 7.5f, 15.0f,
         "Food: 0",
         7.5f,
         {255, 215, 0, 255}
@@ -1651,7 +1651,7 @@ void HUD::initTileResourceDisplay()
         {50, 205, 50, 255}
     );
 
-    float yPosCol2 = 34.0f;
+    float yPosCol2 = 27.5f;
     float xPosCol2 = 45.0f;
 
     bottomContainer->addTextPercent(
@@ -1682,7 +1682,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_food_increment_btn",
-        32.5f, 24.0f,
+        32.5f, 15.0f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1693,7 +1693,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_food_decrement_btn",
-        35.f, 24.0f,
+        35.f, 15.0f,
         2.f, 8.f,
         "-",
         [this]() {
@@ -1704,7 +1704,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_linemate_increment_btn",
-        25.f, 35.0f,
+        25.f, 27.5f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1715,7 +1715,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_linemate_decrement_btn",
-        27.5f, 35.0f,
+        27.5f, 27.5f,
         2.f, 8.f,
         "-",
         [this]() {
@@ -1726,7 +1726,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_deraumere_increment_btn",
-        25.f, 48.0f,
+        25.f, 40.5f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1737,7 +1737,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_deraumere_decrement_btn",
-        27.5f, 48.0f,
+        27.5f, 40.5f,
         2.f, 8.f,
         "-",
         [this]() {
@@ -1748,7 +1748,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_sibur_increment_btn",
-        25.f, 61.0f,
+        25.f, 53.5f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1759,7 +1759,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_sibur_decrement_btn",
-        27.5f, 61.0f,
+        27.5f, 53.5f,
         2.f, 8.f,
         "-",
         [this]() {
@@ -1770,7 +1770,7 @@ void HUD::initTileResourceDisplay()
 
         bottomContainer->addButtonPercent(
         "tile_mendiane_increment_btn",
-        40.f, 35.0f,
+        40.f, 27.5f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1781,7 +1781,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_mendiane_decrement_btn",
-        42.5f, 35.0f,
+        42.5f, 27.5f,
         2.f, 8.f,
         "-",
         [this]() {
@@ -1792,7 +1792,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_phiras_increment_btn",
-        40.f, 48.0f,
+        40.f, 40.5f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1803,7 +1803,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_phiras_decrement_btn",
-        42.5f, 48.0f,
+        42.5f, 40.5f,
         2.f, 8.f,
         "-",
         [this]() {
@@ -1814,7 +1814,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_thystame_increment_btn",
-        40.f, 61.0f,
+        40.f, 53.5f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1825,7 +1825,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_thystame_decrement_btn",
-        42.5f, 61.0f,
+        42.5f, 53.5f,
         2.f, 8.f,
         "-",
         [this]() {
