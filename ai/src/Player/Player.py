@@ -283,7 +283,7 @@ class Player:
             self.incantationState["phase"] = "waitForPlayersToArrive"
 
         elif phase == "waitForPlayersToArrive":
-            sleep(1.0)
+            sleep(0.5)
             self.incantationState["phase"] = "sendConnectNbr"
 
         elif phase == "sendConnectNbr":
@@ -299,10 +299,9 @@ class Player:
                 self.incantationState["playerResponses"] = []
 
             elif self.incantationState["lastCommand"] == "broadcast isEveryBodyHere":
-                expectedPlayers = LVL_UPGRADES[self.level]["players"] - 1
                 receivedResponses = len(self.incantationState["playerResponses"])
 
-                if receivedResponses >= expectedPlayers:
+                if receivedResponses >= self.nbConnectedPlayers:
                     allPlayersHere = all(
                         resp["isHere"] for resp in self.incantationState["playerResponses"]
                     )
@@ -315,7 +314,7 @@ class Player:
                         self.incantationState["lastCommand"] = None
                         self.incantationState["playerResponses"] = []
                 else:
-                    pass
+                    sleep(0.1)
 
         elif phase == "dropStones":
             self.broadcaster.broadcastMessage(f"dropStones {self.id}")
