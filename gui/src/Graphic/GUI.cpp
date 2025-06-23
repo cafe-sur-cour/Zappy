@@ -519,6 +519,8 @@ void GUI::initPlayers()
 
 void GUI::handlePlayerClicks()
 {
+    std::lock_guard<std::mutex> lock(_playerMutex);
+
     _hoveredPlayerId = getPlayerUnderMouse();
 
     if (this->_display->isMouseButtonPressed(this->_display->getKeyId(MOUSE_LEFT))) {
