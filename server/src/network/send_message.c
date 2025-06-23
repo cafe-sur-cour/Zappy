@@ -10,6 +10,7 @@
 #include <poll.h>
 #include "network.h"
 
+/* Poll the write so that we check if the fd is ready */
 int write_message(int fd, const char *message)
 {
     struct pollfd pollfd = {.fd = fd, .events = POLLOUT};

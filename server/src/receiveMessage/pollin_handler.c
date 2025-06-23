@@ -58,7 +58,7 @@ static int handle_cooldown(player_t *player, zappy_t *zappy)
 }
 
 /* This function defines wether the player is occupied or not */
-static void process_player_actions(player_t *player, zappy_t *zappy)
+void process_player_actions(player_t *player, zappy_t *zappy)
 {
     action_request_t *action = NULL;
 
@@ -75,38 +75,8 @@ static void process_player_actions(player_t *player, zappy_t *zappy)
     }
 }
 
-/* This function allows the smart poll to have different timeout */
-static int calculate_poll_timeout(player_t *player, int frequency)
-{
-    int base_timeout = 1000 / frequency;
-
-    if (player->is_busy) {
-        return base_timeout * 2;
-    }
-    if (player->pending_actions && player->pending_actions->count > 0) {
-        return base_timeout / 2;
-    }
-    return base_timeout;
-}
-
-/* This function "polls" the message and the queue it */
-static void poll_player_input(player_t *player, zappy_t *zappy)
-{
-    int timeout = 0;
-    char *message = NULL;
-
-    if (!player || !player->network || player->network->fd < 0)
-        return;
-    timeout = calculate_poll_timeout(player, zappy->params->freq);
-    message = get_message(player->network->fd, timeout);
-    if (message) {
-        queue_action(player, message, zappy);
-        free(message);
-    }
-}
-
-/* This functions loops thrue all player in all team to handle cmd */
-void smart_poll_players(zappy_t *zappy)
+/* This function processes player actions without polling */
+void process_player_actions_tick(zappy_t *zappy)
 {
     team_t *team = NULL;
     player_t *player = NULL;
@@ -117,7 +87,6 @@ void smart_poll_players(zappy_t *zappy)
     while (team) {
         player = team->players;
         while (player) {
-            poll_player_input(player, zappy);
             process_player_actions(player, zappy);
             player = player->next;
         }

@@ -51,6 +51,7 @@ static char *end_message(buffer_t *cb)
     return message;
 }
 
+/* Here in the read we poll the fd to make sure it's ready */
 static buffer_t *get_message_from_buffer(int fd, buffer_t *cb,
     int timeout, char c)
 {
