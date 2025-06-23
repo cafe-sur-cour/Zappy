@@ -28,7 +28,7 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
       _selectedTile(-1, -1)
 {
     _help = std::make_shared<Help>(display, audio);
-    _settings = std::make_shared<Settings>(display, audio, camera);
+    _settings = std::make_shared<Settings>(display, audio, camera, gameInfos);
     initDefaultLayout(15.0f, 20.0f);
     initExitButton();
     initSettingsButton();

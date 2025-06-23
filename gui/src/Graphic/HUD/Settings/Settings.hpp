@@ -12,12 +12,14 @@
 #include "../../../IDisplay.hpp"
 #include  "../../../Audio/IAudio.hpp"
 #include "Graphic/Camera/CameraManager.hpp"
+#include "../../../Game/GameInfos.hpp"
 
 class Settings {
     private:
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<IAudio> _audio;
         std::shared_ptr<CameraManager> _camera;
+        std::shared_ptr<GameInfos> _gameInfos;
         float _sfxLevel;
         float _musicLevel;
         float _cameraMovingSpeed;
@@ -44,7 +46,8 @@ class Settings {
         Settings(
             std::shared_ptr<IDisplay> display,
             std::shared_ptr<IAudio> audio,
-            std::shared_ptr<CameraManager> camera
+            std::shared_ptr<CameraManager> camera,
+            std::shared_ptr<GameInfos> gameInfos
         );
         ~Settings();
 };
