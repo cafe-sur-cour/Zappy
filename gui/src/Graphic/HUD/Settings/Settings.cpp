@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <cctype>
 #include "Utils/HelpText.hpp"
 
 void Settings::show()
@@ -64,9 +65,10 @@ void Settings::handleResize(int oldWidth, int oldHeight, int newWidth, int newHe
 Settings::Settings(
     std::shared_ptr<IDisplay> display,
     std::shared_ptr<IAudio> audio,
-    std::shared_ptr<CameraManager> camera
+    std::shared_ptr<CameraManager> camera,
+    std::shared_ptr<GameInfos> gameInfos
 ):
-    _display(display), _audio(audio), _camera(camera)
+    _display(display), _audio(audio), _camera(camera), _gameInfos(gameInfos)
 {
     if (!_display)
         return;
@@ -85,7 +87,7 @@ Settings::Settings(
 
     this->_settingsContainer->setRelativePosition(
         15.0f, 0.0f,
-        30.0f, 40.0f
+        60.0f, 40.0f
     );
 
     this->_settingsContainer->addTextPercent(
@@ -113,7 +115,7 @@ Settings::Settings(
     this->_settingsContainer->addTextPercent(
         "settings_separator",
         0.0f, 16.0f,
-        std::string(120, '-'),
+        std::string(350, '-'),
         1.0f,
         {150, 150, 150, 200}
     );
@@ -122,7 +124,7 @@ Settings::Settings(
 
     this->_settingsContainer->addSliderPercent(
         "slider_music",
-        5.f, yPos, 90.f, 16.f,
+        5.f, yPos, 45.f, 16.f,
         0.f, 100.f, this->_audio->getMusicVolumeLevel(), "Volume Music:",
         [this](float nbr) {
             this->_musicLevel = nbr;
@@ -132,7 +134,7 @@ Settings::Settings(
 
     this->_settingsContainer->addSliderPercent(
         "slider_click",
-        5.f, yPos, 90.f, 16.f,
+        5.f, yPos, 45.f, 16.f,
         0.f, 100.f, this->_audio->getSFXVolumeLevel(), "Volume SFX:",
         [this](float nbr) {
             this->_sfxLevel = nbr;
@@ -141,7 +143,7 @@ Settings::Settings(
 
     this->_settingsContainer->addImageButtonPercent(
         "test_music_button",
-        62.0f, 42.f,
+        33.0f, 42.f,
         25.0f, 25.0f,
         "gui/assets/sprite/hp_logo.png",
         [this]() {
@@ -151,7 +153,7 @@ Settings::Settings(
 
     this->_settingsContainer->addSliderPercent(
         "slider_camera_speed_moving",
-        5.f, yPos, 90.f, 16.f,
+        5.f, yPos, 45.f, 16.f,
         0.1f, 250.f, this->_cameraMovingSpeed, "Camera Moving Speed:",
         [this](float nbr) {
             this->_cameraMovingSpeed = nbr;
@@ -161,7 +163,7 @@ Settings::Settings(
 
     this->_settingsContainer->addSliderPercent(
         "slider_camera_speed_rota",
-        5.f, yPos, 90.f, 16.f,
+        5.f, yPos, 45.f, 16.f,
         0.1f, 20.f, this->_cameraRotaSpeed, "Camera Rota Speed:",
         [this](float nbr) {
             this->_cameraRotaSpeed = nbr;
@@ -171,12 +173,74 @@ Settings::Settings(
 
     this->_settingsContainer->addSliderPercent(
         "slider_camera_speed_zoom",
-        5.f, yPos, 90.f, 16.f,
+        5.f, yPos, 45.f, 16.f,
         50.f, 500.f, this->_cameraZoomSpeed, "Camera Zoom Speed:",
         [this](float nbr) {
             this->_cameraZoomSpeed = nbr;
         }
     );
+    yPos += 20.0f;
+
+    float rightColumnX = 52.0f;
+    float rightColumnY = 22.0f;
+
+    this->_settingsContainer->addTextPercent(
+        "objects_title",
+        rightColumnX, rightColumnY,
+        "Object Visibility:",
+        6.0f,
+        {255, 255, 255, 255}
+    );
+    rightColumnY += 8.0f;
+
+    this->_settingsContainer->addTextPercent(
+        "objects_separator",
+        rightColumnX - 5.0f, rightColumnY,
+        std::string(125, '-'),
+        1.5f,
+        {120, 120, 120, 150}
+    );
+    rightColumnY += 6.0f;
+
+    float firstColumnX = rightColumnX - 3.0f;
+    float secondColumnX = rightColumnX + 20.0f;
+    float currentY = rightColumnY;
+
+    std::vector<std::pair<std::string, std::string>> allItems = {
+        {"players", "Players"},
+        {"eggs", "Eggs"},
+        {"food", "Food"},
+        {"linemate", "Linemate"},
+        {"deraumere", "Deraumere"},
+        {"sibur", "Sibur"},
+        {"mendiane", "Mendiane"},
+        {"phiras", "Phiras"},
+        {"thystame", "Thystame"}
+    };
+
+    for (size_t i = 0; i < allItems.size(); ++i) {
+        const auto& item = allItems[i];
+        float currentX = (i % 2 == 0) ? firstColumnX : secondColumnX;
+
+        if (i % 2 == 1 && i > 0) {
+        } else if (i > 1) {
+            currentY += 10.0f;
+        }
+
+        this->_settingsContainer->addCheckboxPercent(
+            item.first + "_checkbox", currentX, currentY,
+            25.0f, 8.0f, true,
+            [this, itemKey = item.first](bool checked) {
+                this->_gameInfos->setObjectVisibility(itemKey, checked);
+            }
+        );
+
+        this->_settingsContainer->addTextPercent(
+            item.first + "_title", currentX + 4.0f, currentY + 2.0f,
+            item.second, 5.5f, {255, 255, 255, 255}
+        );
+    }
+
     this->_visible = false;
 }
 
