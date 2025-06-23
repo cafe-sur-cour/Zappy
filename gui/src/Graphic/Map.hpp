@@ -13,6 +13,7 @@
 #include <vector>
 #include <string>
 #include <chrono>
+#include <mutex>
 #include "../Game/GameInfos.hpp"
 #include "../IDisplay.hpp"
 
@@ -65,7 +66,6 @@ class Map {
 
         void drawAllPlayers();
         void drawEggs(int x, int y);
-        Color32 getTeamColor(const std::string &teamName);
 
         float getOffset(DisplayPriority priority, int x, int y, size_t stackIndex = 0);
         void updatePlayerRotations();
@@ -76,13 +76,12 @@ class Map {
     private:
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<IDisplay> _display;
-        std::unordered_map<std::string, Color32> _teamColors;
-        std::vector<Color32> _colors;
-        int _colorIndex = 0;
 
         std::unordered_map<int, std::chrono::steady_clock::time_point> _broadcastStartTimes;
         std::unordered_map<int, PlayerRotationState> _playerRotations;
         std::unordered_map<int, PlayerPositionState> _playerPositions;
+
+        mutable std::mutex _playerStatesMutex;
 
         static constexpr float BASE_HEIGHT_TILE = 0.0f;
 

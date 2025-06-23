@@ -20,6 +20,21 @@ static int send_plv_message(graph_net_t *graphic, player_t *player)
     return write_message(graphic->fd, buffer);
 }
 
+static void increase_player_from_button(player_t *player, zappy_t *zappy)
+{
+    char msg[19];
+
+    if (!player || !zappy || !zappy->game)
+        return;
+    if (player->level < 8) {
+        player->level += 1;
+        send_player_level(zappy, player);
+    }
+    snprintf(msg, 19, "Current level: %d\n", player->level);
+    write_message(player->network->fd, msg);
+}
+
+/* Send okay to the player */
 int plu(zappy_t *zappy, graph_net_t *graphic, char *message)
 {
     player_t *player = NULL;
@@ -36,9 +51,6 @@ int plu(zappy_t *zappy, graph_net_t *graphic, char *message)
     player = get_player_by_id(zappy->game, player_id);
     if (!player)
         return -1;
-    if (player->level < 8) {
-        player->level += 1;
-        send_player_level(zappy, player);
-    }
+    increase_player_from_button(player, zappy);
     return send_plv_message(graphic, player);
 }

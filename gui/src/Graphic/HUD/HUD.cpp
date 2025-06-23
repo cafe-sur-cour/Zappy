@@ -28,7 +28,7 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
       _selectedTile(-1, -1)
 {
     _help = std::make_shared<Help>(display, audio);
-    _settings = std::make_shared<Settings>(display, audio, camera);
+    _settings = std::make_shared<Settings>(display, audio, camera, gameInfos);
     initDefaultLayout(15.0f, 20.0f);
     initExitButton();
     initSettingsButton();
@@ -448,13 +448,14 @@ void HUD::initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
             }
         );
 
+        Color32 teamColor = gameInfos->getTeamColor(teamName);
         sideContainer->addTextPercent(
             teamId + "_title",
             12.0f,
             yPos,
             "TEAM: " + teamName,
             3.5f,
-            {255, 255, 255, 255}
+            teamColor
         );
 
         yPos += 4.0f;
@@ -492,6 +493,9 @@ void HUD::updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
             sideContainer->getElement(teamId + "_title"));
 
         if (titleElem) {
+            Color32 teamColor = gameInfos->getTeamColor(teamName);
+            titleElem->setColor(teamColor);
+
             float yPos = titleElem->getBounds().y - sideContainer->getBounds().y;
             yPos = yPos / sideContainer->getBounds().height * 100.0f;
             yPos += 4.0f;

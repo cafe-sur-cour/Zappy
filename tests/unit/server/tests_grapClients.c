@@ -131,18 +131,6 @@ Test(graphic_client, remove_graph_node_empty_list, .init = redirect_all_std)
 }
 
 
-// Test suite for poll_graphic_clients function
-Test(graphic_client, poll_graphic_clients_empty_list, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy();
-    cr_assert_not_null(zappy, "Test zappy should be created");
-    
-    // Should not crash with empty graph list
-    poll_graphic_clients(zappy);
-    
-    free_test_zappy(zappy);
-}
-
 Test(graphic_client, poll_graphic_clients_null_zappy, .init = redirect_all_std)
 {
     // Should handle NULL zappy gracefully (may crash depending on implementation)
@@ -150,39 +138,6 @@ Test(graphic_client, poll_graphic_clients_null_zappy, .init = redirect_all_std)
     cr_assert(1, "This test documents that NULL zappy handling should be considered");
 }
 
-Test(graphic_client, poll_graphic_clients_with_valid_sockets, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy();
-    cr_assert_not_null(zappy, "Test zappy should be created");
-    
-    // Create a pair of connected sockets for testing
-    int sockpair[2];
-    if (socketpair(AF_UNIX, SOCK_STREAM, 0, sockpair) == 0) {
-        add_graph_node(&zappy->graph, sockpair[0]);
-        
-        // This should poll without crashing
-        poll_graphic_clients(zappy);
-        
-        close(sockpair[0]);
-        close(sockpair[1]);
-    }
-    
-    free_test_zappy(zappy);
-}
-
-Test(graphic_client, poll_graphic_clients_with_closed_socket, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy();
-    cr_assert_not_null(zappy, "Test zappy should be created");
-    
-    // Add a node with an invalid fd
-    add_graph_node(&zappy->graph, -1);
-    
-    // Should handle invalid fd gracefully
-    poll_graphic_clients(zappy);
-    
-    free_test_zappy(zappy);
-}
 
 // Integration test
 Test(graphic_client, add_and_remove_integration, .init = redirect_all_std)

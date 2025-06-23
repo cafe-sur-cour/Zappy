@@ -142,11 +142,13 @@ void GUI::update()
 
     updateCamera();
     handlePlayerClicks();
-    this->_hud->updateTeamPlayersDisplay(this->_gameInfos);
-    this->_hud->updatePlayerInventoryDisplay(this->_cameraManager->getPlayerId(),
-        this->_cameraMode);
-    this->_hud->updateHelpInformationHUD(this->_cameraMode);
-    this->_hud->update();
+    if (this->_isHUDVisible) {
+        this->_hud->updateTeamPlayersDisplay(this->_gameInfos);
+        this->_hud->updatePlayerInventoryDisplay(this->_cameraManager->getPlayerId(),
+            this->_cameraMode);
+        this->_hud->updateHelpInformationHUD(this->_cameraMode);
+        this->_hud->update();
+    }
 
     this->_audio->playNextTheme(_audio->getMusicVolumeLevel());
 }
@@ -519,6 +521,8 @@ void GUI::initPlayers()
 
 void GUI::handlePlayerClicks()
 {
+    std::lock_guard<std::mutex> lock(_playerMutex);
+
     _hoveredPlayerId = getPlayerUnderMouse();
 
     if (this->_display->isMouseButtonPressed(this->_display->getKeyId(MOUSE_LEFT))) {

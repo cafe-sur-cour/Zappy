@@ -120,3 +120,38 @@ void check_player_status(zappy_t *zappy)
         check_winning_condition(zappy, current);
     }
 }
+
+static void remove_player_from_team(team_t *team, player_t *player, int fd,
+    zappy_t *zappy)
+{
+    player_t *prev = NULL;
+
+    while (player) {
+        if (player->network && player->network->fd != fd) {
+            prev = player;
+            player = player->next;
+            continue;
+        }
+        if (prev)
+            prev->next = player->next;
+        else
+            team->players = player->next;
+        if (team->nbPlayerAlive > 0)
+            team->nbPlayerAlive--;
+        send_player_death(zappy, player);
+        free_player(player);
+        return;
+    }
+}
+
+void remove_player_by_fd(zappy_t *zappy, int fd)
+{
+    team_t *team = zappy->game->teams;
+    player_t *player = NULL;
+
+    while (team) {
+        player = team->players;
+        remove_player_from_team(team, player, fd, zappy);
+        team = team->next;
+    }
+}

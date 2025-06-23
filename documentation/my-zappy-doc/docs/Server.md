@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 
 2. **Network Initialization** - [`server.c`](server/src/server.c)
    - Creates socket and binds to specified port
-   - Sets up polling for incoming connections
+   - Initializes unified polling system for all client connections
    - Prepares for multiple client handling
 
 3. **Game World Creation** - [`game/game.c`](server/src/game/game.c)
@@ -147,157 +147,263 @@ From [`protocol.c`](server/src/protocol.c):
 ```c
 int start_protocol(zappy_t *zappy)
 {
-    int tick_duration_ms = 1000 / zappy->params->freq;
+    double respawn_interval = 0;
+    double time_since_last_spawn = 0.0;
+    struct timespec last_time;
+
+    clock_gettime(CLOCK_MONOTONIC, &last_time);
+    setup_signal();
     
     while (*get_running_state()) {
-        // Poll for new connections
-        if (zappy->network->pollserver.revents & POLLIN)
-            accept_client(zappy);
-            
-        // Send GUI updates
-        send_gui_message(zappy);
-        
-        // Process player actions
-        smart_poll_players(zappy);
-        
-        // Handle GUI client requests
-        poll_graphic_clients(zappy);
+        respawn_interval = 20.0 / zappy->params->freq;
+        poll_all_clients(zappy);              // Unified polling system
+        handle_time_and_respawn(zappy, &last_time, &time_since_last_spawn,
+            respawn_interval);
+        handle_clients_and_game(zappy);       // Process game logic
     }
 }
 ```
 
-### Timing System
-- **Frequency-based ticks**: Actions execute based on server frequency
-- **Action queuing**: Commands are queued and executed in priority order
-- **Time-based execution**: Different actions have different execution times
+### Unified Polling System
+The server now uses a unified polling architecture that efficiently manages all client connections in a single poll operation:
 
-## 🤖 AI Command Processing
-
-### Command System
-The server supports various AI commands:
-
-- **Movement**: `Forward`, `Left`, `Right`
-- **Resource Management**: `Take`, `Set`
-- **Information**: `Look`, `Inventory`, `Connect_nbr`
-- **Communication**: `Broadcast`
-- **Advanced**: `Fork`, `Incantation`, `Eject`
-
-### Command Execution Flow
-From [`aiMessage/`](server/src/aiMessage/) modules:
-
-1. **Command Reception**: Read from player socket
-2. **Validation**: Check command format and parameters
-3. **Queuing**: Add to player's action queue with priority
-4. **Timing**: Execute based on action time requirements
-5. **Response**: Send result back to AI client
-6. **GUI Notification**: Broadcast changes to GUI clients
-
-### Look Command Example
-From [`aiMessage/look.c`](server/src/aiMessage/look.c):
+#### Unified Poll Structure
+From [`zappy.h`](server/include/zappy.h):
 
 ```c
-char *look_up(player_t *player, zappy_t *zappy)
+typedef struct unified_poll_s {
+    struct pollfd *fds;     // Array of file descriptors to poll
+    int count;              // Current number of active FDs
+    int capacity;           // Maximum capacity of the array
+} unified_poll_t;
+```
+
+#### Poll Management Functions
+From [`unified_poll.c`](server/src/unified_poll.c):
+
+- **`init_unified_poll()`**: Initializes the polling structure
+- **`add_fd_to_poll()`**: Adds a new file descriptor to the poll array
+- **`remove_fd_from_poll()`**: Removes a file descriptor from polling
+- **`rebuild_poll_fds()`**: Reconstructs the poll array for efficiency
+- **`poll_all_clients()`**: Main polling function that handles all connections
+
+#### Client Processing Flow
+```c
+void poll_all_clients(zappy_t *zappy)
 {
-    // Creates vision cone based on player level
-    // Returns formatted string of visible tiles and contents
-    // Handles wraparound coordinates
+    // 1. Poll all file descriptors simultaneously
+    int poll_result = poll(zappy->unified_poll->fds, 
+                          zappy->unified_poll->count, 0);
+    
+    // 2. Check server socket for new connections
+    if (server_socket_ready)
+        accept_client(zappy);
+    
+    // 3. Process AI client messages
+    for each AI client with POLLIN:
+        queue_action(player, command, zappy);
+    
+    // 4. Handle GUI client requests
+    for each GUI client with POLLIN:
+        poll_graphic_commands(zappy, current, buffer);
+    
+    // 5. Detect disconnections (POLLHUP/POLLERR)
+    remove_disconnected_clients();
 }
 ```
 
-## 📊 GUI Communication
+### Connection Processing Details
 
-### Real-time Updates
-The server continuously broadcasts game state to GUI clients:
-
-- **Map State**: Tile contents and resource distribution
-- **Player Updates**: Position, level, inventory changes
-- **Egg Status**: Creation, hatching, and removal
-- **Game Events**: Broadcasts, deaths, level-ups
-
-### Message Types
-From [`guiMessage/`](server/src/guiMessage/) modules:
-
-- `msz`: Map size
-- `bct`: Tile content
-- `pnw`: New player
-- `ppo`: Player position
-- `plv`: Player level
-- `pin`: Player inventory
-- `enw`: New egg
-- `ebo`: Egg hatching
-- `edi`: Egg death
-
-> 📖 **For detailed protocol specification**, see [Network Protocol](NetworkProtocol.md)
-
-## 🔧 Memory Management
-
-### Resource Cleanup
-The server implements comprehensive memory management:
-
-- **Structured Deallocation**: [`free.c`](server/src/free.c) handles all cleanup
-- **Linked List Management**: Proper node removal and memory freeing
-- **Error Handling**: Graceful cleanup on allocation failures
-
-### Safety Measures
-- **Null Pointer Checks**: Consistent validation before operations
-- **Exit Handling**: Signal-based cleanup on server termination
-- **Memory Leak Prevention**: Systematic resource tracking
-
-## 🚨 Error Handling and Logging
-
-### Message System
-From [`messages.c`](server/src/messages.c):
+#### Server Socket Monitoring
+The unified polling system monitors the server socket for incoming connections:
 
 ```c
-void error_message(char const *message)
-{
-    // Timestamped error logging with color coding
-}
-
-void valid_message(char const *message)
-{
-    // Success message logging
+// Check if server socket has incoming connections
+if (zappy->unified_poll->fds[0].revents & POLLIN) {
+    accept_client(zappy);  // Handle new connection
 }
 ```
 
-### Debug Mode
-When `is_debug` is enabled:
-- **Detailed Logging**: All GUI messages and operations
-- **Map Visualization**: Tile contents and resource distribution
-- **Connection Tracking**: Client join/leave notifications
+#### AI Client Message Processing
+For each AI client with available data (`POLLIN` event):
 
-## 🎯 Victory Conditions
+1. **Message Reception**: Read command from client socket
+2. **Command Parsing**: Extract and validate command format
+3. **Action Queuing**: Add command to player's action queue with priority
+4. **Response Handling**: Queue appropriate response for later transmission
 
-The game ends when a team achieves:
-- **6 players** at **maximum level** (level 8)
-- **End game notification** sent to all clients
-- **Server shutdown** or continued operation for new games
-
-## 🔧 Configuration
-
-### Server Parameters
-```bash
-./zappy_server -p <port> -x <width> -y <height> -n <team1> <team2> ... -c <nb_clients> -f <freq>
+```c
+// From accept.c and unified polling
+char *message = get_message(fd, timeout);
+if (message) {
+    queue_action(player, message, zappy);
+}
 ```
 
-- **Port**: Network listening port
-- **Dimensions**: Map width and height
-- **Teams**: Team names for competition
-- **Clients**: Maximum players per team
-- **Frequency**: Game tick rate (actions per second)
+#### GUI Client Request Handling
+GUI clients send specific query commands that are processed immediately:
 
-## 🚀 Performance Considerations
+```c
+// From graphic_client.c
+for (int i = 0; GRAPHIC_COMMAND[i].command != NULL; i++) {
+    if (strncmp(GRAPHIC_COMMAND[i].command, buffer,
+        strlen(GRAPHIC_COMMAND[i].command)) == 0)
+        return GRAPHIC_COMMAND[i].handler(zappy, current, buffer);
+}
+```
 
-### Scalability Features
-- **Non-blocking I/O**: Polling-based network handling
-- **Efficient Data Structures**: Linked lists for dynamic sizing
-- **Memory Pool Management**: Structured allocation patterns
-- **Event-driven Architecture**: Responsive to client actions
+#### Connection State Management
+The polling system efficiently handles connection lifecycle:
 
-### Optimization Strategies
-- **Resource Distribution Caching**: Pre-computed tile layouts
-- **Command Prioritization**: Critical actions processed first
-- **Batched GUI Updates**: Efficient state broadcasting
-- **Connection Pooling**: Reusable network resources
+- **New Connections**: Added to unified poll array via `add_fd_to_poll()`
+- **Active Monitoring**: All connections polled simultaneously
+- **Disconnection Detection**: `POLLHUP` and `POLLERR` events trigger cleanup
+- **Resource Cleanup**: File descriptors removed and closed properly
 
-The Zappy server provides a robust, scalable foundation for multiplayer strategic gameplay, handling complex game logic while maintaining real-time responsiveness for all connected clients.
+#### Performance Benefits
+The unified polling approach provides several advantages:
+
+1. **Single System Call**: All file descriptors polled in one `poll()` call
+2. **Scalable Architecture**: Handles multiple client types efficiently
+3. **Event-Driven Processing**: Only processes clients with available data
+4. **Reduced CPU Usage**: No busy-waiting or individual socket polling
+5. **Centralized Management**: Single point of control for all network I/O
+
+## 🔄 Unified Polling Implementation
+
+### Overview
+The Zappy server implements a sophisticated unified polling system that handles all network I/O operations through a single, efficient polling mechanism. This system manages three types of connections simultaneously:
+
+1. **Server Socket**: Listening for new incoming connections
+2. **AI Clients**: Game players sending commands and receiving responses
+3. **GUI Clients**: Observers requesting game state information
+
+### Implementation Details
+
+#### Polling Structure Management
+From [`unified_poll.c`](server/src/unified_poll.c):
+
+```c
+unified_poll_t *init_unified_poll(void)
+{
+    unified_poll_t *poll_struct = malloc(sizeof(unified_poll_t));
+    poll_struct->fds = malloc(sizeof(struct pollfd) * INITIAL_CAPACITY);
+    poll_struct->count = 0;
+    poll_struct->capacity = INITIAL_CAPACITY;
+    return poll_struct;
+}
+```
+
+#### Dynamic File Descriptor Management
+The system dynamically manages file descriptors with automatic capacity expansion:
+
+- **Adding FDs**: `add_fd_to_poll()` adds new connections to the polling array
+- **Removing FDs**: `remove_fd_from_poll()` removes disconnected clients
+- **Rebuilding**: `rebuild_poll_fds()` optimizes the array structure
+
+#### Event Processing Flow
+From [`unified_poll.c`](server/src/unified_poll.c):
+
+```c
+void poll_all_clients(zappy_t *zappy)
+{
+    // Poll all file descriptors with timeout of 0 (non-blocking)
+    int poll_result = poll(zappy->unified_poll->fds, 
+                          zappy->unified_poll->count, 0);
+    
+    if (poll_result > 0) {
+        // Process server socket for new connections
+        check_server_socket(zappy);
+        
+        // Process existing client connections
+        process_client_events(zappy);
+        
+        // Handle disconnections and errors
+        cleanup_disconnected_clients(zappy);
+    }
+}
+```
+
+### Client Type Handling
+
+#### AI Client Processing
+AI clients are processed through the action queue system:
+
+1. **Message Reading**: Commands are read from client sockets
+2. **Command Validation**: Messages are parsed and validated
+3. **Action Queuing**: Valid commands are added to player action queues
+4. **Priority Handling**: Actions are executed based on priority levels
+
+#### GUI Client Processing
+GUI clients receive immediate responses to their queries:
+
+1. **Command Parsing**: GUI commands are parsed immediately
+2. **Handler Dispatch**: Appropriate handler functions are called
+3. **Response Generation**: Game state data is formatted and sent
+4. **Real-time Updates**: Continuous broadcasting of game events
+
+### Error Handling and Robustness
+
+#### Connection Error Detection
+The polling system detects various connection states:
+
+- **POLLIN**: Data available for reading
+- **POLLOUT**: Socket ready for writing
+- **POLLHUP**: Client disconnected (hang up)
+- **POLLERR**: Socket error occurred
+- **POLLNVAL**: Invalid file descriptor
+
+#### Graceful Disconnection Handling
+```c
+// From unified polling implementation
+if (poll_fd.revents & (POLLHUP | POLLERR)) {
+    remove_client_from_game(fd);
+    remove_fd_from_poll(zappy->unified_poll, fd);
+    close(fd);
+}
+```
+
+### Performance Characteristics
+
+#### Efficiency Gains
+- **O(1) Addition/Removal**: File descriptor management is constant time
+- **Single System Call**: All network I/O handled in one poll() call
+- **Event-Driven**: Only processes clients with pending data
+- **No Busy Waiting**: Non-blocking operation with efficient timeout handling
+
+#### Scalability Features
+- **Dynamic Capacity**: Automatic expansion of polling array
+- **Memory Efficient**: Compact data structures minimize overhead
+- **Low Latency**: Direct event processing without intermediate queues
+- **Multi-Client Support**: Handles hundreds of simultaneous connections
+
+### Integration with Game Logic
+
+#### Action Queue System
+The polling system integrates seamlessly with the action queue mechanism:
+
+```c
+// From pollin_handler.c
+void process_player_actions_tick(zappy_t *zappy)
+{
+    team_t *team = zappy->game->teams;
+    while (team) {
+        player_t *player = team->players;
+        while (player) {
+            process_player_actions(player, zappy);
+            player = player->next;
+        }
+        team = team->next;
+    }
+}
+```
+
+#### Real-time Game Updates
+The system ensures real-time synchronization between AI actions and GUI updates:
+
+1. **Command Reception**: AI commands received via polling
+2. **Action Execution**: Commands processed through action queue
+3. **State Changes**: Game state updated accordingly
+4. **GUI Notification**: Changes broadcast to all GUI clients
+
+This unified polling architecture provides the foundation for Zappy's efficient, scalable multiplayer networking system.

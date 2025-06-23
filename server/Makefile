@@ -72,6 +72,8 @@ SRC 		=	src/params.c										\
 				src/receiveMessage/pollin_handler.c					\
 				src/receiveMessage/loop_thru_command.c				\
 				src/receiveMessage/queu_hanlder.c					\
+				src/receiveMessage/unified_polling.c				\
+				src/receiveMessage/init_poll_fds.c 					\
 				src/aiMessage/end_incantation.c 					\
 				src/aiMessage/forward.c								\
 				src/aiMessage/right.c								\

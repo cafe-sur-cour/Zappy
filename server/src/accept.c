@@ -60,6 +60,7 @@ static int complete_connection(zappy_t *zappy, int fd, const char *message)
 
     if (strcmp(message, "GRAPHIC") == 0) {
         free(buffer);
+        add_fd_to_poll(zappy->unified_poll, fd, POLLIN);
         return 0;
     }
     team = add_client_to_team(message, fd, zappy);
@@ -72,6 +73,7 @@ static int complete_connection(zappy_t *zappy, int fd, const char *message)
         free(buffer);
         return -1;
     }
+    add_fd_to_poll(zappy->unified_poll, fd, POLLIN);
     return 0;
 }
 
