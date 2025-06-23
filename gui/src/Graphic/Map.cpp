@@ -105,9 +105,17 @@ void Map::draw(bool performanceMode)
                     continue;
 
                 drawPerformanceTile(tile);
-                drawEggs(x, y);
-                drawPerformanceFood(x, y, tile);
-                drawPerformanceRock(x, y, tile);
+                if (_gameInfos->isObjectVisible("eggs"))
+                    drawEggs(x, y);
+                if (_gameInfos->isObjectVisible("food"))
+                    drawPerformanceFood(x, y, tile);
+                if (_gameInfos->isObjectVisible("linemate") ||
+                    _gameInfos->isObjectVisible("deraumere") ||
+                    _gameInfos->isObjectVisible("sibur") ||
+                    _gameInfos->isObjectVisible("mendiane") ||
+                    _gameInfos->isObjectVisible("phiras") ||
+                    _gameInfos->isObjectVisible("thystame"))
+                    drawPerformanceRock(x, y, tile);
             }
         }
     } else {
@@ -116,9 +124,14 @@ void Map::draw(bool performanceMode)
                 const auto& tile = _gameInfos->getTileRef(x, y);
 
                 drawTile(x, y, tile);
-                drawEggs(x, y);
-                drawFood(x, y, tile);
-                drawRock(x, y, tile);
+                if (_gameInfos->isObjectVisible("eggs"))
+                    drawEggs(x, y);
+                if (_gameInfos->isObjectVisible("food"))
+                    drawFood(x, y, tile);
+                if (_gameInfos->isObjectVisible("linemate") || _gameInfos->isObjectVisible("deraumere") ||
+                    _gameInfos->isObjectVisible("sibur") || _gameInfos->isObjectVisible("mendiane") ||
+                    _gameInfos->isObjectVisible("phiras") || _gameInfos->isObjectVisible("thystame"))
+                    drawRock(x, y, tile);
             }
         }
     }
@@ -162,6 +175,9 @@ void Map::drawPerformanceTile(const zappy::structs::Tile &tile)
 
 void Map::drawAllPlayers()
 {
+    if (!_gameInfos->isObjectVisible("players"))
+        return;
+
     const auto& players = _gameInfos->getPlayers();
 
     for (const auto& player : players) {
@@ -317,6 +333,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
     float rotationAngle = -1;
 
     for (int i = 0; i < tile.linemate; ++i) {
+        if (!_gameInfos->isObjectVisible("linemate"))
+            break;
+
         Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
@@ -335,6 +354,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
     }
 
     for (int i = 0; i < tile.deraumere; ++i) {
+        if (!_gameInfos->isObjectVisible("deraumere"))
+            break;
+
         Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
@@ -354,6 +376,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
     }
 
     for (int i = 0; i < tile.sibur; ++i) {
+        if (!_gameInfos->isObjectVisible("sibur"))
+            break;
+
         Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
@@ -371,6 +396,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
     }
 
     for (int i = 0; i < tile.mendiane; ++i) {
+        if (!_gameInfos->isObjectVisible("mendiane"))
+            break;
+
         Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
@@ -389,6 +417,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
     }
 
     for (int i = 0; i < tile.phiras; ++i) {
+        if (!_gameInfos->isObjectVisible("phiras"))
+            break;
+
         Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
@@ -405,6 +436,9 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
     }
 
     for (int i = 0; i < tile.thystame; ++i) {
+        if (!_gameInfos->isObjectVisible("thystame"))
+            break;
+
         Vector3f position = {
             static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
             getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
@@ -426,21 +460,84 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
 
 void Map::drawPerformanceRock(int x, int y, const zappy::structs::Tile &tile)
 {
-    if (tile.linemate <= 0 && tile.deraumere <= 0 && tile.sibur <= 0 &&
-        tile.mendiane <= 0 && tile.phiras <= 0 && tile.thystame <= 0)
+    int visibleRocks = 0;
+    if (_gameInfos->isObjectVisible("linemate")) visibleRocks += tile.linemate;
+    if (_gameInfos->isObjectVisible("deraumere")) visibleRocks += tile.deraumere;
+    if (_gameInfos->isObjectVisible("sibur")) visibleRocks += tile.sibur;
+    if (_gameInfos->isObjectVisible("mendiane")) visibleRocks += tile.mendiane;
+    if (_gameInfos->isObjectVisible("phiras")) visibleRocks += tile.phiras;
+    if (_gameInfos->isObjectVisible("thystame")) visibleRocks += tile.thystame;
+
+    if (visibleRocks <= 0)
         return;
 
     int index = tile.food;
     float sphereRadius = 0.15f;
 
-    for (int i = 0; i < tile.linemate + tile.deraumere + tile.sibur + tile.mendiane
-                + tile.phiras + tile.thystame; ++i) {
-        Vector3f position = {
-            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-        };
-        this->_display->drawSphere(position, sphereRadius, CBLUE);
+    if (_gameInfos->isObjectVisible("linemate")) {
+        for (int i = 0; i < tile.linemate; ++i) {
+            Vector3f position = {
+                static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+                static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+            };
+            this->_display->drawSphere(position, sphereRadius, CBLUE);
+        }
+    }
+
+    if (_gameInfos->isObjectVisible("deraumere")) {
+        for (int i = 0; i < tile.deraumere; ++i) {
+            Vector3f position = {
+                static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+                static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+            };
+            this->_display->drawSphere(position, sphereRadius, CBLUE);
+        }
+    }
+
+    if (_gameInfos->isObjectVisible("sibur")) {
+        for (int i = 0; i < tile.sibur; ++i) {
+            Vector3f position = {
+                static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+                static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+            };
+            this->_display->drawSphere(position, sphereRadius, CBLUE);
+        }
+    }
+
+    if (_gameInfos->isObjectVisible("mendiane")) {
+        for (int i = 0; i < tile.mendiane; ++i) {
+            Vector3f position = {
+                static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+                static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+            };
+            this->_display->drawSphere(position, sphereRadius, CBLUE);
+        }
+    }
+
+    if (_gameInfos->isObjectVisible("phiras")) {
+        for (int i = 0; i < tile.phiras; ++i) {
+            Vector3f position = {
+                static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+                static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+            };
+            this->_display->drawSphere(position, sphereRadius, CBLUE);
+        }
+    }
+
+    if (_gameInfos->isObjectVisible("thystame")) {
+        for (int i = 0; i < tile.thystame; ++i) {
+            Vector3f position = {
+                static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+                static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+            };
+            this->_display->drawSphere(position, sphereRadius, CBLUE);
+        }
     }
 }
 

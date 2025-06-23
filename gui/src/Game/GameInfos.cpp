@@ -179,6 +179,30 @@ const std::unordered_map<std::string, bool> GameInfos::getTeamVisibilities() con
     return _teamVisibilities;
 }
 
+void GameInfos::setObjectVisibility(const std::string &objectType, bool visible)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+    _objectVisibilities[objectType] = visible;
+}
+
+bool GameInfos::isObjectVisible(const std::string &objectType) const
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    auto it = _objectVisibilities.find(objectType);
+    if (it != _objectVisibilities.end()) {
+        return it->second;
+    }
+
+    return true;
+}
+
+const std::unordered_map<std::string, bool> GameInfos::getObjectVisibilities() const
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+    return _objectVisibilities;
+}
+
 Color32 GameInfos::getTeamColor(const std::string &teamName)
 {
     std::lock_guard<std::mutex> lock(_dataMutex);

@@ -48,6 +48,10 @@ class GameInfos : public Subject {
         bool isTeamVisible(const std::string &teamName) const;
         const std::unordered_map<std::string, bool> getTeamVisibilities() const;
 
+        void setObjectVisibility(const std::string &objectType, bool visible);
+        bool isObjectVisible(const std::string &objectType) const;
+        const std::unordered_map<std::string, bool> getObjectVisibilities() const;
+
         Color32 getTeamColor(const std::string &teamName);
 
         void addPlayer(const zappy::structs::Player player);
@@ -101,6 +105,7 @@ class GameInfos : public Subject {
         std::vector<std::string> _teamNames;
         std::unordered_map<std::string, bool> _teamVisibilities;
         std::unordered_map<std::string, Color32> _teamColors;
+        std::unordered_map<std::string, bool> _objectVisibilities;
         std::vector<Color32> _colors;
         int _colorIndex = 0;
         std::vector<zappy::structs::Player> _players;
