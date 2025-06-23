@@ -107,7 +107,8 @@ float RayLibEnc::measureText(const std::string& text, float fontSize) const
     if (_fonts.find("default") != _fonts.end()) {
         float scaledFontSize = getScaledFontSize(fontSize);
         float spacing = getFontSpacing(scaledFontSize);
-        Vector2 textSize = MeasureTextEx(_fonts.at("default"), text.c_str(), scaledFontSize, spacing);
+        Vector2 textSize = MeasureTextEx(_fonts.at("default"), text.c_str(),
+            scaledFontSize, spacing);
         return textSize.x * FONT_RENDER_SCALE;
     }
     return static_cast<float>(MeasureText(text.c_str(), static_cast<int>(fontSize)));
@@ -118,7 +119,8 @@ float RayLibEnc::measureTextEx(const std::string& text, float fontSize, float sp
     if (_fonts.find("default") != _fonts.end()) {
         float scaledFontSize = getScaledFontSize(fontSize);
         float scaledSpacing = getScaledSpacing(spacing);
-        Vector2 textSize = MeasureTextEx(_fonts.at("default"), text.c_str(), scaledFontSize, scaledSpacing);
+        Vector2 textSize = MeasureTextEx(_fonts.at("default"), text.c_str(),
+            scaledFontSize, scaledSpacing);
         return textSize.x * FONT_RENDER_SCALE;
     }
     return static_cast<float>(MeasureText(text.c_str(), static_cast<int>(fontSize)));
@@ -166,7 +168,6 @@ bool RayLibEnc::loadFont(const std::string& id, const std::string& filepath)
     SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
 
     _fonts[id] = font;
-    std::cout << "Successfully loaded font: " << filepath << " with ID: " << id << " (base size: " << fontBaseSize << ")" << std::endl;
     return true;
 }
 
