@@ -186,7 +186,6 @@ egg_t *kil_egg_node(egg_t **head, int egg_id);
 int forward_message(player_t *player, params_t *params);
 
 /* Pollin handler */
-void smart_poll_players(zappy_t *zappy);
 void process_player_actions(player_t *player, zappy_t *zappy);
 void process_player_actions_tick(zappy_t *zappy);
 void execute_action(player_t *player, action_request_t *action,
