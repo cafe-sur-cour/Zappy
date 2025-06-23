@@ -227,6 +227,8 @@ From [`guiMessage/`](server/src/guiMessage/) modules:
 - `ebo`: Egg hatching
 - `edi`: Egg death
 
+> 📖 **For detailed protocol specification**, see [Network Protocol](NetworkProtocol.md)
+
 ## 🔧 Memory Management
 
 ### Resource Cleanup

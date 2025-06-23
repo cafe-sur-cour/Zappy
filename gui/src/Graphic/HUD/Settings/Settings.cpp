@@ -183,3 +183,11 @@ Settings::Settings(
 Settings::~Settings()
 {
 }
+
+bool Settings::containsPoint(float x, float y) const
+{
+    if (!this->_settingsContainer || !this->_visible)
+        return false;
+
+    return this->_settingsContainer->contains(x, y);
+}

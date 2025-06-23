@@ -257,12 +257,19 @@ int mct(zappy_t *zappy, graph_net_t *graphic, char *message);
 int tna(zappy_t *zappy, graph_net_t *graphic, char *message);
 int ppo(zappy_t *zappy, graph_net_t *graphic, char *message);
 int plv(zappy_t *zappy, graph_net_t *graphic, char *message);
+int plu(zappy_t *zappy, graph_net_t *graphic, char *message);
+int pld(zappy_t *zappy, graph_net_t *graphic, char *message);
 int pin(zappy_t *zappy, graph_net_t *graphic, char *message);
 int sgt(zappy_t *zappy, graph_net_t *graphic, char *message);
 int sst(zappy_t *zappy, graph_net_t *graphic, char *message);
 int kil(zappy_t *zappy, graph_net_t *graphic, char *message);
+int tar(zappy_t *zappy, graph_net_t *graphic, char *message);
+int tsr(zappy_t *zappy, graph_net_t *graphic, char *message);
+int pia(zappy_t *zappy, graph_net_t *graphic, char *message);
+int pis(zappy_t *zappy, graph_net_t *graphic, char *message);
 int send_bct_message(graph_net_t *graphic, int x, int y,
     inventory_t *inventory);
+int send_pin_message(graph_net_t *graphic, player_t *player);
 
 /* player_id.c */
 player_t *get_player_by_id(game_t *game, int player_id);

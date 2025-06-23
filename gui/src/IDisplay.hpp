@@ -13,11 +13,13 @@
 
 enum Key {
     TAB,
+    ESC,
     UP,
     DOWN,
     RIGHT,
     LEFT,
     H,
+    C,
     GM_PD_LEFT_SHOULDER,
     GM_PD_RIGHT_SHOULDER,
     GM_PD_LEFT_TRIGGER,
@@ -35,6 +37,14 @@ typedef struct Vector3f {
     float x;
     float y;
     float z;
+
+    bool operator==(const Vector3f& other) const {
+        return x == other.x && y == other.y && z == other.z;
+    }
+
+    bool operator!=(const Vector3f& other) const {
+        return !(*this == other);
+    }
 } Vector3f;
 
 typedef struct Vector2f {
@@ -154,6 +164,7 @@ class IDisplay {
         virtual void disableCursor() = 0;
 
         virtual float getFrameTime() = 0;
+        virtual int getFPS() = 0;
 
         virtual void updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed) = 0;
 
@@ -240,7 +251,7 @@ class IDisplay {
 
         virtual void drawSkybox(const std::string& id) = 0;
 
-        virtual void drawSimpleSkybox() = 0;
+        virtual float getTime() const = 0;
 
         ~IDisplay() = default;
 };

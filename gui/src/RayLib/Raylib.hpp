@@ -68,6 +68,7 @@ class Raylib : public IDisplay {
         virtual void disableCursor();
 
         virtual float getFrameTime();
+        virtual int getFPS();
 
         virtual void updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed);
 
@@ -154,7 +155,7 @@ class Raylib : public IDisplay {
 
         virtual void drawSkybox(const std::string& id);
 
-        virtual void drawSimpleSkybox();
+        virtual float getTime() const;
 
         Raylib();
         ~Raylib() = default;

@@ -24,8 +24,9 @@ class Client {
         Client(int ac, const char *const *av);
         ~Client();
 
+        void tryToCreateGuiWithSharedLibInFolder(const std::string &libPath);
+
     private:
-        void _tryToCreateGuiWithSharedLibInFolder(const std::string &libPath = "./gui/lib/");
         zappy::structs::Config _config;
         void initialize(int ac, const char * const *av);
 

@@ -28,6 +28,7 @@ SRC =	../../../gui/src/Client/Client.cpp \
 		../../../gui/src/Graphic/HUD/Containers/AContainers.cpp \
 		../../../gui/src/Graphic/HUD/Text/Text.cpp \
 		../../../gui/src/Graphic/HUD/Slider/Slider.cpp \
+		../../../gui/src/Graphic/HUD/Checkbox/Checkbox.cpp \
 		../../../gui/src/Graphic/HUD/UIElement/AUIElement.cpp \
 		../../../gui/src/Graphic/HUD/HUD.cpp \
 		../../../gui/src/Graphic/Camera/CameraManager.cpp \
@@ -49,6 +50,10 @@ TEST_SRC = main_test.cpp \
 		   Client/MsgHandler_test.cpp \
 		   Communication/Communication_test.cpp \
 		   Game/GameInfos_test.cpp \
+		   Camera_manager/Camera_manager_test.cpp \
+		   Observer/Subject_test.cpp \
+		   Observer/IObserver_test.cpp \
+		   Observer/GuiObserver_test.cpp \
 
 TEST_OBJ = $(TEST_SRC:.cpp=.o)
 

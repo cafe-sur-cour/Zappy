@@ -63,6 +63,8 @@ int Raylib::getKeyId(Key key)
     {
     case TAB:
         return KEY_TAB;
+    case ESC:
+        return KEY_ESCAPE;
     case UP:
         return KEY_UP;
     case DOWN:
@@ -73,6 +75,8 @@ int Raylib::getKeyId(Key key)
         return KEY_LEFT;
     case H:
         return KEY_H;
+    case C:
+        return KEY_C;
     case GM_PD_H:
         return GAMEPAD_BUTTON_SELECT;
     case GM_PD_LEFT_SHOULDER:
@@ -221,6 +225,11 @@ void Raylib::disableCursor()
 float Raylib::getFrameTime()
 {
     return this->_raylib->getFrameTime();
+}
+
+int Raylib::getFPS()
+{
+    return this->_raylib->getFPS();
 }
 
 void Raylib::updateCameraFreeMode(float camMovingSpeed, float camRotaSpeed)
@@ -530,12 +539,12 @@ void Raylib::drawSkybox(const std::string& id)
     this->_raylib->drawSkybox(id);
 }
 
-void Raylib::drawSimpleSkybox()
-{
-    this->_raylib->drawSimpleSkybox();
-}
-
 bool Raylib::loadFont(const std::string& id, const std::string& filepath)
 {
     return this->_raylib->loadFont(id, filepath);
+}
+
+float Raylib::getTime() const
+{
+    return this->_raylib->getTime();
 }

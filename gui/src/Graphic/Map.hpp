@@ -50,12 +50,19 @@ class Map {
         Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<IDisplay> display);
         ~Map();
 
-        void draw();
+        void draw(bool performanceMode = false);
         void drawBroadcastingPlayers();
         void drawIncantations();
+
         void drawTile(int x, int y, const zappy::structs::Tile &tile);
+        void drawPerformanceTile(const zappy::structs::Tile &tile);
+
         void drawRock(int x, int y, const zappy::structs::Tile &tile);
+        void drawPerformanceRock(int x, int y, const zappy::structs::Tile &tile);
+
         void drawFood(int x, int y, const zappy::structs::Tile &tile);
+        void drawPerformanceFood(int x, int y, const zappy::structs::Tile &tile);
+
         void drawAllPlayers();
         void drawEggs(int x, int y);
         Color32 getTeamColor(const std::string &teamName);
@@ -85,8 +92,8 @@ class Map {
         static constexpr float BASE_HEIGHT_EGG = 0.0f;
         static constexpr float EGG_HEIGHT = 0.2f;
 
-        static constexpr float BASE_HEIGHT_FOOD = 0.2f;
-        static constexpr float FOOD_HEIGHT = 0.3f;
+        static constexpr float BASE_HEIGHT_FOOD = 0.1f;
+        static constexpr float FOOD_HEIGHT = 0.7f;
 
         static constexpr float BASE_HEIGHT_ROCK = 0.1f;
         static constexpr float ROCK_HEIGHT = 0.7f;
@@ -100,6 +107,8 @@ class Map {
         Vector3f calculatePlayerWorldPosition(int x, int y);
         float getDistance(const Vector3f& from, const Vector3f& to);
         Vector3f lerpVector3f(const Vector3f& from, const Vector3f& to, float t);
+
+        bool _performanceMode = false;
 };
 
 #endif /* !MAP_HPP_ */

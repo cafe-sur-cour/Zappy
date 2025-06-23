@@ -12,6 +12,7 @@ void RayLibEnc::initWindow(int width, int height, const std::string &title)
 {
     SetTraceLogLevel(LOG_NONE);
     InitWindow(width, height, title.c_str());
+    SetExitKey(0);
     _isInitialized = true;
 }
 

@@ -31,6 +31,7 @@ namespace zappy::constants {
         "  - Right mouse button + drag: Rotate camera\n\n"
         "Interface:\n"
         "  - Click on players to see their stats\n"
+        "  - Click on tiles to see their stats\n"
         "  - Use the RESET CAMERA button to return to default view\n"
         "  - Use the Settings button to adjust game settings";
 
@@ -48,6 +49,12 @@ namespace zappy::constants {
     inline const char *HELP_SECTION_4_CONTENT =
         "Resources on the map are represented by different colored objects.\n"
         "Players collect these resources to perform rituals and level up.";
+
+    inline const char *HELP_SECTION_5 =
+        "Levels";
+
+    inline const char *HELP_SECTION_6 =
+        "Items";
 
 }  // namespace zappy::constants
 

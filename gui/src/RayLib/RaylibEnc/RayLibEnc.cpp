@@ -15,6 +15,7 @@
 #include <iostream>
 #include "raylib.h"
 #include "raymath.h"
+#include "rlgl.h"
 #include "../../Utils/Constants.hpp"
 #include "../../Utils/GamepadConstants.hpp"
 #include "RayLibEnc.hpp"
@@ -45,9 +46,18 @@ void RayLibEnc::drawText(const std::string& text, float x, float y, float fontSi
     Color color)
 {
     if (_fonts.find("default") != _fonts.end()) {
+        float scaledFontSize = getScaledFontSize(fontSize);
+        float spacing = getFontSpacing(scaledFontSize);
+
+        rlPushMatrix();
+        rlTranslatef(x, y, 0.0f);
+        rlScalef(FONT_RENDER_SCALE, FONT_RENDER_SCALE, 1.0f);
+
         DrawTextEx(_fonts["default"], text.c_str(),
-                   {static_cast<float>(x), static_cast<float>(y)},
-                   fontSize, 1.0f, color);
+                   {0.0f, 0.0f},
+                   scaledFontSize, spacing, color);
+
+        rlPopMatrix();
     } else {
         DrawText(text.c_str(),
                  static_cast<int>(x),
@@ -61,9 +71,18 @@ void RayLibEnc::drawTextEx(const std::string& text, float x, float y, float font
     float spacing, Color color)
 {
     if (_fonts.find("default") != _fonts.end()) {
+        float scaledFontSize = getScaledFontSize(fontSize);
+        float scaledSpacing = getScaledSpacing(spacing);
+
+        rlPushMatrix();
+        rlTranslatef(x, y, 0.0f);
+        rlScalef(FONT_RENDER_SCALE, FONT_RENDER_SCALE, 1.0f);
+
         DrawTextEx(_fonts["default"], text.c_str(),
-                   {static_cast<float>(x), static_cast<float>(y)},
-                   fontSize, spacing, color);
+                   {0.0f, 0.0f},
+                   scaledFontSize, scaledSpacing, color);
+
+        rlPopMatrix();
     } else {
         DrawText(text.c_str(),
                  static_cast<int>(x),
@@ -86,8 +105,11 @@ void RayLibEnc::drawCircleLines(float centerX, float centerY, float radius, Colo
 float RayLibEnc::measureText(const std::string& text, float fontSize) const
 {
     if (_fonts.find("default") != _fonts.end()) {
-        Vector2 textSize = MeasureTextEx(_fonts.at("default"), text.c_str(), fontSize, 1.0f);
-        return textSize.x;
+        float scaledFontSize = getScaledFontSize(fontSize);
+        float spacing = getFontSpacing(scaledFontSize);
+        Vector2 textSize = MeasureTextEx(_fonts.at("default"), text.c_str(),
+            scaledFontSize, spacing);
+        return textSize.x * FONT_RENDER_SCALE;
     }
     return static_cast<float>(MeasureText(text.c_str(), static_cast<int>(fontSize)));
 }
@@ -95,9 +117,11 @@ float RayLibEnc::measureText(const std::string& text, float fontSize) const
 float RayLibEnc::measureTextEx(const std::string& text, float fontSize, float spacing) const
 {
     if (_fonts.find("default") != _fonts.end()) {
-        Vector2 textSize = MeasureTextEx(_fonts.at("default"), text.c_str(), fontSize,
-            spacing);
-        return textSize.x;
+        float scaledFontSize = getScaledFontSize(fontSize);
+        float scaledSpacing = getScaledSpacing(spacing);
+        Vector2 textSize = MeasureTextEx(_fonts.at("default"), text.c_str(),
+            scaledFontSize, scaledSpacing);
+        return textSize.x * FONT_RENDER_SCALE;
     }
     return static_cast<float>(MeasureText(text.c_str(), static_cast<int>(fontSize)));
 }
@@ -130,13 +154,20 @@ void RayLibEnc::endScissorMode()
 
 bool RayLibEnc::loadFont(const std::string& id, const std::string& filepath)
 {
-    Font font = LoadFont(filepath.c_str());
+    int fontBaseSize = 96;
+    Font font = LoadFontEx(filepath.c_str(), fontBaseSize, 0, 250);
+
     if (font.texture.id == 0) {
         std::cout << "Failed to load font: " << filepath << std::endl;
-        return false;
+
+        font = LoadFont(filepath.c_str());
+        if (font.texture.id == 0)
+            return false;
     }
+
+    SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
+
     _fonts[id] = font;
-    std::cout << "Successfully loaded font: " << filepath << " with ID: " << id << std::endl;
     return true;
 }
 
@@ -220,4 +251,24 @@ void RayLibEnc::updateLastInputType()
         _lastInputType = InputType::KEYBOARD_MOUSE;
         return;
     }
+}
+
+float RayLibEnc::getTime() const
+{
+    return GetTime();
+}
+
+float RayLibEnc::getScaledFontSize(float fontSize) const
+{
+    return fontSize * FONT_SCALE_FACTOR;
+}
+
+float RayLibEnc::getFontSpacing(float scaledFontSize) const
+{
+    return scaledFontSize * FONT_SPACING_RATIO;
+}
+
+float RayLibEnc::getScaledSpacing(float spacing) const
+{
+    return spacing * FONT_SCALE_FACTOR;
 }

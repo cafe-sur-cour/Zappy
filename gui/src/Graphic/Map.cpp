@@ -14,6 +14,7 @@
 #include <cmath>
 #include <iostream>
 #include <chrono>
+#include <limits>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -43,18 +44,96 @@ Color32 Map::getTeamColor(const std::string &teamName)
     return _teamColors[teamName];
 }
 
-void Map::draw()
+void Map::draw(bool performanceMode)
 {
+    _performanceMode = performanceMode;
+
     updatePlayerRotations();
     updatePlayerPositions();
 
-    auto tiles = _gameInfos->getTiles();
+    auto mapSize = _gameInfos->getMapSize();
+    int mapWidth = mapSize.first;
+    int mapHeight = mapSize.second;
 
-    for (const auto &tile : tiles) {
-        drawTile(tile.x, tile.y, tile);
-        drawEggs(tile.x, tile.y);
-        drawFood(tile.x, tile.y, tile);
-        drawRock(tile.x, tile.y, tile);
+    if (_performanceMode) {
+        float minDistance = std::numeric_limits<float>::max();
+        int cameraX = mapWidth / 2;
+        int cameraY = mapHeight / 2;
+        int searchStep = std::max(1, std::min(mapWidth, mapHeight) / 20);
+
+        for (int testY = 0; testY < mapHeight; testY += searchStep) {
+            for (int testX = 0; testX < mapWidth; testX += searchStep) {
+                Vector3f testPos = {
+                    static_cast<float>(testX * zappy::gui::POSITION_MULTIPLIER),
+                    0.0f,
+                    static_cast<float>(testY * zappy::gui::POSITION_MULTIPLIER)
+                };
+                float distance = _display->vector3DDistanceFromCamera(testPos);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    cameraX = testX;
+                    cameraY = testY;
+                }
+            }
+        }
+
+        for (int offsetY = -searchStep; offsetY <= searchStep; ++offsetY) {
+            for (int offsetX = -searchStep; offsetX <= searchStep; ++offsetX) {
+                int testX = cameraX + offsetX;
+                int testY = cameraY + offsetY;
+
+                if (testX >= 0 && testX < mapWidth && testY >= 0 && testY < mapHeight) {
+                    Vector3f testPos = {
+                        static_cast<float>(testX * zappy::gui::POSITION_MULTIPLIER),
+                        0.0f,
+                        static_cast<float>(testY * zappy::gui::POSITION_MULTIPLIER)
+                    };
+                    float distance = _display->vector3DDistanceFromCamera(testPos);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        cameraX = testX;
+                        cameraY = testY;
+                    }
+                }
+            }
+        }
+
+        int fogRangeInTiles = static_cast<int>(zappy::gui::FOG_DISTANCE_MAX /
+            zappy::gui::POSITION_MULTIPLIER) + 2;
+
+        for (int y = std::max(0, cameraY - fogRangeInTiles);
+             y < std::min(mapHeight, cameraY + fogRangeInTiles + 1); ++y) {
+            for (int x = std::max(0, cameraX - fogRangeInTiles);
+                 x < std::min(mapWidth, cameraX + fogRangeInTiles + 1); ++x) {
+                const auto& tile = _gameInfos->getTileRef(x, y);
+
+                Vector3f tilePosition = {
+                    static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+                    0.0f,
+                    static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+                };
+                float distanceFromCamera = _display->vector3DDistanceFromCamera(tilePosition);
+
+                if (distanceFromCamera > zappy::gui::FOG_DISTANCE_MAX)
+                    continue;
+
+                drawPerformanceTile(tile);
+                drawEggs(x, y);
+                drawPerformanceFood(x, y, tile);
+                drawPerformanceRock(x, y, tile);
+            }
+        }
+    } else {
+        for (int y = 0; y < mapHeight; ++y) {
+            for (int x = 0; x < mapWidth; ++x) {
+                const auto& tile = _gameInfos->getTileRef(x, y);
+
+                drawTile(x, y, tile);
+                drawEggs(x, y);
+                drawFood(x, y, tile);
+                drawRock(x, y, tile);
+            }
+        }
     }
 
     drawAllPlayers();
@@ -81,13 +160,37 @@ void Map::drawTile(int x, int y, const zappy::structs::Tile &tile)
         angle, {0.9f, 0.9f, 0.9f}, CWHITE);
 }
 
+void Map::drawPerformanceTile(const zappy::structs::Tile &tile)
+{
+    Vector3f position = {
+        static_cast<float>(tile.x * zappy::gui::POSITION_MULTIPLIER),
+        0.0f - 0.2f,
+        static_cast<float>(tile.y * zappy::gui::POSITION_MULTIPLIER)
+    };
+
+    float cubeSize = 2.0f;
+    this->_display->drawCube(position, cubeSize, 0.2f, cubeSize, CPINK);
+    this->_display->drawCubeWires(position, cubeSize, 0.2f, cubeSize, CBLACK);
+}
+
 void Map::drawAllPlayers()
 {
     const auto& players = _gameInfos->getPlayers();
 
     for (const auto& player : players) {
+        if (!_gameInfos->isTeamVisible(player.teamName))
+            continue;
+
         Vector3f interpolatedPosition = getPlayerInterpolatedPosition(player.number,
             player.x, player.y);
+
+        if (_performanceMode) {
+            float distanceFromCamera =
+                _display->vector3DDistanceFromCamera(interpolatedPosition);
+            if (distanceFromCamera > zappy::gui::FOG_DISTANCE_MAX) {
+                continue;
+            }
+        }
 
         size_t stackIndex = 0;
         for (const auto& otherPlayer : players) {
@@ -132,6 +235,9 @@ void Map::drawEggs(int x, int y)
     std::vector<const zappy::structs::Egg*> eggsOnTile;
 
     for (const auto& egg : eggs) {
+        if (!_gameInfos->isTeamVisible(egg.teamName))
+            continue;
+
         if (egg.x == x && egg.y == y && !egg.hatched) {
             eggsOnTile.push_back(&egg);
         }
@@ -191,6 +297,25 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
     }
 }
 
+void Map::drawPerformanceFood(int x, int y, const zappy::structs::Tile &tile)
+{
+    if (tile.food <= 0)
+        return;
+
+    for (int i = 0; i < tile.food; ++i) {
+        Vector3f position = {
+            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+            getOffset(DisplayPriority::FOOD, x, y, static_cast<size_t>(i)),
+            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+        };
+
+        this->_display->drawModelEx("food", position, {0.0f, 1.0f, 0.0f},
+            0.0f,
+            {zappy::gui::FOOD_SCALE, zappy::gui::FOOD_SCALE, zappy::gui::FOOD_SCALE},
+            CWHITE);
+    }
+}
+
 void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
 {
     if (tile.linemate <= 0 && tile.deraumere <= 0 && tile.sibur <= 0 &&
@@ -201,7 +326,7 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
     std::pair<int, int> temp = this->_gameInfos->getMapSize();
     if (temp.first < 40 && temp.second < 40)
         timeAccumulator += this->_display->getFrameTime();
-    int index = 0;
+    int index = tile.food;
     float rotationAngle = -1;
 
     for (int i = 0; i < tile.linemate; ++i) {
@@ -312,6 +437,26 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
     }
 }
 
+void Map::drawPerformanceRock(int x, int y, const zappy::structs::Tile &tile)
+{
+    if (tile.linemate <= 0 && tile.deraumere <= 0 && tile.sibur <= 0 &&
+        tile.mendiane <= 0 && tile.phiras <= 0 && tile.thystame <= 0)
+        return;
+
+    int index = tile.food;
+    float sphereRadius = 0.15f;
+
+    for (int i = 0; i < tile.linemate + tile.deraumere + tile.sibur + tile.mendiane
+                + tile.phiras + tile.thystame; ++i) {
+        Vector3f position = {
+            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+        };
+        this->_display->drawSphere(position, sphereRadius, CBLUE);
+    }
+}
+
 float Map::getOffset(DisplayPriority priority, int x, int y, size_t stackIndex)
 {
     switch (priority) {
@@ -386,24 +531,18 @@ float Map::getOffset(DisplayPriority priority, int x, int y, size_t stackIndex)
                 }
             }
 
-            const auto& tiles = _gameInfos->getTiles();
-            size_t rockCount = 0;
-            for (const auto& tile : tiles) {
-                if (tile.x == x && tile.y == y &&
-                    (tile.linemate > 0 || tile.deraumere > 0 ||
-                        tile.sibur > 0 || tile.mendiane > 0 ||
-                        tile.phiras > 0 || tile.thystame > 0)) {
-                    rockCount++;
-                }
-            }
+            const auto& currentTile = _gameInfos->getTileRef(x, y);
+            bool hasRocks = (currentTile.linemate > 0 || currentTile.deraumere > 0 ||
+                            currentTile.sibur > 0 || currentTile.mendiane > 0 ||
+                            currentTile.phiras > 0 || currentTile.thystame > 0);
 
             float baseRockHeight = BASE_HEIGHT_ROCK;
             if (eggCount > 0)
                 baseRockHeight = BASE_HEIGHT_EGG + (eggCount * EGG_HEIGHT);
             if (playerCount > 0)
                 baseRockHeight += (playerCount * PLAYER_HEIGHT);
-            if (rockCount > 0)
-                baseRockHeight += (rockCount * ROCK_HEIGHT);
+            if (hasRocks)
+                baseRockHeight += ROCK_HEIGHT;
             return baseRockHeight + (stackIndex * ROCK_HEIGHT);
         }
 
@@ -429,6 +568,11 @@ void Map::drawBroadcastingPlayers()
     auto it = _broadcastStartTimes.begin();
     while (it != _broadcastStartTimes.end()) {
         int playerNumber = it->first;
+        if (!_gameInfos->isTeamVisible(_gameInfos->getPlayer(playerNumber).teamName)) {
+            it = _broadcastStartTimes.erase(it);
+            continue;
+        }
+
         auto startTime = it->second;
 
         auto duration =
@@ -448,6 +592,15 @@ void Map::drawBroadcastingPlayers()
 
         Vector3f interpolatedPosition = getPlayerInterpolatedPosition(playerNumber,
             playerInfo.x, playerInfo.y);
+
+        if (_performanceMode) {
+            float distanceFromCamera =
+                _display->vector3DDistanceFromCamera(interpolatedPosition);
+            if (distanceFromCamera > zappy::gui::FOG_DISTANCE_MAX) {
+                ++it;
+                continue;
+            }
+        }
 
         Vector3f position = {
             interpolatedPosition.x,
@@ -516,6 +669,20 @@ void Map::drawIncantations()
     timeAccumulator += this->_display->getFrameTime();
 
     for (const auto& incantation : incantations) {
+        Vector3f incantationWorldPos = {
+            static_cast<float>(incantation.x * zappy::gui::POSITION_MULTIPLIER),
+            0.0f,
+            static_cast<float>(incantation.y * zappy::gui::POSITION_MULTIPLIER)
+        };
+
+        if (_performanceMode) {
+            float distanceFromCamera =
+                _display->vector3DDistanceFromCamera(incantationWorldPos);
+            if (distanceFromCamera > zappy::gui::FOG_DISTANCE_MAX) {
+                continue;
+            }
+        }
+
         float levelProgress = static_cast<float>(incantation.level - 1) / 7.0f;
 
         unsigned char red = static_cast<unsigned char>(50 + levelProgress * 180);
@@ -524,6 +691,10 @@ void Map::drawIncantations()
         Color32 incantationColor = {red, green, blue, 70};
 
         for (size_t i = 0; i < incantation.players.size(); ++i) {
+            if (!_gameInfos->isTeamVisible(
+                    _gameInfos->getPlayer(incantation.players[i]).teamName))
+                continue;
+
             Vector3f basePosition = {
                 static_cast<float>(incantation.x * zappy::gui::POSITION_MULTIPLIER),
                 getOffset(DisplayPriority::PLAYER, incantation.x, incantation.y, i) + 0.4f,

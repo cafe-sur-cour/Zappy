@@ -14,6 +14,7 @@
 #include <mutex>
 #include <string>
 #include <chrono>
+#include <unordered_map>
 
 #include "../Utils/Constants.hpp"
 #include "../Communication/ICommunication.hpp"
@@ -36,11 +37,16 @@ class GameInfos : public Subject {
         int getTimeUnit() const;
 
         void updateTile(const zappy::structs::Tile tile);
-        const std::vector<zappy::structs::Tile> getTiles() const;
         const zappy::structs::Tile getTile(int x, int y) const;
+        const zappy::structs::Tile& getTileRef(int x, int y) const;
+        void initializeTileMatrix();
 
         void updateTeamName(const std::string &teamName);
         const std::vector<std::string> getTeamNames() const;
+
+        void setTeamVisibility(const std::string &teamName, bool visible);
+        bool isTeamVisible(const std::string &teamName) const;
+        const std::unordered_map<std::string, bool> getTeamVisibilities() const;
 
         void addPlayer(const zappy::structs::Player player);
         void killPlayer(int playerNumber);
@@ -76,14 +82,22 @@ class GameInfos : public Subject {
         const std::vector<std::string> getServerMessages() const;
 
         void securityActualisation();
+        void incrementPlayerLevel(int playerNumber);
+        void decrementPlayerLevel(int playerNumber);
+        void incrementPlayerInventoryItem(int playerNumber, int resourceId);
+        void decrementPlayerInventoryItem(int playerNumber, int resourceId);
+        void incrementTileInventoryItem(int x, int y, int resourceId);
+        void decrementTileInventoryItem(int x, int y, int resourceId);
 
     private:
         int _mapWidth;
         int _mapHeight;
         int _timeUnit;
 
-        std::vector<zappy::structs::Tile> _tiles;
+        std::vector<std::vector<zappy::structs::Tile>> _tileMatrix;
+        bool _matrixInitialized;
         std::vector<std::string> _teamNames;
+        std::unordered_map<std::string, bool> _teamVisibilities;
         std::vector<zappy::structs::Player> _players;
         std::vector<std::pair<int, bool>> _playersExpulsing;
         std::vector<std::tuple<int, std::string, std::chrono::steady_clock::time_point>>
@@ -94,6 +108,7 @@ class GameInfos : public Subject {
 
         bool _gameOver;
         std::string _winningTeam;
+        bool _victorySoundPlayed;
 
         mutable std::mutex _dataMutex;
 
