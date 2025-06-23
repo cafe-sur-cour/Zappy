@@ -128,9 +128,12 @@ void Map::draw(bool performanceMode)
                     drawEggs(x, y);
                 if (_gameInfos->isObjectVisible("food"))
                     drawFood(x, y, tile);
-                if (_gameInfos->isObjectVisible("linemate") || _gameInfos->isObjectVisible("deraumere") ||
-                    _gameInfos->isObjectVisible("sibur") || _gameInfos->isObjectVisible("mendiane") ||
-                    _gameInfos->isObjectVisible("phiras") || _gameInfos->isObjectVisible("thystame"))
+                if (_gameInfos->isObjectVisible("linemate") ||
+                    _gameInfos->isObjectVisible("deraumere") ||
+                    _gameInfos->isObjectVisible("sibur") ||
+                    _gameInfos->isObjectVisible("mendiane") ||
+                    _gameInfos->isObjectVisible("phiras") ||
+                    _gameInfos->isObjectVisible("thystame"))
                     drawRock(x, y, tile);
             }
         }

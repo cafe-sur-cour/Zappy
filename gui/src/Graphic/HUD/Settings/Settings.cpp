@@ -5,11 +5,12 @@
 ** Settings
 */
 
-#include "Settings.hpp"
 #include <iostream>
 #include <string>
 #include <memory>
 #include <cctype>
+#include <vector>
+#include "Settings.hpp"
 #include "Utils/HelpText.hpp"
 
 void Settings::show()
