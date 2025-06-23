@@ -45,7 +45,7 @@ class CameraManager {
         Vector3f calculateCameraPosition(const Vector3f& playerPos, float angleXZ);
 
     private:
-        float _cameraMovingSpeed = 7.5f;
+        float _cameraMovingSpeed = 15.0f;
         float _cameraRotaSpeed = 2.0f;
         float _cameraZoomSpeed = 120.0f;
         std::shared_ptr<IDisplay> _display;

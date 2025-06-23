@@ -639,3 +639,312 @@ TEST_F(GameInfosAdditionalTest, SetTimeUnitWithServerCommunication) {
     );
     gameInfos->setTimeUnit(400, true);
 }
+
+// Tests for new GameInfos methods
+
+// Test incrementPlayerLevel method
+TEST_F(GameInfosAdditionalTest, IncrementPlayerLevel) {
+    zappy::structs::Player player(1, 5, 5, 1, 3, "Team1");
+    gameInfos->addPlayer(player);
+
+    EXPECT_CALL(*mockCommunication, sendMessage("plu #1\n")).Times(1);
+    gameInfos->incrementPlayerLevel(1);
+
+    testing::Mock::VerifyAndClearExpectations(mockCommunication.get());
+
+    gameInfos->updatePlayerLevel(1, 8);
+    gameInfos->incrementPlayerLevel(1);
+
+    gameInfos->incrementPlayerLevel(999);
+
+    EXPECT_CALL(*mockCommunication, sendMessage("plu #1\n")).WillOnce(
+        testing::Throw(Exceptions::NetworkException("Network error"))
+    );
+    gameInfos->updatePlayerLevel(1, 5);
+    gameInfos->incrementPlayerLevel(1);
+}
+
+// Test decrementPlayerLevel method
+TEST_F(GameInfosAdditionalTest, DecrementPlayerLevel) {
+    zappy::structs::Player player(1, 5, 5, 1, 5, "Team1");
+    gameInfos->addPlayer(player);
+
+    EXPECT_CALL(*mockCommunication, sendMessage("pld #1\n")).Times(1);
+    gameInfos->decrementPlayerLevel(1);
+
+    testing::Mock::VerifyAndClearExpectations(mockCommunication.get());
+
+    gameInfos->updatePlayerLevel(1, 1);
+    gameInfos->decrementPlayerLevel(1);
+
+    gameInfos->decrementPlayerLevel(999);
+
+    EXPECT_CALL(*mockCommunication, sendMessage("pld #1\n")).WillOnce(
+        testing::Throw(Exceptions::NetworkException("Network error"))
+    );
+    gameInfos->updatePlayerLevel(1, 3);
+    gameInfos->decrementPlayerLevel(1);
+}
+
+// Test securityActualisation method
+TEST_F(GameInfosAdditionalTest, SecurityActualisation) {
+    zappy::structs::Player player1(1, 5, 5, 1, 3, "Team1");
+    zappy::structs::Player player2(2, 10, 10, 2, 4, "Team2");
+    gameInfos->addPlayer(player1);
+    gameInfos->addPlayer(player2);
+
+    EXPECT_CALL(*mockCommunication, sendMessage("msz\n")).Times(1);
+    EXPECT_CALL(*mockCommunication, sendMessage("tna\n")).Times(1);
+    EXPECT_CALL(*mockCommunication, sendMessage("sgt\n")).Times(1);
+    EXPECT_CALL(*mockCommunication, sendMessage("mct\n")).Times(1);
+
+    EXPECT_CALL(*mockCommunication, sendMessage("ppo #1\n")).Times(1);
+    EXPECT_CALL(*mockCommunication, sendMessage("plv #1\n")).Times(1);
+    EXPECT_CALL(*mockCommunication, sendMessage("pin #1\n")).Times(1);
+    EXPECT_CALL(*mockCommunication, sendMessage("ppo #2\n")).Times(1);
+    EXPECT_CALL(*mockCommunication, sendMessage("plv #2\n")).Times(1);
+    EXPECT_CALL(*mockCommunication, sendMessage("pin #2\n")).Times(1);
+
+    gameInfos->securityActualisation();
+}
+
+// Test securityActualisation with network exception
+TEST_F(GameInfosAdditionalTest, SecurityActualisationNetworkException) {
+    zappy::structs::Player player(1, 5, 5, 1, 3, "Team1");
+    gameInfos->addPlayer(player);
+
+    ON_CALL(*mockCommunication, sendMessage).WillByDefault(
+        [](const std::string &) { throw Exceptions::NetworkException("Network error"); }
+    );
+
+    EXPECT_NO_THROW(gameInfos->securityActualisation());
+}
+
+// Test getServerMessages and addServerMessage methods
+TEST_F(GameInfosAdditionalTest, ServerMessages) {
+    auto messages = gameInfos->getServerMessages();
+    EXPECT_TRUE(messages.empty());
+
+    gameInfos->addServerMessage("First message");
+    gameInfos->addServerMessage("Second message");
+    gameInfos->addServerMessage("Third message");
+
+    messages = gameInfos->getServerMessages();
+    EXPECT_EQ(messages.size(), 3);
+    EXPECT_EQ(messages[0], "First message");
+    EXPECT_EQ(messages[1], "Second message");
+    EXPECT_EQ(messages[2], "Third message");
+
+    gameInfos->addServerMessage("");
+    messages = gameInfos->getServerMessages();
+    EXPECT_EQ(messages.size(), 4);
+    EXPECT_EQ(messages[3], "");
+}
+
+// Test team visibility methods
+TEST_F(GameInfosAdditionalTest, TeamVisibility) {
+    gameInfos->setTeamVisibility("Team1", false);
+    gameInfos->setTeamVisibility("Team2", true);
+    gameInfos->setTeamVisibility("Team3", false);
+
+    EXPECT_FALSE(gameInfos->isTeamVisible("Team1"));
+    EXPECT_TRUE(gameInfos->isTeamVisible("Team2"));
+    EXPECT_FALSE(gameInfos->isTeamVisible("Team3"));
+
+    EXPECT_TRUE(gameInfos->isTeamVisible("NonExistentTeam"));
+
+    auto visibilities = gameInfos->getTeamVisibilities();
+    EXPECT_EQ(visibilities.size(), 3);
+    EXPECT_FALSE(visibilities["Team1"]);
+    EXPECT_TRUE(visibilities["Team2"]);
+    EXPECT_FALSE(visibilities["Team3"]);
+
+    gameInfos->setTeamVisibility("Team1", true);
+    EXPECT_TRUE(gameInfos->isTeamVisible("Team1"));
+}
+
+// Test incrementPlayerInventoryItem method
+TEST_F(GameInfosAdditionalTest, IncrementPlayerInventoryItem) {
+    EXPECT_CALL(*mockCommunication, sendMessage("pia #1 2\n")).Times(1);
+    gameInfos->incrementPlayerInventoryItem(1, 2);
+
+    testing::Mock::VerifyAndClearExpectations(mockCommunication.get());
+
+    for (int resourceId = 0; resourceId <= 6; ++resourceId) {
+        EXPECT_CALL(*mockCommunication, sendMessage("pia #5 " + std::to_string(resourceId) + "\n")).Times(1);
+        gameInfos->incrementPlayerInventoryItem(5, resourceId);
+    }
+
+    testing::Mock::VerifyAndClearExpectations(mockCommunication.get());
+
+    gameInfos->incrementPlayerInventoryItem(-1, 2);
+    gameInfos->incrementPlayerInventoryItem(1, -1);
+    gameInfos->incrementPlayerInventoryItem(1, 7);
+
+    EXPECT_CALL(*mockCommunication, sendMessage("pia #1 3\n")).WillOnce(
+        testing::Throw(Exceptions::NetworkException("Network error"))
+    );
+    EXPECT_NO_THROW(gameInfos->incrementPlayerInventoryItem(1, 3));
+}
+
+// Test decrementPlayerInventoryItem method
+TEST_F(GameInfosAdditionalTest, DecrementPlayerInventoryItem) {
+    EXPECT_CALL(*mockCommunication, sendMessage("pis #1 2\n")).Times(1);
+    gameInfos->decrementPlayerInventoryItem(1, 2);
+
+    testing::Mock::VerifyAndClearExpectations(mockCommunication.get());
+
+    for (int resourceId = 0; resourceId <= 6; ++resourceId) {
+        EXPECT_CALL(*mockCommunication, sendMessage("pis #5 " + std::to_string(resourceId) + "\n")).Times(1);
+        gameInfos->decrementPlayerInventoryItem(5, resourceId);
+    }
+
+    testing::Mock::VerifyAndClearExpectations(mockCommunication.get());
+
+    gameInfos->decrementPlayerInventoryItem(-1, 2);
+    gameInfos->decrementPlayerInventoryItem(1, -1);
+    gameInfos->decrementPlayerInventoryItem(1, 7);
+
+    EXPECT_CALL(*mockCommunication, sendMessage("pis #1 3\n")).WillOnce(
+        testing::Throw(Exceptions::NetworkException("Network error"))
+    );
+    EXPECT_NO_THROW(gameInfos->decrementPlayerInventoryItem(1, 3));
+}
+
+// Test incrementTileInventoryItem method
+TEST_F(GameInfosAdditionalTest, IncrementTileInventoryItem) {
+    EXPECT_CALL(*mockCommunication, sendMessage("tar 5 10 2\n")).Times(1);
+    gameInfos->incrementTileInventoryItem(5, 10, 2);
+
+    testing::Mock::VerifyAndClearExpectations(mockCommunication.get());
+
+    for (int resourceId = 0; resourceId <= 6; ++resourceId) {
+        EXPECT_CALL(*mockCommunication, sendMessage("tar 3 7 " + std::to_string(resourceId) + "\n")).Times(1);
+        gameInfos->incrementTileInventoryItem(3, 7, resourceId);
+    }
+
+    testing::Mock::VerifyAndClearExpectations(mockCommunication.get());
+
+    gameInfos->incrementTileInventoryItem(-1, 5, 2);
+    gameInfos->incrementTileInventoryItem(5, -1, 2);
+    gameInfos->incrementTileInventoryItem(5, 10, -1);
+    gameInfos->incrementTileInventoryItem(5, 10, 7);
+
+    EXPECT_CALL(*mockCommunication, sendMessage("tar 5 10 3\n")).WillOnce(
+        testing::Throw(Exceptions::NetworkException("Network error"))
+    );
+    EXPECT_NO_THROW(gameInfos->incrementTileInventoryItem(5, 10, 3));
+}
+
+// Test decrementTileInventoryItem method
+TEST_F(GameInfosAdditionalTest, DecrementTileInventoryItem) {
+    EXPECT_CALL(*mockCommunication, sendMessage("tsr 5 10 2\n")).Times(1);
+    gameInfos->decrementTileInventoryItem(5, 10, 2);
+
+    testing::Mock::VerifyAndClearExpectations(mockCommunication.get());
+
+    for (int resourceId = 0; resourceId <= 6; ++resourceId) {
+        EXPECT_CALL(*mockCommunication, sendMessage("tsr 3 7 " + std::to_string(resourceId) + "\n")).Times(1);
+        gameInfos->decrementTileInventoryItem(3, 7, resourceId);
+    }
+
+    testing::Mock::VerifyAndClearExpectations(mockCommunication.get());
+
+    gameInfos->decrementTileInventoryItem(-1, 5, 2);
+    gameInfos->decrementTileInventoryItem(5, -1, 2);
+    gameInfos->decrementTileInventoryItem(5, 10, -1);
+    gameInfos->decrementTileInventoryItem(5, 10, 7);
+
+    EXPECT_CALL(*mockCommunication, sendMessage("tsr 5 10 3\n")).WillOnce(
+        testing::Throw(Exceptions::NetworkException("Network error"))
+    );
+    EXPECT_NO_THROW(gameInfos->decrementTileInventoryItem(5, 10, 3));
+}
+
+// Test notifyStateChange (through observer)
+TEST_F(GameInfosAdditionalTest, NotifyStateChangeIndirect) {
+    EXPECT_CALL(*mockObserver, onGameEvent(GameEventType::TEAM_WIN, "WinningTeam")).Times(1);
+
+    gameInfos->setGameOver("WinningTeam");
+
+    testing::Mock::VerifyAndClearExpectations(mockObserver.get());
+}
+
+// Additional edge case tests for robustness
+TEST_F(GameInfosAdditionalTest, EdgeCases) {
+    zappy::structs::Player player(1, 5, 5, 1, 1, "Team1");
+    gameInfos->addPlayer(player);
+
+    gameInfos->decrementPlayerLevel(1);
+
+    gameInfos->updatePlayerLevel(1, 8);
+    gameInfos->incrementPlayerLevel(1);
+
+    gameInfos->setTeamVisibility("Team1", true);
+    gameInfos->setTeamVisibility("Team1", true);
+    EXPECT_TRUE(gameInfos->isTeamVisible("Team1"));
+
+    gameInfos->addServerMessage("");
+    auto messages = gameInfos->getServerMessages();
+    EXPECT_FALSE(messages.empty());
+}
+
+// Test updateTile with uninitialized matrix
+TEST_F(GameInfosAdditionalTest, UpdateTileWithUninitializedMatrix) {
+    gameInfos->setMapSize(10, 10);
+
+    zappy::structs::Tile tile(5, 5, 10, 1, 2, 3, 4, 5, 6);
+
+    gameInfos->updateTile(tile);
+
+    auto retrievedTile = gameInfos->getTile(5, 5);
+    EXPECT_EQ(retrievedTile.x, 5);
+    EXPECT_EQ(retrievedTile.y, 5);
+    EXPECT_EQ(retrievedTile.food, 10);
+    EXPECT_EQ(retrievedTile.linemate, 1);
+    EXPECT_EQ(retrievedTile.deraumere, 2);
+    EXPECT_EQ(retrievedTile.sibur, 3);
+    EXPECT_EQ(retrievedTile.mendiane, 4);
+    EXPECT_EQ(retrievedTile.phiras, 5);
+    EXPECT_EQ(retrievedTile.thystame, 6);
+
+    zappy::structs::Tile tile2(3, 7, 20, 2, 3, 4, 5, 6, 7);
+    gameInfos->updateTile(tile2);
+
+    auto retrievedTile2 = gameInfos->getTile(3, 7);
+    EXPECT_EQ(retrievedTile2.x, 3);
+    EXPECT_EQ(retrievedTile2.y, 7);
+    EXPECT_EQ(retrievedTile2.food, 20);
+    EXPECT_EQ(retrievedTile2.linemate, 2);
+}
+
+// Test getTile with negative coordinates
+TEST_F(GameInfosAdditionalTest, GetTileWithNegativeCoordinates) {
+    gameInfos->setMapSize(10, 10);
+
+    auto tileNegativeX = gameInfos->getTile(-1, 5);
+    EXPECT_EQ(tileNegativeX.x, -1);
+    EXPECT_EQ(tileNegativeX.y, 5);
+    EXPECT_EQ(tileNegativeX.food, 0);
+    EXPECT_EQ(tileNegativeX.linemate, 0);
+    EXPECT_EQ(tileNegativeX.deraumere, 0);
+    EXPECT_EQ(tileNegativeX.sibur, 0);
+    EXPECT_EQ(tileNegativeX.mendiane, 0);
+    EXPECT_EQ(tileNegativeX.phiras, 0);
+    EXPECT_EQ(tileNegativeX.thystame, 0);
+
+    auto tileNegativeY = gameInfos->getTile(5, -1);
+    EXPECT_EQ(tileNegativeY.x, 5);
+    EXPECT_EQ(tileNegativeY.y, -1);
+    EXPECT_EQ(tileNegativeY.food, 0);
+
+    auto tileBothNegative = gameInfos->getTile(-5, -3);
+    EXPECT_EQ(tileBothNegative.x, -5);
+    EXPECT_EQ(tileBothNegative.y, -3);
+    EXPECT_EQ(tileBothNegative.food, 0);
+
+    const auto& tileRefNegative = gameInfos->getTileRef(-1, 5);
+    EXPECT_EQ(tileRefNegative.x, 0);
+    EXPECT_EQ(tileRefNegative.y, 0);
+    EXPECT_EQ(tileRefNegative.food, 0);
+}

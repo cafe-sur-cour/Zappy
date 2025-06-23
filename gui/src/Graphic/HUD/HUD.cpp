@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <utility>
+#include <cmath>
 #include "../../Utils/Constants.hpp"
 #include "../../Utils/InputType.hpp"
 #include "HUD.hpp"
@@ -1942,8 +1943,15 @@ void HUD::initFpsDisplay()
 
     bottomContainer->addTextPercent(
         "fps_display",
-        96.0f, 35.0f,
+        96.0f, 32.5f,
         "FPS: 60", 6.0f,
+        {255, 255, 255, 255}
+    );
+
+    bottomContainer->addTextPercent(
+        "cycle_display",
+        96.0f, 37.5f,
+        "Cycle: 00h", 6.0f,
         {255, 255, 255, 255}
     );
 }
@@ -1959,5 +1967,14 @@ void HUD::updateFpsDisplay()
         bottomContainer->getElement("fps_display"));
     if (fpsElement) {
         fpsElement->setText("FPS: " + std::to_string(fps));
+    }
+
+    auto cycleElement = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("cycle_display"));
+    if (cycleElement) {
+        int hours = static_cast<int>(fmodf(_display->getTime() /
+            zappy::gui::DURATION_DAYNIGHT_CYCLE * 24.0f + 12.0f, 24.0f));
+
+        cycleElement->setText("Cycle: " + std::to_string(hours) + "h");
     }
 }

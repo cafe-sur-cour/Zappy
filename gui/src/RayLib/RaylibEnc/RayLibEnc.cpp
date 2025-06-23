@@ -221,3 +221,8 @@ void RayLibEnc::updateLastInputType()
         return;
     }
 }
+
+float RayLibEnc::getTime() const
+{
+    return GetTime();
+}

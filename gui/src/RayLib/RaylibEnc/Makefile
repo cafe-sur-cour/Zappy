@@ -22,7 +22,6 @@ SRC =	RayLibEnc.cpp	\
 		Raylib3dModel.cpp	\
 		RaylibTextures.cpp	\
 		RaylibSkybox.cpp	\
-		ColorGradientSkybox.cpp \
 		RaylibCollision3D.cpp	\
 
 OBJ = $(SRC:.cpp=.o)
