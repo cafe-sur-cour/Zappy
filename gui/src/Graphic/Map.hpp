@@ -65,7 +65,6 @@ class Map {
 
         void drawAllPlayers();
         void drawEggs(int x, int y);
-        Color32 getTeamColor(const std::string &teamName);
 
         float getOffset(DisplayPriority priority, int x, int y, size_t stackIndex = 0);
         void updatePlayerRotations();
@@ -76,9 +75,6 @@ class Map {
     private:
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<IDisplay> _display;
-        std::unordered_map<std::string, Color32> _teamColors;
-        std::vector<Color32> _colors;
-        int _colorIndex = 0;
 
         std::unordered_map<int, std::chrono::steady_clock::time_point> _broadcastStartTimes;
         std::unordered_map<int, PlayerRotationState> _playerRotations;

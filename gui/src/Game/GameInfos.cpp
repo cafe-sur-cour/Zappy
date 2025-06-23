@@ -21,12 +21,14 @@ GameInfos::GameInfos(std::shared_ptr<ICommunication> communication) :
     _mapHeight(0),
     _timeUnit(0),
     _matrixInitialized(false),
+    _colorIndex(0),
     _gameOver(false),
     _victorySoundPlayed(false),
     _currentCameraMode(zappy::gui::CameraMode::FREE),
     _currentPlayerFocus(-1)
 {
     _communication = communication;
+    _colors = {CBLUE, CYELLOW, CPURPLE, CORANGE, CPINK, CMAROON, CRED, CGREEN};
 }
 
 GameInfos::~GameInfos()
@@ -175,6 +177,20 @@ const std::unordered_map<std::string, bool> GameInfos::getTeamVisibilities() con
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
     return _teamVisibilities;
+}
+
+Color32 GameInfos::getTeamColor(const std::string &teamName)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    if (teamName.empty())
+        return CWHITE;
+
+    if (_teamColors.find(teamName) == _teamColors.end()) {
+        _teamColors[teamName] = _colors[_colorIndex];
+        _colorIndex = (_colorIndex + 1) % _colors.size();
+    }
+    return _teamColors[teamName];
 }
 
 void GameInfos::addPlayer(const zappy::structs::Player player)

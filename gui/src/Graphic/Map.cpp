@@ -25,23 +25,10 @@
 Map::Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<IDisplay> display)
     : _gameInfos(std::move(gameInfos)), _display(display)
 {
-    _colors = {CBLUE, CYELLOW, CPURPLE, CORANGE, CPINK, CMAROON, CRED, CGREEN};
 }
 
 Map::~Map()
 {
-}
-
-Color32 Map::getTeamColor(const std::string &teamName)
-{
-    if (teamName.empty())
-        return CWHITE;
-
-    if (_teamColors.find(teamName) == _teamColors.end()) {
-        _teamColors[teamName] = _colors[_colorIndex];
-        _colorIndex = (_colorIndex + 1) % _colors.size();
-    }
-    return _teamColors[teamName];
 }
 
 void Map::draw(bool performanceMode)
@@ -204,7 +191,7 @@ void Map::drawAllPlayers()
         interpolatedPosition.y = getOffset(DisplayPriority::PLAYER, player.x, player.y,
             stackIndex);
 
-        Color32 teamColor = getTeamColor(player.teamName);
+        Color32 teamColor = _gameInfos->getTeamColor(player.teamName);
         float rotationAngle = getPlayerInterpolatedRotation(player.number,
             player.orientation);
 
@@ -250,7 +237,7 @@ void Map::drawEggs(int x, int y)
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        Color32 teamColor = getTeamColor(eggsOnTile[i]->teamName);
+        Color32 teamColor = _gameInfos->getTeamColor(eggsOnTile[i]->teamName);
 
         static float timeAccumulator = 0.0f;
         timeAccumulator += this->_display->getFrameTime();
