@@ -51,7 +51,8 @@ TESTS 	    =   tests_accept.c						\
 				tests_team.c						\
 				tests_eject.c						\
 				tests_map_init.c					\
-				tests_kil.c
+				tests_kil.c							\
+				tests_message_handlers.c
 #  tests_broadcast.c					\
 
 SRC 		=	../../../server/src/accept.c								\
