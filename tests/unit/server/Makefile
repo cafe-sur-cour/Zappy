@@ -118,6 +118,8 @@ SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/receiveMessage/loop_thru_command.c		\
 				../../../server/src/receiveMessage/pollin_handler.c			\
 				../../../server/src/receiveMessage/queu_hanlder.c			\
+				../../../server/src/receiveMessage/unified_polling.c		\
+				../../../server/src/receiveMessage/init_poll_fds.c      	\
 				../../../server/src/aiMessage/broadcast.c					\
 				../../../server/src/aiMessage/connect.c						\
 				../../../server/src/aiMessage/eject.c						\
