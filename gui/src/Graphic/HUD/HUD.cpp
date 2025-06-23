@@ -1600,7 +1600,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addTextPercent(
         "tile_resources_title",
-        30.0f, 10.0f,
+        30.0f, 2.5f,
         "TILE RESOURCES",
         8.0f,
         {255, 255, 255, 255}
@@ -1608,18 +1608,18 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addTextPercent(
         "tile_resources_separator",
-        30.0f, 17.0f,
+        30.0f, 10.0f,
         std::string(130, '-'),
         2.0f,
         {150, 150, 150, 200}
     );
 
-    float yPosCol1 = 34.0f;
+    float yPosCol1 = 27.5f;
     float xPosCol1 = 30.0f;
 
     bottomContainer->addTextPercent(
         "tile_resource_food",
-        xPosCol1 + 7.5f, 24.0f,
+        xPosCol1 + 7.5f, 15.0f,
         "Food: 0",
         7.5f,
         {255, 215, 0, 255}
@@ -1651,7 +1651,7 @@ void HUD::initTileResourceDisplay()
         {50, 205, 50, 255}
     );
 
-    float yPosCol2 = 34.0f;
+    float yPosCol2 = 27.5f;
     float xPosCol2 = 45.0f;
 
     bottomContainer->addTextPercent(
@@ -1682,7 +1682,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_food_increment_btn",
-        32.5f, 24.0f,
+        32.5f, 15.0f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1693,7 +1693,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_food_decrement_btn",
-        35.f, 24.0f,
+        35.f, 15.0f,
         2.f, 8.f,
         "-",
         [this]() {
@@ -1704,7 +1704,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_linemate_increment_btn",
-        25.f, 35.0f,
+        25.f, 27.5f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1715,7 +1715,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_linemate_decrement_btn",
-        27.5f, 35.0f,
+        27.5f, 27.5f,
         2.f, 8.f,
         "-",
         [this]() {
@@ -1726,7 +1726,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_deraumere_increment_btn",
-        25.f, 48.0f,
+        25.f, 40.5f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1737,7 +1737,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_deraumere_decrement_btn",
-        27.5f, 48.0f,
+        27.5f, 40.5f,
         2.f, 8.f,
         "-",
         [this]() {
@@ -1748,7 +1748,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_sibur_increment_btn",
-        25.f, 61.0f,
+        25.f, 53.5f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1759,7 +1759,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_sibur_decrement_btn",
-        27.5f, 61.0f,
+        27.5f, 53.5f,
         2.f, 8.f,
         "-",
         [this]() {
@@ -1770,7 +1770,7 @@ void HUD::initTileResourceDisplay()
 
         bottomContainer->addButtonPercent(
         "tile_mendiane_increment_btn",
-        40.f, 35.0f,
+        40.f, 27.5f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1781,7 +1781,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_mendiane_decrement_btn",
-        42.5f, 35.0f,
+        42.5f, 27.5f,
         2.f, 8.f,
         "-",
         [this]() {
@@ -1792,7 +1792,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_phiras_increment_btn",
-        40.f, 48.0f,
+        40.f, 40.5f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1803,7 +1803,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_phiras_decrement_btn",
-        42.5f, 48.0f,
+        42.5f, 40.5f,
         2.f, 8.f,
         "-",
         [this]() {
@@ -1814,7 +1814,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_thystame_increment_btn",
-        40.f, 61.0f,
+        40.f, 53.5f,
         2.f, 8.f,
         "+",
         [this]() {
@@ -1825,7 +1825,7 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_thystame_decrement_btn",
-        42.5f, 61.0f,
+        42.5f, 53.5f,
         2.f, 8.f,
         "-",
         [this]() {
