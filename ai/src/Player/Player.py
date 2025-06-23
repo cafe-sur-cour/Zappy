@@ -412,7 +412,7 @@ class Player:
             return
 
         if self.goToIncantationState["newDir"]:
-            self.goToIncantationState["steps"] = self.getStepsFromDirection()
+            self.goToIncantationState["steps"] += self.getStepsFromDirection()
             self.goToIncantationState["newDir"] = False
             self.goToIncantationState["movementStarted"] = True
 
@@ -767,7 +767,7 @@ class Player:
         if id == self.id:
             return
 
-        self.broadcaster.broadcastMessage(f"yourPosition {direction} {self.id} {id}")
+        self.broadcaster.broadcastMessage(f"yourPosition {self.id} {id}")
 
     def handleMessageYourPosition(self, direction: int, rest: str) -> None:
         contents = rest.split(" ")
@@ -775,17 +775,20 @@ class Player:
             self.logger.error(f"Invalid contents in yourPosition message: {rest.strip()}")
             return
 
-        reported_direction = int(contents[0])
+        senderID = contents[0]
         responderID = contents[1]
 
+        if senderID == self.id:
+            return
+
         if responderID == self.id and self.goToIncantationState["waitingForConfirmation"]:
-            if reported_direction == 0:
+            if direction == 0:
                 self.goToIncantationState["arrived"] = True
                 self.goToIncantationState["direction"] = 0
                 self.goToIncantationState["waitingForConfirmation"] = False
                 self.inIncantation = True
             else:
-                self.goToIncantationState["direction"] = reported_direction
+                self.goToIncantationState["direction"] = direction
                 self.goToIncantationState["newDir"] = True
                 self.goToIncantationState["waitingForConfirmation"] = False
                 self.goToIncantationState["arrived"] = False
@@ -815,6 +818,7 @@ class Player:
             "yourPosition ": self.handleMessageYourPosition,
             "dropStones ": self.handleMessageDropStones,
         }
+
         for key in switcher.keys():
             if message.startswith(key):
                 rest = message[len(key):].strip()
@@ -823,6 +827,7 @@ class Player:
                 else:
                     switcher[key]()
                 return
+
         self.logger.error(f"Unknown message: {message.strip()}")
 
     def loop(self) -> None:
