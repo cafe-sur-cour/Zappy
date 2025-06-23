@@ -156,6 +156,5 @@ class App:
         finally:
             if self.is_main_process:
                 self.logger.info(f"AI team {self.name} finished")
-                self._cleanup_children()
 
         return SUCCESS
