@@ -39,6 +39,13 @@ typedef struct graph_net_s {
     struct graph_net_s *next;
 } graph_net_t;
 
+/* Unified polling structure for all clients */
+typedef struct unified_poll_s {
+    struct pollfd *fds;
+    int count;
+    int capacity;
+} unified_poll_t;
+
 /* Server part of the network */
 typedef struct server_s {
     int sockfd;
@@ -50,6 +57,7 @@ typedef struct zappy_s {
     game_t *game;
     graph_net_t *graph;
     params_t *params;
+    unified_poll_t *unified_poll;
 } zappy_t;
 
 typedef struct command_pf_s {
@@ -81,6 +89,15 @@ bool check_height(char const *flag, char const *value, params_t *params);
 bool check_client(char const *flag, char const *value, params_t *params);
 bool check_freq(char const *flag, char const *value, params_t *params);
 
+/* unified_poll.c */
+unified_poll_t *init_unified_poll(void);
+void free_unified_poll(unified_poll_t *poll_struct);
+int add_fd_to_poll(unified_poll_t *poll_struct, int fd, short events);
+int remove_fd_from_poll(unified_poll_t *poll_struct, int fd);
+void rebuild_poll_fds(zappy_t *zappy);
+void poll_all_clients(zappy_t *zappy);
+
+
 /* signal.c */
 void setup_signal(void);
 int *get_running_state(void);
@@ -103,6 +120,7 @@ int start_protocol(zappy_t *server);
 bool process_new_client(const char *team_name, int fd, zappy_t *server);
 team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server);
 void check_player_status(zappy_t *zappy);
+void remove_player_by_fd(zappy_t *zappy, int fd);
 
 /* init_map.c */
 void init_game(zappy_t *server);
@@ -169,6 +187,8 @@ int forward_message(player_t *player, params_t *params);
 
 /* Pollin handler */
 void smart_poll_players(zappy_t *zappy);
+void process_player_actions(player_t *player, zappy_t *zappy);
+void process_player_actions_tick(zappy_t *zappy);
 void execute_action(player_t *player, action_request_t *action,
     zappy_t *zappy);
 void queue_action(player_t *player, char *command, zappy_t *zappy);
@@ -181,6 +201,14 @@ action_request_t *dequeue_highest_priority_action(action_queue_t *queue);
 void free_action_request(action_request_t *action);
 void insert_action_by_priority(action_queue_t *queue,
     action_request_t *action);
+
+/* Unified polling functions */
+unified_poll_t *init_unified_poll(void);
+void free_unified_poll(unified_poll_t *poll_struct);
+int add_fd_to_poll(unified_poll_t *poll_struct, int fd, short events);
+int remove_fd_from_poll(unified_poll_t *poll_struct, int fd);
+void poll_all_clients(zappy_t *zappy);
+void rebuild_poll_fds(zappy_t *zappy);
 
 /* This is the definition of the array function of the commands */
 int handle_forward(player_t *player, char *command, zappy_t *zappy);
@@ -230,7 +258,8 @@ int handle_take(player_t *player, char *command, zappy_t *zappy);
 /* graphic_clinet.c */
 graph_net_t *add_graph_node(graph_net_t **head, int fd);
 graph_net_t *remove_graph_node(graph_net_t **head, int fd);
-void poll_graphic_clients(zappy_t *zappy);
+int poll_graphic_commands(zappy_t *zappy, graph_net_t *current,
+    char *buffer);
 
 
 /* Element hander.c */
