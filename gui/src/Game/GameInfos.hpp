@@ -48,6 +48,8 @@ class GameInfos : public Subject {
         bool isTeamVisible(const std::string &teamName) const;
         const std::unordered_map<std::string, bool> getTeamVisibilities() const;
 
+        Color32 getTeamColor(const std::string &teamName);
+
         void addPlayer(const zappy::structs::Player player);
         void killPlayer(int playerNumber);
         void updatePlayerPosition(int playerNumber, int x, int y);
@@ -98,6 +100,9 @@ class GameInfos : public Subject {
         bool _matrixInitialized;
         std::vector<std::string> _teamNames;
         std::unordered_map<std::string, bool> _teamVisibilities;
+        std::unordered_map<std::string, Color32> _teamColors;
+        std::vector<Color32> _colors;
+        int _colorIndex = 0;
         std::vector<zappy::structs::Player> _players;
         std::vector<std::pair<int, bool>> _playersExpulsing;
         std::vector<std::tuple<int, std::string, std::chrono::steady_clock::time_point>>

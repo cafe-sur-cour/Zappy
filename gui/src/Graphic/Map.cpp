@@ -25,23 +25,10 @@
 Map::Map(std::shared_ptr<GameInfos> gameInfos, std::shared_ptr<IDisplay> display)
     : _gameInfos(std::move(gameInfos)), _display(display)
 {
-    _colors = {CBLUE, CYELLOW, CPURPLE, CORANGE, CPINK, CMAROON, CRED, CGREEN};
 }
 
 Map::~Map()
 {
-}
-
-Color32 Map::getTeamColor(const std::string &teamName)
-{
-    if (teamName.empty())
-        return CWHITE;
-
-    if (_teamColors.find(teamName) == _teamColors.end()) {
-        _teamColors[teamName] = _colors[_colorIndex];
-        _colorIndex = (_colorIndex + 1) % _colors.size();
-    }
-    return _teamColors[teamName];
 }
 
 void Map::draw(bool performanceMode)
@@ -204,7 +191,7 @@ void Map::drawAllPlayers()
         interpolatedPosition.y = getOffset(DisplayPriority::PLAYER, player.x, player.y,
             stackIndex);
 
-        Color32 teamColor = getTeamColor(player.teamName);
+        Color32 teamColor = _gameInfos->getTeamColor(player.teamName);
         float rotationAngle = getPlayerInterpolatedRotation(player.number,
             player.orientation);
 
@@ -250,7 +237,7 @@ void Map::drawEggs(int x, int y)
             static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
         };
 
-        Color32 teamColor = getTeamColor(eggsOnTile[i]->teamName);
+        Color32 teamColor = _gameInfos->getTeamColor(eggsOnTile[i]->teamName);
 
         static float timeAccumulator = 0.0f;
         timeAccumulator += this->_display->getFrameTime();
@@ -568,7 +555,14 @@ void Map::drawBroadcastingPlayers()
     auto it = _broadcastStartTimes.begin();
     while (it != _broadcastStartTimes.end()) {
         int playerNumber = it->first;
-        if (!_gameInfos->isTeamVisible(_gameInfos->getPlayer(playerNumber).teamName)) {
+
+        const auto& playerInfo = _gameInfos->getPlayer(playerNumber);
+        if (playerInfo.number <= 0 || playerInfo.teamName.empty()) {
+            it = _broadcastStartTimes.erase(it);
+            continue;
+        }
+
+        if (!_gameInfos->isTeamVisible(playerInfo.teamName)) {
             it = _broadcastStartTimes.erase(it);
             continue;
         }
@@ -581,12 +575,6 @@ void Map::drawBroadcastingPlayers()
 
         if (elapsedTime >= ANIMATION_DURATION) {
             it = _broadcastStartTimes.erase(it);
-            continue;
-        }
-
-        const auto& playerInfo = _gameInfos->getPlayer(playerNumber);
-        if (playerInfo.teamName.empty()) {
-            ++it;
             continue;
         }
 
@@ -760,6 +748,8 @@ float Map::getShortestAngleDifference(float from, float to)
 
 void Map::updatePlayerRotations()
 {
+    std::lock_guard<std::mutex> lock(_playerStatesMutex);
+
     auto now = std::chrono::steady_clock::now();
     const auto& players = _gameInfos->getPlayers();
 
@@ -827,6 +817,7 @@ float Map::getPlayerInterpolatedRotation(int playerId, int serverOrientation)
 {
     updatePlayerRotations();
 
+    std::lock_guard<std::mutex> lock(_playerStatesMutex);
     auto it = _playerRotations.find(playerId);
     if (it != _playerRotations.end()) {
         return it->second.currentRotation;
@@ -863,6 +854,8 @@ Vector3f Map::lerpVector3f(const Vector3f& from, const Vector3f& to, float t)
 
 void Map::updatePlayerPositions()
 {
+    std::lock_guard<std::mutex> lock(_playerStatesMutex);
+
     auto now = std::chrono::steady_clock::now();
     const auto& players = _gameInfos->getPlayers();
 
@@ -939,6 +932,7 @@ Vector3f Map::getPlayerInterpolatedPosition(int playerId, int serverX, int serve
 {
     updatePlayerPositions();
 
+    std::lock_guard<std::mutex> lock(_playerStatesMutex);
     auto it = _playerPositions.find(playerId);
     if (it != _playerPositions.end()) {
         return it->second.currentPosition;

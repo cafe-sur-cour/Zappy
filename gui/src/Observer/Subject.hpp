@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <mutex>
 
 #include "ISubject.hpp"
 
@@ -29,6 +30,7 @@ class Subject : public ISubject {
 
     private:
         std::vector<std::weak_ptr<IObserver>> _observers;
+        mutable std::mutex _observersMutex;
 };
 
 #endif /* !SUBJECT_HPP_ */

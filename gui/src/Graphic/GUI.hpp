@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <mutex>
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
 #include "HUD/HUD.hpp"
@@ -81,6 +82,8 @@ class GUI {
         std::pair<int, int> _selectedTile;
 
         bool _performanceMode = false;
+
+        mutable std::mutex _playerMutex;
 };
 
 #endif /* !GUI_HPP_ */
