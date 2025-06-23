@@ -555,7 +555,14 @@ void Map::drawBroadcastingPlayers()
     auto it = _broadcastStartTimes.begin();
     while (it != _broadcastStartTimes.end()) {
         int playerNumber = it->first;
-        if (!_gameInfos->isTeamVisible(_gameInfos->getPlayer(playerNumber).teamName)) {
+
+        const auto& playerInfo = _gameInfos->getPlayer(playerNumber);
+        if (playerInfo.number <= 0 || playerInfo.teamName.empty()) {
+            it = _broadcastStartTimes.erase(it);
+            continue;
+        }
+
+        if (!_gameInfos->isTeamVisible(playerInfo.teamName)) {
             it = _broadcastStartTimes.erase(it);
             continue;
         }
@@ -568,12 +575,6 @@ void Map::drawBroadcastingPlayers()
 
         if (elapsedTime >= ANIMATION_DURATION) {
             it = _broadcastStartTimes.erase(it);
-            continue;
-        }
-
-        const auto& playerInfo = _gameInfos->getPlayer(playerNumber);
-        if (playerInfo.teamName.empty()) {
-            ++it;
             continue;
         }
 
@@ -747,6 +748,8 @@ float Map::getShortestAngleDifference(float from, float to)
 
 void Map::updatePlayerRotations()
 {
+    std::lock_guard<std::mutex> lock(_playerStatesMutex);
+
     auto now = std::chrono::steady_clock::now();
     const auto& players = _gameInfos->getPlayers();
 
@@ -814,6 +817,7 @@ float Map::getPlayerInterpolatedRotation(int playerId, int serverOrientation)
 {
     updatePlayerRotations();
 
+    std::lock_guard<std::mutex> lock(_playerStatesMutex);
     auto it = _playerRotations.find(playerId);
     if (it != _playerRotations.end()) {
         return it->second.currentRotation;
@@ -850,6 +854,8 @@ Vector3f Map::lerpVector3f(const Vector3f& from, const Vector3f& to, float t)
 
 void Map::updatePlayerPositions()
 {
+    std::lock_guard<std::mutex> lock(_playerStatesMutex);
+
     auto now = std::chrono::steady_clock::now();
     const auto& players = _gameInfos->getPlayers();
 
@@ -926,6 +932,7 @@ Vector3f Map::getPlayerInterpolatedPosition(int playerId, int serverX, int serve
 {
     updatePlayerPositions();
 
+    std::lock_guard<std::mutex> lock(_playerStatesMutex);
     auto it = _playerPositions.find(playerId);
     if (it != _playerPositions.end()) {
         return it->second.currentPosition;

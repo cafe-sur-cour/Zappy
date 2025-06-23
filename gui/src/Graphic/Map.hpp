@@ -13,6 +13,7 @@
 #include <vector>
 #include <string>
 #include <chrono>
+#include <mutex>
 #include "../Game/GameInfos.hpp"
 #include "../IDisplay.hpp"
 
@@ -79,6 +80,8 @@ class Map {
         std::unordered_map<int, std::chrono::steady_clock::time_point> _broadcastStartTimes;
         std::unordered_map<int, PlayerRotationState> _playerRotations;
         std::unordered_map<int, PlayerPositionState> _playerPositions;
+
+        mutable std::mutex _playerStatesMutex;
 
         static constexpr float BASE_HEIGHT_TILE = 0.0f;
 

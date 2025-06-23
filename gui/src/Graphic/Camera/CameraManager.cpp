@@ -312,7 +312,6 @@ void CameraManager::updateCameraPlayerMode()
             _playerAngleXZ += rightStickX * zappy::gui::GAMEPAD_STICK_SENSITIVITY * deltaTime;
     }
 
-
     Vector3f playerPos = calculatePlayerPosition(*playerIt);
     Vector3f cameraPos = calculateCameraPosition(playerPos, _playerAngleXZ);
 
