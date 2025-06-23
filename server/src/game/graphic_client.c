@@ -102,7 +102,7 @@ static int poll_graphic(zappy_t *zappy, int poll_result,
     char *buffer = NULL;
 
     pfd->events = POLLIN;
-    poll_result = poll(pfd, 1, 0);
+    poll_result = poll(pfd, 1, 100);
     if (poll_result == -1 || (pfd->revents & (POLLHUP | POLLERR | POLLNVAL))) {
         disconnect_and_remove_client(zappy, current->fd);
         return -1;
