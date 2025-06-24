@@ -20,10 +20,13 @@
 #include "Camera/CameraManager.hpp"
 #include "../IDisplay.hpp"
 #include "../DLLoader/DLLoader.hpp"
+#include "DLLoader/LoaderType.hpp"
 
 class GUI {
     public:
-        GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &libPath);
+        GUI(std::shared_ptr<GameInfos> gameInfos,
+            const std::string &libGraphicPath,
+            const std::string &libAudioPath);
         ~GUI();
 
         void run();
@@ -63,7 +66,8 @@ class GUI {
         std::string _currentLibLoaded;
         bool _isRunning;
 
-        DLLoader<std::shared_ptr<IDisplay>> _dlLoader;
+        DLLoader<std::shared_ptr<IDisplay>> _dlLoaderGraphic;
+        DLLoader<std::shared_ptr<IDisplay>> _dlLoaderAudio;
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<Map> _map;

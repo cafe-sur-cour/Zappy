@@ -14,35 +14,55 @@
 #include <utility>
 #include "GUI.hpp"
 #include "../Exceptions/Exceptions.hpp"
-#include "../DLLoader/LoaderType.hpp"
-#include "../Audio/Audio.hpp"
+#include "../Audio/IAudio.hpp"
 #include "../Utils/Constants.hpp"
 #include "../Utils/GamepadConstants.hpp"
 
-GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
+GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &libGraphic, const std::string &libAudioPath)
     : _isRunning(false), _gameInfos(gameInfos), _backgroundLoaded(false),
         _skyboxLoaded(false), _hoveredPlayerId(-1), _selectedTile({-1, -1})
 {
-    this->_dlLoader = DLLoader<std::shared_ptr<IDisplay>>();
-    if (lib.empty())
-        throw Exceptions::ModuleError(lib + ": Lib input empty");
-    this->_dlLoader.Open(lib.c_str());
-    if (!this->_dlLoader.getHandler())
-        throw Exceptions::ModuleError(lib + ": Failed to open library: " +
+    this->_dlLoaderGraphic = DLLoader<std::shared_ptr<IDisplay>>();
+    if (libGraphic.empty())
+        throw Exceptions::ModuleGraphicError(libGraphic + ": Lib input empty");
+    this->_dlLoaderGraphic.Open(libGraphic.c_str());
+    if (!this->_dlLoaderGraphic.getHandler())
+        throw Exceptions::ModuleGraphicError(libGraphic + ": Failed to open library: " +
             std::string(dlerror()));
-    using CreateFunc = std::shared_ptr<IDisplay>(*)();
-    using GetTypeFunc = ModuleType_t(*)();
 
-    GetTypeFunc getTypeFunc = reinterpret_cast<GetTypeFunc>(this->_dlLoader.Symbol("getType"));
+    getTypeFunc_t getTypeFunc = reinterpret_cast<getTypeFunc_t>(
+        this->_dlLoaderGraphic.Symbol("getType"));
     if (!getTypeFunc || getTypeFunc() != ModuleType_t::DISPLAY_MODULE)
-        throw Exceptions::ModuleError(lib + ": Not a valid module");
+        throw Exceptions::ModuleGraphicError(libGraphic + ": Not a valid module");
 
-    CreateFunc createFunc = reinterpret_cast<CreateFunc>(this->_dlLoader.Symbol("create"));
-    if (!createFunc)
-        throw Exceptions::ModuleError(lib + ": No create symbole found in the shared lib");
-    this->_display = createFunc();
+    createGraphicFunc_t createGraphicFunc = reinterpret_cast<createGraphicFunc_t>(
+        this->_dlLoaderGraphic.Symbol("create"));
+    if (!createGraphicFunc)
+        throw Exceptions::ModuleGraphicError(libGraphic + ": No create symbole found in the shared lib");
+    this->_display = createGraphicFunc();
+    std::cout << libGraphic + ": Module GUI Found" << std::endl;
 
-    std::cout << lib + ": Module GUI Found" << std::endl;
+
+    this->_dlLoaderAudio = DLLoader<std::shared_ptr<IDisplay>>();
+    if (libAudioPath.empty())
+        throw Exceptions::ModuleAudioError(libAudioPath + ": Lib input empty");
+    this->_dlLoaderAudio.Open(libAudioPath.c_str());
+    if (!this->_dlLoaderAudio.getHandler())
+        throw Exceptions::ModuleAudioError(libAudioPath + ": Failed to open library: " +
+            std::string(dlerror()));
+
+    getTypeFunc = reinterpret_cast<getTypeFunc_t>(
+        this->_dlLoaderAudio.Symbol("getType"));
+    if (!getTypeFunc || getTypeFunc() != ModuleType_t::AUDIO_MODULE)
+        throw Exceptions::ModuleAudioError(libAudioPath + ": Not a valid module");
+
+    createAudioFunc_t createAudioFunc = reinterpret_cast<createAudioFunc_t>(
+        this->_dlLoaderAudio.Symbol("create"));
+    if (!createAudioFunc)
+        throw Exceptions::ModuleAudioError(libAudioPath + ": No create symbole found in the shared lib");
+    this->_audio = createAudioFunc();
+
+    std::cout << libAudioPath + ": Module Audio Found" << std::endl;
     _cameraMode = zappy::gui::CameraMode::FREE;
     auto monitorSize = this->_display->getMonitorSize();
     this->_windowWidth = monitorSize.x;
@@ -53,7 +73,6 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &lib)
     this->_display->initCamera();
     _isRunning = this->_display->isWindowReady();
     this->_display->setTargetFPS(zappy::gui::FPS);
-    this->_audio = std::make_shared<Audio>();
     this->_gameInfos->setAudio(this->_audio);
     this->_map = std::make_unique<Map>(_gameInfos, this->_display);
     if (!this->_display->loadFont("default", zappy::gui::CUSTOM_FONT_PATH)) {
