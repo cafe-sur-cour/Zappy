@@ -67,14 +67,11 @@ void HUD::draw()
     }
 
     auto msgContainer = _containers.find("message_container");
-    if (msgContainer != _containers.end() && msgContainer->second->isVisible()) {
+    if (msgContainer != _containers.end() && msgContainer->second->isVisible())
         msgContainer->second->draw();
-    }
 
-    // Draw team details container if visible
-    if (_teamDetailsContainer && _teamDetailsContainer->isVisible()) {
+    if (_teamDetailsContainer && _teamDetailsContainer->isVisible())
         _teamDetailsContainer->draw();
-    }
 
     if (_showVictoryMessage && !_winningTeam.empty()) {
         std::string message = "Team " + _winningTeam + " WINS!";
