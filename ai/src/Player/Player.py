@@ -220,6 +220,8 @@ class Player:
             self.look = self.communication.getLook() or self.look
             if self.look and len(self.look) > 0:
                 for item, quantity in self.look[0].items():
+                    if item == "player":
+                        continue
                     if self.teamHasEnoughStones and item != "food":
                         continue
                     for _ in range(quantity):
