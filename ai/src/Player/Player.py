@@ -16,9 +16,11 @@ from src.Exceptions.Exceptions import (
     SocketException
 )
 from src.Communication.Communication import Communication
-from src.Utils.Utils import (
+from src.Config.Constants import (
     SUCCESS,
-    FAILURE,
+    FAILURE
+)
+from src.Config.GameConfig import (
     LVL_UPGRADES,
     TOTAL_NEEDED_STONES
 )
