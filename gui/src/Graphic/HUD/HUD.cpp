@@ -25,7 +25,9 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
       _showVictoryMessage(false),
       _winningTeam(""),
       _victoryColor({0, 127, 255, 255}),
-      _selectedTile(-1, -1)
+      _selectedTile(-1, -1),
+      _hoveredTeam(""),
+      _teamDetailsContainer(nullptr)
 {
     _help = std::make_shared<Help>(display, audio);
     _settings = std::make_shared<Settings>(display, audio, camera, gameInfos);
@@ -67,6 +69,11 @@ void HUD::draw()
     auto msgContainer = _containers.find("message_container");
     if (msgContainer != _containers.end() && msgContainer->second->isVisible()) {
         msgContainer->second->draw();
+    }
+
+    // Draw team details container if visible
+    if (_teamDetailsContainer && _teamDetailsContainer->isVisible()) {
+        _teamDetailsContainer->draw();
     }
 
     if (_showVictoryMessage && !_winningTeam.empty()) {
@@ -128,6 +135,7 @@ void HUD::update()
     updateTpsSlider(_gameInfos);
     updateServerMessagesDisplay(_gameInfos);
     updateFpsDisplay();
+    updateTeamHoverDetection();
 
     if (_selectedTile.first >= 0 && _selectedTile.second >= 0)
         updateTileResourceDisplay(_selectedTile.first, _selectedTile.second);
@@ -184,13 +192,14 @@ void HUD::handleResize(int oldWidth, int oldHeight, int newWidth, int newHeight)
         pair.second->handleResize(oldWidth, oldHeight, newWidth, newHeight);
     }
 
-    if (_help) {
+    if (_help)
         _help->handleResize(oldWidth, oldHeight, newWidth, newHeight);
-    }
 
-    if (this->_settings) {
+    if (this->_settings)
         this->_settings->handleResize(oldWidth, oldHeight, newWidth, newHeight);
-    }
+
+    if (_teamDetailsContainer)
+        _teamDetailsContainer->handleResize(oldWidth, oldHeight, newWidth, newHeight);
 }
 
 void HUD::clearAllContainers()
@@ -1992,4 +2001,145 @@ void HUD::updateFpsDisplay()
 
         cycleElement->setText("Cycle: " + std::to_string(hours) + "h");
     }
+}
+
+void HUD::updateTeamHoverDetection()
+{
+    if (!_gameInfos || !_display)
+        return;
+
+    Vector2f mousePos = _display->getMousePosition();
+    auto sideContainer = getSideContainer();
+    if (!sideContainer)
+        return;
+
+    std::string currentHoveredTeam = "";
+    const std::vector<std::string> teams = _gameInfos->getTeamNames();
+
+    for (int i = static_cast<int>(teams.size()) - 1; i >= 0; i--) {
+        std::string teamId = "team_display_" + std::to_string(i);
+        const std::string& teamName = teams[i];
+
+        auto titleElement = sideContainer->getElement(teamId + "_title");
+        if (titleElement && titleElement->contains(mousePos.x, mousePos.y)) {
+            currentHoveredTeam = teamName;
+            break;
+        }
+
+        auto checkboxElement = sideContainer->getElement(teamId + "_checkbox");
+        if (checkboxElement && checkboxElement->contains(mousePos.x, mousePos.y)) {
+            currentHoveredTeam = teamName;
+            break;
+        }
+    }
+
+    if (currentHoveredTeam != _hoveredTeam) {
+        _hoveredTeam = currentHoveredTeam;
+
+        if (!_hoveredTeam.empty())
+            showTeamDetailsContainer(_hoveredTeam);
+        else
+            hideTeamDetailsContainer();
+    }
+}
+
+void HUD::createTeamDetailsContainer()
+{
+    if (_teamDetailsContainer)
+        return;
+
+    Vector2i screenDimensions = _display->getScreenSize();
+    float screenWidth = static_cast<float>(screenDimensions.x);
+    float screenHeight = static_cast<float>(screenDimensions.y);
+
+    float sideWidthPercent = 15.0f;
+    float bottomHeightPercent = 20.0f;
+    float sideWidth = (screenWidth * sideWidthPercent) / 100.0f;
+    float squareSize = sideWidth;
+
+    float containerWidth = screenWidth * 0.15f;
+    float containerHeight = screenHeight - squareSize -
+        (screenHeight * bottomHeightPercent / 100.0f);
+    float containerX = sideWidth;
+    float containerY = squareSize;
+
+    _teamDetailsContainer = std::make_shared<Containers>(
+        _display,
+        _audio,
+        containerX,
+        containerY,
+        containerWidth,
+        containerHeight,
+        Color32{40, 40, 40, 220}
+    );
+
+    _teamDetailsContainer->setRelativePosition(
+        sideWidthPercent,
+        sideWidthPercent,
+        sideWidthPercent,
+        100.0f - sideWidthPercent - bottomHeightPercent
+    );
+
+    _teamDetailsContainer->setVisible(false);
+}
+
+void HUD::showTeamDetailsContainer(const std::string& teamName)
+{
+    if (!_teamDetailsContainer)
+        createTeamDetailsContainer();
+
+    _teamDetailsContainer->clearElements();
+
+    _teamDetailsContainer->addTextPercent(
+        "details_title",
+        5.0f,
+        5.0f,
+        "Team Details: " + teamName,
+        4.0f,
+        {255, 255, 255, 255}
+    );
+
+    _teamDetailsContainer->addTextPercent(
+        "details_placeholder",
+        5.0f,
+        15.0f,
+        "Details coming soon...",
+        3.0f,
+        {180, 180, 180, 255}
+    );
+
+    _teamDetailsContainer->setVisible(true);
+}
+
+void HUD::hideTeamDetailsContainer()
+{
+    if (_teamDetailsContainer)
+        _teamDetailsContainer->setVisible(false);
+}
+
+bool HUD::isMouseOverTeam(const std::string& teamName, std::string& hoveredTeam)
+{
+    if (!_gameInfos || !_display)
+        return false;
+
+    Vector2f mousePos = _display->getMousePosition();
+    auto sideContainer = getSideContainer();
+    if (!sideContainer)
+        return false;
+
+    const std::vector<std::string> teams = _gameInfos->getTeamNames();
+
+    for (int i = static_cast<int>(teams.size()) - 1; i >= 0; i--) {
+        if (teams[i] == teamName) {
+            std::string teamId = "team_display_" + std::to_string(i);
+
+            auto titleElement = sideContainer->getElement(teamId + "_title");
+            if (titleElement && titleElement->contains(mousePos.x, mousePos.y)) {
+                hoveredTeam = teamName;
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
