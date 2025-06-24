@@ -127,9 +127,10 @@ static void send_elevation_uder_way_to_all(zappy_t *zappy, int *player_list,
     int nb_players)
 {
     char *message = "Elevation underway\n";
+    player_t *player = NULL;
 
     for (int i = 0; i < nb_players; i++) {
-        player_t *player = get_player_by_id(zappy->game, player_list[i]);
+        player = get_player_by_id(zappy->game, player_list[i]);
         if (player && player->network) {
             printf("Sending to player %d: %s", player->id, message);
             write_message(player->network->fd, message);
