@@ -72,7 +72,8 @@ CC = g++
 
 all: $(NAME)
 
-$(NAME): $(COMM_LIB) $(RAYLIB_LIB) $(AUDIO_LIB) $(DLLoader_LIB) $(OBJ) $(MAIN_OBJ)
+$(NAME): $(COMM_LIB) $(RAYLIB_LIB) $(AUDIO_LIB) $(DLLoader_LIB) \
+ 	$(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
 	$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ Compilation completed successfully!$(NC)"
