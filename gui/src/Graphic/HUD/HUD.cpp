@@ -2094,15 +2094,25 @@ void HUD::showTeamDetailsContainer(const std::string& teamName)
         "details_title",
         5.0f,
         5.0f,
-        "Team Details: " + teamName,
+        "Team Details:",
         4.0f,
         {255, 255, 255, 255}
+    );
+
+    Color32 teamColor = _gameInfos->getTeamColor(teamName);
+    _teamDetailsContainer->addTextPercent(
+        "team_name",
+        5.0f,
+        10.0f,
+        teamName,
+        4.0f,
+        teamColor
     );
 
     _teamDetailsContainer->addTextPercent(
         "details_placeholder",
         5.0f,
-        15.0f,
+        20.0f,
         "Details coming soon...",
         3.0f,
         {180, 180, 180, 255}
