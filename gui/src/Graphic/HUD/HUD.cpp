@@ -2136,10 +2136,12 @@ void HUD::showTeamDetailsContainer(const std::string& teamName)
     );
     yPos += 4.0f;
 
-    float averageLevel = totalPlayers > 0 ? static_cast<float>(totalLevels) / totalPlayers : 0.0f;
+    float averageLevel = totalPlayers > 0 ?
+        static_cast<float>(totalLevels) / totalPlayers : 0.0f;
     _teamDetailsContainer->addTextPercent(
         "average_level", 5.0f, yPos,
-        "Average Level: " + (totalPlayers > 0 ? std::to_string(averageLevel).substr(0, 4) : "0.0"),
+        "Average Level: " + (totalPlayers > 0 ?
+            std::to_string(averageLevel).substr(0, 4) : "0.0"),
         3.0f, {220, 220, 220, 255}
     );
     yPos += 4.0f;
