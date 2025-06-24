@@ -71,7 +71,7 @@ Test(malloc_fails, validate_no_extra_args_calloc_fail, .init = redirect_all_std)
 // Test network/handle_input.c malloc failures
 Test(malloc_fails, get_message_malloc_fail, .init = redirect_all_std) {
     enable_malloc_failure(0);
-    char *result = get_message(-1, 1000);
+    char *result = get_message(-1);
     cr_assert_null(result);
     disable_malloc_failure();
 }
