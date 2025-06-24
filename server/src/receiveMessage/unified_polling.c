@@ -17,7 +17,7 @@
 
 static void get_message_client(int fd, player_t *player, zappy_t *zappy)
 {
-    char *message = get_message(fd, 10);
+    char *message = get_message(fd);
 
     if (message) {
         queue_action(player, message, zappy);
@@ -64,7 +64,7 @@ static void handle_player_fd(zappy_t *zappy, int fd, short revents)
 static void get_graphic_buffer(int fd, graph_net_t *current,
     zappy_t *zappy)
 {
-    char *buffer = get_message(fd, 10);
+    char *buffer = get_message(fd);
 
     if (buffer) {
         poll_graphic_commands(zappy, current, buffer);
