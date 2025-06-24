@@ -39,8 +39,26 @@ class App:
         if self.is_main_process:
             self.logger.info(f"Shutting down AI team {self.name}...")
             self.running = False
-            self._cleanup_children()
-            exit(SUCCESS)
+
+    def _wait_for_children(self):
+        if not self.is_main_process:
+            return
+
+        if len(self.childs) > 0:
+            self.logger.info(f"Waiting for {len(self.childs)} AI child processes to finish...")
+
+        for pid in self.childs:
+            try:
+                os.waitpid(pid, 0)
+            except (ProcessLookupError, ChildProcessError):
+                pass
+            except Exception:
+                pass
+
+        num_children = len(self.childs)
+        self.childs.clear()
+        if num_children > 0:
+            self.logger.success(f"All AI processes finished.")
 
     def _cleanup_children(self):
         if not self.is_main_process:
@@ -146,15 +164,19 @@ class App:
                     break
         except (CommunicationException, SocketException):
             self.logger.error(f"Server connection lost for team {self.name}")
+            self._cleanup_children()
             return FAILURE
         except KeyboardInterrupt:
             self.logger.info(f"Interrupted - shutting down team {self.name}")
+            self._cleanup_children()
             return SUCCESS
         except Exception as e:
             self.logger.error(f"Unexpected error in main player: {e}")
+            self._cleanup_children()
             return FAILURE
         finally:
             if self.is_main_process:
+                self._wait_for_children()
                 self.logger.info(f"AI team {self.name} finished")
 
         return SUCCESS
