@@ -2040,6 +2040,8 @@ void HUD::updateTeamHoverDetection()
             showTeamDetailsContainer(_hoveredTeam);
         else
             hideTeamDetailsContainer();
+    } else if (!_hoveredTeam.empty()) {
+        showTeamDetailsContainer(_hoveredTeam);
     }
 }
 
@@ -2109,14 +2111,72 @@ void HUD::showTeamDetailsContainer(const std::string& teamName)
         teamColor
     );
 
+    const auto& players = _gameInfos->getPlayers();
+    std::vector<zappy::structs::Player> teamPlayers;
+    std::vector<int> levelCount(9, 0);
+    int totalPlayers = 0;
+    int totalLevels = 0;
+
+    for (const auto& player : players) {
+        if (player.teamName == teamName) {
+            teamPlayers.push_back(player);
+            totalPlayers++;
+            totalLevels += player.level;
+            if (player.level >= 1 && player.level <= 8)
+                levelCount[player.level]++;
+        }
+    }
+
+    float yPos = 18.0f;
+
     _teamDetailsContainer->addTextPercent(
-        "details_placeholder",
-        5.0f,
-        20.0f,
-        "Details coming soon...",
-        3.0f,
-        {180, 180, 180, 255}
+        "total_players", 5.0f, yPos,
+        "Total Players: " + std::to_string(totalPlayers),
+        3.0f, {220, 220, 220, 255}
     );
+    yPos += 4.0f;
+
+    float averageLevel = totalPlayers > 0 ? static_cast<float>(totalLevels) / totalPlayers : 0.0f;
+    _teamDetailsContainer->addTextPercent(
+        "average_level", 5.0f, yPos,
+        "Average Level: " + (totalPlayers > 0 ? std::to_string(averageLevel).substr(0, 4) : "0.0"),
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 4.0f;
+
+    _teamDetailsContainer->addTextPercent(
+        "level_distribution_title", 5.0f, yPos,
+        "Level Distribution:",
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 3.0f;
+
+    for (int level = 1; level <= 8; level++) {
+        int r = std::min(255, 150 + level * 10);
+        int g = std::min(255, 150 + level * 5);
+        int b = std::max(0, 255 - level * 15);
+        Color32 levelColor = levelCount[level] > 0 ?
+            Color32{static_cast<unsigned char>(r), static_cast<unsigned char>(g),
+                static_cast<unsigned char>(b), 255} :
+            Color32{100, 100, 100, 255};
+
+        _teamDetailsContainer->addTextPercent(
+            "level_" + std::to_string(level), 10.0f, yPos,
+            "Level " + std::to_string(level) + ": " + std::to_string(levelCount[level])
+                + " player" + (levelCount[level] > 1 ? "s" : ""),
+            2.5f, levelColor
+        );
+        yPos += 3.0f;
+    }
+
+    _teamDetailsContainer->addTextPercent(
+        "max_level_status", 5.0f, yPos,
+        levelCount[8] > 0 ?
+            "MAX LEVEL REACHED!\n(" + std::to_string(levelCount[8]) + " at level 8)" :
+            "No players at max\nlevel yet",
+        3.0f, levelCount[8] > 0 ? Color32{255, 215, 0, 255} : Color32{220, 220, 220, 255}
+    );
+    yPos += 4.0f;
 
     _teamDetailsContainer->setVisible(true);
 }
