@@ -85,12 +85,12 @@ int broadcast_text(player_t *source, player_t *dest, char *text,
     wrap_coordinates(&d[0], &d[1], zappy->params->x, zappy->params->y);
     dir[0] = get_orientation(d[0], d[1]);
     dir[1] = adjust_for_orientation(dir[0], dest->direction);
-    dir[3] = strlen(text) + int_str_len(dir[1]) + 11;
-    message = malloc(sizeof(char) * (dir[3] + 1));
+    dir[2] = strlen(text) + int_str_len(dir[1]) + 11;
+    message = malloc(sizeof(char) * (dir[2] + 1));
     if (!message)
         return -1;
-    snprintf(message, dir[3] + 1, "message %d, %s\n", dir[1], text);
-    message[dir[3]] = '\0';
+    snprintf(message, dir[2] + 1, "message %d, %s\n", dir[1], text);
+    message[dir[2]] = '\0';
     if (write_message(dest->network->fd, message) == -1) {
         free(message);
         return -1;
