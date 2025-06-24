@@ -106,6 +106,10 @@ class HUD : public IObserver {
 
         void updateFpsDisplay();
 
+        void initMapInfoDisplay();
+
+        void updateMapInfoDisplay();
+
         zappy::structs::Player getPlayerById(int playerId) const;
 
         bool isPlayerInIncantation(int playerId) const;
@@ -125,6 +129,8 @@ class HUD : public IObserver {
         std::string _camModeToText(zappy::gui::CameraMode, bool isGamePadAvailable);
 
         std::string _camKeyHelp(zappy::gui::CameraMode, bool isGamePadAvailable);
+
+        std::string _mapGlobalInfo(std::shared_ptr<GameInfos> gameInfos);
 
         std::shared_ptr<Containers> createSquareContainer(float squareSize,
             float sideWidthPercent);
