@@ -21,7 +21,7 @@ static int *distrib_tiles(int *tile_index, tiles_t *shuffled_tiles,
 
     if (pos == NULL) {
         error_message("Failed to allocate memory for tile position.");
-        return NULL;
+        exit(84);
     }
     if (*tile_index >= mapValue) {
         *tile_index = 0;
@@ -67,26 +67,10 @@ static int *get_needed_amount_of_ressources(float *density, int mapValue,
     return needed_count;
 }
 
-static int loop_thru_tiles(zappy_t *z, int type, int *needed_count,
-    tiles_t *shuffled_tiles, int tile_index)
-{
-    int *pos = NULL;
-    int mapValue = z->params->x * z->params->y;
-
-    for (int count = 0; count < needed_count[type]; count++) {
-        pos = distrib_tiles(&tile_index, shuffled_tiles, mapValue);
-        if (pos == NULL)
-            return -1;
-        z->game->map = set_tile(pos[0], pos[1], z->game->map, type);
-        send_map_tile(z->game->map->tiles, z, pos[0], pos[1]);
-        free(pos);
-    }
-    return 0;
-}
-
 /* This function distrbute the ressources on the tiles */
 int distribute_resources(zappy_t *z)
 {
+    int *pos = NULL;
     int mapValue = z->params->x * z->params->y;
     float density[7] = {0.5, 0.3, 0.15, 0.1, 0.1, 0.08, 0.05};
     tiles_t *shuffled_tiles = shuffle_fisher(z->params->x, z->params->y);
@@ -96,10 +80,11 @@ int distribute_resources(zappy_t *z)
     if (shuffled_tiles == NULL || needed_count == NULL)
         return -1;
     for (int type = 0; type < 7; type++) {
-        if (loop_thru_tiles(z, type, needed_count, shuffled_tiles, tile_index) == -1) {
-            free(needed_count);
-            free(shuffled_tiles);
-            return -1;
+        for (int count = 0; count < needed_count[type]; count++) {
+            pos = distrib_tiles(&tile_index, shuffled_tiles, mapValue);
+            z->game->map = set_tile(pos[0], pos[1], z->game->map, type);
+            send_map_tile(z->game->map->tiles, z, pos[0], pos[1]);
+            free(pos);
         }
     }
     free(shuffled_tiles);
