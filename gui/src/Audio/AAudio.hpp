@@ -12,22 +12,20 @@
 #include <map>
 #include <memory>
 #include <vector>
-#include <SFML/Audio.hpp>
 #include "IAudio.hpp"
 
-class Audio : public IAudio {
-    private:
+class AAudio : public IAudio {
+    protected:
         std::vector<std::string> _musicId = {"main_theme", "main_theme2"};
         std::vector<std::string> _sfxId = {"click", "clickPlayer", "collect",
                                             "win", "loose"};
-        std::map<std::string, std::unique_ptr<sf::Music>> _sounds;
         float _levelSFX = 75.f;
         float _levelMusic = 50.f;
         int _themeIndex = 0;
 
     public:
-        Audio();
-        ~Audio();
+        AAudio() = default;
+        ~AAudio() = default;
 
         float getSFXVolumeLevel();
         float getMusicVolumeLevel();
@@ -35,17 +33,10 @@ class Audio : public IAudio {
         void setSFXVolumeLevel(float);
         void setMusicVolumeLevel(float);
 
-        bool loadSound(const std::string& id, const std::string& filepath);
 
         void playMainTheme(float volume);
         void playNextTheme(float volume);
 
-        void playSound(const std::string& id, float volume);
-        void stopSound(const std::string& id);
-        bool isSoundPlaying(const std::string& id) const;
-
-        void setSoundLooping(const std::string& id, bool looping);
-        void setSoundVolume(const std::string& id, float volume);
 };
 
 #endif /* !AUDIO_HPP_ */
