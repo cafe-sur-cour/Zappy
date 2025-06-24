@@ -2117,13 +2117,43 @@ void HUD::showTeamDetailsContainer(const std::string& teamName)
     int totalPlayers = 0;
     int totalLevels = 0;
 
+    zappy::structs::Inventory teamResources;
+    int alivePlayersCount = 0;
+
     for (const auto& player : players) {
         if (player.teamName == teamName) {
             teamPlayers.push_back(player);
             totalPlayers++;
+            alivePlayersCount++;
             totalLevels += player.level;
             if (player.level >= 1 && player.level <= 8)
                 levelCount[player.level]++;
+
+            teamResources.food += player.inventory.food;
+            teamResources.linemate += player.inventory.linemate;
+            teamResources.deraumere += player.inventory.deraumere;
+            teamResources.sibur += player.inventory.sibur;
+            teamResources.mendiane += player.inventory.mendiane;
+            teamResources.phiras += player.inventory.phiras;
+            teamResources.thystame += player.inventory.thystame;
+        }
+    }
+
+    const auto& eggs = _gameInfos->getEggs();
+    int teamEggs = 0;
+    for (const auto& egg : eggs) {
+        if (egg.teamName == teamName)
+            teamEggs++;
+    }
+
+    const auto& incantations = _gameInfos->getIncantations();
+    int teamIncantations = 0;
+    for (const auto& incantation : incantations) {
+        for (const auto& player : teamPlayers) {
+            if (player.x == incantation.x && player.y == incantation.y) {
+                teamIncantations++;
+                break;
+            }
         }
     }
 
@@ -2170,6 +2200,7 @@ void HUD::showTeamDetailsContainer(const std::string& teamName)
         );
         yPos += 3.0f;
     }
+    yPos += 1.0f;
 
     _teamDetailsContainer->addTextPercent(
         "max_level_status", 5.0f, yPos,
@@ -2177,6 +2208,56 @@ void HUD::showTeamDetailsContainer(const std::string& teamName)
             "MAX LEVEL REACHED!\n(" + std::to_string(levelCount[8]) + " at level 8)" :
             "No players at max\nlevel yet",
         3.0f, levelCount[8] > 0 ? Color32{255, 215, 0, 255} : Color32{220, 220, 220, 255}
+    );
+    yPos += 7.5f;
+
+    _teamDetailsContainer->addTextPercent(
+        "resources_title", 5.0f, yPos,
+        "Team Resources:",
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 3.0f;
+
+    std::vector<std::pair<std::string, int>> resources = {
+        {"Food", teamResources.food},
+        {"Linemate", teamResources.linemate},
+        {"Deraumere", teamResources.deraumere},
+        {"Sibur", teamResources.sibur},
+        {"Mendiane", teamResources.mendiane},
+        {"Phiras", teamResources.phiras},
+        {"Thystame", teamResources.thystame}
+    };
+
+    for (const auto& res : resources) {
+        Color32 resColor = res.second > 0 ? Color32{150, 255, 150, 255} :
+            Color32{150, 150, 150, 255};
+        _teamDetailsContainer->addTextPercent(
+            "resource_" + res.first, 10.0f, yPos,
+            res.first + ": " + std::to_string(res.second),
+            2.2f, resColor
+        );
+        yPos += 2.5f;
+    }
+    yPos += 2.0f;
+
+    _teamDetailsContainer->addTextPercent(
+        "eggs_title", 5.0f, yPos,
+        "Eggs Status:",
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 3.0f;
+
+    _teamDetailsContainer->addTextPercent(
+        "total_eggs", 10.0f, yPos,
+        "Total Eggs: " + std::to_string(teamEggs),
+        2.5f, teamEggs > 0 ? Color32{255, 200, 100, 255} : Color32{150, 150, 150, 255}
+    );
+    yPos += 4.5f;
+
+    _teamDetailsContainer->addTextPercent(
+        "incantations_status", 5.0f, yPos,
+        "Active Incantations: " + std::to_string(teamIncantations),
+        3.0f, Color32{220, 220, 220, 255}
     );
     yPos += 4.0f;
 
