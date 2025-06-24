@@ -202,7 +202,7 @@ class Player:
             return False
 
         for inventory in self.roombaState["teamInventories"]:
-            if not self.enoughFoodForIncantation(inventory["food"] * 126):
+            if not self.enoughFoodForIncantation(inventory["food"]):
                 return False
 
         return True
