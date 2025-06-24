@@ -82,7 +82,6 @@ class Player:
             "phase": "sendComeIncant",
             "lastCommand": None,
             "playerResponses": [],
-            "nbResponsesWait": 0,
         }
 
         self.goToIncantationState: dict = {
@@ -93,6 +92,7 @@ class Player:
             "arrived": False,
             "movementStarted": False,
             "droppingStones": False,
+            "needToWait": False,
         }
         self.teamHasEnoughStones = False
 
@@ -302,30 +302,18 @@ class Player:
             self.communication.sendGetConnectNbr()
             self.incantationState["lastCommand"] = "Connect_nbr"
             self.incantationState["lastPhase"] = "sendConnectNbr"
-            self.incantationState["phase"] = "checkNbPlayers"
+            self.incantationState["phase"] = "waitForWhereAreYou"
+            self.incantationState["playerResponses"] = []
 
-        elif phase == "checkNbPlayers":
-            if self.incantationState["lastCommand"] == "Connect_nbr":
-                self.broadcaster.broadcastMessage(f"isEveryBodyHere {self.id}")
-                self.incantationState["lastCommand"] = "broadcast isEveryBodyHere"
-                self.incantationState["playerResponses"] = []
-                self.incantationState["nbPlayersWait"] = 0
+        elif phase == "waitForWhereAreYou":
+            arrivedPlayers = len([
+                response for response in self.incantationState["playerResponses"] 
+                if response.get("direction") == 0
+            ])
 
-            elif self.incantationState["lastCommand"] == "broadcast isEveryBodyHere":
-                receivedResponses = len(self.incantationState["playerResponses"])
-
-                if receivedResponses >= self.nbConnectedPlayers:
-                    self.incantationState["phase"] = "dropStones"
-                    self.incantationState["lastCommand"] = None
-                else:
-                    if self.incantationState["nbPlayersWait"] == 1:
-                        self.incantationState["status"] = False
-                        self.incantationState["nbPlayersWait"] = 0
-                        self.incantationState["playerResponses"] = []
-                        self.incantationState["phase"] = "sendComeIncant"
-                        self.roombaState["phase"] = "forward"
-                        return
-                    self.incantationState["nbPlayersWait"] += 1
+            if arrivedPlayers >= self.nbConnectedPlayers - 1:
+                self.incantationState["phase"] = "dropStones"
+                self.incantationState["lastCommand"] = None
 
         elif phase == "dropStones":
             self.broadcaster.broadcastMessage(f"dropStones {self.id}")
@@ -348,7 +336,6 @@ class Player:
                 self.incantationState["phase"] = "sendComeIncant"
                 self.incantationState["lastCommand"] = None
                 self.incantationState["playerResponses"] = []
-                self.incantationState["nbPlayersWait"] = 0
                 return
 
             self.communication.sendIncantation()
@@ -373,12 +360,19 @@ class Player:
             self.goToIncantationState["direction"] == 0 and
             self.goToIncantationState["movementStarted"]
         ):
-            self.inIncantation = True
             self.goToIncantationState["arrived"] = True
+            self.broadcaster.broadcastMessage(f"whereAreYou {self.id}")
+            self.goToIncantationState["lastCommand"] = "broadcast whereAreYou"
+            return
+
+        if self.goToIncantationState["needToWait"]:
+            sleep(0.5)
             return
 
         if len(self.goToIncantationState["steps"]) == 0:
-            sleep(0.1)
+            self.broadcaster.broadcastMessage(f"whereAreYou {self.id}")
+            self.goToIncantationState["needToWait"] = True
+            self.goToIncantationState["lastCommand"] = "broadcast whereAreYou"
             return
 
         self.goToIncantationState["movementStarted"] = True
@@ -441,7 +435,6 @@ class Player:
             self.incantationState["phase"] = "sendComeIncant"
             self.incantationState["lastCommand"] = None
             self.incantationState["playerResponses"] = []
-            self.incantationState["nbPlayersWait"] = 0
 
     def handleResponseOK(self) -> None:
         if (
@@ -469,26 +462,27 @@ class Player:
                     self.incantationState["phase"] = "sendComeIncant"
                     self.incantationState["lastCommand"] = None
                     self.incantationState["playerResponses"] = []
-                    self.incantationState["nbPlayersWait"] = 0
                     self.goToIncantationState["status"] = False
                     self.goToIncantationState["arrived"] = False
                     self.goToIncantationState["movementStarted"] = False
                     self.goToIncantationState["steps"] = []
                     self.goToIncantationState["droppingStones"] = False
                 else:
-                    if self.incantationState["status"]:
-                        self.incantationState["status"] = False
-                        self.incantationState["phase"] = "sendComeIncant"
-                        self.incantationState["lastCommand"] = None
-                        self.incantationState["playerResponses"] = []
-                        self.incantationState["nbPlayersWait"] = 0
-                        self.roombaState["phase"] = "updateInventory"
+                    self.incantationState["status"] = False
+                    self.incantationState["phase"] = "sendComeIncant"
+                    self.incantationState["lastCommand"] = None
+                    self.incantationState["playerResponses"] = []
 
                     self.goToIncantationState["status"] = False
                     self.goToIncantationState["arrived"] = False
                     self.goToIncantationState["movementStarted"] = False
                     self.goToIncantationState["steps"] = []
                     self.goToIncantationState["droppingStones"] = False
+                    self.goToIncantationState["needToWait"] = False
+
+                    self.roombaState["phase"] = "updateInventory"
+                    self.roombaState["lastCommand"] = None
+                    self.roombaState["teamInventories"] = []
             else:
                 self.logger.error(
                     f"Unexpected level response: got {new_level}, old level = {self.level}"
@@ -698,34 +692,47 @@ class Player:
             self.goToIncantationState["status"] = True
             self.goToIncantationState["direction"] = direction
             self.goToIncantationState["arrived"] = (direction == 0)
-            self.goToIncantationState["steps"] = []
+            self.goToIncantationState["steps"] = self.getStepsFromDirection()
             self.goToIncantationState["movementStarted"] = False
             self.goToIncantationState["droppingStones"] = False
 
-    def handleMessageIsEveryBodyHere(self, direction: int, rest: str) -> None:
+            self.broadcaster.broadcastMessage(f"whereAreYou {self.id}")
+
+    def handleMessageDropStones(self, direction: int, rest: str) -> None:
         id = rest.strip()
         if id == self.id:
             return
 
-        if not self.goToIncantationState["status"]:
+        if (
+            self.goToIncantationState["status"] and
+            self.goToIncantationState["arrived"]
+        ):
+            self.goToIncantationState["droppingStones"] = True
+
+    def handleMessageWhereAreYou(self, direction: int, rest: str) -> None:
+        id = rest.strip()
+        if id == self.id:
             return
 
-        self.goToIncantationState["arrived"] = (direction == 0)
-        self.goToIncantationState["direction"] = direction
-        self.goToIncantationState["steps"] += self.getStepsFromDirection()
-        self.goToIncantationState["droppingStones"] = False
+        if not self.incantationState["status"]:
+            return
 
-        if (
-            self.goToIncantationState["arrived"] and 
-            len(self.goToIncantationState["steps"]) == 0 and
-            self.goToIncantationState["direction"] == 0
-        ):
-            self.broadcaster.broadcastMessage(f"iAmHere {self.id} {id}")
+        self.broadcaster.broadcastMessage(f"here {self.id} {id}")
 
-    def handleMessageIAmHere(self, direction: int, rest: str) -> None:
+        for response in self.incantationState["playerResponses"]:
+            if response["id"] == id:
+                response["direction"] = direction
+                return
+
+        self.incantationState["playerResponses"].append({
+            "id": id,
+            "direction": direction
+        })
+
+    def handleMessageHere(self, direction: int, rest: str) -> None:
         contents = rest.split(" ")
         if len(contents) != 2:
-            self.logger.error(f"Invalid contents in iAmHere message: {rest.strip()}")
+            self.logger.error(f"Invalid contents in here message: {rest.strip()}")
             return
 
         responderID = contents[0]
@@ -736,25 +743,12 @@ class Player:
         if demanderID != self.id:
             return
 
-        for response in self.incantationState["playerResponses"]:
-            if response["id"] == responderID:
-                return
-
-        self.incantationState["playerResponses"].append({
-            "id": responderID
-        })
-
-    def handleMessageDropStones(self, direction: int, rest: str) -> None:
-        id = rest.strip()
-        if id == self.id:
-            return
-
-        if (
-            self.goToIncantationState["status"] and
-            self.goToIncantationState["arrived"] and
-            self.goToIncantationState["direction"] == 0
-        ):
-            self.goToIncantationState["droppingStones"] = True
+        if self.goToIncantationState["status"]:
+            self.goToIncantationState["direction"] = direction
+            self.goToIncantationState["steps"] = self.getStepsFromDirection()
+            self.goToIncantationState["arrived"] = (direction == 0)
+            self.goToIncantationState["movementStarted"] = False
+            self.goToIncantationState["needToWait"] = False
 
     def handleMessages(self, direction: int, message: str) -> None:
         switcher = {
@@ -762,8 +756,8 @@ class Player:
             "sendInventory ": self.handleMessageSendInventory,
             "inventory ": self.handleMessageInventory,
             "comeIncant ": self.handleMessageComeIncant,
-            "isEveryBodyHere ": self.handleMessageIsEveryBodyHere,
-            "iAmHere ": self.handleMessageIAmHere,
+            "whereAreYou ": self.handleMessageWhereAreYou,
+            "here ": self.handleMessageHere,
             "dropStones ": self.handleMessageDropStones,
         }
 
@@ -773,7 +767,7 @@ class Player:
                 if rest:
                     switcher[key](direction, rest)
                 else:
-                    switcher[key]()
+                    switcher[key](direction)
                 return
 
         self.logger.error(f"Unknown message: {message.strip()}")
