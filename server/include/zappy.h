@@ -181,7 +181,7 @@ int send_start_incantation(zappy_t *zappy, player_t *player, int *player_list,
 int send_end_incantation(zappy_t *zappy, player_t *player, char *result);
 
 /* init_egg.c */
-void init_egg(zappy_t *zappy);
+int init_egg(zappy_t *zappy);
 egg_t *add_egg_node(int id, int *pos, char *team_name, int id_layer);
 egg_t *kil_egg_node(egg_t **head, int egg_id);
 

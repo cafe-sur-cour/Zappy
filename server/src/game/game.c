@@ -179,6 +179,9 @@ int init_game(zappy_t *zappy)
     }
     if (zappy->params->is_debug == true)
         print_map_tiles(zappy);
-    init_egg(zappy);
+    if (init_egg(zappy) == -1) {
+        free_zappy(zappy);
+        return -1;
+    }
     return 0;
 }
