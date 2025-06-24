@@ -191,8 +191,8 @@ TEST_F(ExceptionsTest, ReceiveExceptionTest) {
 // Test the ModuleException
 TEST_F(ExceptionsTest, ModuleExceptionTest) {
     std::string errorMessage = "Module initialization failed";
-    Exceptions::ModuleError exception(errorMessage);
+    Exceptions::ModuleAudioError exception(errorMessage);
 
     EXPECT_STREQ(exception.what(), exception.what());
-    EXPECT_TRUE(dynamic_cast<const Exceptions::ModuleError*>(&exception) != nullptr);
+    EXPECT_TRUE(dynamic_cast<const Exceptions::ModuleAudioError*>(&exception) != nullptr);
 }

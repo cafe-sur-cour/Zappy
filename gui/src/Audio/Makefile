@@ -12,39 +12,15 @@ RED=\033[1;31m
 YELLOW=\033[1;33m
 NC=\033[0m
 
-SRC =	Audio.cpp
-
-OBJ = $(SRC:.cpp=.o)
-
-INCLUDES = -I../../include -I../..
-
-CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror -fPIC
-CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
-
-LIBS = -lsfml-audio
-
-NAME = libaudio.a
-
-CC = g++
-
-all: $(NAME)
-
-$(NAME): $(OBJ)
-	@echo -e "$(BLUE)ᒥ🔧ᒧ Creating static library $(NAME)...$(NC)"
-	ar rcs $(NAME) $(OBJ)
-	@echo -e "$(GREEN)ᒥ✅ᒧ Library $(NAME) created successfully!$(NC)"
-
-%.o: %.cpp
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+all:
+	@make -C ./SFML
 
 clean:
-	@rm -rf $(OBJ)
-	@rm -rf *.gcda
-	@rm -rf *.gcno
-	@rm -rf *.gcov
+	@make -C ./SFML clean
+
 
 fclean: clean
-	@rm -rf $(NAME)
+	@make -C ./SFML fclean
 
 re: fclean all
 

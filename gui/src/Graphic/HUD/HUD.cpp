@@ -2002,6 +2002,23 @@ void HUD::updateFpsDisplay()
 
 void HUD::updateTeamHoverDetection()
 {
+    return;
+    static std::chrono::steady_clock::time_point lastCheckTime;
+    static std::string lastHoveredTeam;
+    static bool shouldDisplay = false;
+
+    auto now = std::chrono::steady_clock::now();
+    std::chrono::duration<float> elapsed = now - lastCheckTime;
+
+    if (elapsed.count() < 0.1f) {
+        if (shouldDisplay && !lastHoveredTeam.empty())
+            showTeamDetailsContainer(lastHoveredTeam);
+        else
+            hideTeamDetailsContainer();
+        return;
+    }
+    lastCheckTime = now;
+
     if (!_gameInfos || !_display)
         return;
 
@@ -2032,13 +2049,19 @@ void HUD::updateTeamHoverDetection()
 
     if (currentHoveredTeam != _hoveredTeam) {
         _hoveredTeam = currentHoveredTeam;
-
-        if (!_hoveredTeam.empty())
+        lastHoveredTeam = _hoveredTeam;
+        shouldDisplay = !_hoveredTeam.empty();
+        if (shouldDisplay)
             showTeamDetailsContainer(_hoveredTeam);
         else
             hideTeamDetailsContainer();
     } else if (!_hoveredTeam.empty()) {
+        lastHoveredTeam = _hoveredTeam;
+        shouldDisplay = true;
         showTeamDetailsContainer(_hoveredTeam);
+    } else {
+        shouldDisplay = false;
+        hideTeamDetailsContainer();
     }
 }
 
@@ -2265,31 +2288,4 @@ void HUD::hideTeamDetailsContainer()
 {
     if (_teamDetailsContainer)
         _teamDetailsContainer->setVisible(false);
-}
-
-bool HUD::isMouseOverTeam(const std::string& teamName, std::string& hoveredTeam)
-{
-    if (!_gameInfos || !_display)
-        return false;
-
-    Vector2f mousePos = _display->getMousePosition();
-    auto sideContainer = getSideContainer();
-    if (!sideContainer)
-        return false;
-
-    const std::vector<std::string> teams = _gameInfos->getTeamNames();
-
-    for (int i = static_cast<int>(teams.size()) - 1; i >= 0; i--) {
-        if (teams[i] == teamName) {
-            std::string teamId = "team_display_" + std::to_string(i);
-
-            auto titleElement = sideContainer->getElement(teamId + "_title");
-            if (titleElement && titleElement->contains(mousePos.x, mousePos.y)) {
-                hoveredTeam = teamName;
-                return true;
-            }
-        }
-    }
-
-    return false;
 }
