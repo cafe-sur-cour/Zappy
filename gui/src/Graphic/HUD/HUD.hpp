@@ -186,7 +186,6 @@ class HUD : public IObserver {
         void createTeamDetailsContainer();
         void showTeamDetailsContainer(const std::string& teamName);
         void hideTeamDetailsContainer();
-        bool isMouseOverTeam(const std::string& teamName, std::string& hoveredTeam);
 
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<IDisplay> _display;
