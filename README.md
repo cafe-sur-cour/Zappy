@@ -63,13 +63,45 @@ Before running Zappy, ensure you have:
 
 ### 🔧 Installation
 
-1. **Clone the repository**
+1. **Install RayLib** (only if you don't already have the lib)
+   **Ubuntu**:
+    ```bash 
+    apt install libraylib-dev
+   ```  
+   **Other distributions**:
+   ```bash
+    git clone https://github.com/raysan5/raylib.git raylib
+    cd raylib
+    mkdir build && cd build
+    cmake -DSHARED=ON -DBUILD_EXAMPLES=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON ..
+    make -j$(nproc)
+    make install
+    ldconfig
+    cd ../..
+    ```
+
+2. **Install SFML** (only if you don't already have the lib)
+    **Ubuntu**:
+    ```bash 
+    apt install libsfml-dev
+   ``` 
+   **Other distributions**:
+   ```bash
+    wget https://github.com/SFML/SFML/archive/refs/heads/2.3.x.zip
+    unzip 2.3.x.zip && cd 2.3.x
+    mkdir build && cd build 
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
+    make -j$(nproc)
+    make install
+    ```
+
+3. **Clone the repository**
    ```bash
    git clone <repository-url>
    cd zappy
    ```
-
-2. **Build all components**
+   
+4. **Build all components**
    ```bash
    make
    ```
@@ -78,7 +110,7 @@ Before running Zappy, ensure you have:
    - `zappy_gui` - The graphical interface
    - `zappy_ai` - The AI bot
 
-3. **Run the game**
+5. **Run the game**
    
    **Start the server:**
    ```bash
