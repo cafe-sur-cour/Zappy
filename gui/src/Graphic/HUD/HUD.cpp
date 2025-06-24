@@ -1293,6 +1293,7 @@ std::string HUD::_mapGlobalInfo(std::shared_ptr<GameInfos> gameInfos)
     info += "Map size: " + std::to_string(mapSize.first) + "x" +
                        std::to_string(mapSize.second) + "\n";
 
+    int totalEgg = gameInfos->getEggs().size();
     int totalFood = 0;
     int totalLinemate = 0;
     int totalDeraumere = 0;
@@ -1314,20 +1315,30 @@ std::string HUD::_mapGlobalInfo(std::shared_ptr<GameInfos> gameInfos)
         }
     }
 
-    info += "Food: " + std::to_string(totalFood) + "\n";
+    info += "Food: " + std::to_string(totalFood) + " Egg: " + std::to_string(totalEgg)+ "\n";
     info += "Linemate: " + std::to_string(totalLinemate);
     info += " Deraumere: " + std::to_string(totalDeraumere) + "\n";
     info += "Sibur: " + std::to_string(totalSibur);
     info += " Mendiane: " + std::to_string(totalMendiane) + "\n";
     info += "Phiras: " + std::to_string(totalPhiras);
     info += " Thystame: " + std::to_string(totalThystame) + "\n";
-
+    info += "Total resources: "
+         + std::to_string(totalFood + totalLinemate + totalDeraumere
+                          + totalSibur + totalMendiane
+                          + totalPhiras + totalThystame) + "\n";
     const auto& players = gameInfos->getPlayers();
     const auto& teams = gameInfos->getTeamNames();
 
     info += "Total players / teams: " + std::to_string(players.size()) + "/ "
          + std::to_string(teams.size()) + "\n";
 
+    int max_level = 1;
+
+    for (const auto& player : players) {
+        if (player.level > max_level)
+            max_level = player.level;
+    }
+    info += "Player level max: " + std::to_string(max_level) + "\n";
     return info;
 }
 
