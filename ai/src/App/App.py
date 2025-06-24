@@ -9,7 +9,7 @@ import os
 import sys
 import signal
 import time
-from src.Utils.Utils import (
+from src.Config.Constants import (
     FAILURE,
     SUCCESS,
 )
