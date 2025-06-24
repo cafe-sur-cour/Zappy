@@ -97,6 +97,9 @@ int remove_fd_from_poll(unified_poll_t *poll_struct, int fd);
 void rebuild_poll_fds(zappy_t *zappy);
 void poll_all_clients(zappy_t *zappy);
 
+/* build_fds.c */
+void rebuild_poll_fds(zappy_t *zappy);
+
 
 /* signal.c */
 void setup_signal(void);
@@ -303,4 +306,8 @@ int send_pin_message(graph_net_t *graphic, player_t *player);
 player_t *get_player_by_id(game_t *game, int player_id);
 int get_next_free_id(zappy_t *server);
 void verify_player_id(zappy_t *zappy, player_t *player);
+
+/* pending_connections.c */
+bool is_pending_connection(zappy_t *zappy, int fd);
+int accept_client_team_name(zappy_t *zappy, int new_sockfd);
 #endif /* !ZAPPY_H_ */
