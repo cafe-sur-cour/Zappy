@@ -68,7 +68,6 @@ class Communication : public ICommunication {
         int _socket;
         struct pollfd _pollfd;
         static const int BUFFER_SIZE = 4096;
-        static const int POLL_TIMEOUT = 100;
         static const char MESSAGE_DELIMITER = '\n';
 };
 
