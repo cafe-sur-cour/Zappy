@@ -18,7 +18,8 @@
 class Audio : public IAudio {
     private:
         std::vector<std::string> _musicId = {"main_theme", "main_theme2"};
-        std::vector<std::string> _sfxId = {"click", "clickPlayer"};
+        std::vector<std::string> _sfxId = {"click", "clickPlayer", "collect",
+                                            "win", "loose"};
         std::map<std::string, std::unique_ptr<sf::Music>> _sounds;
         float _levelSFX = 75.f;
         float _levelMusic = 50.f;
