@@ -13,7 +13,7 @@ SRC =	../AAudio.cpp	\
 
 CXX = g++
 
-CFLAGS = -std=c++20 -Wall -Wextra -Wshadow -Werror -fPIC -lsfml-audio
+CFLAGS = -std=c++20 -Wall -Wextra -Wshadow -Werror -O2 -fPIC -lsfml-audio
 
 OBJ = $(SRC:.cpp=.o)
 
