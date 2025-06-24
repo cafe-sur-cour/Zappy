@@ -532,7 +532,7 @@ void GUI::handlePlayerClicks()
         if (_hoveredPlayerId >= 0) {
             setPlayerToFollow(_hoveredPlayerId);
             switchCameraMode(zappy::gui::CameraMode::PLAYER);
-            _audio->playSound("clickPlayer", 100.0f);
+            _audio->playSound("clickPlayer", this->_audio->getSFXVolumeLevel());
         } else {
             handleTileClicks();
         }
