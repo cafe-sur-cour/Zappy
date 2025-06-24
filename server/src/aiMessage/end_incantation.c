@@ -18,7 +18,6 @@ static void send_end_incantation_to_all(zappy_t *zappy, int *player_list,
 {
     player_t *current_player = NULL;
     char msg[19];
-    player_t *current_player = NULL;
 
     snprintf(msg, 19, "Current level: %d\n", player->level);
     for (int i = 0; i < nb_players; i++) {
