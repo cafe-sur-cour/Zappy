@@ -17,7 +17,7 @@
 
 static void get_message_client(int fd, player_t *player, zappy_t *zappy)
 {
-    char *message = get_message(fd, 10);
+    char *message = get_message(fd);
 
     if (message) {
         queue_action(player, message, zappy);
@@ -64,7 +64,7 @@ static void handle_player_fd(zappy_t *zappy, int fd, short revents)
 static void get_graphic_buffer(int fd, graph_net_t *current,
     zappy_t *zappy)
 {
-    char *buffer = get_message(fd, 10);
+    char *buffer = get_message(fd);
 
     if (buffer) {
         poll_graphic_commands(zappy, current, buffer);
@@ -95,46 +95,6 @@ static void handle_graphic_fd(zappy_t *zappy, int fd, short revents)
     }
 }
 
-static void poll_graphics_clients(zappy_t *zappy)
-{
-    graph_net_t *graphic = zappy->graph;
-
-    while (graphic) {
-        if (graphic->fd >= 0) {
-            add_fd_to_poll(zappy->unified_poll, graphic->fd, POLLIN);
-        }
-        graphic = graphic->next;
-    }
-}
-
-static void accept_client_fd_to_list(zappy_t *zappy, player_t *player)
-{
-    while (player) {
-        if (player->network && player->network->fd >= 0) {
-            add_fd_to_poll(zappy->unified_poll, player->network->fd, POLLIN);
-        }
-        player = player->next;
-    }
-}
-
-void rebuild_poll_fds(zappy_t *zappy)
-{
-    team_t *team = NULL;
-    player_t *player = NULL;
-
-    if (!zappy || !zappy->unified_poll)
-        return;
-    zappy->unified_poll->count = 0;
-    add_fd_to_poll(zappy->unified_poll, zappy->network->sockfd, POLLIN);
-    team = zappy->game->teams;
-    while (team) {
-        player = team->players;
-        accept_client_fd_to_list(zappy, player);
-        team = team->next;
-    }
-    poll_graphics_clients(zappy);
-}
-
 static int verify_value_polls(zappy_t *zappy)
 {
     int tick_duration_ms = 0;
@@ -155,6 +115,21 @@ static int verify_value_polls(zappy_t *zappy)
     return tick_duration_ms;
 }
 
+static int handle_pending_and_new_connection(zappy_t *zappy, int fd,
+    short revents)
+{
+    if (fd == zappy->network->sockfd && revents & POLLIN) {
+        accept_client(zappy);
+        return 1;
+    }
+    if (is_pending_connection(zappy, fd) && revents & POLLIN) {
+        accept_client_team_name(zappy, fd);
+        return 1;
+    }
+    return 0;
+}
+
+/* This funtion rebuilds and handle commands from FD'S */
 void poll_all_clients(zappy_t *zappy)
 {
     int tick_duration_ms = verify_value_polls(zappy);
@@ -168,8 +143,8 @@ void poll_all_clients(zappy_t *zappy)
             continue;
         fd = zappy->unified_poll->fds[i].fd;
         revents = zappy->unified_poll->fds[i].revents;
-        if (fd == zappy->network->sockfd && revents & POLLIN)
-            accept_client(zappy);
+        if (handle_pending_and_new_connection(zappy, fd, revents) == 1)
+            continue;
         handle_player_fd(zappy, fd, revents);
         handle_graphic_fd(zappy, fd, revents);
     }
