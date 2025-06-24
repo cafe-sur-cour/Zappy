@@ -19,8 +19,11 @@
 
 HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
          std::shared_ptr<IAudio> audio,
-         std::shared_ptr<CameraManager> camera, std::function<void()> resetCameraFunc)
+         std::shared_ptr<CameraManager> camera,
+         bool performanceMode,
+         std::function<void()> resetCameraFunc)
     : _containers(), _display(display), _gameInfos(gameInfos), _audio(audio), _camera(camera),
+      _performanceMode(performanceMode),
       _resetCameraFunc(resetCameraFunc),
       _showVictoryMessage(false),
       _winningTeam(""),
@@ -1288,32 +1291,22 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
 
 std::string HUD::_mapGlobalInfo(std::shared_ptr<GameInfos> gameInfos)
 {
-    std::string info = "";
     auto mapSize = gameInfos->getMapSize();
+    if (this->_performanceMode || (mapSize.first >= 50 && mapSize.second >= 50))
+        return "Performance mode enabled";
+
+    std::string info = "";
     info += "Map size: " + std::to_string(mapSize.first) + "x" +
                        std::to_string(mapSize.second) + "\n";
 
-    int totalEgg = gameInfos->getEggs().size();
-    int totalFood = 0;
-    int totalLinemate = 0;
-    int totalDeraumere = 0;
-    int totalSibur = 0;
-    int totalMendiane = 0;
-    int totalPhiras = 0;
-    int totalThystame = 0;
-
-    for (int y = 0; y < mapSize.second; y++) {
-        for (int x = 0; x < mapSize.first; x++) {
-            auto tile = gameInfos->getTile(x, y);
-            totalFood += tile.food;
-            totalLinemate += tile.linemate;
-            totalDeraumere += tile.deraumere;
-            totalSibur += tile.sibur;
-            totalMendiane += tile.mendiane;
-            totalPhiras += tile.phiras;
-            totalThystame += tile.thystame;
-        }
-    }
+    int totalEgg = gameInfos->getTotalEggs();
+    int totalFood = gameInfos->getTotalFood();
+    int totalLinemate = gameInfos->getTotalLinemate();
+    int totalDeraumere = gameInfos->getTotalDeraumere();
+    int totalSibur = gameInfos->getTotalSibur();
+    int totalMendiane = gameInfos->getTotalMendiane();
+    int totalPhiras = gameInfos->getTotalPhiras();
+    int totalThystame = gameInfos->getTotalThystame();
 
     info += "Food: " + std::to_string(totalFood) + " Egg: " + std::to_string(totalEgg)+ "\n";
     info += "Linemate: " + std::to_string(totalLinemate);
