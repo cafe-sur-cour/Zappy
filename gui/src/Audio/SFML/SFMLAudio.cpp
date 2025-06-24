@@ -7,6 +7,9 @@
 
 #include "SFMLAudio.hpp"
 #include <iostream>
+#include <string>
+#include <utility>
+#include <memory>
 
 SFMLAudio::SFMLAudio()
 {

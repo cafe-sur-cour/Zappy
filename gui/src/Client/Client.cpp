@@ -113,7 +113,6 @@ void Client::_createGUI()
         }
         break;
     }
-
 }
 
 void Client::initialize(int ac, const char *const *av)

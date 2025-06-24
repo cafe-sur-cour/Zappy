@@ -33,10 +33,8 @@ class AAudio : public IAudio {
         void setSFXVolumeLevel(float);
         void setMusicVolumeLevel(float);
 
-
         void playMainTheme(float volume);
         void playNextTheme(float volume);
-
 };
 
 #endif /* !AUDIO_HPP_ */

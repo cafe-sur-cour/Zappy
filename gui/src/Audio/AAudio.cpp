@@ -5,8 +5,6 @@
 ** Audio
 */
 
-#include "AAudio.hpp"
-#include <SFML/Audio.hpp>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -14,6 +12,8 @@
 #include <random>
 #include <chrono>
 #include <algorithm>
+#include <SFML/Audio.hpp>
+#include "AAudio.hpp"
 
 float AAudio::getSFXVolumeLevel() {
     return this->_levelSFX;

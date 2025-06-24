@@ -18,8 +18,10 @@
 #include "../Utils/Constants.hpp"
 #include "../Utils/GamepadConstants.hpp"
 
-GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &libGraphic, const std::string &libAudioPath)
-    : _isRunning(false), _gameInfos(gameInfos), _backgroundLoaded(false),
+GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
+    const std::string &libGraphic,
+    const std::string &libAudioPath
+): _isRunning(false), _gameInfos(gameInfos), _backgroundLoaded(false),
         _skyboxLoaded(false), _hoveredPlayerId(-1), _selectedTile({-1, -1})
 {
     this->_dlLoaderGraphic = DLLoader<std::shared_ptr<IDisplay>>();
@@ -38,7 +40,8 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &libGraphic, co
     createGraphicFunc_t createGraphicFunc = reinterpret_cast<createGraphicFunc_t>(
         this->_dlLoaderGraphic.Symbol("create"));
     if (!createGraphicFunc)
-        throw Exceptions::ModuleGraphicError(libGraphic + ": No create symbole found in the shared lib");
+        throw Exceptions::ModuleGraphicError(libGraphic +
+            ": No create symbole found in the shared lib");
     this->_display = createGraphicFunc();
     std::cout << libGraphic + ": Module GUI Found" << std::endl;
 
@@ -59,7 +62,8 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &libGraphic, co
     createAudioFunc_t createAudioFunc = reinterpret_cast<createAudioFunc_t>(
         this->_dlLoaderAudio.Symbol("create"));
     if (!createAudioFunc)
-        throw Exceptions::ModuleAudioError(libAudioPath + ": No create symbole found in the shared lib");
+        throw Exceptions::ModuleAudioError(libAudioPath +
+            ": No create symbole found in the shared lib");
     this->_audio = createAudioFunc();
 
     std::cout << libAudioPath + ": Module Audio Found" << std::endl;

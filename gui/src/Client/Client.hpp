@@ -9,6 +9,7 @@
 #define CLIENT_HPP_
 
 #include <memory>
+#include <vector>
 #include <filesystem>
 #include <string>
 #include "../Utils/Constants.hpp"

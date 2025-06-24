@@ -8,6 +8,9 @@
 #ifndef SFMLAUDIO_HPP
 #define SFMLAUDIO_HPP
 
+#include <string>
+#include <memory>
+#include <map>
 #include <SFML/Audio.hpp>
 #include "../AAudio.hpp"
 
@@ -33,4 +36,4 @@ class SFMLAudio : public AAudio{
 
 
 
-#endif //SFMLAUDIO_HPP
+#endif  // SFMLAUDIO_HPP
