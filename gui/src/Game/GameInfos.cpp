@@ -433,7 +433,7 @@ void GameInfos::updatePlayerResourceAction(int playerNumber, int resourceId, boo
     if (isCollecting && _audio) {
         if (_currentCameraMode == zappy::gui::CameraMode::PLAYER) {
             if (playerNumber == _currentPlayerFocus) {
-                _audio->playSound("collect", 100.0f);
+                _audio->playSound("collect", this->_audio->getSFXVolumeLevel());
             }
         }
     }
