@@ -242,7 +242,10 @@ class Player:
                 receivedInventories = len(self.roombaState["teamInventories"])
 
                 if receivedInventories >= expectedTeammates:
-                    if self.doesTeamHaveEnoughStones() and self.teamHasEnoughFoodForIncantation():
+                    if (
+                        self.doesTeamHaveEnoughStones() and
+                        self.teamHasEnoughFoodForIncantation()
+                    ):
                         should_initiate = True
                         for inventory in self.roombaState["teamInventories"]:
                             teammate_id = inventory["id"]
@@ -307,7 +310,7 @@ class Player:
 
         elif phase == "waitForWhereAreYou":
             arrivedPlayers = len([
-                response for response in self.incantationState["playerResponses"] 
+                response for response in self.incantationState["playerResponses"]
                 if response.get("direction") == 0
             ])
 
