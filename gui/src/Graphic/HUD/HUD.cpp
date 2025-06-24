@@ -37,6 +37,7 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
     initTeamPlayersDisplay(_gameInfos);
     initTpsSlider(_gameInfos, _display, _audio);
     initServerMessagesDisplay(_gameInfos);
+    initMapInfoDisplay();
     this->_initHelpInformation();
 
     if (_gameInfos) {
@@ -127,6 +128,7 @@ void HUD::update()
     updateTeamPlayersDisplay(_gameInfos);
     updateTpsSlider(_gameInfos);
     updateServerMessagesDisplay(_gameInfos);
+    updateMapInfoDisplay();
     updateFpsDisplay();
 
     if (_selectedTile.first >= 0 && _selectedTile.second >= 0)
@@ -1240,16 +1242,20 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
         switch (cameraMode)
         {
         case zappy::gui::CameraMode::FREE:
-            return "Right joystick = Change camera direction\n"
-                     "Left joystick = Move camera x and z\n"
+            return "Right joystick =\n"
+                     "Change camera direction\n"
+                     "Left joystick = Move camera x z\n"
                      "RT | LT = Move camera y\n"
                      "Select = Toggle HUD\n";
         case zappy::gui::CameraMode::PLAYER:
-            return "UP | DOWN = Next / Previous player\n"
-                     "Right joystick = Change camera direction\n"
+            return "UP | DOWN =\n"
+                     "Next / Previous player\n"
+                     "Right joystick =\n"
+                     "Change camera direction\n"
                      "Select = Toggle HUD\n";
         case zappy::gui::CameraMode::TARGETED:
-            return "Right joystick = Rotate camera around map origin\n"
+            return "Right joystick =\n"
+                     "Rotate camera around center\n"
                      "RT | LT = Zoom / Unzoom\n"
                      "Select = Toggle HUD\n";
         default:
@@ -1260,20 +1266,69 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
     {
     case zappy::gui::CameraMode::FREE:
         return "Z | Q | S | D = Move camera\n"
-                 "UP | DOWN | RIGHT | LEFT = Change camera direction\n"
+                 "UP | DOWN | RIGHT | LEFT =\n"
+                 "Change camera direction\n"
                  "H = Toggle HUD\n";
     case zappy::gui::CameraMode::PLAYER:
-        return "UP | DOWN = Next / Previous player\n"
-                 "RIGHT | LEFT = Change camera direction\n"
+        return "UP | DOWN =\n"
+                 "Next / Previous player\n"
+                 "RIGHT | LEFT =\n"
+                 "Change camera direction\n"
                  "H = Toggle HUD\n";
     case zappy::gui::CameraMode::TARGETED:
-        return "UP | DOWN | RIGHT | LEFT = Rotate camera around map origin\n"
+        return "UP | DOWN | RIGHT | LEFT =\n"
+                 "Rotate camera around center\n"
                  "SCROLL = Zoom / Unzoom\n"
                  "H = Toggle HUD\n";
     default:
         return "Unknown";
     }
     return "Unknown";
+}
+
+std::string HUD::_mapGlobalInfo(std::shared_ptr<GameInfos> gameInfos)
+{
+    std::string info = "";
+    auto mapSize = gameInfos->getMapSize();
+    info += "Map size: " + std::to_string(mapSize.first) + "x" +
+                       std::to_string(mapSize.second) + "\n";
+
+    int totalFood = 0;
+    int totalLinemate = 0;
+    int totalDeraumere = 0;
+    int totalSibur = 0;
+    int totalMendiane = 0;
+    int totalPhiras = 0;
+    int totalThystame = 0;
+
+    for (int y = 0; y < mapSize.second; y++) {
+        for (int x = 0; x < mapSize.first; x++) {
+            auto tile = gameInfos->getTile(x, y);
+            totalFood += tile.food;
+            totalLinemate += tile.linemate;
+            totalDeraumere += tile.deraumere;
+            totalSibur += tile.sibur;
+            totalMendiane += tile.mendiane;
+            totalPhiras += tile.phiras;
+            totalThystame += tile.thystame;
+        }
+    }
+
+    info += "Food: " + std::to_string(totalFood) + "\n";
+    info += "Linemate: " + std::to_string(totalLinemate);
+    info += " Deraumere: " + std::to_string(totalDeraumere) + "\n";
+    info += "Sibur: " + std::to_string(totalSibur);
+    info += " Mendiane: " + std::to_string(totalMendiane) + "\n";
+    info += "Phiras: " + std::to_string(totalPhiras);
+    info += " Thystame: " + std::to_string(totalThystame) + "\n";
+
+    const auto& players = gameInfos->getPlayers();
+    const auto& teams = gameInfos->getTeamNames();
+
+    info += "Total players / teams: " + std::to_string(players.size()) + "/ "
+         + std::to_string(teams.size()) + "\n";
+
+    return info;
 }
 
 void HUD::updateHelpInformationHUD(zappy::gui::CameraMode cameraMode)
@@ -1298,6 +1353,44 @@ void HUD::updateHelpInformationHUD(zappy::gui::CameraMode cameraMode)
     if (keyHelp && keyHelp->getText() != camHelpKey) {
         keyHelp->setText(camHelpKey);
         return;
+    }
+}
+
+void HUD::initMapInfoDisplay()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    bottomContainer->addTextPercent(
+        "map_info_content",
+        15.0f, 2.5f,
+        "Loading map data...",
+        7.0f,
+        {220, 220, 220, 255}
+    );
+}
+
+void HUD::updateMapInfoDisplay()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer || !_gameInfos)
+        return;
+
+    auto mapInfoTextElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("map_info_content"));
+
+    if (!mapInfoTextElem) {
+        initMapInfoDisplay();
+        mapInfoTextElem = std::dynamic_pointer_cast<Text>(
+            bottomContainer->getElement("map_info_content"));
+        if (!mapInfoTextElem)
+            return;
+    }
+
+    auto mapInfoText = this->_mapGlobalInfo(_gameInfos);
+    if (mapInfoTextElem->getText() != mapInfoText) {
+        mapInfoTextElem->setText(mapInfoText);
     }
 }
 
@@ -1686,8 +1779,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_food_increment_btn",
-        32.5f, 15.0f,
-        2.f, 8.f,
+        34.9f, 15.0f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1697,8 +1790,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_food_decrement_btn",
-        35.f, 15.0f,
-        2.f, 8.f,
+        36.0f, 15.0f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1708,8 +1801,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_linemate_increment_btn",
-        25.f, 27.5f,
-        2.f, 8.f,
+        27.4f, 27.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1719,8 +1812,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_linemate_decrement_btn",
-        27.5f, 27.5f,
-        2.f, 8.f,
+        28.5f, 27.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1730,8 +1823,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_deraumere_increment_btn",
-        25.f, 40.5f,
-        2.f, 8.f,
+        27.4f, 40.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1741,8 +1834,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_deraumere_decrement_btn",
-        27.5f, 40.5f,
-        2.f, 8.f,
+        28.5f, 40.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1752,8 +1845,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_sibur_increment_btn",
-        25.f, 53.5f,
-        2.f, 8.f,
+        27.4f, 53.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1763,8 +1856,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_sibur_decrement_btn",
-        27.5f, 53.5f,
-        2.f, 8.f,
+        28.5f, 53.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1774,8 +1867,8 @@ void HUD::initTileResourceDisplay()
 
         bottomContainer->addButtonPercent(
         "tile_mendiane_increment_btn",
-        40.f, 27.5f,
-        2.f, 8.f,
+        42.4f, 27.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1785,8 +1878,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_mendiane_decrement_btn",
-        42.5f, 27.5f,
-        2.f, 8.f,
+        43.5f, 27.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1796,8 +1889,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_phiras_increment_btn",
-        40.f, 40.5f,
-        2.f, 8.f,
+        42.4f, 40.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1807,8 +1900,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_phiras_decrement_btn",
-        42.5f, 40.5f,
-        2.f, 8.f,
+        43.5f, 40.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1818,8 +1911,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_thystame_increment_btn",
-        40.f, 53.5f,
-        2.f, 8.f,
+        42.4f, 53.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1829,8 +1922,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_thystame_decrement_btn",
-        42.5f, 53.5f,
-        2.f, 8.f,
+        43.5f, 53.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
