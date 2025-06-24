@@ -10,7 +10,10 @@
 
 enum ModuleType_t{
     DISPLAY_MODULE,
+    AUDIO_MODULE,
     NONE
 };
+
+typedef ModuleType_t (*getTypeFunc_t)();
 
 #endif /* !LOADERTYPE_HPP_ */
