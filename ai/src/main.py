@@ -5,7 +5,7 @@
 ## main
 ##
 
-from src.Utils.Utils import (
+from src.Config.Constants import (
     USAGE_STRING,
     FAILURE,
     SUCCESS

@@ -2,7 +2,7 @@
 ## EPITECH PROJECT, 2025
 ## zappy
 ## File description:
-## Utils
+## Constants
 ##
 
 USAGE_STRING = "Usage: ./zappy_ai -p port -n name [-h machine]\n" \

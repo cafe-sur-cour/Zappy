@@ -13,6 +13,20 @@
 #include <stdio.h>
 #include <string.h>
 
+static void send_end_incantation_to_all(zappy_t *zappy, int *player_list, int nb_players,
+    player_t *player)
+{
+    char msg[19];
+
+    snprintf(msg, 19, "Current level: %d\n", player->level);
+    for (int i = 0; i < nb_players; i++) {
+        player_t *current_player = get_player_by_id(zappy->game, player_list[i]);
+        if (current_player && current_player->network) {
+            write_message(current_player->network->fd, msg);
+        }
+    }
+}
+
 /* This functions checks the params of the variable of incantation */
 int handle_end_incantation(player_t *player, zappy_t *z)
 {
@@ -26,6 +40,7 @@ int handle_end_incantation(player_t *player, zappy_t *z)
     send_end_incantation(z, player, "ok");
     remove_crystal_from_tiles(player->posX, player->posY, player->level, z);
     increase_level_player(player_list, nb_players, z);
+    send_end_incantation_to_all(z, player_list, nb_players, player);
     return 0;
 }
 
