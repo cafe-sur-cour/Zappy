@@ -51,19 +51,10 @@ static char *end_message(buffer_t *cb)
     return message;
 }
 
-/* Here in the read we poll the fd to make sure it's ready */
 static buffer_t *get_message_from_buffer(int fd, buffer_t *cb,
     int timeout, char c)
 {
-    struct pollfd pollfd = {.fd = fd, .events = POLLIN};
-    int poll_result = 0;
-
     while (1) {
-        poll_result = poll(&pollfd, 1, timeout);
-        if (poll_result == -1 || poll_result == 0)
-            return NULL;
-        if (!(pollfd.revents & POLLIN))
-            return NULL;
         if (read(fd, &c, 1) <= 0)
             return NULL;
         cb_write(cb, c);

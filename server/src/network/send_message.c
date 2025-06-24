@@ -8,27 +8,22 @@
 #include <string.h>
 #include <unistd.h>
 #include <poll.h>
+#include <stdio.h>
+
 #include "network.h"
 
-/* Poll the write so that we check if the fd is ready */
 int write_message(int fd, const char *message)
 {
-    struct pollfd pollfd = {.fd = fd, .events = POLLOUT};
+    int write_value = -1;
 
-    if (poll(&pollfd, 1, 1000) == -1) {
-        error_print("Client socket not ready for writing.");
+    write_value = write(fd, message, strlen(message));
+    if (write_value == -1) {
+        error_print("Failed to write message to client.");
         close(fd);
         return -1;
     }
-    if (pollfd.revents & POLLOUT) {
-        if (write(fd, message, strlen(message)) == -1) {
-            error_print("Failed to write message to client.");
-            close(fd);
-            return -1;
-        }
-        return 0;
+    if (write_value != strlen(message)) {
+        error_print("Partial write sent to client.");
     }
-    error_print("Client socket not ready for writing.");
-    close(fd);
-    return -1;
+    return 0;
 }
