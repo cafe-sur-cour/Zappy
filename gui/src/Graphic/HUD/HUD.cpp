@@ -1565,7 +1565,7 @@ void HUD::displayWinMessage(const std::string& teamName)
 {
     _showVictoryMessage = true;
     _winningTeam = teamName;
-    _victoryColor = {0, 127, 255, 255};
+    _victoryColor = _gameInfos->getTeamColor(teamName);
 }
 
 void HUD::onGameEvent(GameEventType eventType, const std::string& teamName)
@@ -1574,7 +1574,7 @@ void HUD::onGameEvent(GameEventType eventType, const std::string& teamName)
         case GameEventType::TEAM_WIN:
             _showVictoryMessage = true;
             _winningTeam = teamName;
-            _victoryColor = {0, 127, 255, 255};
+            _victoryColor = _gameInfos->getTeamColor(teamName);
             break;
         default:
             break;
