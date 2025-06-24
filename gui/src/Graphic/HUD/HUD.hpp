@@ -29,6 +29,7 @@ class HUD : public IObserver {
         HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
             std::shared_ptr<IAudio> audio,
             std::shared_ptr<CameraManager>,
+            bool performanceMode,
             std::function<void()> resetCameraFunc = nullptr);
 
         ~HUD();
@@ -193,6 +194,7 @@ class HUD : public IObserver {
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<IAudio> _audio;
         std::shared_ptr<CameraManager> _camera;
+        bool _performanceMode;
         std::shared_ptr<Help> _help;
         std::shared_ptr<Settings> _settings;
         std::function<void()> _resetCameraFunc;
