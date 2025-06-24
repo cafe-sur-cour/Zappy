@@ -34,6 +34,7 @@ SRC 		=	src/params.c										\
 				src/game/food_refiil.c 								\
 				src/game/get_ids_player_tile.c 						\
 				src/game/init_team.c 								\
+				src/game/init_map.c									\
 				src/free.c											\
 				src/algo.c											\
 				src/accept.c										\

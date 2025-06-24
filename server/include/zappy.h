@@ -128,6 +128,7 @@ void remove_player_by_fd(zappy_t *zappy, int fd);
 /* init_map.c */
 int init_game(zappy_t *server);
 int distribute_resources(zappy_t *z);
+map_t *create_map(int width, int height);
 
 /* init_team.c */
 int init_teams(zappy_t *server);
