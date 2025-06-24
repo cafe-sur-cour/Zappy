@@ -126,11 +126,11 @@ void check_player_status(zappy_t *zappy);
 void remove_player_by_fd(zappy_t *zappy, int fd);
 
 /* init_map.c */
-void init_game(zappy_t *server);
+int init_game(zappy_t *server);
 int distribute_resources(zappy_t *z);
 
 /* init_team.c */
-void init_teams(zappy_t *server);
+int init_teams(zappy_t *server);
 
 /* accept.c */
 int accept_client(zappy_t *server);

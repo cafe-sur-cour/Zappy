@@ -168,13 +168,17 @@ static map_t *create_map(int width, int height)
     return map;
 }
 
-void init_game(zappy_t *zappy)
+int init_game(zappy_t *zappy)
 {
     zappy->game = create_game();
     zappy->game->map = create_map(zappy->params->x, zappy->params->y);
     distribute_resources(zappy);
-    init_teams(zappy);
+    if (init_teams(zappy) == -1) {
+        free_zappy(zappy);
+        return -1;
+    }
     if (zappy->params->is_debug == true)
         print_map_tiles(zappy);
     init_egg(zappy);
+    return 0;
 }
