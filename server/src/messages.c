@@ -17,9 +17,12 @@
 int helper(void)
 {
     printf("USAGE: ./zappy_server -p port -x width -y height ");
-    printf("-n name1 name2 ... -c clientsNb -f freq\n");
-    printf("Max number of teams: 8\n");
-    printf("Max number of clients per team: 10\n");
+    printf("-n name1 name2 ... -c clientsNb -f freq\n\n");
+    printf("---\nPort must be between 1024 and 65535.\n");
+    printf("Width and height must be positive integers between 1 and 2500.\n");
+    printf("Number of clients must be between 1 and 8.\n");
+    printf("Frequency must be between 1 and 1000.\n");
+    printf("Number of teams must be between 1 and 8.\n---\n");
     return 84;
 }
 
