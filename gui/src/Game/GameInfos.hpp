@@ -29,6 +29,7 @@ class GameInfos : public Subject {
         void setAudio(std::shared_ptr<IAudio> audio);
         void setCurrentCameraMode(zappy::gui::CameraMode cameraMode);
         void setCurrentPlayerFocus(int playerId);
+        void setPerformanceMode(bool performanceMode);
 
         void setMapSize(int width, int height);
         std::pair<int, int> getMapSize() const;
@@ -95,6 +96,17 @@ class GameInfos : public Subject {
         void incrementTileInventoryItem(int x, int y, int resourceId);
         void decrementTileInventoryItem(int x, int y, int resourceId);
 
+        void updateResourceTotals();
+        int getTotalResource(const std::string& resourceName);
+        int getTotalFood();
+        int getTotalEggs() const;
+        int getTotalLinemate();
+        int getTotalDeraumere();
+        int getTotalSibur();
+        int getTotalMendiane();
+        int getTotalPhiras();
+        int getTotalThystame();
+
     private:
         int _mapWidth;
         int _mapHeight;
@@ -126,6 +138,11 @@ class GameInfos : public Subject {
         std::shared_ptr<IAudio> _audio;
         zappy::gui::CameraMode _currentCameraMode;
         int _currentPlayerFocus;
+        
+        // Cache pour les totaux de ressources
+        mutable std::unordered_map<std::string, int> _resourceTotals;
+        mutable bool _resourceTotalsNeedUpdate = true;
+        bool _performanceMode = false;
 
         void notifyStateChange();
 };
