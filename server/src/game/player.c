@@ -104,8 +104,10 @@ static void check_winning_condition(zappy_t *zappy, team_t *current)
         }
         player = player->next;
     }
-    if (nb_at_eight >= 6)
+    if (nb_at_eight >= 6 && zappy->game->won == false) {
         send_end_game(zappy, current->name);
+        zappy->game->won = true;
+    }
 }
 
 /* Loop thru the player to check health and connection updates */
