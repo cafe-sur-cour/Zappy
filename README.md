@@ -58,6 +58,8 @@ Before running Zappy, ensure you have:
 - **Python 3.x** 
 - **Make** build system
 - **PDF-LaTeX** (for documentation generation)
+- **Raylib** graphics library
+- **SFML** audio library
 
 ### 🔧 Installation
 

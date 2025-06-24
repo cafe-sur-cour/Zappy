@@ -189,7 +189,7 @@ void Communication::communicationLoop()
 
 bool Communication::handlePoll()
 {
-    int ret = poll(&_pollfd, 1, POLL_TIMEOUT);
+    int ret = poll(&_pollfd, 1, -1);
 
     if (ret < 0) {
         std::string errorMsg = "Poll failed: ";

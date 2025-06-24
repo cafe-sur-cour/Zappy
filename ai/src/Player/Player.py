@@ -475,21 +475,18 @@ class Player:
                     self.goToIncantationState["steps"] = []
                     self.goToIncantationState["droppingStones"] = False
                 else:
-                    self.incantationState["status"] = False
-                    self.incantationState["phase"] = "sendComeIncant"
-                    self.incantationState["lastCommand"] = None
-                    self.incantationState["playerResponses"] = []
+                    if self.incantationState["status"]:
+                        self.incantationState["phase"] = "sendComeIncant"
+                        self.incantationState["lastCommand"] = None
+                        self.incantationState["playerResponses"] = []
 
-                    self.goToIncantationState["status"] = False
-                    self.goToIncantationState["arrived"] = False
-                    self.goToIncantationState["movementStarted"] = False
-                    self.goToIncantationState["steps"] = []
-                    self.goToIncantationState["droppingStones"] = False
-                    self.goToIncantationState["needToWait"] = False
+                    if self.goToIncantationState["status"]:
+                        self.goToIncantationState["arrived"] = True
+                        self.goToIncantationState["movementStarted"] = False
+                        self.goToIncantationState["steps"] = []
+                        self.goToIncantationState["droppingStones"] = True
+                        self.goToIncantationState["needToWait"] = False
 
-                    self.roombaState["phase"] = "updateInventory"
-                    self.roombaState["lastCommand"] = None
-                    self.roombaState["teamInventories"] = []
             else:
                 self.logger.error(
                     f"Unexpected level response: got {new_level}, old level = {self.level}"
