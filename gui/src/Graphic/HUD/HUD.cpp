@@ -25,7 +25,9 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
       _showVictoryMessage(false),
       _winningTeam(""),
       _victoryColor({0, 127, 255, 255}),
-      _selectedTile(-1, -1)
+      _selectedTile(-1, -1),
+      _hoveredTeam(""),
+      _teamDetailsContainer(nullptr)
 {
     _help = std::make_shared<Help>(display, audio);
     _settings = std::make_shared<Settings>(display, audio, camera, gameInfos);
@@ -65,9 +67,11 @@ void HUD::draw()
     }
 
     auto msgContainer = _containers.find("message_container");
-    if (msgContainer != _containers.end() && msgContainer->second->isVisible()) {
+    if (msgContainer != _containers.end() && msgContainer->second->isVisible())
         msgContainer->second->draw();
-    }
+
+    if (_teamDetailsContainer && _teamDetailsContainer->isVisible())
+        _teamDetailsContainer->draw();
 
     if (_showVictoryMessage && !_winningTeam.empty()) {
         std::string message = "Team " + _winningTeam + " WINS!";
@@ -128,6 +132,7 @@ void HUD::update()
     updateTpsSlider(_gameInfos);
     updateServerMessagesDisplay(_gameInfos);
     updateFpsDisplay();
+    updateTeamHoverDetection();
 
     if (_selectedTile.first >= 0 && _selectedTile.second >= 0)
         updateTileResourceDisplay(_selectedTile.first, _selectedTile.second);
@@ -184,13 +189,14 @@ void HUD::handleResize(int oldWidth, int oldHeight, int newWidth, int newHeight)
         pair.second->handleResize(oldWidth, oldHeight, newWidth, newHeight);
     }
 
-    if (_help) {
+    if (_help)
         _help->handleResize(oldWidth, oldHeight, newWidth, newHeight);
-    }
 
-    if (this->_settings) {
+    if (this->_settings)
         this->_settings->handleResize(oldWidth, oldHeight, newWidth, newHeight);
-    }
+
+    if (_teamDetailsContainer)
+        _teamDetailsContainer->handleResize(oldWidth, oldHeight, newWidth, newHeight);
 }
 
 void HUD::clearAllContainers()
@@ -1565,7 +1571,7 @@ void HUD::displayWinMessage(const std::string& teamName)
 {
     _showVictoryMessage = true;
     _winningTeam = teamName;
-    _victoryColor = {0, 127, 255, 255};
+    _victoryColor = _gameInfos->getTeamColor(teamName);
 }
 
 void HUD::onGameEvent(GameEventType eventType, const std::string& teamName)
@@ -1574,7 +1580,7 @@ void HUD::onGameEvent(GameEventType eventType, const std::string& teamName)
         case GameEventType::TEAM_WIN:
             _showVictoryMessage = true;
             _winningTeam = teamName;
-            _victoryColor = {0, 127, 255, 255};
+            _victoryColor = _gameInfos->getTeamColor(teamName);
             break;
         default:
             break;
@@ -1992,4 +1998,298 @@ void HUD::updateFpsDisplay()
 
         cycleElement->setText("Cycle: " + std::to_string(hours) + "h");
     }
+}
+
+void HUD::updateTeamHoverDetection()
+{
+    if (!_gameInfos || !_display)
+        return;
+
+    Vector2f mousePos = _display->getMousePosition();
+    auto sideContainer = getSideContainer();
+    if (!sideContainer)
+        return;
+
+    std::string currentHoveredTeam = "";
+    const std::vector<std::string> teams = _gameInfos->getTeamNames();
+
+    for (int i = static_cast<int>(teams.size()) - 1; i >= 0; i--) {
+        std::string teamId = "team_display_" + std::to_string(i);
+        const std::string& teamName = teams[i];
+
+        auto titleElement = sideContainer->getElement(teamId + "_title");
+        if (titleElement && titleElement->contains(mousePos.x, mousePos.y)) {
+            currentHoveredTeam = teamName;
+            break;
+        }
+
+        auto checkboxElement = sideContainer->getElement(teamId + "_checkbox");
+        if (checkboxElement && checkboxElement->contains(mousePos.x, mousePos.y)) {
+            currentHoveredTeam = teamName;
+            break;
+        }
+    }
+
+    if (currentHoveredTeam != _hoveredTeam) {
+        _hoveredTeam = currentHoveredTeam;
+
+        if (!_hoveredTeam.empty())
+            showTeamDetailsContainer(_hoveredTeam);
+        else
+            hideTeamDetailsContainer();
+    } else if (!_hoveredTeam.empty()) {
+        showTeamDetailsContainer(_hoveredTeam);
+    }
+}
+
+void HUD::createTeamDetailsContainer()
+{
+    if (_teamDetailsContainer)
+        return;
+
+    Vector2i screenDimensions = _display->getScreenSize();
+    float screenWidth = static_cast<float>(screenDimensions.x);
+    float screenHeight = static_cast<float>(screenDimensions.y);
+
+    float sideWidthPercent = 15.0f;
+    float bottomHeightPercent = 20.0f;
+    float sideWidth = (screenWidth * sideWidthPercent) / 100.0f;
+    float squareSize = sideWidth;
+
+    float containerWidth = screenWidth * 0.15f;
+    float containerHeight = screenHeight - squareSize -
+        (screenHeight * bottomHeightPercent / 100.0f);
+    float containerX = sideWidth;
+    float containerY = squareSize;
+
+    _teamDetailsContainer = std::make_shared<Containers>(
+        _display,
+        _audio,
+        containerX,
+        containerY,
+        containerWidth,
+        containerHeight,
+        Color32{40, 40, 40, 220}
+    );
+
+    _teamDetailsContainer->setRelativePosition(
+        sideWidthPercent,
+        sideWidthPercent,
+        sideWidthPercent,
+        100.0f - sideWidthPercent - bottomHeightPercent
+    );
+
+    _teamDetailsContainer->setVisible(false);
+}
+
+void HUD::showTeamDetailsContainer(const std::string& teamName)
+{
+    if (!_teamDetailsContainer)
+        createTeamDetailsContainer();
+
+    _teamDetailsContainer->clearElements();
+
+    _teamDetailsContainer->addTextPercent(
+        "details_title",
+        5.0f,
+        5.0f,
+        "Team Details:",
+        4.0f,
+        {255, 255, 255, 255}
+    );
+
+    Color32 teamColor = _gameInfos->getTeamColor(teamName);
+    _teamDetailsContainer->addTextPercent(
+        "team_name",
+        5.0f,
+        10.0f,
+        teamName,
+        4.0f,
+        teamColor
+    );
+
+    const auto& players = _gameInfos->getPlayers();
+    std::vector<zappy::structs::Player> teamPlayers;
+    std::vector<int> levelCount(9, 0);
+    int totalPlayers = 0;
+    int totalLevels = 0;
+
+    zappy::structs::Inventory teamResources;
+    int alivePlayersCount = 0;
+
+    for (const auto& player : players) {
+        if (player.teamName == teamName) {
+            teamPlayers.push_back(player);
+            totalPlayers++;
+            alivePlayersCount++;
+            totalLevels += player.level;
+            if (player.level >= 1 && player.level <= 8)
+                levelCount[player.level]++;
+
+            teamResources.food += player.inventory.food;
+            teamResources.linemate += player.inventory.linemate;
+            teamResources.deraumere += player.inventory.deraumere;
+            teamResources.sibur += player.inventory.sibur;
+            teamResources.mendiane += player.inventory.mendiane;
+            teamResources.phiras += player.inventory.phiras;
+            teamResources.thystame += player.inventory.thystame;
+        }
+    }
+
+    const auto& eggs = _gameInfos->getEggs();
+    int teamEggs = 0;
+    for (const auto& egg : eggs) {
+        if (egg.teamName == teamName)
+            teamEggs++;
+    }
+
+    const auto& incantations = _gameInfos->getIncantations();
+    int teamIncantations = 0;
+    for (const auto& incantation : incantations) {
+        for (const auto& player : teamPlayers) {
+            if (player.x == incantation.x && player.y == incantation.y) {
+                teamIncantations++;
+                break;
+            }
+        }
+    }
+
+    float yPos = 18.0f;
+
+    _teamDetailsContainer->addTextPercent(
+        "total_players", 5.0f, yPos,
+        "Total Players: " + std::to_string(totalPlayers),
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 4.0f;
+
+    float averageLevel = totalPlayers > 0 ?
+        static_cast<float>(totalLevels) / totalPlayers : 0.0f;
+    _teamDetailsContainer->addTextPercent(
+        "average_level", 5.0f, yPos,
+        "Average Level: " + (totalPlayers > 0 ?
+            std::to_string(averageLevel).substr(0, 4) : "0.0"),
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 4.0f;
+
+    _teamDetailsContainer->addTextPercent(
+        "level_distribution_title", 5.0f, yPos,
+        "Level Distribution:",
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 3.0f;
+
+    for (int level = 1; level <= 8; level++) {
+        int r = std::min(255, 150 + level * 10);
+        int g = std::min(255, 150 + level * 5);
+        int b = std::max(0, 255 - level * 15);
+        Color32 levelColor = levelCount[level] > 0 ?
+            Color32{static_cast<unsigned char>(r), static_cast<unsigned char>(g),
+                static_cast<unsigned char>(b), 255} :
+            Color32{100, 100, 100, 255};
+
+        _teamDetailsContainer->addTextPercent(
+            "level_" + std::to_string(level), 10.0f, yPos,
+            "Level " + std::to_string(level) + ": " + std::to_string(levelCount[level])
+                + " player" + (levelCount[level] > 1 ? "s" : ""),
+            2.5f, levelColor
+        );
+        yPos += 3.0f;
+    }
+    yPos += 1.0f;
+
+    _teamDetailsContainer->addTextPercent(
+        "max_level_status", 5.0f, yPos,
+        levelCount[8] > 0 ?
+            "MAX LEVEL REACHED!\n(" + std::to_string(levelCount[8]) + " at level 8)" :
+            "No players at max\nlevel yet",
+        3.0f, levelCount[8] > 0 ? Color32{255, 215, 0, 255} : Color32{220, 220, 220, 255}
+    );
+    yPos += 7.5f;
+
+    _teamDetailsContainer->addTextPercent(
+        "resources_title", 5.0f, yPos,
+        "Team Resources:",
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 3.0f;
+
+    std::vector<std::pair<std::string, int>> resources = {
+        {"Food", teamResources.food},
+        {"Linemate", teamResources.linemate},
+        {"Deraumere", teamResources.deraumere},
+        {"Sibur", teamResources.sibur},
+        {"Mendiane", teamResources.mendiane},
+        {"Phiras", teamResources.phiras},
+        {"Thystame", teamResources.thystame}
+    };
+
+    for (const auto& res : resources) {
+        Color32 resColor = res.second > 0 ? Color32{150, 255, 150, 255} :
+            Color32{150, 150, 150, 255};
+        _teamDetailsContainer->addTextPercent(
+            "resource_" + res.first, 10.0f, yPos,
+            res.first + ": " + std::to_string(res.second),
+            2.2f, resColor
+        );
+        yPos += 2.5f;
+    }
+    yPos += 2.0f;
+
+    _teamDetailsContainer->addTextPercent(
+        "eggs_title", 5.0f, yPos,
+        "Eggs Status:",
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 3.0f;
+
+    _teamDetailsContainer->addTextPercent(
+        "total_eggs", 10.0f, yPos,
+        "Total Eggs: " + std::to_string(teamEggs),
+        2.5f, teamEggs > 0 ? Color32{255, 200, 100, 255} : Color32{150, 150, 150, 255}
+    );
+    yPos += 4.5f;
+
+    _teamDetailsContainer->addTextPercent(
+        "incantations_status", 5.0f, yPos,
+        "Active Incantations: " + std::to_string(teamIncantations),
+        3.0f, Color32{220, 220, 220, 255}
+    );
+    yPos += 4.0f;
+
+    _teamDetailsContainer->setVisible(true);
+}
+
+void HUD::hideTeamDetailsContainer()
+{
+    if (_teamDetailsContainer)
+        _teamDetailsContainer->setVisible(false);
+}
+
+bool HUD::isMouseOverTeam(const std::string& teamName, std::string& hoveredTeam)
+{
+    if (!_gameInfos || !_display)
+        return false;
+
+    Vector2f mousePos = _display->getMousePosition();
+    auto sideContainer = getSideContainer();
+    if (!sideContainer)
+        return false;
+
+    const std::vector<std::string> teams = _gameInfos->getTeamNames();
+
+    for (int i = static_cast<int>(teams.size()) - 1; i >= 0; i--) {
+        if (teams[i] == teamName) {
+            std::string teamId = "team_display_" + std::to_string(i);
+
+            auto titleElement = sideContainer->getElement(teamId + "_title");
+            if (titleElement && titleElement->contains(mousePos.x, mousePos.y)) {
+                hoveredTeam = teamName;
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
