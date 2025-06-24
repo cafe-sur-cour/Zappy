@@ -5,7 +5,7 @@
 ## Logger
 ##
 
-from src.Utils.Utils import Colors
+from src.Config.Constants import Colors
 
 
 class Logger:

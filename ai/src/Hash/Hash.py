@@ -18,6 +18,14 @@ class Hash:
         return "".join(f"{b:02x}" for b in hashed)
 
     def unHashMessage(self, hex_message: str) -> str:
-        encrypted = bytes(int(hex_message[i:i + 2], 16) for i in range(0, len(hex_message), 2))
-        decrypted = self.simple_xor(encrypted)
-        return decrypted.decode()
+        try:
+            if len(hex_message) % 2 != 0:
+                raise ValueError("Hex string must have even length")
+
+            encrypted = bytes(
+                int(hex_message[i:i + 2], 16) for i in range(0, len(hex_message), 2)
+            )
+            decrypted = self.simple_xor(encrypted)
+            return decrypted.decode()
+        except (ValueError, UnicodeDecodeError) as e:
+            raise ValueError(f"Failed to unhash message: {e}")

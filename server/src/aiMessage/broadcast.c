@@ -34,9 +34,13 @@ static void print_broadcast_server(player_t *source, player_t *dest,
 static int adjust_for_orientation(int direction_number,
     direction_t orientation)
 {
-    int offset = (2 * (orientation - 1)) % 8;
-    int adjusted = ((direction_number - 1 - offset + 8) % 8) + 1;
+    int offset = 0;
+    int adjusted = 0;
 
+    if (direction_number == 0)
+        return 0;
+    offset = (orientation - 1) * 2;
+    adjusted = ((direction_number - 1 - offset + 8) % 8) + 1;
     return adjusted;
 }
 
@@ -58,27 +62,27 @@ static int get_orientation(int dx, int dy)
         return 0;
     if (dx == 0 && dy < 0)
         return 1;
-    if (dx == 1 && dy < 0)
-        return 8;
+    if (dx > 0 && dy < 0)
+        return 2;
     if (dx > 0 && dy == 0)
-        return 7;
+        return 3;
     if (dx > 0 && dy > 0)
-        return 6;
+        return 4;
     if (dx == 0 && dy > 0)
         return 5;
     if (dx < 0 && dy > 0)
-        return 4;
+        return 6;
     if (dx < 0 && dy == 0)
-        return 3;
+        return 7;
     if (dx < 0 && dy < 0)
-        return 2;
+        return 8;
     return 0;
 }
 
 int broadcast_text(player_t *source, player_t *dest, char *text,
     zappy_t *zappy)
 {
-    int d[2] = {dest->posX - source->posX, dest->posY - source->posY};
+    int d[2] = {source->posX - dest->posX, source->posY - dest->posY};
     int dir[3] = {0};
     char *message = NULL;
 
