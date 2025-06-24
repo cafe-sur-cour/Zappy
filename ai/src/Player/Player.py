@@ -185,7 +185,8 @@ class Player:
         return True
 
     def enoughFoodForIncantation(self, nbFood: int) -> bool:
-        incantationCost = 300
+        nbIncantations = 8 - self.level
+        incantationCost = 300 * nbIncantations
 
         stonesToDrop = sum(LVL_UPGRADES[self.level]["stones"].values())
         droppingCost = stonesToDrop * 7
@@ -250,17 +251,21 @@ class Player:
                         self.doesTeamHaveEnoughStones() and
                         self.teamHasEnoughFoodForIncantation()
                     ):
-                        should_initiate = True
+                        highest_pid = self.pid
+                        highest_pid_id = self.id
+
                         for inventory in self.roombaState["teamInventories"]:
                             teammate_id = inventory["id"]
                             if "-" in teammate_id:
                                 teammate_pid = int(teammate_id.split("-")[1])
-                                if teammate_pid > self.pid:
-                                    should_initiate = False
-                                    break
+                                if teammate_pid > highest_pid:
+                                    highest_pid = teammate_pid
+                                    highest_pid_id = teammate_id
 
-                        if should_initiate:
+                        if highest_pid == self.pid:
                             self.incantationState["status"] = True
+                        else:
+                            self.broadcaster.broadcastMessage(f"leadIncantation {highest_pid_id}")
                     self.roombaState["phase"] = "forward"
                 else:
                     self.communication.sendGetConnectNbr()
@@ -754,6 +759,17 @@ class Player:
             self.goToIncantationState["movementStarted"] = False
             self.goToIncantationState["needToWait"] = False
 
+    def handleMessageLeadIncantation(self, direction: int, rest: str) -> None:
+        target_id = rest.strip()
+        if target_id != self.id:
+            return
+
+        if (
+            not self.goToIncantationState["status"] and
+            not self.incantationState["status"]
+        ):
+            self.incantationState["status"] = True
+
     def handleMessages(self, direction: int, message: str) -> None:
         switcher = {
             "teamslots ": self.handleMessageTeamslots,
@@ -763,6 +779,7 @@ class Player:
             "whereAreYou ": self.handleMessageWhereAreYou,
             "here ": self.handleMessageHere,
             "dropStones ": self.handleMessageDropStones,
+            "leadIncantation ": self.handleMessageLeadIncantation,
         }
 
         for key in switcher.keys():
