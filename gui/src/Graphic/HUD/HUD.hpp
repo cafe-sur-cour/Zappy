@@ -66,6 +66,8 @@ class HUD : public IObserver {
 
         std::shared_ptr<Containers> getServerMessagesContainer() const;
 
+        std::shared_ptr<Containers> getMapInfoContainer() const;
+
         void initExitButton();
 
         void initSettingsButton();
@@ -168,6 +170,8 @@ class HUD : public IObserver {
             int screenHeight,
             float bottomHeight,
             float bottomHeightPercent);
+
+        std::shared_ptr<Containers> createMapInfoContainer();
 
         void updateElementPositions(
             std::shared_ptr<Containers> container,

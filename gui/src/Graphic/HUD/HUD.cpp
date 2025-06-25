@@ -262,6 +262,8 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
                             bottomHeight,
                             bottomHeightPercent);
 
+    auto mapInfoContainer = createMapInfoContainer();
+
     initFpsDisplay();
 }
 
@@ -314,6 +316,11 @@ std::shared_ptr<Containers> HUD::getSecurityContainer() const
 std::shared_ptr<Containers> HUD::getServerMessagesContainer() const
 {
     return getContainer("server_messages_container");
+}
+
+std::shared_ptr<Containers> HUD::getMapInfoContainer() const
+{
+    return getContainer("map_info_container");
 }
 
 void HUD::initExitButton()
@@ -961,6 +968,45 @@ std::shared_ptr<Containers> HUD::createServerMessagesContainer(
     return serverMessagesContainer;
 }
 
+std::shared_ptr<Containers> HUD::createMapInfoContainer()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return nullptr;
+
+    FloatRect bottomBounds = bottomContainer->getBounds();
+    float buttonX = bottomBounds.x + (bottomBounds.width * 0.945f);
+    float buttonY = bottomBounds.y + (bottomBounds.height * 0.025f);
+
+    float containerWidth = 350.0f;
+    float containerHeight = 250.0f;
+    float containerX = buttonX - containerWidth + (bottomBounds.width * 0.05f);
+    float containerY = buttonY - containerHeight - 10.0f;
+
+    auto mapInfoContainer = addContainer(
+        "map_info_container",
+        containerX, containerY,
+        containerWidth, containerHeight,
+        {40, 40, 40, 240}
+    );
+
+    if (mapInfoContainer) {
+        mapInfoContainer->addTextPercent(
+            "map_info_title", 5.0f, 5.0f, "Map Information", 12.0f,
+            {255, 255, 255, 255}
+        );
+
+        mapInfoContainer->addTextPercent(
+            "map_info_content", 5.0f, 20.0f, "Loading map data...", 4.5f,
+            {220, 220, 220, 255}
+        );
+
+        mapInfoContainer->setVisible(false);
+    }
+
+    return mapInfoContainer;
+}
+
 std::pair<float, float> HUD::calculateContentMetrics(
     std::shared_ptr<Containers> container,
     const std::unordered_map<std::string, float> &initialYPositions)
@@ -1370,23 +1416,11 @@ void HUD::updateHelpInformationHUD(zappy::gui::CameraMode cameraMode)
 
 void HUD::initMapInfoDisplay()
 {
-    auto bottomContainer = getBottomContainer();
-    if (!bottomContainer)
+    auto mapInfoContainer = getMapInfoContainer();
+    if (!mapInfoContainer)
         return;
 
-    bottomContainer->addTextPercent(
-        "map_info_content",
-        15.0f, 2.5f,
-        "Loading map data...",
-        7.0f,
-        {220, 220, 220, 255}
-    );
-
-    auto mapInfoTextElem = std::dynamic_pointer_cast<Text>(
-        bottomContainer->getElement("map_info_content"));
-    if (mapInfoTextElem) {
-        mapInfoTextElem->setVisible(false);
-    }
+    mapInfoContainer->setVisible(false);
 }
 
 void HUD::initMapInfoButton()
@@ -1407,7 +1441,8 @@ void HUD::initMapInfoButton()
 void HUD::updateMapInfoDisplay()
 {
     auto bottomContainer = getBottomContainer();
-    if (!bottomContainer || !_gameInfos)
+    auto mapInfoContainer = getMapInfoContainer();
+    if (!bottomContainer || !mapInfoContainer || !_gameInfos)
         return;
 
     auto mapInfoButton = std::dynamic_pointer_cast<Button>(
@@ -1420,14 +1455,10 @@ void HUD::updateMapInfoDisplay()
     }
 
     auto mapInfoTextElem = std::dynamic_pointer_cast<Text>(
-        bottomContainer->getElement("map_info_content"));
+        mapInfoContainer->getElement("map_info_content"));
 
     if (!mapInfoTextElem) {
-        initMapInfoDisplay();
-        mapInfoTextElem = std::dynamic_pointer_cast<Text>(
-            bottomContainer->getElement("map_info_content"));
-        if (!mapInfoTextElem)
-            return;
+        return;
     }
 
     if (isButtonHovered) {
@@ -1435,9 +1466,9 @@ void HUD::updateMapInfoDisplay()
         if (mapInfoTextElem->getText() != mapInfoText) {
             mapInfoTextElem->setText(mapInfoText);
         }
-        mapInfoTextElem->setVisible(true);
+        mapInfoContainer->setVisible(true);
     } else {
-        mapInfoTextElem->setVisible(false);
+        mapInfoContainer->setVisible(false);
     }
 }
 
