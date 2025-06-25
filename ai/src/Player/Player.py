@@ -6,6 +6,8 @@
 #
 
 import os
+import sys
+import signal
 from threading import Thread
 from typing import Callable
 from time import sleep
@@ -128,19 +130,15 @@ class Player:
             f"Going to incantation: {self.goToIncantationState['status']}"
         )
 
-    def create_child(self) -> int:
-        pid: int = os.fork()
-        if pid < 0:
-            return -1
-        if pid == 0:
-            try:
-                p = Player(self.teamName, self.ip, self.port)
-                p.startComThread()
-                p.loop()
-            except CommunicationException:
-                exit(FAILURE)
-            exit(SUCCESS)
-        return pid
+    def _child_signal_handler(self, signum, frame):
+        try:
+            if hasattr(self, 'communication') and self.communication:
+                self.communication.stopLoop()
+        except Exception:
+            pass
+        sys.stdout.flush()
+        sys.stderr.flush()
+        os._exit(SUCCESS)
 
     def startComThread(self) -> None:
         self.commThread.start()
@@ -152,6 +150,31 @@ class Player:
 
     def setNbSlots(self, slots: int) -> None:
         self.nbTeamSlots = slots
+
+    def start(self):
+        try:
+            if self.is_child_process:
+                signal.signal(signal.SIGINT, self._child_signal_handler)
+                signal.signal(signal.SIGTERM, self._child_signal_handler)
+
+            slots, x, y = self.communication.connectToServer()
+            self.setMapSize(x, y)
+
+            if not self.is_child_process:
+                self.setNbSlots(slots + 1)
+
+            self.startComThread()
+
+            self.loop()
+
+            return SUCCESS
+
+        except (CommunicationException, SocketException):
+            return FAILURE
+        except KeyboardInterrupt:
+            return SUCCESS
+        except Exception:
+            return FAILURE
 
     def getNeededStonesByPriority(self) -> list[(str, int)]:
         neededStones = []
