@@ -34,6 +34,17 @@ int print_inventory_server(player_t *player, int len)
     return 0;
 }
 
+static int write_inventory_message(player_t *player, char *message)
+{
+    write_in_buffer(player->network->writingBuffer, message);
+    if (write_message(player->network) == -1) {
+        free(message);
+        return -1;
+    }
+    free(message);
+    return 0;
+}
+
 int inventory_message(player_t *player)
 {
     int n = int_str_len(player->inventory->nbFood) + int_str_len(
@@ -52,8 +63,7 @@ int inventory_message(player_t *player)
         player->inventory->nbDeraumere, player->inventory->nbSibur,
         player->inventory->nbMendiane, player->inventory->nbPhiras,
         player->inventory->nbThystame);
-    write_in_buffer(player->network->writingBuffer, message);
-    if (write_message(player->network) == -1)
+    if (write_inventory_message(player, message) == -1)
         return -1;
     return print_inventory_server(player, n);
 }

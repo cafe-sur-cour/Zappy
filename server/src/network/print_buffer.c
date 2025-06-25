@@ -80,7 +80,7 @@ int *print_content_buffer(buffer_t *cb, int data_count, int *result)
 void print_buffer_state(buffer_t *cb, const char *label)
 {
     int data_count = 0;
-    int *indexes = malloc(sizeof(int) * 2);
+    int indexes[2] = {0};
 
     if (!indexes || error_handling(cb) == -1)
         return;
@@ -94,5 +94,4 @@ void print_buffer_state(buffer_t *cb, const char *label)
     }
     printf("\"\n");
     printf("========================\n");
-    free(indexes);
 }

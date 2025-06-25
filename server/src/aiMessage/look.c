@@ -136,6 +136,7 @@ char *look_up(player_t *player, zappy_t *zappy)
             message = process_tile(message, player, zappy, tiles);
         }
     }
+    free(tiles);
     return finalize_message(message);
 }
 
