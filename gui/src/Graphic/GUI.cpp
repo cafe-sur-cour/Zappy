@@ -11,7 +11,10 @@
 #include <algorithm>
 #include <string>
 #include <limits>
+#include <random>
 #include <utility>
+#include <chrono>
+#include <thread>
 #include "GUI.hpp"
 #include "../Exceptions/Exceptions.hpp"
 #include "../Audio/IAudio.hpp"
@@ -78,16 +81,66 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     _isRunning = this->_display->isWindowReady();
     this->_display->setTargetFPS(zappy::gui::FPS);
     this->_gameInfos->setAudio(this->_audio);
-    this->_gameInfos->setPerformanceMode(_performanceMode);
-    this->_map = std::make_unique<Map>(_gameInfos, this->_display);
+
+this->_gameInfos->setPerformanceMode(_performanceMode);
+    this->_splashScreen = std::make_unique<SplashScreen>(this->_display);
+    this->_splashScreen->show();
+    this->_splashScreen->setLoadingText("Initializing Graphics...");
+    this->_audio->playSound("splash_screen", this->_audio->getSFXVolumeLevel());
+    auto startTime = std::chrono::steady_clock::now();
+    auto time = this->_getRandomTime(100, 350);
+    drawSplashFrame();
+    while (std::chrono::duration_cast<std::chrono::milliseconds>(
+    std::chrono::steady_clock::now() - startTime).count() < time){}
+    drawSplashFrame();
+
+    this->_splashScreen->setLoadingProgress(0.1f);
+    this->_splashScreen->setLoadingText("Loading Resources...");
+    startTime = std::chrono::steady_clock::now();
+    time = this->_getRandomTime(100, 350);
+    drawSplashFrame();
+    while (std::chrono::duration_cast<std::chrono::milliseconds>(
+    std::chrono::steady_clock::now() - startTime).count() < time){}
+    drawSplashFrame();
     if (!this->_display->loadFont("default", zappy::gui::CUSTOM_FONT_PATH)) {
         std::cout << colors::T_RED << "[WARNING] Failed to load custom font: "
         << zappy::gui::CUSTOM_FONT_PATH << ". Using default font."
         << colors::RESET << std::endl;
     }
+
+    this->_splashScreen->setLoadingProgress(0.2f);
+    this->_splashScreen->setLoadingText("Setting up Camera...");
+    startTime = std::chrono::steady_clock::now();
+    time = this->_getRandomTime(100, 350);
+    drawSplashFrame();
+    while (std::chrono::duration_cast<std::chrono::milliseconds>(
+    std::chrono::steady_clock::now() - startTime).count() < time){}
+    drawSplashFrame();
+
     _cameraManager = std::make_shared<CameraManager>(this->_display);
     _cameraManager->setGameInfos(_gameInfos);
+
+    this->_splashScreen->setLoadingProgress(0.4f);
+    this->_splashScreen->setLoadingText("Creating World...");
+    startTime = std::chrono::steady_clock::now();
+    time = this->_getRandomTime(100, 350);
+    drawSplashFrame();
+    while (std::chrono::duration_cast<std::chrono::milliseconds>(
+    std::chrono::steady_clock::now() - startTime).count() < time){}
+    drawSplashFrame();
+
+    this->_map = std::make_unique<Map>(_gameInfos, this->_display);
     _cameraManager->setMapInstance(std::shared_ptr<Map>(_map.get(), [](Map*){}));
+
+    this->_splashScreen->setLoadingProgress(0.6f);
+    this->_splashScreen->setLoadingText("Positioning Camera...");
+    startTime = std::chrono::steady_clock::now();
+    time = this->_getRandomTime(100, 350);
+    drawSplashFrame();
+    while (std::chrono::duration_cast<std::chrono::milliseconds>(
+    std::chrono::steady_clock::now() - startTime).count() < time){}
+    drawSplashFrame();
+
     const auto& mapSize = _gameInfos->getMapSize();
 
     Vector3f mapCenter = {
@@ -99,13 +152,37 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     mapCenter.y = mapScale * 0.2f;
     _cameraManager->setMapCenter(mapCenter);
     _cameraManager->setMapSize(mapSize.first, mapSize.second);
+
+    this->_splashScreen->setLoadingProgress(0.8f);
+    this->_splashScreen->setLoadingText("Creating Interface...");
+    startTime = std::chrono::steady_clock::now();
+    time = this->_getRandomTime(100, 350);
+    drawSplashFrame();
+    while (std::chrono::duration_cast<std::chrono::milliseconds>(
+    std::chrono::steady_clock::now() - startTime).count() < time){}
+
     this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio, _cameraManager,
         _performanceMode,
     [this]() {
         this->switchCameraMode(zappy::gui::CameraMode::FREE);
     });
 
+    this->_splashScreen->setLoadingProgress(0.9f);
+    this->_splashScreen->setLoadingText("Loading 3D Models...");
+    drawSplashFrame();
     initModels();
+
+    this->_splashScreen->setLoadingProgress(1.0f);
+    this->_splashScreen->setLoadingText("Ready!");
+    drawSplashFrame();
+
+    startTime = std::chrono::steady_clock::now();
+    while (std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::steady_clock::now() - startTime).count() < 500) {
+        drawSplashFrame();
+    }
+    _loadingComplete = true;
+    this->_audio->playMainTheme(this->_audio->getMusicVolumeLevel());
 }
 
 GUI::~GUI()
@@ -125,6 +202,14 @@ void GUI::run()
     }
 }
 
+int GUI::_getRandomTime(int min, int max) {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    static std::uniform_int_distribution<> distrib(min, max);
+
+    return distrib(gen);
+}
+
 void GUI::updateCamera()
 {
     _cameraManager->updateCamera(_cameraMode);
@@ -133,6 +218,15 @@ void GUI::updateCamera()
 void GUI::update()
 {
     this->_isRunning = this->_display->isOpen();
+    if (_showingSplashScreen) {
+        float deltaTime = this->_display->getFrameTime();
+        _splashScreen->update(deltaTime);
+        if (_loadingComplete) {
+            _splashScreen->finish();
+            _showingSplashScreen = false;
+        }
+        return;
+    }
     if (_gameInfos->getMapSize().first * _gameInfos->getMapSize().second >= 2500) {
         bool wasPerformanceMode = _performanceMode;
         _performanceMode = true;
@@ -193,6 +287,11 @@ void GUI::draw()
 {
     if (!this->_display->isOpen())
         return;
+
+    if (_showingSplashScreen) {
+        _splashScreen->draw();
+        return;
+    }
 
     this->_display->beginDrawing();
 
@@ -724,4 +823,15 @@ BoundingBox3D GUI::getTileBoundingBox(int x, int y) const
     };
 
     return {min, max};
+}
+
+void GUI::drawSplashFrame()
+{
+    if (!this->_display->isOpen() || !this->_splashScreen) {
+        return;
+    }
+    float deltaTime = this->_display->getFrameTime();
+    this->_splashScreen->update(deltaTime);
+    this->_splashScreen->draw();
+    std::this_thread::sleep_for(std::chrono::milliseconds(16));
 }
