@@ -25,7 +25,7 @@ env:
 jobs:
   draw_doofenschmirtz:
     name: Secret Job ;)
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: checkout@v4
         uses: actions/checkout@v4
@@ -40,7 +40,7 @@ jobs:
 
   check_program_compilation:
     name: Check Program Compilation
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: epitechcontent/epitest-docker:latest
     steps:
@@ -82,7 +82,7 @@ jobs:
 
   coding_style_cpp:
     name: Check Coding Style CPP
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: epitechcontent/epitest-docker:latest
     steps:
@@ -111,7 +111,7 @@ jobs:
 
   coding_style_python:
     name: Check Coding Style Python
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: epitechcontent/epitest-docker:latest
     steps:
@@ -140,7 +140,7 @@ jobs:
 
   check_coding_style_c:
       name: Check Coding Style C
-      runs-on: self-hosted
+      runs-on: ubuntu-latest
       container:
         image: ghcr.io/epitech/coding-style-checker:latest
       steps:
@@ -176,7 +176,7 @@ jobs:
 
   run_functionnal_tests:
     name: Run Functional Tests
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: epitechcontent/epitest-docker
 
@@ -211,7 +211,7 @@ jobs:
 
   run_tests:
     name: Run Unit Tests
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: epitechcontent/epitest-docker:latest
     steps:
