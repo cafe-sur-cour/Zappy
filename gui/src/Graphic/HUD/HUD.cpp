@@ -980,8 +980,8 @@ std::shared_ptr<Containers> HUD::createMapInfoContainer()
 
     float containerWidth = 350.0f;
     float containerHeight = 250.0f;
-    float containerX = buttonX - containerWidth + (bottomBounds.width * 0.05f);
-    float containerY = buttonY - containerHeight - 10.0f;
+    float containerX = buttonX - containerWidth + (bottomBounds.width * 0.05f) + 10.0f;
+    float containerY = buttonY - containerHeight - 5.0f;
 
     auto mapInfoContainer = addContainer(
         "map_info_container",
