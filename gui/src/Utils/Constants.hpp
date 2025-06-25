@@ -156,7 +156,7 @@ namespace zappy::gui {
     inline const float EGG_SCALE = 1.0f;
     inline const float FOOD_SCALE = 0.005f;
     inline const float FOOD_FLOAT_AMPLITUDE = 0.05f;
-    inline const float FOOD_FLOAT_SPEED = 0.10f;
+    inline const float FOOD_FLOAT_SPEED = 1.0f;
 
     inline const float LINEMATE_SCALE = 0.2f;    // soccerball
     inline const float DERAUMERE_SCALE = 0.15f;  // beachball
