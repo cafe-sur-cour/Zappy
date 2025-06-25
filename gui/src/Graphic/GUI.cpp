@@ -82,6 +82,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     this->_display->setTargetFPS(zappy::gui::FPS);
     this->_gameInfos->setAudio(this->_audio);
 
+this->_gameInfos->setPerformanceMode(_performanceMode);
     this->_splashScreen = std::make_unique<SplashScreen>(this->_display);
     this->_splashScreen->show();
     this->_splashScreen->setLoadingText("Initializing Graphics...");
@@ -101,7 +102,6 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     while (std::chrono::duration_cast<std::chrono::milliseconds>(
     std::chrono::steady_clock::now() - startTime).count() < time){}
     drawSplashFrame();
-
     if (!this->_display->loadFont("default", zappy::gui::CUSTOM_FONT_PATH)) {
         std::cout << colors::T_RED << "[WARNING] Failed to load custom font: "
         << zappy::gui::CUSTOM_FONT_PATH << ". Using default font."
@@ -162,6 +162,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     std::chrono::steady_clock::now() - startTime).count() < time){}
 
     this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio, _cameraManager,
+        _performanceMode,
     [this]() {
         this->switchCameraMode(zappy::gui::CameraMode::FREE);
     });
@@ -229,6 +230,7 @@ void GUI::update()
     if (_gameInfos->getMapSize().first * _gameInfos->getMapSize().second >= 2500) {
         bool wasPerformanceMode = _performanceMode;
         _performanceMode = true;
+        _gameInfos->setPerformanceMode(true);
 
         if (!wasPerformanceMode && _cameraMode == zappy::gui::CameraMode::TARGETED)
             switchCameraMode(zappy::gui::CameraMode::FREE);
@@ -655,7 +657,7 @@ void GUI::handlePlayerClicks()
         if (_hoveredPlayerId >= 0) {
             setPlayerToFollow(_hoveredPlayerId);
             switchCameraMode(zappy::gui::CameraMode::PLAYER);
-            _audio->playSound("clickPlayer", 100.0f);
+            _audio->playSound("clickPlayer", this->_audio->getSFXVolumeLevel());
         } else {
             handleTileClicks();
         }

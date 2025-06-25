@@ -19,15 +19,19 @@
 
 HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
          std::shared_ptr<IAudio> audio,
-         std::shared_ptr<CameraManager> camera, std::function<void()> resetCameraFunc)
+         std::shared_ptr<CameraManager> camera,
+         bool performanceMode,
+         std::function<void()> resetCameraFunc)
     : _containers(), _display(display), _gameInfos(gameInfos), _audio(audio), _camera(camera),
+      _performanceMode(performanceMode),
       _resetCameraFunc(resetCameraFunc),
       _showVictoryMessage(false),
       _winningTeam(""),
       _victoryColor({0, 127, 255, 255}),
       _selectedTile(-1, -1),
       _hoveredTeam(""),
-      _teamDetailsContainer(nullptr)
+      _teamDetailsContainer(nullptr),
+      _mapInfoButtonHovered(false)
 {
     _help = std::make_shared<Help>(display, audio);
     _settings = std::make_shared<Settings>(display, audio, camera, gameInfos);
@@ -39,6 +43,8 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
     initTeamPlayersDisplay(_gameInfos);
     initTpsSlider(_gameInfos, _display, _audio);
     initServerMessagesDisplay(_gameInfos);
+    initMapInfoDisplay();
+    initMapInfoButton();
     this->_initHelpInformation();
 
     if (_gameInfos) {
@@ -131,6 +137,7 @@ void HUD::update()
     updateTeamPlayersDisplay(_gameInfos);
     updateTpsSlider(_gameInfos);
     updateServerMessagesDisplay(_gameInfos);
+    updateMapInfoDisplay();
     updateFpsDisplay();
     updateTeamHoverDetection();
 
@@ -255,6 +262,8 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
                             bottomHeight,
                             bottomHeightPercent);
 
+    auto mapInfoContainer = createMapInfoContainer();
+
     initFpsDisplay();
 }
 
@@ -307,6 +316,11 @@ std::shared_ptr<Containers> HUD::getSecurityContainer() const
 std::shared_ptr<Containers> HUD::getServerMessagesContainer() const
 {
     return getContainer("server_messages_container");
+}
+
+std::shared_ptr<Containers> HUD::getMapInfoContainer() const
+{
+    return getContainer("map_info_container");
 }
 
 void HUD::initExitButton()
@@ -954,6 +968,45 @@ std::shared_ptr<Containers> HUD::createServerMessagesContainer(
     return serverMessagesContainer;
 }
 
+std::shared_ptr<Containers> HUD::createMapInfoContainer()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return nullptr;
+
+    FloatRect bottomBounds = bottomContainer->getBounds();
+    float buttonX = bottomBounds.x + (bottomBounds.width * 0.945f);
+    float buttonY = bottomBounds.y + (bottomBounds.height * 0.025f);
+
+    float containerWidth = 350.0f;
+    float containerHeight = 250.0f;
+    float containerX = buttonX - containerWidth + (bottomBounds.width * 0.05f);
+    float containerY = buttonY - containerHeight - 10.0f;
+
+    auto mapInfoContainer = addContainer(
+        "map_info_container",
+        containerX, containerY,
+        containerWidth, containerHeight,
+        {40, 40, 40, 240}
+    );
+
+    if (mapInfoContainer) {
+        mapInfoContainer->addTextPercent(
+            "map_info_title", 5.0f, 2.5f, "Map Information", 12.0f,
+            {255, 255, 255, 255}
+        );
+
+        mapInfoContainer->addTextPercent(
+            "map_info_content", 5.0f, 15.5f, "Loading map data...", 6.5f,
+            {200, 200, 200, 255}
+        );
+
+        mapInfoContainer->setVisible(false);
+    }
+
+    return mapInfoContainer;
+}
+
 std::pair<float, float> HUD::calculateContentMetrics(
     std::shared_ptr<Containers> container,
     const std::unordered_map<std::string, float> &initialYPositions)
@@ -1246,16 +1299,20 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
         switch (cameraMode)
         {
         case zappy::gui::CameraMode::FREE:
-            return "Right joystick = Change camera direction\n"
-                     "Left joystick = Move camera x and z\n"
+            return "Right joystick =\n"
+                     "Change camera direction\n"
+                     "Left joystick = Move camera x z\n"
                      "RT | LT = Move camera y\n"
                      "Select = Toggle HUD\n";
         case zappy::gui::CameraMode::PLAYER:
-            return "UP | DOWN = Next / Previous player\n"
-                     "Right joystick = Change camera direction\n"
+            return "UP | DOWN =\n"
+                     "Next / Previous player\n"
+                     "Right joystick =\n"
+                     "Change camera direction\n"
                      "Select = Toggle HUD\n";
         case zappy::gui::CameraMode::TARGETED:
-            return "Right joystick = Rotate camera around map origin\n"
+            return "Right joystick =\n"
+                     "Rotate camera around center\n"
                      "RT | LT = Zoom / Unzoom\n"
                      "Select = Toggle HUD\n";
         default:
@@ -1266,20 +1323,76 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
     {
     case zappy::gui::CameraMode::FREE:
         return "Z | Q | S | D = Move camera\n"
-                 "UP | DOWN | RIGHT | LEFT = Change camera direction\n"
+                 "UP | DOWN | RIGHT | LEFT =\n"
+                 "Change camera direction\n"
                  "H = Toggle HUD\n";
     case zappy::gui::CameraMode::PLAYER:
-        return "UP | DOWN = Next / Previous player\n"
-                 "RIGHT | LEFT = Change camera direction\n"
+        return "UP | DOWN =\n"
+                 "Next / Previous player\n"
+                 "RIGHT | LEFT =\n"
+                 "Change camera direction\n"
                  "H = Toggle HUD\n";
     case zappy::gui::CameraMode::TARGETED:
-        return "UP | DOWN | RIGHT | LEFT = Rotate camera around map origin\n"
+        return "UP | DOWN | RIGHT | LEFT =\n"
+                 "Rotate camera around center\n"
                  "SCROLL = Zoom / Unzoom\n"
                  "H = Toggle HUD\n";
     default:
         return "Unknown";
     }
     return "Unknown";
+}
+
+std::string HUD::_mapGlobalInfo(std::shared_ptr<GameInfos> gameInfos)
+{
+    auto mapSize = gameInfos->getMapSize();
+    std::string info = "";
+
+    info += "Map Size: " + std::to_string(mapSize.first) + " x " +
+        std::to_string(mapSize.second) + "\n";
+
+    if (this->_performanceMode || (mapSize.first >= 50 && mapSize.second >= 50)) {
+        info += "Food: X   Egg: X\n";
+        info += "Linemate: X\nDeraumere: X\n";
+        info += "Sibur: X\nMendiane: X\n";
+        info += "Phiras: X\nThystame: X\n";
+        info += "Total ressources: X\n";
+    } else {
+        int totalEgg = gameInfos->getTotalEggs();
+        int totalFood = gameInfos->getTotalFood();
+        int totalLinemate = gameInfos->getTotalLinemate();
+        int totalDeraumere = gameInfos->getTotalDeraumere();
+        int totalSibur = gameInfos->getTotalSibur();
+        int totalMendiane = gameInfos->getTotalMendiane();
+        int totalPhiras = gameInfos->getTotalPhiras();
+        int totalThystame = gameInfos->getTotalThystame();
+
+        info += "Food: " + std::to_string(totalFood) + "   Egg: " +
+            std::to_string(totalEgg) + "\n";
+        info += "Linemate: " + std::to_string(totalLinemate) + "\nDeraumere: " +
+            std::to_string(totalDeraumere) + "\n";
+        info += "Sibur: " + std::to_string(totalSibur) + "\nMendiane: " +
+            std::to_string(totalMendiane) + "\n";
+        info += "Phiras: " + std::to_string(totalPhiras) + "\nThystame: " +
+            std::to_string(totalThystame) + "\n";
+        info += "Total ressources: " + std::to_string(totalFood + totalLinemate +
+            totalDeraumere + totalSibur + totalMendiane + totalPhiras + totalThystame) + "\n";
+    }
+
+    const auto& players = gameInfos->getPlayers();
+    const auto& teams = gameInfos->getTeamNames();
+
+    info += "Total teams: " + std::to_string(teams.size()) + "\n";
+    info += "Total players: " + std::to_string(players.size()) + "\n";
+
+    int max_level = 1;
+    for (const auto& player : players) {
+        if (player.level > max_level)
+            max_level = player.level;
+    }
+    info += "Player Level Max: " + std::to_string(max_level) + "\n";
+
+    return info;
 }
 
 void HUD::updateHelpInformationHUD(zappy::gui::CameraMode cameraMode)
@@ -1304,6 +1417,64 @@ void HUD::updateHelpInformationHUD(zappy::gui::CameraMode cameraMode)
     if (keyHelp && keyHelp->getText() != camHelpKey) {
         keyHelp->setText(camHelpKey);
         return;
+    }
+}
+
+void HUD::initMapInfoDisplay()
+{
+    auto mapInfoContainer = getMapInfoContainer();
+    if (!mapInfoContainer)
+        return;
+
+    mapInfoContainer->setVisible(false);
+}
+
+void HUD::initMapInfoButton()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    bottomContainer->addButtonPercent(
+        "map_info_button", 94.5f, 2.5f, 5.0f, 15.0f,
+        "Map Info",
+        []() {
+        },
+        {70, 130, 180, 220}, {100, 160, 210, 255}, {100, 160, 210, 255}, {255, 255, 255, 255}
+    );
+}
+
+void HUD::updateMapInfoDisplay()
+{
+    auto bottomContainer = getBottomContainer();
+    auto mapInfoContainer = getMapInfoContainer();
+    if (!bottomContainer || !mapInfoContainer || !_gameInfos)
+        return;
+
+    auto mapInfoButton = std::dynamic_pointer_cast<Button>(
+        bottomContainer->getElement("map_info_button"));
+
+    bool isButtonHovered = false;
+    if (mapInfoButton) {
+        Vector2f mousePos = _display->getMousePosition();
+        isButtonHovered = mapInfoButton->contains(mousePos.x, mousePos.y);
+    }
+
+    auto mapInfoTextElem = std::dynamic_pointer_cast<Text>(
+        mapInfoContainer->getElement("map_info_content"));
+
+    if (!mapInfoTextElem) {
+        return;
+    }
+
+    if (isButtonHovered) {
+        auto mapInfoText = this->_mapGlobalInfo(_gameInfos);
+        if (mapInfoTextElem->getText() != mapInfoText) {
+            mapInfoTextElem->setText(mapInfoText);
+        }
+        mapInfoContainer->setVisible(true);
+    } else {
+        mapInfoContainer->setVisible(false);
     }
 }
 
@@ -1692,8 +1863,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_food_increment_btn",
-        32.5f, 15.0f,
-        2.f, 8.f,
+        34.9f, 15.0f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1703,8 +1874,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_food_decrement_btn",
-        35.f, 15.0f,
-        2.f, 8.f,
+        36.0f, 15.0f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1714,8 +1885,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_linemate_increment_btn",
-        25.f, 27.5f,
-        2.f, 8.f,
+        27.4f, 27.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1725,8 +1896,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_linemate_decrement_btn",
-        27.5f, 27.5f,
-        2.f, 8.f,
+        28.5f, 27.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1736,8 +1907,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_deraumere_increment_btn",
-        25.f, 40.5f,
-        2.f, 8.f,
+        27.4f, 40.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1747,8 +1918,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_deraumere_decrement_btn",
-        27.5f, 40.5f,
-        2.f, 8.f,
+        28.5f, 40.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1758,8 +1929,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_sibur_increment_btn",
-        25.f, 53.5f,
-        2.f, 8.f,
+        27.4f, 53.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1769,8 +1940,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_sibur_decrement_btn",
-        27.5f, 53.5f,
-        2.f, 8.f,
+        28.5f, 53.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1780,8 +1951,8 @@ void HUD::initTileResourceDisplay()
 
         bottomContainer->addButtonPercent(
         "tile_mendiane_increment_btn",
-        40.f, 27.5f,
-        2.f, 8.f,
+        42.4f, 27.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1791,8 +1962,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_mendiane_decrement_btn",
-        42.5f, 27.5f,
-        2.f, 8.f,
+        43.5f, 27.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1802,8 +1973,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_phiras_increment_btn",
-        40.f, 40.5f,
-        2.f, 8.f,
+        42.4f, 40.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1813,8 +1984,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_phiras_decrement_btn",
-        42.5f, 40.5f,
-        2.f, 8.f,
+        43.5f, 40.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1824,8 +1995,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_thystame_increment_btn",
-        40.f, 53.5f,
-        2.f, 8.f,
+        42.4f, 53.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1835,8 +2006,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_thystame_decrement_btn",
-        42.5f, 53.5f,
-        2.f, 8.f,
+        43.5f, 53.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1964,14 +2135,14 @@ void HUD::initFpsDisplay()
 
     bottomContainer->addTextPercent(
         "fps_display",
-        96.0f, 32.5f,
+        95.25f, 32.5f,
         "FPS: 60", 6.0f,
         {255, 255, 255, 255}
     );
 
     bottomContainer->addTextPercent(
         "cycle_display",
-        96.0f, 37.5f,
+        95.25f, 37.5f,
         "Cycle: 00h", 6.0f,
         {255, 255, 255, 255}
     );
@@ -2260,7 +2431,7 @@ void HUD::showTeamDetailsContainer(const std::string& teamName)
     yPos += 2.0f;
 
     _teamDetailsContainer->addTextPercent(
-        "eggs_title", 5.0f, yPos,
+        "eggs_status", 5.0f, yPos,
         "Eggs Status:",
         3.0f, {220, 220, 220, 255}
     );
