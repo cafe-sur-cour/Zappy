@@ -109,6 +109,8 @@ class HUD : public IObserver {
 
         void initMapInfoDisplay();
 
+        void initMapInfoButton();
+
         void updateMapInfoDisplay();
 
         zappy::structs::Player getPlayerById(int playerId) const;
@@ -210,4 +212,5 @@ class HUD : public IObserver {
 
         std::string _hoveredTeam;
         std::shared_ptr<Containers> _teamDetailsContainer;
+        bool _mapInfoButtonHovered;
 };

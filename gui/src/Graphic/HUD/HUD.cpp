@@ -30,7 +30,8 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
       _victoryColor({0, 127, 255, 255}),
       _selectedTile(-1, -1),
       _hoveredTeam(""),
-      _teamDetailsContainer(nullptr)
+      _teamDetailsContainer(nullptr),
+      _mapInfoButtonHovered(false)
 {
     _help = std::make_shared<Help>(display, audio);
     _settings = std::make_shared<Settings>(display, audio, camera, gameInfos);
@@ -43,6 +44,7 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
     initTpsSlider(_gameInfos, _display, _audio);
     initServerMessagesDisplay(_gameInfos);
     initMapInfoDisplay();
+    initMapInfoButton();
     this->_initHelpInformation();
 
     if (_gameInfos) {
@@ -1379,6 +1381,27 @@ void HUD::initMapInfoDisplay()
         7.0f,
         {220, 220, 220, 255}
     );
+
+    auto mapInfoTextElem = std::dynamic_pointer_cast<Text>(
+        bottomContainer->getElement("map_info_content"));
+    if (mapInfoTextElem) {
+        mapInfoTextElem->setVisible(false);
+    }
+}
+
+void HUD::initMapInfoButton()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    bottomContainer->addButtonPercent(
+        "map_info_button", 94.5f, 2.5f, 5.0f, 15.0f,
+        "Map Info",
+        []() {
+        },
+        {70, 130, 180, 220}, {100, 160, 210, 255}, {100, 160, 210, 255}, {255, 255, 255, 255}
+    );
 }
 
 void HUD::updateMapInfoDisplay()
@@ -1386,6 +1409,15 @@ void HUD::updateMapInfoDisplay()
     auto bottomContainer = getBottomContainer();
     if (!bottomContainer || !_gameInfos)
         return;
+
+    auto mapInfoButton = std::dynamic_pointer_cast<Button>(
+        bottomContainer->getElement("map_info_button"));
+
+    bool isButtonHovered = false;
+    if (mapInfoButton) {
+        Vector2f mousePos = _display->getMousePosition();
+        isButtonHovered = mapInfoButton->contains(mousePos.x, mousePos.y);
+    }
 
     auto mapInfoTextElem = std::dynamic_pointer_cast<Text>(
         bottomContainer->getElement("map_info_content"));
@@ -1398,9 +1430,14 @@ void HUD::updateMapInfoDisplay()
             return;
     }
 
-    auto mapInfoText = this->_mapGlobalInfo(_gameInfos);
-    if (mapInfoTextElem->getText() != mapInfoText) {
-        mapInfoTextElem->setText(mapInfoText);
+    if (isButtonHovered) {
+        auto mapInfoText = this->_mapGlobalInfo(_gameInfos);
+        if (mapInfoTextElem->getText() != mapInfoText) {
+            mapInfoTextElem->setText(mapInfoText);
+        }
+        mapInfoTextElem->setVisible(true);
+    } else {
+        mapInfoTextElem->setVisible(false);
     }
 }
 
@@ -2061,14 +2098,14 @@ void HUD::initFpsDisplay()
 
     bottomContainer->addTextPercent(
         "fps_display",
-        96.0f, 32.5f,
+        95.25f, 32.5f,
         "FPS: 60", 6.0f,
         {255, 255, 255, 255}
     );
 
     bottomContainer->addTextPercent(
         "cycle_display",
-        96.0f, 37.5f,
+        95.25f, 37.5f,
         "Cycle: 00h", 6.0f,
         {255, 255, 255, 255}
     );
@@ -2357,7 +2394,7 @@ void HUD::showTeamDetailsContainer(const std::string& teamName)
     yPos += 2.0f;
 
     _teamDetailsContainer->addTextPercent(
-        "eggs_title", 5.0f, yPos,
+        "eggs_status", 5.0f, yPos,
         "Eggs Status:",
         3.0f, {220, 220, 220, 255}
     );
