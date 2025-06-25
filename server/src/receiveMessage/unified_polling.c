@@ -131,11 +131,12 @@ static int handle_pending_and_new_connection(zappy_t *zappy, int fd,
 /* This function tell use if a revuimf of the list is neccessary */
 static int need_rebuild_poll_fds(zappy_t *zappy)
 {
+    static int last_poll_count = -1;
+    int current_count = 0;
+
     if (zappy == NULL)
         return -1;
-    static int last_poll_count = -1;
-    int current_count = zappy->unified_poll ? zappy->unified_poll->count : 0;
-
+    current_count = zappy->unified_poll ? zappy->unified_poll->count : 0;
     if (last_poll_count != current_count) {
         last_poll_count = current_count;
         return 1;
