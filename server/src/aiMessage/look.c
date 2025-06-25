@@ -98,15 +98,19 @@ static char *process_tile(char *message, player_t *player, zappy_t *zappy,
     inventory_t *current_tile = &zappy->game->map->tiles[tiles[0]][tiles[1]];
 
     if (tiles == NULL)
-        exit(84);
+        return NULL;
     message = add_players_on_tile(message, tiles, player, zappy);
     message = add_resources_on_tile(message, current_tile);
     message = append_to_message(message, ",");
     return message;
 }
 
-static char *finalize_message(char *message)
+static char *finalize_message(char *message, int *tiles)
 {
+    if (tiles != NULL)
+        free(tiles);
+    if (message == NULL)
+        return NULL;
     if (strlen(message) > 1 && message[strlen(message) - 1] == ',') {
         message[strlen(message) - 1] = ' ';
         message = append_to_message(message, "]\n");
@@ -119,25 +123,25 @@ static char *finalize_message(char *message)
 char *look_up(player_t *player, zappy_t *zappy)
 {
     char *message = strdup("[ player");
-    int tile_x = 0;
-    int tile_y = 0;
     int *tiles = malloc(2 * sizeof(int));
     int tiles_in_row = 0;
 
     if (tiles == NULL)
-        exit(84);
+        return NULL;
     for (int level = 0; level <= player->level; level++) {
         tiles_in_row = 2 * level + 1;
         for (int i = 0; i < tiles_in_row; i++) {
-            tile_x = wrap(player->posX + (i - level), zappy->game->map->width);
-            tile_y = wrap(player->posY - level, zappy->game->map->height);
-            tiles[0] = tile_x;
-            tiles[1] = tile_y;
+            tiles[0] = wrap(player->posX + (i - level),
+                zappy->game->map->width);
+            tiles[1] = wrap(player->posY - level, zappy->game->map->height);
             message = process_tile(message, player, zappy, tiles);
         }
+        if (message == NULL) {
+            free(tiles);
+            return NULL;
+        }
     }
-    free(tiles);
-    return finalize_message(message);
+    return finalize_message(message, tiles);
 }
 
 /* This is the function that handle the mov in the array of function */
@@ -146,6 +150,10 @@ int handle_look(player_t *player, char *command, zappy_t *zappy)
     char *message = look_up(player, zappy);
 
     (void)command;
+    if (message == NULL) {
+        error_message("Failed to create look message.");
+        return -1;
+    }
     write_in_buffer(player->network->writingBuffer, message);
     if (write_message(player->network) == -1) {
         free(message);

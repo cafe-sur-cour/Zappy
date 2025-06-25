@@ -117,11 +117,21 @@ namespace Exceptions {
                                   colors::RESET) {}
     };
 
-    class ModuleError : public std::exception {
+    class ModuleGraphicError : public std::exception {
         private:
             std::string _message = "";
         public:
-            explicit ModuleError(const std::string &msg) : _message(msg) {};
+            explicit ModuleGraphicError(const std::string &msg) : _message(msg) {};
+            const char *what() const noexcept override {
+                return this->_message.c_str();
+            }
+    };
+
+    class ModuleAudioError : public std::exception {
+        private:
+            std::string _message = "";
+        public:
+            explicit ModuleAudioError(const std::string &msg) : _message(msg) {};
             const char *what() const noexcept override {
                 return this->_message.c_str();
             }

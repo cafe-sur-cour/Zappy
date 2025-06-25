@@ -32,30 +32,41 @@ static void write_end_incantation(player_t *player, zappy_t *zappy)
     }
 }
 
+/* This function tells use wether or not enough time elapsed */
+static bool is_elapsed_enough(player_t *player)
+{
+    struct timeval current_time;
+    double current_seconds = 0;
+    double start_seconds = 0;
+    double elapsed = 0;
+
+    gettimeofday(&current_time, NULL);
+    current_seconds = current_time.tv_sec + current_time.tv_usec / 1000000.0;
+    start_seconds = player->last_action_time.tv_sec +
+        player->last_action_time.tv_usec / 1000000.0;
+    elapsed = current_seconds - start_seconds;
+    if (elapsed >= player->time_action) {
+        return true;
+    }
+    return false;
+}
+
 static int handle_cooldown(player_t *player, zappy_t *zappy)
 {
-    if (player->is_busy == true) {
-        struct timeval current_time;
-        gettimeofday(&current_time, NULL);
-        
-        double current_seconds = current_time.tv_sec + current_time.tv_usec / 1000000.0;
-        double start_seconds = player->last_action_time.tv_sec + player->last_action_time.tv_usec / 1000000.0;
-        double elapsed = current_seconds - start_seconds;
-        
-        printf("Elapsed time: %f seconds vs limit %f\n", elapsed, player->time_action);
-        
-        if (elapsed >= player->time_action) {
-            player->is_busy = false;
-            if (player->current_action != NULL && strcmp(player->current_action, "Incantation") == 0) {
-                write_end_incantation(player, zappy);
-            }
-            if (player->current_action != NULL && strcmp(player->current_action, "Fork") == 0) {
-                handle_fork_end(player, zappy);
-            }
+    if (player->is_busy != true)
+        return 0;
+    if (is_elapsed_enough(player) == true) {
+        player->is_busy = false;
+        if (player->current_action != NULL && strcmp(player->current_action,
+                "Incantation") == 0) {
+            write_end_incantation(player, zappy);
         }
-        return 1;
+        if (player->current_action != NULL && strcmp(player->current_action,
+                "Fork") == 0) {
+            handle_fork_end(player, zappy);
+        }
     }
-    return 0;
+    return 1;
 }
 
 /* This function defines wether the player is occupied or not */

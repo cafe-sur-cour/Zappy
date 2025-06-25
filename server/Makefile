@@ -34,6 +34,7 @@ SRC 		=	src/params.c										\
 				src/game/food_refiil.c 								\
 				src/game/get_ids_player_tile.c 						\
 				src/game/init_team.c 								\
+				src/game/init_map.c									\
 				src/free.c											\
 				src/algo.c											\
 				src/accept.c										\
@@ -94,7 +95,7 @@ OBJ 		= 	$(SRC:.c=.o)
 
 INCLUDES 	= 	-I./include
 
-CFLAGS 		=	-Wall -Wextra -Werror -Wshadow -g
+CFLAGS 		=	-Wall -Wextra -Werror -Wshadow
 
 LIBS 		= -L./ -lmy -lnetwork -lm
 

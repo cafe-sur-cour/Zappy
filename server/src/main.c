@@ -20,7 +20,10 @@ int main(int argc, char **argv)
     zappy = init_server(argc, argv);
     if (zappy == NULL)
         return 84;
-    init_game(zappy);
+    if (init_game(zappy) == -1) {
+        free_zappy(zappy);
+        return 84;
+    }
     start_protocol(zappy);
     free_zappy(zappy);
     return 0;

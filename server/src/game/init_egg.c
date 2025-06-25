@@ -74,7 +74,7 @@ static void print_eggs(zappy_t *zappy)
 }
 
 /* Sub function to allow to loop thrue the egg and be coding style */
-static void loop_for_eggs(zappy_t *zappy, tiles_t *tiles, int *pos)
+static int loop_for_eggs(zappy_t *zappy, tiles_t *tiles, int *pos)
 {
     egg_t *new_egg = NULL;
 
@@ -83,16 +83,19 @@ static void loop_for_eggs(zappy_t *zappy, tiles_t *tiles, int *pos)
         pos[0] = tiles[i].x;
         pos[1] = tiles[i].y;
         new_egg = add_egg_node(i + 1, pos, NULL, -1);
-        if (!new_egg)
-            exit(84);
+        if (!new_egg) {
+            error_message("Failed to create new egg node.");
+            return -1;
+        }
         new_egg->next = zappy->game->map->currentEggs;
         zappy->game->map->currentEggs = new_egg;
         new_egg = NULL;
     }
+    return 0;
 }
 
 /* Sending function that allow the server to init the entire egg list */
-void init_egg(zappy_t *zappy)
+int init_egg(zappy_t *zappy)
 {
     tiles_t *tiles = shuffle_fisher(zappy->game->map->width,
         zappy->game->map->height);
@@ -100,11 +103,16 @@ void init_egg(zappy_t *zappy)
 
     if (!pos || tiles == NULL) {
         error_message("Failed to allocate memory for egg position.");
-        exit(84);
+        return -1;
     }
-    loop_for_eggs(zappy, tiles, pos);
+    if (loop_for_eggs(zappy, tiles, pos) == -1) {
+        free(pos);
+        free(tiles);
+        return -1;
+    }
     if (pos)
         free(pos);
     print_eggs(zappy);
     free(tiles);
+    return 0;
 }

@@ -261,7 +261,7 @@ void Map::drawEggs(int x, int y)
         static float timeAccumulator = 0.0f;
         timeAccumulator += this->_display->getFrameTime();
 
-        float rotationAngle = timeAccumulator * 0.50f +
+        float rotationAngle = timeAccumulator * 1.0f +
             static_cast<float>(x * 10 + y * 15 + i * 20);
 
         this->_display->drawModelEx("egg", position, {0.0f, 1.0f, 0.0f},
@@ -277,25 +277,30 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
     if (tile.food <= 0)
         return;
 
-    static float timeAccumulator = 0.0f;
-    std::pair<int, int> temp = this->_gameInfos->getMapSize();
-    if (temp.first < 40 && temp.second < 40)
-        timeAccumulator += this->_display->getFrameTime();
+    static auto startTime = std::chrono::steady_clock::now();
+    auto currentTime = std::chrono::steady_clock::now();
+    float elapsedSeconds = std::chrono::duration<float>(currentTime - startTime).count();
+
+    float baseX = static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER);
+    float baseZ = static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER);
 
     for (int i = 0; i < tile.food; ++i) {
-        float baseHeight = getOffset(DisplayPriority::FOOD, x, y, static_cast<size_t>(i));
-        float phase = static_cast<float>(x * 10 + y * 15 + i * 20) * 0.1f;
-        float floatOffset = sin(timeAccumulator * zappy::gui::FOOD_FLOAT_SPEED + phase) *
-            zappy::gui::FOOD_FLOAT_AMPLITUDE;
+        float baseHeight = getOffset(
+            DisplayPriority::FOOD, x, y, static_cast<size_t>(i)) + 0.3f;
+        float phase = static_cast<float>(x * 10 + y * 15 + i * 20) * 0.6f;
+
+        float floatOffset = sin(elapsedSeconds * zappy::gui::FOOD_FLOAT_SPEED * 1.5f + phase) *
+            (zappy::gui::FOOD_FLOAT_AMPLITUDE * 1.2f);
+
         Vector3f position = {
-            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+            baseX,
             baseHeight + floatOffset,
-            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+            baseZ
         };
-        float rotationAngle = -1;
-        if (temp.first < 40 && temp.second < 40)
-            rotationAngle = timeAccumulator * 0.50f +
-                static_cast<float>(x * 10 + y * 15 + i * 20);
+
+        float rotationAngle = elapsedSeconds * 20.0f +
+            static_cast<float>(x * 10 + y * 15 + i * 20);
+
         this->_display->drawModelEx("food", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
             {zappy::gui::FOOD_SCALE, zappy::gui::FOOD_SCALE, zappy::gui::FOOD_SCALE},
@@ -308,15 +313,32 @@ void Map::drawPerformanceFood(int x, int y, const zappy::structs::Tile &tile)
     if (tile.food <= 0)
         return;
 
+    static auto startTime = std::chrono::steady_clock::now();
+    auto currentTime = std::chrono::steady_clock::now();
+    float elapsedSeconds = std::chrono::duration<float>(currentTime - startTime).count();
+
+    float baseX = static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER);
+    float baseZ = static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER);
+
     for (int i = 0; i < tile.food; ++i) {
+        float baseHeight = getOffset(
+            DisplayPriority::FOOD, x, y, static_cast<size_t>(i)) + 0.3f;
+        float phase = static_cast<float>(x * 10 + y * 15 + i * 20) * 0.6f;
+
+        float floatOffset = sin(elapsedSeconds * zappy::gui::FOOD_FLOAT_SPEED * 1.2f + phase) *
+            (zappy::gui::FOOD_FLOAT_AMPLITUDE * 0.8f);
+
         Vector3f position = {
-            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-            getOffset(DisplayPriority::FOOD, x, y, static_cast<size_t>(i)),
-            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+            baseX,
+            baseHeight + floatOffset,
+            baseZ
         };
 
+        float rotationAngle = elapsedSeconds * 1.0f +
+            static_cast<float>(x * 10 + y * 15 + i * 20);
+
         this->_display->drawModelEx("food", position, {0.0f, 1.0f, 0.0f},
-            0.0f,
+            rotationAngle,
             {zappy::gui::FOOD_SCALE, zappy::gui::FOOD_SCALE, zappy::gui::FOOD_SCALE},
             CWHITE);
     }
@@ -324,222 +346,135 @@ void Map::drawPerformanceFood(int x, int y, const zappy::structs::Tile &tile)
 
 void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
 {
-    if (tile.linemate <= 0 && tile.deraumere <= 0 && tile.sibur <= 0 &&
-        tile.mendiane <= 0 && tile.phiras <= 0 && tile.thystame <= 0)
-        return;
+    struct RockInfo {
+        std::string name;
+        int count;
+        Vector3f scale;
+    };
 
-    static float timeAccumulator = 0.0f;
-    std::pair<int, int> temp = this->_gameInfos->getMapSize();
-    if (temp.first < 40 && temp.second < 40)
-        timeAccumulator += this->_display->getFrameTime();
-    int index = tile.food;
-    float rotationAngle = -1;
-
-    for (int i = 0; i < tile.linemate; ++i) {
-        if (!_gameInfos->isObjectVisible("linemate"))
-            break;
-
-        Vector3f position = {
-            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-        };
-
-        if (temp.first < 40 && temp.second < 40)
-            rotationAngle = timeAccumulator * 0.50f +
-                static_cast<float>(x * 10 + y * 15 + i * 20);
-        this->_display->drawModelEx("linemate", position, {0.0f, 1.0f, 0.0f},
-            rotationAngle,
+    std::vector<RockInfo> rockTypes = {
+        {"linemate", tile.linemate,
             {zappy::gui::LINEMATE_SCALE,
              zappy::gui::LINEMATE_SCALE,
-             zappy::gui::LINEMATE_SCALE},
-            CWHITE);
-    }
-
-    for (int i = 0; i < tile.deraumere; ++i) {
-        if (!_gameInfos->isObjectVisible("deraumere"))
-            break;
-
-        Vector3f position = {
-            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-        };
-
-        if (temp.first < 40 && temp.second < 40)
-            rotationAngle = timeAccumulator * 0.50f +
-                static_cast<float>(x * 10 + y * 15 + i * 20);
-
-        this->_display->drawModelEx("deraumere", position, {0.0f, 1.0f, 0.0f},
-            rotationAngle,
+             zappy::gui::LINEMATE_SCALE}},
+        {"deraumere", tile.deraumere,
             {zappy::gui::DERAUMERE_SCALE,
              zappy::gui::DERAUMERE_SCALE,
-             zappy::gui::DERAUMERE_SCALE},
-            CWHITE);
-    }
-
-    for (int i = 0; i < tile.sibur; ++i) {
-        if (!_gameInfos->isObjectVisible("sibur"))
-            break;
-
-        Vector3f position = {
-            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-        };
-
-        if (temp.first < 40 && temp.second < 40)
-            rotationAngle = timeAccumulator * 0.50f +
-                static_cast<float>(x * 10 + y * 15 + i * 20);
-
-        this->_display->drawModelEx("sibur", position, {0.0f, 1.0f, 0.0f},
-            rotationAngle,
-            {zappy::gui::SIBUR_SCALE, zappy::gui::SIBUR_SCALE, zappy::gui::SIBUR_SCALE},
-            CWHITE);
-    }
-
-    for (int i = 0; i < tile.mendiane; ++i) {
-        if (!_gameInfos->isObjectVisible("mendiane"))
-            break;
-
-        Vector3f position = {
-            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-        };
-
-        if (temp.first < 40 && temp.second < 40)
-            rotationAngle = timeAccumulator * 0.50f +
-                static_cast<float>(x * 10 + y * 15 + i * 20);
-        this->_display->drawModelEx("mendiane", position, {0.0f, 1.0f, 0.0f},
-            rotationAngle,
+             zappy::gui::DERAUMERE_SCALE}},
+        {"sibur", tile.sibur,
+            {zappy::gui::SIBUR_SCALE,
+             zappy::gui::SIBUR_SCALE,
+             zappy::gui::SIBUR_SCALE}},
+        {"mendiane", tile.mendiane,
             {zappy::gui::MENDIANE_SCALE,
              zappy::gui::MENDIANE_SCALE,
-             zappy::gui::MENDIANE_SCALE},
-            CWHITE);
-    }
-
-    for (int i = 0; i < tile.phiras; ++i) {
-        if (!_gameInfos->isObjectVisible("phiras"))
-            break;
-
-        Vector3f position = {
-            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-        };
-        if (temp.first < 40 && temp.second < 40)
-            rotationAngle = timeAccumulator * 0.50f +
-                static_cast<float>(x * 10 + y * 15 + i * 20);
-
-        this->_display->drawModelEx("phiras", position, {0.0f, 1.0f, 0.0f},
-            rotationAngle,
-            {zappy::gui::PHIRAS_SCALE, zappy::gui::PHIRAS_SCALE, zappy::gui::PHIRAS_SCALE},
-            CWHITE);
-    }
-
-    for (int i = 0; i < tile.thystame; ++i) {
-        if (!_gameInfos->isObjectVisible("thystame"))
-            break;
-
-        Vector3f position = {
-            static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-            getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-            static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-        };
-
-        if (temp.first < 40 && temp.second < 40)
-            rotationAngle = timeAccumulator * 0.50f +
-                static_cast<float>(x * 10 + y * 15 + i * 20);
-
-        this->_display->drawModelEx("thystame", position, {0.0f, 1.0f, 0.0f},
-            rotationAngle,
+             zappy::gui::MENDIANE_SCALE}},
+        {"phiras", tile.phiras,
+            {zappy::gui::PHIRAS_SCALE,
+             zappy::gui::PHIRAS_SCALE,
+             zappy::gui::PHIRAS_SCALE}},
+        {"thystame", tile.thystame,
             {zappy::gui::THYSTAME_SCALE,
              zappy::gui::THYSTAME_SCALE,
-             zappy::gui::THYSTAME_SCALE},
-            CWHITE);
+             zappy::gui::THYSTAME_SCALE}}
+    };
+
+    bool hasRocks = false;
+    for (const auto& rock : rockTypes) {
+        if (rock.count > 0) {
+            hasRocks = true;
+            break;
+        }
+    }
+
+    if (!hasRocks)
+        return;
+
+    static auto startTime = std::chrono::steady_clock::now();
+    auto currentTime = std::chrono::steady_clock::now();
+    float elapsedSeconds = std::chrono::duration<float>(currentTime - startTime).count();
+
+    int index = tile.food;
+    float baseX = static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER);
+    float baseZ = static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER);
+    std::pair<int, int> mapSize = this->_gameInfos->getMapSize();
+    bool smallMap = (mapSize.first < 40 && mapSize.second < 40);
+
+    for (const auto& rock : rockTypes) {
+        if (!_gameInfos->isObjectVisible(rock.name) || rock.count <= 0)
+            continue;
+
+        for (int i = 0; i < rock.count; ++i) {
+            Vector3f position = {
+                baseX,
+                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+                baseZ
+            };
+
+            float rotationAngle = -1;
+            if (smallMap) {
+                rotationAngle = elapsedSeconds * 12.0f +
+                    static_cast<float>(x * 10 + y * 15 + i * 20);
+            }
+
+            this->_display->drawModelEx(rock.name, position, {0.0f, 1.0f, 0.0f},
+                rotationAngle, rock.scale, CWHITE);
+        }
     }
 }
 
 void Map::drawPerformanceRock(int x, int y, const zappy::structs::Tile &tile)
 {
+    static const std::vector<std::string> rockNames = {
+        "linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame"
+    };
+
+    std::vector<std::pair<std::string, int>> rockTypes;
+    rockTypes.reserve(rockNames.size());
+    rockTypes.emplace_back(rockNames[0], tile.linemate);
+    rockTypes.emplace_back(rockNames[1], tile.deraumere);
+    rockTypes.emplace_back(rockNames[2], tile.sibur);
+    rockTypes.emplace_back(rockNames[3], tile.mendiane);
+    rockTypes.emplace_back(rockNames[4], tile.phiras);
+    rockTypes.emplace_back(rockNames[5], tile.thystame);
     int visibleRocks = 0;
-    if (_gameInfos->isObjectVisible("linemate")) visibleRocks += tile.linemate;
-    if (_gameInfos->isObjectVisible("deraumere")) visibleRocks += tile.deraumere;
-    if (_gameInfos->isObjectVisible("sibur")) visibleRocks += tile.sibur;
-    if (_gameInfos->isObjectVisible("mendiane")) visibleRocks += tile.mendiane;
-    if (_gameInfos->isObjectVisible("phiras")) visibleRocks += tile.phiras;
-    if (_gameInfos->isObjectVisible("thystame")) visibleRocks += tile.thystame;
+    for (const auto& rockType : rockTypes) {
+        if (_gameInfos->isObjectVisible(rockType.first)) {
+            visibleRocks += rockType.second;
+        }
+    }
 
     if (visibleRocks <= 0)
         return;
 
+    static auto startTime = std::chrono::steady_clock::now();
+    auto currentTime = std::chrono::steady_clock::now();
+    float elapsedSeconds = std::chrono::duration<float>(currentTime - startTime).count();
+
     int index = tile.food;
     float sphereRadius = 0.15f;
+    float baseX = static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER);
+    float baseZ = static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER);
 
-    if (_gameInfos->isObjectVisible("linemate")) {
-        for (int i = 0; i < tile.linemate; ++i) {
-            Vector3f position = {
-                static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-                static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-            };
-            this->_display->drawSphere(position, sphereRadius, CBLUE);
-        }
-    }
+    float colorPhase = elapsedSeconds * 0.5f;
+    unsigned char r = static_cast<unsigned char>(127.5f + 127.5f * sin(colorPhase));
+    unsigned char g = static_cast<unsigned char>(127.5f + 127.5f * sin(colorPhase + 2.0f));
+    unsigned char b = static_cast<unsigned char>(127.5f + 127.5f * sin(colorPhase + 4.0f));
+    Color32 rockColor = {r, g, b, 255};
 
-    if (_gameInfos->isObjectVisible("deraumere")) {
-        for (int i = 0; i < tile.deraumere; ++i) {
-            Vector3f position = {
-                static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-                static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-            };
-            this->_display->drawSphere(position, sphereRadius, CBLUE);
-        }
-    }
+    for (const auto& rockType : rockTypes) {
+        const std::string& type = rockType.first;
+        int count = rockType.second;
 
-    if (_gameInfos->isObjectVisible("sibur")) {
-        for (int i = 0; i < tile.sibur; ++i) {
-            Vector3f position = {
-                static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-                static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-            };
-            this->_display->drawSphere(position, sphereRadius, CBLUE);
-        }
-    }
-
-    if (_gameInfos->isObjectVisible("mendiane")) {
-        for (int i = 0; i < tile.mendiane; ++i) {
-            Vector3f position = {
-                static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-                static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-            };
-            this->_display->drawSphere(position, sphereRadius, CBLUE);
-        }
-    }
-
-    if (_gameInfos->isObjectVisible("phiras")) {
-        for (int i = 0; i < tile.phiras; ++i) {
-            Vector3f position = {
-                static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-                static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-            };
-            this->_display->drawSphere(position, sphereRadius, CBLUE);
-        }
-    }
-
-    if (_gameInfos->isObjectVisible("thystame")) {
-        for (int i = 0; i < tile.thystame; ++i) {
-            Vector3f position = {
-                static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
-                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-                static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
-            };
-            this->_display->drawSphere(position, sphereRadius, CBLUE);
+        if (_gameInfos->isObjectVisible(type) && count > 0) {
+            for (int i = 0; i < count; ++i) {
+                Vector3f position = {
+                    baseX,
+                    getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+                    baseZ
+                };
+                this->_display->drawSphere(position, sphereRadius, rockColor);
+            }
         }
     }
 }

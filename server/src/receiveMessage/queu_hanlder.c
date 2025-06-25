@@ -26,15 +26,11 @@ void execute_action(player_t *player, action_request_t *action, zappy_t *zappy)
         write_message(player->network);
         return;
     }
-    // player->remaining_cooldown = action->time_limit;
     player->time_action = action->time_limit;
     gettimeofday(&player->last_action_time, NULL);
     if (cmd_info->base_time >= 0)
         player->is_busy = true;
-    printf("Command %s - time_limit: %f\n",
-        cmd_info->command, action->time_limit);
     result = cmd_info->handler(player, action->command, zappy);
-    other_message("Starting command\n");
     if (result == 0) {
         write_in_buffer(player->network->writingBuffer, "ok\n");
         write_message(player->network);

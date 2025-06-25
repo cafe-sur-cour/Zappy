@@ -13,18 +13,15 @@
 #include <stdio.h>
 #include <string.h>
 
-
-
 /* This function updates player food consumption based on time */
 static void update_player_food(player_t *player, zappy_t *zappy)
 {
     time_t current_time = time(NULL);
     double time_elapsed = difftime(current_time, player->last_food_check);
-    double time_units_passed = time_elapsed * zappy->params->freq;
+    int time_units_passed = (int)(time_elapsed * zappy->params->freq);
 
-    if (time_units_passed >= 1.0) {
-        int units_to_subtract = (int)time_units_passed;
-        player->food_timer -= units_to_subtract;
+    if (time_units_passed > 0) {
+        player->food_timer -= time_units_passed;
         player->last_food_check = current_time;
         while (player->food_timer <= 0 && player->inventory->nbFood > 0) {
             player->inventory->nbFood--;
