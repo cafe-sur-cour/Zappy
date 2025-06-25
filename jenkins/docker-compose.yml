@@ -11,9 +11,6 @@ services:
       - jenkins_data:/var/jenkins_home
       - ./setup.yml:/var/jenkins_home/casc_configs/setup.yml
       - ./job_dsl.groovy:/var/jenkins_home/job_dsl.groovy
-      - ../cppStyleChecker.sh:/usr/local/bin/cppStyleChecker.sh
-      - ../pythonStyleChecker.sh:/usr/local/bin/pythonStyleChecker.sh
-      - ./scripts/cStyleChecker.sh:/usr/local/bin/cStyleChecker.sh
       - ./scripts/cppStyleChecker.sh:/usr/local/bin/cppStyleChecker.sh
       - ./scripts/pythonStyleChecker.sh:/usr/local/bin/pythonStyleChecker.sh
       - ./scripts/setup_gui_tests.sh:/var/jenkins_home/setup_gui_tests.sh
