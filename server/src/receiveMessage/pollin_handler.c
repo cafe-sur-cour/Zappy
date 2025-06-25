@@ -28,9 +28,6 @@ static void write_end_incantation(player_t *player, zappy_t *zappy)
     if (handle_end_incantation(player, zappy) != 0) {
         write_message(player->network->fd, "ko\n");
     }
-    if (player->current_action)
-        free(player->current_action);
-    player->current_action = NULL;
 }
 
 static int handle_cooldown(player_t *player, zappy_t *zappy)

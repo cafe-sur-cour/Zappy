@@ -25,6 +25,9 @@ static void send_end_incantation_to_all(zappy_t *zappy, int *player_list,
         if (current_player && current_player->network) {
             write_message(current_player->network->fd, msg);
         }
+        if (current_player->current_action)
+            free(current_player->current_action);
+        current_player->current_action = NULL;
     }
 }
 
