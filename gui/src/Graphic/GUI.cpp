@@ -78,6 +78,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     _isRunning = this->_display->isWindowReady();
     this->_display->setTargetFPS(zappy::gui::FPS);
     this->_gameInfos->setAudio(this->_audio);
+    this->_gameInfos->setPerformanceMode(_performanceMode);
     this->_map = std::make_unique<Map>(_gameInfos, this->_display);
     if (!this->_display->loadFont("default", zappy::gui::CUSTOM_FONT_PATH)) {
         std::cout << colors::T_RED << "[WARNING] Failed to load custom font: "
@@ -99,6 +100,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     _cameraManager->setMapCenter(mapCenter);
     _cameraManager->setMapSize(mapSize.first, mapSize.second);
     this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio, _cameraManager,
+        _performanceMode,
     [this]() {
         this->switchCameraMode(zappy::gui::CameraMode::FREE);
     });
@@ -134,6 +136,7 @@ void GUI::update()
     if (_gameInfos->getMapSize().first * _gameInfos->getMapSize().second >= 2500) {
         bool wasPerformanceMode = _performanceMode;
         _performanceMode = true;
+        _gameInfos->setPerformanceMode(true);
 
         if (!wasPerformanceMode && _cameraMode == zappy::gui::CameraMode::TARGETED)
             switchCameraMode(zappy::gui::CameraMode::FREE);
@@ -555,7 +558,7 @@ void GUI::handlePlayerClicks()
         if (_hoveredPlayerId >= 0) {
             setPlayerToFollow(_hoveredPlayerId);
             switchCameraMode(zappy::gui::CameraMode::PLAYER);
-            _audio->playSound("clickPlayer", 100.0f);
+            _audio->playSound("clickPlayer", this->_audio->getSFXVolumeLevel());
         } else {
             handleTileClicks();
         }
