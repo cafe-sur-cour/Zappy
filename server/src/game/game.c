@@ -24,6 +24,7 @@ static game_t *create_game(void)
     }
     game->teams = NULL;
     game->map = NULL;
+    game->won = false;
     return game;
 }
 

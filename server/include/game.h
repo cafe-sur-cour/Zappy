@@ -143,6 +143,7 @@ typedef struct map_t {
 typedef struct game_s {
     team_t *teams;
     map_t *map;
+    bool won;
 } game_t;
 
 #endif /* !GAME_H_ */

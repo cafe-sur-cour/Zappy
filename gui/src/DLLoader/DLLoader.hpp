@@ -13,6 +13,8 @@
 #include <ostream>
 #include <memory>
 #include "ILoader.hpp"
+#include "../Audio/IAudio.hpp"
+#include "../IDisplay.hpp"
 
 template <typename T>
 
@@ -51,5 +53,8 @@ class DLLoader : public ILoader {
             return dlerror();
         };
 };
+
+typedef std::shared_ptr<IDisplay> (*createGraphicFunc_t)();
+typedef std::shared_ptr<IAudio> (*createAudioFunc_t)();
 
 #endif /* !DLLOADER_HPP_ */

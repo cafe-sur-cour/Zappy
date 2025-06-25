@@ -51,11 +51,12 @@ int send_map_tile(inventory_t **tiles, zappy_t *server,
         .nbLinemate) + int_str_len(tiles[posX][posY].nbDeraumere) +
         int_str_len(tiles[posX][posY].nbSibur) + int_str_len(tiles[posX][posY].
         nbMendiane) + int_str_len(tiles[posX][posY].nbPhiras) +
-        int_str_len(tiles[posX][posY].nbThystame) + 14;
+        int_str_len(tiles[posX][posY].nbThystame) + 20;
     pos[0] = posX;
     pos[1] = posY;
     if (write_map_message(xLength, server, tiles, pos) == -1)
         return -1;
+    free(pos);
     return 0;
 }
 

@@ -189,6 +189,11 @@ class HUD : public IObserver {
 
         void addIncrementDecrementButtons(std::shared_ptr<Containers> container, int playerId);
 
+        void updateTeamHoverDetection();
+        void createTeamDetailsContainer();
+        void showTeamDetailsContainer(const std::string& teamName);
+        void hideTeamDetailsContainer();
+
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
@@ -202,4 +207,7 @@ class HUD : public IObserver {
         std::string _winningTeam;
         Color32 _victoryColor;
         std::pair<int, int> _selectedTile;
+
+        std::string _hoveredTeam;
+        std::shared_ptr<Containers> _teamDetailsContainer;
 };

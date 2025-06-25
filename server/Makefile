@@ -21,6 +21,7 @@ SRC 		=	src/params.c										\
 				src/checkers.c										\
 				src/server.c										\
 				src/protocol.c										\
+				src/pending_connections.c							\
 				src/game/client.c									\
 				src/game/game.c										\
 				src/game/init_egg.c									\
@@ -73,6 +74,7 @@ SRC 		=	src/params.c										\
 				src/receiveMessage/loop_thru_command.c				\
 				src/receiveMessage/queu_hanlder.c					\
 				src/receiveMessage/unified_polling.c				\
+				src/receiveMessage/build_fds.c      				\
 				src/receiveMessage/init_poll_fds.c 					\
 				src/aiMessage/end_incantation.c 					\
 				src/aiMessage/forward.c								\

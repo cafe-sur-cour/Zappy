@@ -51,18 +51,18 @@ TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
 INCLUDES = -I./include -I./src
 
-CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror  -L./src/DLLoader/ \
+CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror -O2  -L./src/DLLoader/ \
 	-lDLLoader
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 LIBS = -L./src/Communication -lcommunication \
-		-L./src/Audio -laudio -L./src/DLLoader/ -lDLLoader -lsfml-audio \
+		-L./src/DLLoader/ -lDLLoader -lsfml-audio \
 		-lGL -lm -lpthread -ldl -lrt -lX11
 
 COMM_LIB = src/Communication/libcommunication.a
 RAYLIB_LIB = src/RayLib/libZappyRayLib.so
-AUDIO_LIB = src/Audio/libaudio.a
-DLLoader_LIB = src/DllLoader/libDLLoader.a
+AUDIO_LIB = src/Audio/SFML/libSFMLAudio.so
+DLLoader_LIB = src/DLLoader/libDLLoader.a
 
 NAME = zappy_gui
 
@@ -72,29 +72,31 @@ CC = g++
 
 all: $(NAME)
 
-$(NAME): communication_lib raylib_lib audio_lib dlloader_lib $(OBJ) $(MAIN_OBJ)
+$(NAME): $(COMM_LIB) $(RAYLIB_LIB) $(AUDIO_LIB) $(DLLoader_LIB) \
+ 	$(OBJ) $(MAIN_OBJ)
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Compiling $(NAME)...$(NC)"
 	$(CC) -o $(NAME) $(MAIN_OBJ) $(OBJ) $(CFLAGS) $(INCLUDES) $(LIBS)
 	@echo -e "$(GREEN)ᒥ✅ᒧ Compilation completed successfully!$(NC)"
 
-communication_lib:
+$(COMM_LIB):
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Building Communication library...$(NC)"
 	@make -C src/Communication
 
-raylib_lib:
+$(RAYLIB_LIB):
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Building RayLib wrapper library...$(NC)"
 	@make -C src/RayLib
 	@echo -e "$(GREEN)ᒥ✅ᒧ Library $(RAYLIB_LIB) created successfully!$(NC)"
 	@mkdir -p ./lib
 	@cp $(RAYLIB_LIB) ./lib/
 
-dlloader_lib:
+$(DLLoader_LIB):
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Building DLLoader library...$(NC)"
 	@make -C src/DLLoader
 
-audio_lib:
+$(AUDIO_LIB):
 	@echo -e "$(BLUE)ᒥ🔧ᒧ Building Audio library...$(NC)"
 	@make -C src/Audio
+	@cp $(AUDIO_LIB) ./lib/
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
@@ -110,7 +112,7 @@ clean:
 fclean: clean
 	@rm -rf $(NAME)
 	@rm -rf $(UNIT_TESTS)
-	@rm -rf ./lib/*
+	@rm -rf ./lib
 	@rm -rf coverage_report/
 	@find . -name "*.gcda" -type f -delete
 	@find . -name "*.gcno" -type f -delete

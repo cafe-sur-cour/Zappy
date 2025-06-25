@@ -18,7 +18,7 @@ OBJ = $(SRC:.cpp=.o)
 
 INCLUDES = -I../../include -I../..
 
-CFLAGS =	-std=c++20 -Wall -Wextra -Werror -fPIC
+CFLAGS =	-std=c++20 -Wall -Wextra -Werror -O2 -fPIC
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 NAME = libcommunication.a
