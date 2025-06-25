@@ -1,21 +1,15 @@
 FROM jenkins/jenkins:lts-jdk17
 
-# Désactiver l'assistant de configuration initial
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
 
-# Copier la liste des plugins dans le répertoire de référence de Jenkins
 COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
 
-# Installer les plugins Jenkins
 RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
 
-# Passer en utilisateur root
 USER root
 
-# Créer des emplacements pour les scripts de vérification de style
 RUN mkdir -p /usr/local/bin
 
-# Installer les dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     gcc \
@@ -51,15 +45,12 @@ RUN apt-get update && apt-get install -y \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Créer et activer un environnement virtuel Python
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Installer les packages Python dans le venv
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir pylint flake8 pycodestyle cpplint
 
-# Cloner et compiler raylib avec -fPIC et sans audio
 RUN git clone https://github.com/raysan5/raylib.git /tmp/raylib && \
     cd /tmp/raylib && mkdir build && cd build && \
     cmake -DSHARED=ON -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DSUPPORT_FILEFORMAT_WAV=OFF -DSUPPORT_AUDIO=OFF .. && \
@@ -67,5 +58,4 @@ RUN git clone https://github.com/raysan5/raylib.git /tmp/raylib && \
     make install && \
     rm -rf /tmp/raylib
 
-# Revenir à l'utilisateur jenkins
 USER jenkins
