@@ -99,7 +99,8 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     mapCenter.y = mapScale * 0.2f;
     _cameraManager->setMapCenter(mapCenter);
     _cameraManager->setMapSize(mapSize.first, mapSize.second);
-    this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio, _cameraManager, _performanceMode,
+    this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio, _cameraManager,
+        _performanceMode,
     [this]() {
         this->switchCameraMode(zappy::gui::CameraMode::FREE);
     });
@@ -135,7 +136,6 @@ void GUI::update()
     if (_gameInfos->getMapSize().first * _gameInfos->getMapSize().second >= 2500) {
         bool wasPerformanceMode = _performanceMode;
         _performanceMode = true;
-        // Mettre à jour le mode performance dans GameInfos
         _gameInfos->setPerformanceMode(true);
 
         if (!wasPerformanceMode && _cameraMode == zappy::gui::CameraMode::TARGETED)

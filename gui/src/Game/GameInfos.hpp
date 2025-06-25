@@ -138,8 +138,7 @@ class GameInfos : public Subject {
         std::shared_ptr<IAudio> _audio;
         zappy::gui::CameraMode _currentCameraMode;
         int _currentPlayerFocus;
-        
-        // Cache pour les totaux de ressources
+
         mutable std::unordered_map<std::string, int> _resourceTotals;
         mutable bool _resourceTotalsNeedUpdate = true;
         bool _performanceMode = false;
