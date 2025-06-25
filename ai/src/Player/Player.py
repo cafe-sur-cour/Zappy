@@ -71,13 +71,14 @@ class Player:
         self.senderID: str = None
         self.needToBroadcastInventory = False
 
+        self.teamMatesStatus: list = []
+
         self.roombaState: dict = {
             "forwardCount": 0,
             "targetForward": 10,
             "phase": "lookAround",
             "lastCommand": None,
             "lastPhase": None,
-            "teamMatesStatus": [],
             "commandSentTime": 0,
             "highestPidSeen": 0,
         }
@@ -173,7 +174,7 @@ class Player:
             "phiras": self.inventory["phiras"],
             "thystame": self.inventory["thystame"]
         }
-        for inventory in self.roombaState["teamMatesStatus"]:
+        for inventory in self.teamMatesStatus:
             totalStones["linemate"] += inventory["linemate"]
             totalStones["deraumere"] += inventory["deraumere"]
             totalStones["sibur"] += inventory["sibur"]
@@ -187,14 +188,16 @@ class Player:
         self.teamHasEnoughStones = True
         return True
 
-    def howManyFoodForIncantation(self, level: int) -> int:
+    def howManyTimeUnitsForIncantation(self, level: int) -> int:
         return (MAX_LEVEL - level) * ELEVATION_COST
 
     def enoughFoodForIncantation(self, level: int, nbFood: int) -> bool:
         if level >= MAX_LEVEL:
             return True
 
-        return nbFood * FOOD_VALUE > self.howManyFoodForIncantation(level)
+        offset = FOOD_VALUE * 1
+
+        return nbFood * FOOD_VALUE > self.howManyTimeUnitsForIncantation(level) + offset
 
     def enoughFoodForGoToIncantation(self, level: int, nbFood: int) -> bool:
         if level >= MAX_LEVEL:
@@ -203,20 +206,20 @@ class Player:
         stonesToDrop = sum(LVL_UPGRADES[level]["stones"].values())
         droppingCost = stonesToDrop * 7
 
-        maxLength = (max(self.x, self.y) / 2) * 5
+        maxLength = (max(self.x, self.y) / 2) * 4
         movementCost = 7 * maxLength
 
-        offset = FOOD_VALUE
+        offset = FOOD_VALUE * 10
 
         totalCost = droppingCost + movementCost + offset
 
-        return nbFood * FOOD_VALUE > (totalCost + self.howManyFoodForIncantation(level))
+        return nbFood * FOOD_VALUE > (totalCost + self.howManyTimeUnitsForIncantation(level))
 
     def teamHasEnoughFoodForGoToIncantation(self) -> bool:
         if not self.enoughFoodForGoToIncantation(self.level, self.inventory["food"]):
             return False
 
-        for teamMate in self.roombaState["teamMatesStatus"]:
+        for teamMate in self.teamMatesStatus:
             if not self.enoughFoodForGoToIncantation(teamMate["level"], teamMate["food"]):
                 return False
 
@@ -226,7 +229,7 @@ class Player:
         if not self.enoughFoodForIncantation(self.level, self.inventory["food"]):
             return False
 
-        for teamMate in self.roombaState["teamMatesStatus"]:
+        for teamMate in self.teamMatesStatus:
             if not self.enoughFoodForIncantation(teamMate["level"], teamMate["food"]):
                 return False
 
@@ -268,7 +271,7 @@ class Player:
 
             elif self.roombaState["lastCommand"] == "broadcast sendInventory":
                 expectedTeamMates = self.nbConnectedPlayers - 1
-                receivedTeamMatesStatus = len(self.roombaState["teamMatesStatus"])
+                receivedTeamMatesStatus = len(self.teamMatesStatus)
 
                 if receivedTeamMatesStatus >= expectedTeamMates:
                     if (
@@ -278,7 +281,7 @@ class Player:
                         highest_pid = self.pid
                         highest_pid_id = self.id
 
-                        for teamMate in self.roombaState["teamMatesStatus"]:
+                        for teamMate in self.teamMatesStatus:
                             teammate_id = teamMate["id"]
                             if "-" in teammate_id:
                                 teammate_pid = int(teammate_id.split("-")[1])
@@ -386,21 +389,36 @@ class Player:
             self.incantationState["lastCommand"] = "drop stones"
 
         elif phase == "inventoryCheck":
-            self.broadcaster.broadcastMessage(f"sendInventory {self.id}")
-            self.incantationState["phase"] = "startIncantation"
-            self.incantationState["lastCommand"] = "broadcast sendInventory"
+            if self.incantationState["lastCommand"] == "Connect_nbr":
+                self.broadcaster.broadcastMessage(f"sendInventory {self.id}")
+                self.incantationState["lastCommand"] = "broadcast sendInventory"
+
+            elif self.incantationState["lastCommand"] == "broadcast sendInventory":
+                expectedTeamMates = self.nbConnectedPlayers - 1
+                receivedTeamMatesStatus = len(self.teamMatesStatus)
+
+                if receivedTeamMatesStatus >= expectedTeamMates:
+                    if not self.teamHasEnoughFoodForIncantation():
+                        self.logger.error("Not enough food for incantation, resetting state")
+                        self.broadcaster.broadcastMessage("goRoombas")
+                        self.incantationState["status"] = False
+                        self.incantationState["phase"] = "sendComeIncant"
+                        self.incantationState["lastCommand"] = None
+                        self.incantationState["playerResponses"] = []
+                        self.roombaState["phase"] = "forward"
+
+                    else:
+                        self.incantationState["phase"] = "startIncantation"
+
+                else:
+                    self.communication.sendGetConnectNbr()
+                    self.incantationState["lastCommand"] = "Connect_nbr"
+
+            else:
+                self.communication.sendGetConnectNbr()
+                self.incantationState["lastCommand"] = "Connect_nbr"
 
         elif phase == "startIncantation":
-            if not self.teamHasEnoughFoodForIncantation():
-                self.logger.error("Not enough food for incantation, resetting state")
-                self.broadcaster.broadcastMessage("goRoombas")
-                self.incantationState["status"] = False
-                self.incantationState["phase"] = "sendComeIncant"
-                self.incantationState["lastCommand"] = None
-                self.incantationState["playerResponses"] = []
-                self.roombaState["phase"] = "forward"
-                return
-
             self.communication.sendIncantation()
             self.incantationState["lastCommand"] = "incantation"
             self.incantationState["phase"] = "waitingForElevation"
@@ -727,14 +745,14 @@ class Player:
                 return
             if demanderID != self.id:
                 return
-            if responderID in [mate["id"] for mate in self.roombaState["teamMatesStatus"]]:
+            if responderID in [mate["id"] for mate in self.teamMatesStatus]:
                 return
 
             teamMate = data.split(",")
             if len(teamMate) != 8:
                 return
             teamMate = list(map(int, teamMate))
-            self.roombaState["teamMatesStatus"].append(
+            self.teamMatesStatus.append(
                 {
                     "linemate": teamMate[0],
                     "deraumere": teamMate[1],
