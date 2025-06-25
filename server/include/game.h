@@ -96,7 +96,7 @@ typedef struct player_s {
     action_queue_t *pending_actions;
     time_t last_action_time;
     bool is_busy;
-    int remaining_cooldown;
+    float remaining_cooldown;
     char *current_action;
     /* Food timer for health system */
     int food_timer;  /* Time units until next food consumption */

@@ -25,7 +25,7 @@ void execute_action(player_t *player, action_request_t *action, zappy_t *zappy)
         return;
     }
     player->remaining_cooldown = action->time_limit;
-    if (cmd_info->base_time >= 42)
+    if (cmd_info->base_time >= 0)
         player->is_busy = true;
     result = cmd_info->handler(player, action->command, zappy);
     if (result == 0) {
