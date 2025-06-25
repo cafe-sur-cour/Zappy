@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void init_teams(zappy_t *server)
+int init_teams(zappy_t *server)
 {
     team_t *current = server->game->teams;
 
@@ -19,7 +19,7 @@ void init_teams(zappy_t *server)
         current = malloc(sizeof(team_t));
         if (!current) {
             error_message("Failed to allocate memory for team structure.");
-            exit(84);
+            return -1;
         }
         current->name = strdup(server->params->teams[i]);
         current->nbPlayers = 0;
@@ -28,4 +28,5 @@ void init_teams(zappy_t *server)
         current->next = server->game->teams;
         server->game->teams = current;
     }
+    return 0;
 }

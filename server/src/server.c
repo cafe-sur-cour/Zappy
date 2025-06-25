@@ -57,7 +57,10 @@ static zappy_t *init_struct_poll(zappy_t *zappy)
         return NULL;
     }
     add_fd_to_poll(zappy->unified_poll, zappy->network->sockfd, POLLIN);
-    init_game(zappy);
+    if (init_game(zappy) == -1) {
+        free_zappy(zappy);
+        return NULL;
+    }
     return zappy;
 }
 

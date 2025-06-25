@@ -99,7 +99,6 @@ void free_map(map_t *map)
         }
     }
     free_eggs(map->currentEggs);
-    free(map->tiles);
     free(map);
 }
 
