@@ -2002,7 +2002,6 @@ void HUD::updateFpsDisplay()
 
 void HUD::updateTeamHoverDetection()
 {
-    return;
     static std::chrono::steady_clock::time_point lastCheckTime;
     static std::string lastHoveredTeam;
     static bool shouldDisplay = false;
