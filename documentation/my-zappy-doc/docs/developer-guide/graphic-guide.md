@@ -268,10 +268,10 @@ set_target_properties(MyCustomDisplay PROPERTIES
 ### Integration Test
 
 1. Compile your library as a shared object (.so/.dll)
-2. Place it in the appropriate directory
+2. Place it in the appropriate directory (/lib)
 3. Launch Zappy GUI with your library:
    ```bash
-   ./zappy_gui -lib ./path/to/your/library.so
+   ./zappy_gui
    ```
 
 ### Performance Considerations

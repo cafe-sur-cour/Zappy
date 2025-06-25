@@ -126,11 +126,12 @@ void check_player_status(zappy_t *zappy);
 void remove_player_by_fd(zappy_t *zappy, int fd);
 
 /* init_map.c */
-void init_game(zappy_t *server);
+int init_game(zappy_t *server);
 int distribute_resources(zappy_t *z);
+map_t *create_map(int width, int height);
 
 /* init_team.c */
-void init_teams(zappy_t *server);
+int init_teams(zappy_t *server);
 
 /* accept.c */
 int accept_client(zappy_t *server);
@@ -181,7 +182,7 @@ int send_start_incantation(zappy_t *zappy, player_t *player, int *player_list,
 int send_end_incantation(zappy_t *zappy, player_t *player, char *result);
 
 /* init_egg.c */
-void init_egg(zappy_t *zappy);
+int init_egg(zappy_t *zappy);
 egg_t *add_egg_node(int id, int *pos, char *team_name, int id_layer);
 egg_t *kil_egg_node(egg_t **head, int egg_id);
 
