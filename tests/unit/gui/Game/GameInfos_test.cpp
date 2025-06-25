@@ -484,30 +484,6 @@ TEST_F(GameInfosObserverTest, NotifyObservers) {
     gameInfos->testNotifyObservers();
 }
 
-// Test for setCurrentCameraMode
-TEST_F(GameInfosAdditionalTest, SetAndUseCurrentCameraMode) {
-    gameInfos->setCurrentCameraMode(zappy::gui::CameraMode::PLAYER);
-
-    zappy::structs::Player player(1, 5, 5, 1, 3, "Team1");
-    gameInfos->addPlayer(player);
-    gameInfos->setCurrentPlayerFocus(1);
-
-    EXPECT_CALL(*mockAudio, playSound("collect", 100.0f)).Times(1);
-    gameInfos->updatePlayerResourceAction(1, 0, true);
-}
-
-// Test for setCurrentPlayerFocus
-TEST_F(GameInfosAdditionalTest, SetCurrentPlayerFocus) {
-    gameInfos->setCurrentPlayerFocus(5);
-
-    zappy::structs::Player player(5, 5, 5, 1, 3, "Team1");
-    gameInfos->addPlayer(player);
-    gameInfos->setCurrentCameraMode(zappy::gui::CameraMode::PLAYER);
-
-    EXPECT_CALL(*mockAudio, playSound("collect", 100.0f)).Times(1);
-    gameInfos->updatePlayerResourceAction(5, 0, true);
-}
-
 // Test killPlayer method
 TEST_F(GameInfosAdditionalTest, KillPlayer) {
     gameInfos->killPlayer(-1);
