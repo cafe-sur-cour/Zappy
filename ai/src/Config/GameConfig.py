@@ -5,6 +5,8 @@
 ## GameConfig
 ##
 
+MAX_LEVEL = 8
+
 LVL_UPGRADES = {
     1: {
         "players": 1,
