@@ -285,7 +285,8 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
     float baseZ = static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER);
 
     for (int i = 0; i < tile.food; ++i) {
-        float baseHeight = getOffset(DisplayPriority::FOOD, x, y, static_cast<size_t>(i)) + 0.3f;
+        float baseHeight = getOffset(
+            DisplayPriority::FOOD, x, y, static_cast<size_t>(i)) + 0.3f;
         float phase = static_cast<float>(x * 10 + y * 15 + i * 20) * 0.6f;
 
         float floatOffset = sin(elapsedSeconds * zappy::gui::FOOD_FLOAT_SPEED * 1.5f + phase) *
@@ -297,7 +298,8 @@ void Map::drawFood(int x, int y, const zappy::structs::Tile &tile)
             baseZ
         };
 
-        float rotationAngle = elapsedSeconds * 20.0f + static_cast<float>(x * 10 + y * 15 + i * 20);
+        float rotationAngle = elapsedSeconds * 20.0f +
+            static_cast<float>(x * 10 + y * 15 + i * 20);
 
         this->_display->drawModelEx("food", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
@@ -319,7 +321,8 @@ void Map::drawPerformanceFood(int x, int y, const zappy::structs::Tile &tile)
     float baseZ = static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER);
 
     for (int i = 0; i < tile.food; ++i) {
-        float baseHeight = getOffset(DisplayPriority::FOOD, x, y, static_cast<size_t>(i)) + 0.3f;
+        float baseHeight = getOffset(
+            DisplayPriority::FOOD, x, y, static_cast<size_t>(i)) + 0.3f;
         float phase = static_cast<float>(x * 10 + y * 15 + i * 20) * 0.6f;
 
         float floatOffset = sin(elapsedSeconds * zappy::gui::FOOD_FLOAT_SPEED * 1.2f + phase) *
@@ -331,7 +334,8 @@ void Map::drawPerformanceFood(int x, int y, const zappy::structs::Tile &tile)
             baseZ
         };
 
-        float rotationAngle = elapsedSeconds * 1.0f + static_cast<float>(x * 10 + y * 15 + i * 20);
+        float rotationAngle = elapsedSeconds * 1.0f +
+            static_cast<float>(x * 10 + y * 15 + i * 20);
 
         this->_display->drawModelEx("food", position, {0.0f, 1.0f, 0.0f},
             rotationAngle,
@@ -349,12 +353,30 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
     };
 
     std::vector<RockInfo> rockTypes = {
-        {"linemate", tile.linemate, {zappy::gui::LINEMATE_SCALE, zappy::gui::LINEMATE_SCALE, zappy::gui::LINEMATE_SCALE}},
-        {"deraumere", tile.deraumere, {zappy::gui::DERAUMERE_SCALE, zappy::gui::DERAUMERE_SCALE, zappy::gui::DERAUMERE_SCALE}},
-        {"sibur", tile.sibur, {zappy::gui::SIBUR_SCALE, zappy::gui::SIBUR_SCALE, zappy::gui::SIBUR_SCALE}},
-        {"mendiane", tile.mendiane, {zappy::gui::MENDIANE_SCALE, zappy::gui::MENDIANE_SCALE, zappy::gui::MENDIANE_SCALE}},
-        {"phiras", tile.phiras, {zappy::gui::PHIRAS_SCALE, zappy::gui::PHIRAS_SCALE, zappy::gui::PHIRAS_SCALE}},
-        {"thystame", tile.thystame, {zappy::gui::THYSTAME_SCALE, zappy::gui::THYSTAME_SCALE, zappy::gui::THYSTAME_SCALE}}
+        {"linemate", tile.linemate,
+            {zappy::gui::LINEMATE_SCALE,
+             zappy::gui::LINEMATE_SCALE,
+             zappy::gui::LINEMATE_SCALE}},
+        {"deraumere", tile.deraumere,
+            {zappy::gui::DERAUMERE_SCALE,
+             zappy::gui::DERAUMERE_SCALE,
+             zappy::gui::DERAUMERE_SCALE}},
+        {"sibur", tile.sibur,
+            {zappy::gui::SIBUR_SCALE,
+             zappy::gui::SIBUR_SCALE,
+             zappy::gui::SIBUR_SCALE}},
+        {"mendiane", tile.mendiane,
+            {zappy::gui::MENDIANE_SCALE,
+             zappy::gui::MENDIANE_SCALE,
+             zappy::gui::MENDIANE_SCALE}},
+        {"phiras", tile.phiras,
+            {zappy::gui::PHIRAS_SCALE,
+             zappy::gui::PHIRAS_SCALE,
+             zappy::gui::PHIRAS_SCALE}},
+        {"thystame", tile.thystame,
+            {zappy::gui::THYSTAME_SCALE,
+             zappy::gui::THYSTAME_SCALE,
+             zappy::gui::THYSTAME_SCALE}}
     };
 
     bool hasRocks = false;
@@ -391,7 +413,8 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
 
             float rotationAngle = -1;
             if (smallMap) {
-                rotationAngle = elapsedSeconds * 12.0f + static_cast<float>(x * 10 + y * 15 + i * 20);
+                rotationAngle = elapsedSeconds * 12.0f +
+                    static_cast<float>(x * 10 + y * 15 + i * 20);
             }
 
             this->_display->drawModelEx(rock.name, position, {0.0f, 1.0f, 0.0f},
