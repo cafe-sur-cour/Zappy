@@ -142,7 +142,8 @@ static player_t *init_player(int fd, zappy_t *zappy)
     player->direction = (direction_t)(rand() % 4 + 1);
     player->inventory = init_inventory();
     player->pending_actions = init_action_queue();
-    player->last_action_time = 0;
+    gettimeofday(&player->last_action_time, NULL);
+    player->time_action = 0;
     player->is_busy = false;
     player->current_action = NULL;
     player->remaining_cooldown = 0;
