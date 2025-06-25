@@ -23,7 +23,9 @@ from src.Config.Constants import (
 from src.Config.GameConfig import (
     LVL_UPGRADES,
     TOTAL_NEEDED_STONES,
-    MAX_LEVEL
+    MAX_LEVEL,
+    ELEVATION_COST,
+    FOOD_VALUE
 )
 from src.Logger.Logger import Logger
 
@@ -186,13 +188,13 @@ class Player:
         return True
 
     def howManyFoodForIncantation(self, level: int) -> int:
-        return (8 - level) * 300
+        return (MAX_LEVEL - level) * ELEVATION_COST
 
     def enoughFoodForIncantation(self, level: int, nbFood: int) -> bool:
         if level >= MAX_LEVEL:
             return True
 
-        return nbFood * 126 > self.howManyFoodForIncantation(level)
+        return nbFood * FOOD_VALUE > self.howManyFoodForIncantation(level)
 
     def enoughFoodForGoToIncantation(self, level: int, nbFood: int) -> bool:
         if level >= MAX_LEVEL:
@@ -204,11 +206,11 @@ class Player:
         maxLength = (max(self.x, self.y) / 2) * 5
         movementCost = 7 * maxLength
 
-        offset = 126
+        offset = FOOD_VALUE
 
         totalCost = droppingCost + movementCost + offset
 
-        return nbFood * 126 > (totalCost + self.howManyFoodForIncantation(level))
+        return nbFood * FOOD_VALUE > (totalCost + self.howManyFoodForIncantation(level))
 
     def teamHasEnoughFoodForGoToIncantation(self) -> bool:
         if not self.enoughFoodForGoToIncantation(self.level, self.inventory["food"]):
@@ -287,7 +289,9 @@ class Player:
                         if highest_pid == self.pid:
                             self.incantationState["status"] = True
                         else:
-                            self.broadcaster.broadcastMessage(f"leadIncantation {highest_pid_id}")
+                            self.broadcaster.broadcastMessage(
+                                f"leadIncantation {highest_pid_id}"
+                            )
                     self.roombaState["phase"] = "forward"
                 else:
                     self.communication.sendGetConnectNbr()
@@ -324,7 +328,10 @@ class Player:
                 self.roombaState["lastPhase"] = "turn"
 
             else:
-                self.logger.error(f"Unexpected lastCommand '{self.roombaState['lastCommand']}' in turn phase, resetting to lookAround")
+                self.logger.error(
+                    f"Unexpected lastCommand '{self.roombaState['lastCommand']}'"
+                    f" in turn phase, resetting to lookAround"
+                )
                 self.roombaState["phase"] = "lookAround"
                 self.roombaState["lastPhase"] = "turn"
 
