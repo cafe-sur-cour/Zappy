@@ -29,7 +29,8 @@ static zappy_t *create_test_server(int width, int height, bool debug)
     server->params->is_debug = debug;
     server->game = NULL;
     server->graph = malloc(sizeof(graph_net_t));
-    server->graph->fd = -1;
+    server->graph->network = malloc(sizeof(network_t));
+    server->graph->network->fd = -1; // Initialize fd to -1
     return server;
 }
 

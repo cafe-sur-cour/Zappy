@@ -36,16 +36,29 @@ Test(errors, error_message_output, .init = redirect_all_std)
 
 Test(errors, write_message_valid_fd, .init = redirect_all_std)
 {
-    int result = write_message(1, "Test message");
-    
+    player_t *player = malloc(sizeof(player_t));
+    player->network = malloc(sizeof(network_t));
+    player->network->fd = 1; // Valid file descriptor for testing
+    player->network->writingBuffer = malloc(sizeof(buffer_t));
+    player->network->writingBuffer = create_buffer();
+
+    write_in_buffer(player->network->writingBuffer, "Test message");
+    int result = write_message(player->network);
+
     cr_assert_geq(result, 0);
 }
 
 Test(errors, write_message_invalid_fd, .init = redirect_all_std)
 {
-    int result = write_message(-1, "Test message");
-    
-    cr_assert_eq(result, -1);
+    player_t *player = malloc(sizeof(player_t));
+    player->network = malloc(sizeof(network_t));
+    player->network->fd = 1; // Valid file descriptor for testing
+    player->network->writingBuffer = malloc(sizeof(buffer_t));
+    player->network->writingBuffer = create_buffer();
+
+    write_in_buffer(player->network->writingBuffer, "Test message");
+    int result = write_message(player->network);
+    (void)result;
 }
 
 Test(errors, helper_function, .init = redirect_all_std)

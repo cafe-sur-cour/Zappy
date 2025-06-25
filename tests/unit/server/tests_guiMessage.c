@@ -46,7 +46,8 @@ static zappy_t *create_test_zappy(void)
     
     zappy->params->freq = 100;
     zappy->params->is_debug = true;
-    zappy->graph->fd = 42;
+    zappy->graph->network = malloc(sizeof(network_t));
+    zappy->graph->network->fd = 42;
     zappy->game->map->currentEggs = NULL;
     
     return zappy;
