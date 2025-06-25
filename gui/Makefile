@@ -22,6 +22,7 @@ SRC =	src/Client/Client.cpp \
 		src/Game/GameInfos.cpp \
 		src/Graphic/GUI.cpp \
 		src/Graphic/Map.cpp \
+		src/Graphic/SplashScreen.cpp \
 		src/Graphic/Camera/CameraManager.cpp \
 		src/Graphic/HUD/Button/Button.cpp \
 		src/Graphic/HUD/Containers/Containers.cpp \
@@ -51,7 +52,7 @@ TEST_OBJ = $(TEST_SRC:.cpp=.o)
 
 INCLUDES = -I./include -I./src
 
-CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror  -L./src/DLLoader/ \
+CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror -O2  -L./src/DLLoader/ \
 	-lDLLoader
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
