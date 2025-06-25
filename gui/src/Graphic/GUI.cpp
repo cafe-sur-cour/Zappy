@@ -219,12 +219,10 @@ void GUI::update()
 {
     this->_isRunning = this->_display->isOpen();
     
-    // Handle splash screen
     if (_showingSplashScreen) {
         float deltaTime = this->_display->getFrameTime();
         _splashScreen->update(deltaTime);
         
-        // Finish splash screen when loading is complete
         if (_loadingComplete) {
             _splashScreen->finish();
             _showingSplashScreen = false;
@@ -292,7 +290,6 @@ void GUI::draw()
     if (!this->_display->isOpen())
         return;
 
-    // Handle splash screen drawing
     if (_showingSplashScreen) {
         _splashScreen->draw();
         return;
@@ -835,14 +832,8 @@ void GUI::drawSplashFrame()
     if (!this->_display->isOpen() || !this->_splashScreen) {
         return;
     }
-    
-    // Update splash screen animation
     float deltaTime = this->_display->getFrameTime();
     this->_splashScreen->update(deltaTime);
-    
-    // Draw splash screen
     this->_splashScreen->draw();
-    
-    // Add a small delay to make loading visible
-    std::this_thread::sleep_for(std::chrono::milliseconds(16)); // ~60 FPS
+    std::this_thread::sleep_for(std::chrono::milliseconds(16));
 }
