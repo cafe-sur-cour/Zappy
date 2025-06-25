@@ -43,6 +43,9 @@ RUN apt-get update && apt-get install -y \
     libopengl-dev \
     liballegro5-dev \
     valgrind \
+    wget  \
+    unzip \
+    libsfml-dev  \
     python3-venv && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

@@ -112,6 +112,28 @@ freeStyleJob('Pull Branch from Zappy') {
                     }
                 }
             }
+            // 4. Tests Job
+            job("Branches/\${BRANCH_NAME}/4-Tests functional") {
+                commonProperties.delegate = delegate
+                commonProperties()
+
+                scm {
+                    scmConfig.delegate = delegate
+                    scmConfig()
+                }
+
+                steps {
+                    shell('echo "\\n\\n==== RUNNING UNIT TESTS WITH COVERAGE ====\\n"')
+                    shell('make functional_tests')
+                }
+
+                publishers {
+                    archiveArtifacts {
+                        pattern('coverage/**')
+                        allowEmpty(true)
+                    }
+                }
+            }
             '''.stripIndent())
         }
     }

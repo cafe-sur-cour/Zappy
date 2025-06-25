@@ -1,6 +1,8 @@
 security:
   globalJobDslSecurityConfiguration:
     useScriptSecurity: false
+  gitHostKeyVerificationConfiguration:
+    sshHostKeyVerificationStrategy: acceptFirstConnectionStrategy
 
 jenkins:
   systemMessage: "Welcome to the Skyblog2.0 Jenkins Instance."
