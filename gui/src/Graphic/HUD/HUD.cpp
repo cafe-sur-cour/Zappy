@@ -60,7 +60,7 @@ HUD::~HUD()
 void HUD::draw()
 {
     for (const auto &pair : _containers) {
-        if (pair.first != "message_container") {
+        if (pair.first != "message_container" && pair.first != "map_info_container") {
             pair.second->draw();
         }
     }
@@ -71,6 +71,10 @@ void HUD::draw()
     if (this->_settings && this->_settings->isVisible()) {
         this->_settings->draw();
     }
+
+    auto mapInfoContainer = _containers.find("map_info_container");
+    if (mapInfoContainer != _containers.end() && mapInfoContainer->second->isVisible())
+        mapInfoContainer->second->draw();
 
     auto msgContainer = _containers.find("message_container");
     if (msgContainer != _containers.end() && msgContainer->second->isVisible())
