@@ -138,9 +138,13 @@ namespace zappy::structs {
 
 namespace zappy::gui {
 
-    inline const std::string WINDOW_TITLE = "Zappy GUI";
-    inline const std::string CUSTOM_FONT_PATH = "gui/assets/fonts/fall.ttf";
-    inline const int FPS = 60;
+    inline const char *WINDOW_TITLE = "Zappy GUI";
+    inline const unsigned int FPS = 60;
+    inline const char *CUSTOM_FONT_PATH = "gui/assets/fonts/fall.ttf";
+
+    inline const char *SPLASH_TITLE = "ZAPPY";
+    inline const char *SPLASH_SUBTITLE = "Advanced 3D Game Visualizer";
+
     inline const float CAMERA_SENSITIVITY = 0.001f;
     inline const float GAMEPAD_STICK_SENSITIVITY = 3.0f;
     inline const float GAMEPAD_DEADZONE = 0.2f;
