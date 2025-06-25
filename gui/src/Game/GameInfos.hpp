@@ -121,7 +121,6 @@ class GameInfos : public Subject {
         std::vector<Color32> _colors;
         int _colorIndex = 0;
         std::vector<zappy::structs::Player> _players;
-        std::vector<std::pair<int, bool>> _playersExpulsing;
         std::vector<std::tuple<int, std::string, std::chrono::steady_clock::time_point>>
             _playersBroadcasting;
         std::vector<zappy::structs::Incantation> _incantations;
