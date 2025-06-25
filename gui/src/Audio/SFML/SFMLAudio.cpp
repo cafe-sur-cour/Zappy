@@ -20,7 +20,8 @@ SFMLAudio::SFMLAudio()
     this->SFMLAudio::loadSound("collect", "gui/assets/sounds/collect.wav");
     this->SFMLAudio::loadSound("win", "gui/assets/sounds/win.wav");
     this->SFMLAudio::loadSound("loose", "gui/assets/sounds/loose.wav");
-    this->AAudio::playMainTheme(this->_levelMusic);
+    this->SFMLAudio::loadSound("zap", "gui/assets/sounds/zap.wav");
+    this->SFMLAudio::loadSound("splash_screen", "gui/assets/sounds/splash_screen.wav");
 }
 
 SFMLAudio::~SFMLAudio() {

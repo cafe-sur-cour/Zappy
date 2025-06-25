@@ -18,7 +18,7 @@ class AAudio : public IAudio {
     protected:
         std::vector<std::string> _musicId = {"main_theme", "main_theme2"};
         std::vector<std::string> _sfxId = {"click", "clickPlayer", "collect",
-                                            "win", "loose"};
+                                            "win", "loose", "zap", "splash_screen"};
         float _levelSFX = 75.f;
         float _levelMusic = 50.f;
         int _themeIndex = 0;
