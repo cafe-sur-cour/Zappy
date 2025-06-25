@@ -101,7 +101,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     while (std::chrono::duration_cast<std::chrono::milliseconds>(
     std::chrono::steady_clock::now() - startTime).count() < time){}
     drawSplashFrame();
-    
+
     if (!this->_display->loadFont("default", zappy::gui::CUSTOM_FONT_PATH)) {
         std::cout << colors::T_RED << "[WARNING] Failed to load custom font: "
         << zappy::gui::CUSTOM_FONT_PATH << ". Using default font."
@@ -116,7 +116,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     while (std::chrono::duration_cast<std::chrono::milliseconds>(
     std::chrono::steady_clock::now() - startTime).count() < time){}
     drawSplashFrame();
-    
+
     _cameraManager = std::make_shared<CameraManager>(this->_display);
     _cameraManager->setGameInfos(_gameInfos);
 
@@ -128,7 +128,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     while (std::chrono::duration_cast<std::chrono::milliseconds>(
     std::chrono::steady_clock::now() - startTime).count() < time){}
     drawSplashFrame();
-    
+
     this->_map = std::make_unique<Map>(_gameInfos, this->_display);
     _cameraManager->setMapInstance(std::shared_ptr<Map>(_map.get(), [](Map*){}));
 
@@ -140,7 +140,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     while (std::chrono::duration_cast<std::chrono::milliseconds>(
     std::chrono::steady_clock::now() - startTime).count() < time){}
     drawSplashFrame();
-    
+
     const auto& mapSize = _gameInfos->getMapSize();
 
     Vector3f mapCenter = {
@@ -160,7 +160,7 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     drawSplashFrame();
     while (std::chrono::duration_cast<std::chrono::milliseconds>(
     std::chrono::steady_clock::now() - startTime).count() < time){}
-    
+
     this->_hud = std::make_unique<HUD>(this->_display, _gameInfos, _audio, _cameraManager,
     [this]() {
         this->switchCameraMode(zappy::gui::CameraMode::FREE);
@@ -169,7 +169,6 @@ GUI::GUI(std::shared_ptr<GameInfos> gameInfos,
     this->_splashScreen->setLoadingProgress(0.9f);
     this->_splashScreen->setLoadingText("Loading 3D Models...");
     drawSplashFrame();
-    
     initModels();
 
     this->_splashScreen->setLoadingProgress(1.0f);
@@ -218,18 +217,15 @@ void GUI::updateCamera()
 void GUI::update()
 {
     this->_isRunning = this->_display->isOpen();
-    
     if (_showingSplashScreen) {
         float deltaTime = this->_display->getFrameTime();
         _splashScreen->update(deltaTime);
-        
         if (_loadingComplete) {
             _splashScreen->finish();
             _showingSplashScreen = false;
         }
         return;
     }
-    
     if (_gameInfos->getMapSize().first * _gameInfos->getMapSize().second >= 2500) {
         bool wasPerformanceMode = _performanceMode;
         _performanceMode = true;
