@@ -410,13 +410,13 @@ class Player:
         if self.needToBroadcastInventory:
             self.broadcaster.broadcastMessage(
                 "inventory "
-                f"{self.inventory["linemate"]},"
-                f"{self.inventory["deraumere"]},"
-                f"{self.inventory["sibur"]},"
-                f"{self.inventory["mendiane"]},"
-                f"{self.inventory["phiras"]},"
-                f"{self.inventory["thystame"]},"
-                f"{self.inventory["food"]} "
+                f"{self.inventory['linemate']},"
+                f"{self.inventory['deraumere']},"
+                f"{self.inventory['sibur']},"
+                f"{self.inventory['mendiane']},"
+                f"{self.inventory['phiras']},"
+                f"{self.inventory['thystame']},"
+                f"{self.inventory['food']} "
                 f"{self.id} {self.senderID}"
             )
             self.needToBroadcastInventory = False
