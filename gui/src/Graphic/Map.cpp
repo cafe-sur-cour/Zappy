@@ -402,15 +402,18 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
 
 void Map::drawPerformanceRock(int x, int y, const zappy::structs::Tile &tile)
 {
-    const std::vector<std::pair<std::string, int>> rockTypes = {
-        {"linemate", tile.linemate},
-        {"deraumere", tile.deraumere},
-        {"sibur", tile.sibur},
-        {"mendiane", tile.mendiane},
-        {"phiras", tile.phiras},
-        {"thystame", tile.thystame}
+    static const std::vector<std::string> rockNames = {
+        "linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame"
     };
 
+    std::vector<std::pair<std::string, int>> rockTypes;
+    rockTypes.reserve(rockNames.size());
+    rockTypes.emplace_back(rockNames[0], tile.linemate);
+    rockTypes.emplace_back(rockNames[1], tile.deraumere);
+    rockTypes.emplace_back(rockNames[2], tile.sibur);
+    rockTypes.emplace_back(rockNames[3], tile.mendiane);
+    rockTypes.emplace_back(rockNames[4], tile.phiras);
+    rockTypes.emplace_back(rockNames[5], tile.thystame);
     int visibleRocks = 0;
     for (const auto& rockType : rockTypes) {
         if (_gameInfos->isObjectVisible(rockType.first)) {
