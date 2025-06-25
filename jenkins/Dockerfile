@@ -46,6 +46,7 @@ RUN apt-get update && apt-get install -y \
     wget  \
     unzip \
     libsfml-dev  \
+    alsa-utils  \
     python3-venv && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
