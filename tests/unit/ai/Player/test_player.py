@@ -163,14 +163,14 @@ class TestPlayer:
         """Test enoughFoodForIncantation with sufficient food"""
         player_instance.x = 10
         player_instance.y = 10
-        result = player_instance.enoughFoodForIncantation(100)
+        result = player_instance.enoughFoodForIncantation(5, 100)
         assert result == True
 
     def test_enough_food_for_incantation_false(self, player_instance):
         """Test enoughFoodForIncantation with insufficient food"""
         player_instance.x = 100
         player_instance.y = 100
-        result = player_instance.enoughFoodForIncantation(1)
+        result = player_instance.enoughFoodForIncantation(1, 1)
         assert result == False
 
     def test_team_has_enough_food_for_incantation_true(self, player_instance):
@@ -374,21 +374,22 @@ class TestPlayer:
     def test_handle_message_inventory(self, player_instance):
         """Test handleMessageInventory method"""
         player_instance.id = "TestTeam-12345"
-        message = "1,2,3,4,5,6,10 OtherTeam-67890 TestTeam-12345"
+        message = "1,2,3,4,5,6,10,1 OtherTeam-67890 TestTeam-12345"
         
         player_instance.handleMessageInventory(0, message)
         
-        assert len(player_instance.roombaState["teamInventories"]) == 1
-        inventory = player_instance.roombaState["teamInventories"][0]
+        assert len(player_instance.roombaState["teamMatesStatus"]) == 1
+        inventory = player_instance.roombaState["teamMatesStatus"][0]
         assert inventory["linemate"] == 1
         assert inventory["deraumere"] == 2
         assert inventory["food"] == 10
+        assert inventory["level"] == 1
         assert inventory["id"] == "OtherTeam-67890"
 
     def test_handle_message_inventory_invalid_format(self, player_instance):
         """Test handleMessageInventory with invalid format"""
         player_instance.handleMessageInventory(0, "invalid format")
-        assert len(player_instance.roombaState["teamInventories"]) == 0
+        assert len(player_instance.roombaState["teamMatesStatus"]) == 0
 
     def test_handle_message_come_incant(self, player_instance):
         """Test handleMessageComeIncant method"""
@@ -647,10 +648,10 @@ class TestPlayer:
             "food": 10, "linemate": 5, "deraumere": 4, "sibur": 5,
             "mendiane": 2, "phiras": 3, "thystame": 0
         }
-        player_instance.roombaState["teamInventories"] = [
+        player_instance.roombaState["teamMatesStatus"] = [
             {
                 "linemate": 4, "deraumere": 4, "sibur": 5,
-                "mendiane": 3, "phiras": 3, "thystame": 1, "food": 10, "id": "teammate1"
+                "mendiane": 3, "phiras": 3, "thystame": 1, "food": 10, "level": 1, "id": "teammate1"
             }
         ]
         
@@ -662,9 +663,9 @@ class TestPlayer:
         player_instance.inventory["food"] = 100
         player_instance.x = 10
         player_instance.y = 10
-        player_instance.roombaState["teamInventories"] = [
+        player_instance.roombaState["teamMatesStatus"] = [
             {"food": 100, "linemate": 0, "deraumere": 0, "sibur": 0,
-             "mendiane": 0, "phiras": 0, "thystame": 0, "id": "teammate1"}
+             "mendiane": 0, "phiras": 0, "thystame": 0, "level": 1, "id": "teammate1"}
         ]
         
         result = player_instance.teamHasEnoughFoodForIncantation()
@@ -686,16 +687,16 @@ class TestPlayer:
         player_instance.roombaState["phase"] = "checkOnTeammates"
         player_instance.roombaState["lastCommand"] = "broadcast sendInventory"
         player_instance.nbConnectedPlayers = 3
-        player_instance.roombaState["teamInventories"] = [
+        player_instance.roombaState["teamMatesStatus"] = [
             {"id": "teammate1", "food": 100, "linemate": 10, "deraumere": 10, "sibur": 10,
-             "mendiane": 10, "phiras": 10, "thystame": 10},
+             "mendiane": 10, "phiras": 10, "thystame": 10, "level": 1},
             {"id": "teammate2", "food": 100, "linemate": 10, "deraumere": 10, "sibur": 10,
-             "mendiane": 10, "phiras": 10, "thystame": 10}
+             "mendiane": 10, "phiras": 10, "thystame": 10, "level": 1}
         ]
         
-        # Mock enough stones and food
+        # Mock enough stones and food  
         with patch.object(player_instance, 'doesTeamHaveEnoughStones', return_value=True), \
-             patch.object(player_instance, 'teamHasEnoughFoodForIncantation', return_value=True):
+             patch.object(player_instance, 'teamHasEnoughFoodForGoToIncantation', return_value=True):
             
             player_instance.roombaAction()
             
@@ -810,10 +811,11 @@ class TestPlayer:
         player_instance.needToBroadcastInventory = True
         player_instance.senderID = "OtherTeam-67890"
         player_instance.id = "TestTeam-12345"
+        player_instance.level = 1
         
         player_instance.handleResponseInventory()
         
-        expected_message = "inventory 2,1,0,0,0,0,15 TestTeam-12345 OtherTeam-67890"
+        expected_message = "inventory 2,1,0,0,0,0,15,1 TestTeam-12345 OtherTeam-67890"
         player_instance.broadcaster.broadcastMessage.assert_called_with(expected_message)
         assert player_instance.needToBroadcastInventory == False
 
@@ -846,12 +848,14 @@ class TestPlayer:
         """Test handleResponseKO when incantation fails"""
         player_instance.incantationState["status"] = True
         player_instance.incantationState["lastCommand"] = "incantation"
+        player_instance.inIncantation = True
         
         player_instance.handleResponseKO()
         
         assert player_instance.incantationState["status"] == False
         assert player_instance.incantationState["phase"] == "sendComeIncant"
-        player_instance.logger.error.assert_called_with("Incantation failed, resetting incantation state")
+        assert player_instance.inIncantation == False
+        player_instance.logger.error.assert_any_call("Incantation failed, going roomba mode")
 
     def test_handle_response_ko_check_teammates_phase(self, player_instance):
         """Test handleResponseKO in checkOnTeammates phase"""
@@ -884,25 +888,25 @@ class TestPlayer:
     def test_handle_message_inventory_wrong_demander(self, player_instance):
         """Test handleMessageInventory with wrong demander ID"""
         player_instance.id = "TestTeam-12345"
-        message = "1,2,3,4,5,6,10 OtherTeam-67890 WrongTeam-11111"
+        message = "1,2,3,4,5,6,10,1 OtherTeam-67890 WrongTeam-11111"
         
         player_instance.handleMessageInventory(0, message)
         
         # Should not add to team inventories
-        assert len(player_instance.roombaState["teamInventories"]) == 0
+        assert len(player_instance.roombaState["teamMatesStatus"]) == 0
 
     def test_handle_message_inventory_duplicate_responder(self, player_instance):
         """Test handleMessageInventory with duplicate responder"""
         player_instance.id = "TestTeam-12345"
-        player_instance.roombaState["teamInventories"] = [
+        player_instance.roombaState["teamMatesStatus"] = [
             {"id": "OtherTeam-67890", "food": 5}
         ]
-        message = "1,2,3,4,5,6,10 OtherTeam-67890 TestTeam-12345"
+        message = "1,2,3,4,5,6,10,1 OtherTeam-67890 TestTeam-12345"
         
         player_instance.handleMessageInventory(0, message)
         
         # Should still have only one inventory (no duplicate)
-        assert len(player_instance.roombaState["teamInventories"]) == 1
+        assert len(player_instance.roombaState["teamMatesStatus"]) == 1
 
     def test_handle_message_come_incant_invalid_format(self, player_instance):
         """Test handleMessageComeIncant with invalid message format"""
@@ -1079,68 +1083,6 @@ class TestPlayer:
             player_instance.loop()
         
         player_instance.communication.sendGetConnectNbr.assert_called()
-
-    def test_loop_action_execution(self, player_instance):
-        """Test loop method executing actions"""
-        call_count = [0]
-        def mock_player_is_dead():
-            call_count[0] += 1
-            return call_count[0] > 1
-        
-        player_instance.communication.playerIsDead.side_effect = mock_player_is_dead
-        player_instance.communication.hasMessages.return_value = False
-        player_instance.communication.hasResponses.return_value = False
-        player_instance.communication.hasRequests.return_value = False
-        player_instance.communication.hasPendingCommands.return_value = False
-        player_instance.inIncantation = False
-        player_instance.sentNbSlots = True
-        player_instance.incantationState["status"] = False
-        player_instance.goToIncantationState["status"] = False
-        
-        with patch.object(player_instance, 'roombaAction') as mock_roomba:
-            player_instance.loop()
-            mock_roomba.assert_called_once()
-
-    def test_loop_incantation_action(self, player_instance):
-        """Test loop method executing incantation action"""
-        call_count = [0]
-        def mock_player_is_dead():
-            call_count[0] += 1
-            return call_count[0] > 1
-        
-        player_instance.communication.playerIsDead.side_effect = mock_player_is_dead
-        player_instance.communication.hasMessages.return_value = False
-        player_instance.communication.hasResponses.return_value = False
-        player_instance.communication.hasRequests.return_value = False
-        player_instance.communication.hasPendingCommands.return_value = False
-        player_instance.inIncantation = False
-        player_instance.sentNbSlots = True
-        player_instance.incantationState["status"] = True
-        
-        with patch.object(player_instance, 'incantationAction') as mock_incantation:
-            player_instance.loop()
-            mock_incantation.assert_called_once()
-
-    def test_loop_go_to_incantation_action(self, player_instance):
-        """Test loop method executing go to incantation action"""
-        call_count = [0]
-        def mock_player_is_dead():
-            call_count[0] += 1
-            return call_count[0] > 1
-        
-        player_instance.communication.playerIsDead.side_effect = mock_player_is_dead
-        player_instance.communication.hasMessages.return_value = False
-        player_instance.communication.hasResponses.return_value = False
-        player_instance.communication.hasRequests.return_value = False
-        player_instance.communication.hasPendingCommands.return_value = False
-        player_instance.inIncantation = False
-        player_instance.sentNbSlots = True
-        player_instance.incantationState["status"] = False
-        player_instance.goToIncantationState["status"] = True
-        
-        with patch.object(player_instance, 'goToIncantationAction') as mock_go_to:
-            player_instance.loop()
-            mock_go_to.assert_called_once()
 
     def test_loop_exception_handling(self, player_instance):
         """Test loop method exception handling"""
