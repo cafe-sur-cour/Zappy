@@ -65,7 +65,8 @@ typedef struct egg_s {
 /* Struct that "handles" the network element */
 typedef struct network_s {
     int fd;
-    buffer_t *buffer;
+    buffer_t *readingBuffer;
+    buffer_t *writingBuffer;
 } network_t;
 
 /* Struct defining the inventory of tiles and players */
