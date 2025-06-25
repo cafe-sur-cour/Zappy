@@ -371,13 +371,8 @@ void GameInfos::updatePlayerExpulsion(int playerNumber)
     if (playerNumber < 0)
         return;
 
-    for (auto &expulsions : _playersExpulsing) {
-        if (expulsions.first == playerNumber) {
-            _playersExpulsing.erase(std::remove(_playersExpulsing.begin(),
-                _playersExpulsing.end(), expulsions), _playersExpulsing.end());
-        }
-    }
-    _playersExpulsing.emplace_back(playerNumber, true);
+    if (_audio)
+        _audio->playSound("zap", this->_audio->getSFXVolumeLevel());
 }
 
 void GameInfos::updatePlayerDeath(int playerNumber)

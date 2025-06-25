@@ -23,6 +23,7 @@ SRC =	../../../gui/src/Client/Client.cpp \
 		../../../gui/src/Game/GameInfos.cpp \
 		../../../gui/src/Graphic/GUI.cpp \
 		../../../gui/src/Graphic/Map.cpp \
+		../../../gui/src/Graphic/SplashScreen.cpp \
 		../../../gui/src/Graphic/HUD/Button/Button.cpp \
 		../../../gui/src/Graphic/HUD/Containers/Containers.cpp \
 		../../../gui/src/Graphic/HUD/Containers/AContainers.cpp \
