@@ -51,7 +51,8 @@ TESTS 	    =   tests_accept.c						\
 				tests_team.c						\
 				tests_eject.c						\
 				tests_map_init.c					\
-				tests_kil.c
+				tests_kil.c							\
+				tests_message_handlers.c
 #  tests_broadcast.c					\
 
 SRC 		=	../../../server/src/accept.c								\
@@ -62,6 +63,9 @@ SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/params_checkers.c 						\
 				../../../server/src/params.c								\
 				../../../server/src/protocol.c								\
+				../../../server/src/pending_connections.c					\
+				../../../server/src/receiveMessage/unified_polling.c		\
+				../../../server/src/receiveMessage/build_fds.c      		\
 				../../../server/src/server.c								\
 				../../../server/src/signal.c								\
 				../../../server/src/game/client.c							\
@@ -118,6 +122,7 @@ SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/receiveMessage/loop_thru_command.c		\
 				../../../server/src/receiveMessage/pollin_handler.c			\
 				../../../server/src/receiveMessage/queu_hanlder.c			\
+				../../../server/src/receiveMessage/init_poll_fds.c      	\
 				../../../server/src/aiMessage/broadcast.c					\
 				../../../server/src/aiMessage/connect.c						\
 				../../../server/src/aiMessage/eject.c						\

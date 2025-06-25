@@ -11,18 +11,23 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <mutex>
 #include "../Game/GameInfos.hpp"
 #include "Map.hpp"
 #include "HUD/HUD.hpp"
+#include "SplashScreen.hpp"
 #include "../Audio/IAudio.hpp"
 #include "../Utils/Constants.hpp"
 #include "Camera/CameraManager.hpp"
 #include "../IDisplay.hpp"
 #include "../DLLoader/DLLoader.hpp"
+#include "DLLoader/LoaderType.hpp"
 
 class GUI {
     public:
-        GUI(std::shared_ptr<GameInfos> gameInfos, const std::string &libPath);
+        GUI(std::shared_ptr<GameInfos> gameInfos,
+            const std::string &libGraphicPath,
+            const std::string &libAudioPath);
         ~GUI();
 
         void run();
@@ -43,11 +48,13 @@ class GUI {
         void switchToPreviousPlayer();
 
     private:
+        static int _getRandomTime(int min, int max);
         void updateCamera();
         virtual void update();
         virtual void draw();
         virtual bool isRunning();
         bool playerExists(int playerId) const;
+        void drawSplashFrame();
 
         void initModels();
         void initPlayers();
@@ -62,11 +69,13 @@ class GUI {
         std::string _currentLibLoaded;
         bool _isRunning;
 
-        DLLoader<std::shared_ptr<IDisplay>> _dlLoader;
+        DLLoader<std::shared_ptr<IDisplay>> _dlLoaderGraphic;
+        DLLoader<std::shared_ptr<IDisplay>> _dlLoaderAudio;
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
         std::unique_ptr<Map> _map;
         std::unique_ptr<HUD> _hud;
+        std::unique_ptr<SplashScreen> _splashScreen;
         std::shared_ptr<IAudio> _audio;
         std::shared_ptr<CameraManager> _cameraManager;
 
@@ -81,6 +90,10 @@ class GUI {
         std::pair<int, int> _selectedTile;
 
         bool _performanceMode = false;
+        bool _showingSplashScreen = true;
+        bool _loadingComplete = false;
+
+        mutable std::mutex _playerMutex;
 };
 
 #endif /* !GUI_HPP_ */

@@ -13,13 +13,11 @@
 #include "network.h"
 #include "zappy.h"
 
+/* In the accept nedd to have a pending state of connection */
 static char *check_team_name(zappy_t *zappy, int new_sockfd)
 {
-    char *message = NULL;
+    char *message = get_message(new_sockfd);
 
-    if (write_message(new_sockfd, "WELCOME\n") == -1)
-        return NULL;
-    message = get_message(new_sockfd, 150);
     if (!message) {
         error_message("Failed to read team name message from client.");
         close(new_sockfd);
@@ -60,6 +58,7 @@ static int complete_connection(zappy_t *zappy, int fd, const char *message)
 
     if (strcmp(message, "GRAPHIC") == 0) {
         free(buffer);
+        add_fd_to_poll(zappy->unified_poll, fd, POLLIN);
         return 0;
     }
     team = add_client_to_team(message, fd, zappy);
@@ -72,13 +71,13 @@ static int complete_connection(zappy_t *zappy, int fd, const char *message)
         free(buffer);
         return -1;
     }
+    add_fd_to_poll(zappy->unified_poll, fd, POLLIN);
     return 0;
 }
 
-int accept_client(zappy_t *zappy)
+int accept_client_team_name(zappy_t *zappy, int new_sockfd)
 {
     char *message = NULL;
-    int new_sockfd = accept_connection(zappy->network->sockfd);
 
     message = check_team_name(zappy, new_sockfd);
     if (!message) {
@@ -89,5 +88,15 @@ int accept_client(zappy_t *zappy)
         close(new_sockfd);
         return -1;
     }
+    return 0;
+}
+
+int accept_client(zappy_t *zappy)
+{
+    int new_sockfd = accept_connection(zappy->network->sockfd);
+
+    if (write_message(new_sockfd, "WELCOME\n") == -1)
+        return -1;
+    add_fd_to_poll(zappy->unified_poll, new_sockfd, POLLIN);
     return 0;
 }

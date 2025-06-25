@@ -47,6 +47,8 @@ class Checkbox : public AUIElement {
 
         void setSize(float width, float height) override;
 
+        bool containsCheckbox(float x, float y) const;
+
     private:
         bool _value;
         std::function<void(bool)> _callback;

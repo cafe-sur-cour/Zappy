@@ -12,51 +12,73 @@
 #include "network.h"
 #include "zappy.h"
 
-static void fill_elements(zappy_t *zappy)
+static server_t *init_network_fd(server_t *network, int port)
 {
-    zappy->network = malloc(sizeof(network_t));
-    if (!zappy->network) {
-        error_message("Memory allocation failed for network.");
-        exit(84);
+    if (bind_socket(network->sockfd, port) == -1) {
+        close(network->sockfd);
+        free(network);
+        return NULL;
     }
-    zappy->graph = NULL;
-    zappy->graph = NULL;
-    zappy->game = NULL;
-    zappy->params = NULL;
+    if (listen_socket(network->sockfd, 10) == -1) {
+        close(network->sockfd);
+        free(network);
+        return NULL;
+    }
+    return network;
 }
 
-static zappy_t *set_zappy_bas(zappy_t *zappy)
+static server_t *init_network(int port)
 {
-    if (bind_socket(zappy->network->sockfd, zappy->params->port) == -1) {
-        free_zappy(zappy);
-        exit(84);
+    server_t *network = malloc(sizeof(server_t));
+
+    if (!network) {
+        error_message("Memory allocation failed for network.");
+        return NULL;
     }
-    if (listen_socket(zappy->network->sockfd,
-        zappy->params->nb_client) == -1) {
-        close(zappy->network->sockfd);
-        free_zappy(zappy);
-        exit(84);
+    network->sockfd = set_socket();
+    if (network->sockfd == -1) {
+        free(network);
+        return NULL;
     }
+    network = init_network_fd(network, port);
+    if (network == NULL)
+        return NULL;
+    network->pollserver.fd = network->sockfd;
+    network->pollserver.events = POLLIN;
+    return network;
+}
+
+static zappy_t *init_struct_poll(zappy_t *zappy)
+{
+    zappy->graph = NULL;
+    zappy->unified_poll = init_unified_poll();
+    if (!zappy->unified_poll) {
+        free_zappy(zappy);
+        return NULL;
+    }
+    add_fd_to_poll(zappy->unified_poll, zappy->network->sockfd, POLLIN);
+    init_game(zappy);
     return zappy;
 }
 
 zappy_t *init_server(int argc, char **argv)
 {
-    zappy_t *zappy = malloc(sizeof(zappy_t));
+    zappy_t *zappy = NULL;
 
-    if (!zappy) {
-        error_message("Memory allocation failed for server.");
+    zappy = malloc(sizeof(zappy_t));
+    if (!zappy)
+        return NULL;
+    zappy->params = check_args(argc, argv);
+    if (!zappy->params) {
+        free(zappy);
         return NULL;
     }
-    fill_elements(zappy);
-    zappy->params = check_args(argc, argv);
-    if (!zappy->params)
-        return free_zappy(zappy);
-    zappy->network->sockfd = set_socket();
-    if (zappy->network->sockfd == -1)
-        return free_zappy(zappy);
-    zappy = set_zappy_bas(zappy);
-    zappy->network->pollserver.fd = zappy->network->sockfd;
-    zappy->network->pollserver.events = POLLIN;
+    zappy->network = init_network(zappy->params->port);
+    if (!zappy->network) {
+        free_params(zappy->params);
+        free(zappy);
+        return NULL;
+    }
+    zappy = init_struct_poll(zappy);
     return zappy;
 }

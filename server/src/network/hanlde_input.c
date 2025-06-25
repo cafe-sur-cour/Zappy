@@ -52,17 +52,9 @@ static char *end_message(buffer_t *cb)
 }
 
 static buffer_t *get_message_from_buffer(int fd, buffer_t *cb,
-    int timeout, char c)
+    char c)
 {
-    struct pollfd pollfd = {.fd = fd, .events = POLLIN};
-    int poll_result = 0;
-
     while (1) {
-        poll_result = poll(&pollfd, 1, timeout);
-        if (poll_result == -1 || poll_result == 0)
-            return NULL;
-        if (!(pollfd.revents & POLLIN))
-            return NULL;
         if (read(fd, &c, 1) <= 0)
             return NULL;
         cb_write(cb, c);
@@ -72,7 +64,7 @@ static buffer_t *get_message_from_buffer(int fd, buffer_t *cb,
     return cb;
 }
 
-char *get_message(int fd, int timeout)
+char *get_message(int fd)
 {
     static buffer_t cb = {.head = 0, .tail = 0, .full = 0};
     buffer_t *cb_ptr = &cb;
@@ -81,7 +73,7 @@ char *get_message(int fd, int timeout)
     if (fd < 0)
         return NULL;
     cb.tail = cb.head;
-    cb_ptr = get_message_from_buffer(fd, cb_ptr, timeout, c);
+    cb_ptr = get_message_from_buffer(fd, cb_ptr, c);
     if (cb_ptr == NULL)
         return NULL;
     return end_message(cb_ptr);

@@ -52,7 +52,7 @@
             "name": "Server: Invalid width (zero)",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "4245", "-x", "0", "-y", "100", "-n", "team1", "team2", "-c", "6", "-f", "10"],
-            "expected_output": "CONTAINS - Width must be a positive integer.",
+            "expected_output": "CONTAINS - Width must be a positive integer between 1 and 2500.",
             "expected_return": 84
         },
         {
@@ -73,7 +73,7 @@
             "name": "Server: Invalid height (zero)",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "4248", "-x", "100", "-y", "0", "-n", "team1", "team2", "-c", "6", "-f", "10"],
-            "expected_output": "CONTAINS - Height must be a positive integer.",
+            "expected_output": "CONTAINS - Height must be a positive integer between 1 and 2500.",
             "expected_return": 84
         },
         {
@@ -94,7 +94,7 @@
             "name": "Server: Invalid client_nb (zero)",
             "description": "Testing with incorrect values in port fields",
             "input": ["./zappy_server", "-p", "4251", "-x", "100", "-y", "100", "-n", "team1", "team2", "-c", "0", "-f", "10"],
-            "expected_output": "CONTAINS - Number of clients must be betwwen 1 and 25.",
+            "expected_output": "CONTAINS - Number of clients must be betwwen 1 and 8.",
             "expected_return": 84
         },
         {

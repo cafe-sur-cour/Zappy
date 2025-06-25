@@ -29,6 +29,7 @@ class GameInfos : public Subject {
         void setAudio(std::shared_ptr<IAudio> audio);
         void setCurrentCameraMode(zappy::gui::CameraMode cameraMode);
         void setCurrentPlayerFocus(int playerId);
+        void setPerformanceMode(bool performanceMode);
 
         void setMapSize(int width, int height);
         std::pair<int, int> getMapSize() const;
@@ -47,6 +48,12 @@ class GameInfos : public Subject {
         void setTeamVisibility(const std::string &teamName, bool visible);
         bool isTeamVisible(const std::string &teamName) const;
         const std::unordered_map<std::string, bool> getTeamVisibilities() const;
+
+        void setObjectVisibility(const std::string &objectType, bool visible);
+        bool isObjectVisible(const std::string &objectType) const;
+        const std::unordered_map<std::string, bool> getObjectVisibilities() const;
+
+        Color32 getTeamColor(const std::string &teamName);
 
         void addPlayer(const zappy::structs::Player player);
         void killPlayer(int playerNumber);
@@ -89,6 +96,17 @@ class GameInfos : public Subject {
         void incrementTileInventoryItem(int x, int y, int resourceId);
         void decrementTileInventoryItem(int x, int y, int resourceId);
 
+        void updateResourceTotals();
+        int getTotalResource(const std::string& resourceName);
+        int getTotalFood();
+        int getTotalEggs() const;
+        int getTotalLinemate();
+        int getTotalDeraumere();
+        int getTotalSibur();
+        int getTotalMendiane();
+        int getTotalPhiras();
+        int getTotalThystame();
+
     private:
         int _mapWidth;
         int _mapHeight;
@@ -98,8 +116,11 @@ class GameInfos : public Subject {
         bool _matrixInitialized;
         std::vector<std::string> _teamNames;
         std::unordered_map<std::string, bool> _teamVisibilities;
+        std::unordered_map<std::string, Color32> _teamColors;
+        std::unordered_map<std::string, bool> _objectVisibilities;
+        std::vector<Color32> _colors;
+        int _colorIndex = 0;
         std::vector<zappy::structs::Player> _players;
-        std::vector<std::pair<int, bool>> _playersExpulsing;
         std::vector<std::tuple<int, std::string, std::chrono::steady_clock::time_point>>
             _playersBroadcasting;
         std::vector<zappy::structs::Incantation> _incantations;
@@ -116,6 +137,10 @@ class GameInfos : public Subject {
         std::shared_ptr<IAudio> _audio;
         zappy::gui::CameraMode _currentCameraMode;
         int _currentPlayerFocus;
+
+        mutable std::unordered_map<std::string, int> _resourceTotals;
+        mutable bool _resourceTotalsNeedUpdate = true;
+        bool _performanceMode = false;
 
         void notifyStateChange();
 };

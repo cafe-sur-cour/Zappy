@@ -46,13 +46,6 @@ static void check_eggs_status(zappy_t *zappy)
     }
 }
 
-/* This is a temporaryt function that sends element to the gui */
-static void send_gui_message(zappy_t *zappy)
-{
-    check_eggs_status(zappy);
-    check_player_status(zappy);
-}
-
 static void handle_time_and_respawn(zappy_t *zappy, struct timespec *last_time,
     double *time_since_last_spawn, double respawn_interval)
 {
@@ -73,16 +66,13 @@ static void handle_time_and_respawn(zappy_t *zappy, struct timespec *last_time,
 /* Handle all client communications and game logic */
 static void handle_clients_and_game(zappy_t *zappy)
 {
-    if (zappy->network->pollserver.revents & POLLIN)
-        accept_client(zappy);
-    send_gui_message(zappy);
-    smart_poll_players(zappy);
-    poll_graphic_clients(zappy);
+    check_eggs_status(zappy);
+    check_player_status(zappy);
+    process_player_actions_tick(zappy);
 }
 
 int start_protocol(zappy_t *zappy)
 {
-    int tick_duration_ms = 0;
     double respawn_interval = 0;
     double time_since_last_spawn = 0.0;
     struct timespec last_time;
@@ -91,11 +81,8 @@ int start_protocol(zappy_t *zappy)
     setup_signal();
     diplay_help(zappy->params->port);
     while (*get_running_state()) {
-        tick_duration_ms = 1000 / zappy->params->freq;
         respawn_interval = 20.0 / zappy->params->freq;
-        if (poll(&zappy->network->pollserver, 1, tick_duration_ms) == -1
-            && *get_running_state())
-            return -1;
+        poll_all_clients(zappy);
         handle_time_and_respawn(zappy, &last_time, &time_since_last_spawn,
             respawn_interval);
         handle_clients_and_game(zappy);

@@ -29,9 +29,7 @@ void execute_action(player_t *player, action_request_t *action, zappy_t *zappy)
     result = cmd_info->handler(player, action->command, zappy);
     if (result == 0)
         write_message(player->network->fd, "ok\n");
-    else if (result == -2)
-        write_message(player->network->fd, "Elevation underway\n");
-    else
+    else if (result == -1)
         write_message(player->network->fd, "ko\n");
 }
 

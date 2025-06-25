@@ -21,12 +21,15 @@ GameInfos::GameInfos(std::shared_ptr<ICommunication> communication) :
     _mapHeight(0),
     _timeUnit(0),
     _matrixInitialized(false),
+    _colorIndex(0),
     _gameOver(false),
     _victorySoundPlayed(false),
     _currentCameraMode(zappy::gui::CameraMode::FREE),
-    _currentPlayerFocus(-1)
+    _currentPlayerFocus(-1),
+    _performanceMode(false)
 {
     _communication = communication;
+    _colors = {CBLUE, CYELLOW, CPURPLE, CORANGE, CPINK, CMAROON, CRED, CGREEN};
 }
 
 GameInfos::~GameInfos()
@@ -72,6 +75,7 @@ void GameInfos::initializeTileMatrix()
     }
 
     _matrixInitialized = true;
+    _resourceTotalsNeedUpdate = true;
 }
 
 std::pair<int, int> GameInfos::getMapSize() const
@@ -113,6 +117,8 @@ void GameInfos::updateTile(const zappy::structs::Tile tile)
     _tileMatrix[tile.y][tile.x] = zappy::structs::Tile(
         tile.x, tile.y, tile.food, tile.linemate, tile.deraumere,
         tile.sibur, tile.mendiane, tile.phiras, tile.thystame);
+
+    _resourceTotalsNeedUpdate = true;
 }
 
 const zappy::structs::Tile GameInfos::getTile(int x, int y) const
@@ -175,6 +181,44 @@ const std::unordered_map<std::string, bool> GameInfos::getTeamVisibilities() con
 {
     std::lock_guard<std::mutex> lock(_dataMutex);
     return _teamVisibilities;
+}
+
+void GameInfos::setObjectVisibility(const std::string &objectType, bool visible)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+    _objectVisibilities[objectType] = visible;
+}
+
+bool GameInfos::isObjectVisible(const std::string &objectType) const
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    auto it = _objectVisibilities.find(objectType);
+    if (it != _objectVisibilities.end()) {
+        return it->second;
+    }
+
+    return true;
+}
+
+const std::unordered_map<std::string, bool> GameInfos::getObjectVisibilities() const
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+    return _objectVisibilities;
+}
+
+Color32 GameInfos::getTeamColor(const std::string &teamName)
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    if (teamName.empty())
+        return CWHITE;
+
+    if (_teamColors.find(teamName) == _teamColors.end()) {
+        _teamColors[teamName] = _colors[_colorIndex];
+        _colorIndex = (_colorIndex + 1) % _colors.size();
+    }
+    return _teamColors[teamName];
 }
 
 void GameInfos::addPlayer(const zappy::structs::Player player)
@@ -327,13 +371,8 @@ void GameInfos::updatePlayerExpulsion(int playerNumber)
     if (playerNumber < 0)
         return;
 
-    for (auto &expulsions : _playersExpulsing) {
-        if (expulsions.first == playerNumber) {
-            _playersExpulsing.erase(std::remove(_playersExpulsing.begin(),
-                _playersExpulsing.end(), expulsions), _playersExpulsing.end());
-        }
-    }
-    _playersExpulsing.emplace_back(playerNumber, true);
+    if (_audio)
+        _audio->playSound("zap", this->_audio->getSFXVolumeLevel());
 }
 
 void GameInfos::updatePlayerDeath(int playerNumber)
@@ -393,7 +432,7 @@ void GameInfos::updatePlayerResourceAction(int playerNumber, int resourceId, boo
     if (isCollecting && _audio) {
         if (_currentCameraMode == zappy::gui::CameraMode::PLAYER) {
             if (playerNumber == _currentPlayerFocus) {
-                _audio->playSound("collect", 100.0f);
+                _audio->playSound("collect", this->_audio->getSFXVolumeLevel());
             }
         }
     }
@@ -662,6 +701,8 @@ void GameInfos::incrementTileInventoryItem(int x, int y, int resourceId)
         _communication->sendMessage("tar " + std::to_string(x) + " " +
                                     std::to_string(y) + " " +
                                     std::to_string(resourceId) + "\n");
+
+        _resourceTotalsNeedUpdate = true;
     } catch (const Exceptions::NetworkException& e) {
         std::cerr << colors::T_RED << "[ERROR] Network exception: "
                   << e.what() << colors::RESET << std::endl;
@@ -679,8 +720,100 @@ void GameInfos::decrementTileInventoryItem(int x, int y, int resourceId)
         _communication->sendMessage("tsr " + std::to_string(x) + " " +
                                     std::to_string(y) + " " +
                                     std::to_string(resourceId) + "\n");
+
+        _resourceTotalsNeedUpdate = true;
     } catch (const Exceptions::NetworkException& e) {
         std::cerr << colors::T_RED << "[ERROR] Network exception: "
                   << e.what() << colors::RESET << std::endl;
     }
+}
+
+void GameInfos::updateResourceTotals()
+{
+    std::lock_guard<std::mutex> lock(_dataMutex);
+
+    if (!_resourceTotalsNeedUpdate || _performanceMode)
+        return;
+    _resourceTotals["food"] = 0;
+    _resourceTotals["linemate"] = 0;
+    _resourceTotals["deraumere"] = 0;
+    _resourceTotals["sibur"] = 0;
+    _resourceTotals["mendiane"] = 0;
+    _resourceTotals["phiras"] = 0;
+    _resourceTotals["thystame"] = 0;
+
+    if (!_matrixInitialized)
+        return;
+
+    for (int y = 0; y < _mapHeight; y++) {
+        for (int x = 0; x < _mapWidth; x++) {
+            auto& tile = _tileMatrix[y][x];
+            _resourceTotals["food"] += tile.food;
+            _resourceTotals["linemate"] += tile.linemate;
+            _resourceTotals["deraumere"] += tile.deraumere;
+            _resourceTotals["sibur"] += tile.sibur;
+            _resourceTotals["mendiane"] += tile.mendiane;
+            _resourceTotals["phiras"] += tile.phiras;
+            _resourceTotals["thystame"] += tile.thystame;
+        }
+    }
+
+    _resourceTotalsNeedUpdate = false;
+}
+
+int GameInfos::getTotalResource(const std::string& resourceName)
+{
+    updateResourceTotals();
+
+    auto it = _resourceTotals.find(resourceName);
+    if (it != _resourceTotals.end()) {
+        return it->second;
+    }
+
+    return 0;
+}
+
+int GameInfos::getTotalFood()
+{
+    return getTotalResource("food");
+}
+
+int GameInfos::getTotalEggs() const
+{
+    return _eggs.size();
+}
+
+int GameInfos::getTotalLinemate()
+{
+    return getTotalResource("linemate");
+}
+
+int GameInfos::getTotalDeraumere()
+{
+    return getTotalResource("deraumere");
+}
+
+int GameInfos::getTotalSibur()
+{
+    return getTotalResource("sibur");
+}
+
+int GameInfos::getTotalMendiane()
+{
+    return getTotalResource("mendiane");
+}
+
+int GameInfos::getTotalPhiras()
+{
+    return getTotalResource("phiras");
+}
+
+int GameInfos::getTotalThystame()
+{
+    return getTotalResource("thystame");
+}
+
+void GameInfos::setPerformanceMode(bool performanceMode)
+{
+    _performanceMode = performanceMode;
 }

@@ -23,6 +23,7 @@ SRC =	../../../gui/src/Client/Client.cpp \
 		../../../gui/src/Game/GameInfos.cpp \
 		../../../gui/src/Graphic/GUI.cpp \
 		../../../gui/src/Graphic/Map.cpp \
+		../../../gui/src/Graphic/SplashScreen.cpp \
 		../../../gui/src/Graphic/HUD/Button/Button.cpp \
 		../../../gui/src/Graphic/HUD/Containers/Containers.cpp \
 		../../../gui/src/Graphic/HUD/Containers/AContainers.cpp \
@@ -63,8 +64,6 @@ CFLAGS =	-std=c++20 -Wall -Wextra -Wshadow -Werror
 CFLAGS_COVERAGE = $(CFLAGS) --coverage -fprofile-arcs -ftest-coverage
 
 LIBS = -L../../../gui/src/Communication -lcommunication \
-		-L../../../gui/src/RayLib \
-		-L../../../gui/src/Audio -laudio -lsfml-audio \
 		-lGL -lm -lpthread -ldl -lrt -lX11
 
 NAME = zappy_gui

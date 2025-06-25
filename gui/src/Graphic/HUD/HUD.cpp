@@ -19,16 +19,22 @@
 
 HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
          std::shared_ptr<IAudio> audio,
-         std::shared_ptr<CameraManager> camera, std::function<void()> resetCameraFunc)
+         std::shared_ptr<CameraManager> camera,
+         bool performanceMode,
+         std::function<void()> resetCameraFunc)
     : _containers(), _display(display), _gameInfos(gameInfos), _audio(audio), _camera(camera),
+      _performanceMode(performanceMode),
       _resetCameraFunc(resetCameraFunc),
       _showVictoryMessage(false),
       _winningTeam(""),
       _victoryColor({0, 127, 255, 255}),
-      _selectedTile(-1, -1)
+      _selectedTile(-1, -1),
+      _hoveredTeam(""),
+      _teamDetailsContainer(nullptr),
+      _mapInfoButtonHovered(false)
 {
     _help = std::make_shared<Help>(display, audio);
-    _settings = std::make_shared<Settings>(display, audio, camera);
+    _settings = std::make_shared<Settings>(display, audio, camera, gameInfos);
     initDefaultLayout(15.0f, 20.0f);
     initExitButton();
     initSettingsButton();
@@ -37,6 +43,8 @@ HUD::HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos
     initTeamPlayersDisplay(_gameInfos);
     initTpsSlider(_gameInfos, _display, _audio);
     initServerMessagesDisplay(_gameInfos);
+    initMapInfoDisplay();
+    initMapInfoButton();
     this->_initHelpInformation();
 
     if (_gameInfos) {
@@ -52,7 +60,7 @@ HUD::~HUD()
 void HUD::draw()
 {
     for (const auto &pair : _containers) {
-        if (pair.first != "message_container") {
+        if (pair.first != "message_container" && pair.first != "map_info_container") {
             pair.second->draw();
         }
     }
@@ -64,10 +72,16 @@ void HUD::draw()
         this->_settings->draw();
     }
 
+    auto mapInfoContainer = _containers.find("map_info_container");
+    if (mapInfoContainer != _containers.end() && mapInfoContainer->second->isVisible())
+        mapInfoContainer->second->draw();
+
     auto msgContainer = _containers.find("message_container");
-    if (msgContainer != _containers.end() && msgContainer->second->isVisible()) {
+    if (msgContainer != _containers.end() && msgContainer->second->isVisible())
         msgContainer->second->draw();
-    }
+
+    if (_teamDetailsContainer && _teamDetailsContainer->isVisible())
+        _teamDetailsContainer->draw();
 
     if (_showVictoryMessage && !_winningTeam.empty()) {
         std::string message = "Team " + _winningTeam + " WINS!";
@@ -127,7 +141,9 @@ void HUD::update()
     updateTeamPlayersDisplay(_gameInfos);
     updateTpsSlider(_gameInfos);
     updateServerMessagesDisplay(_gameInfos);
+    updateMapInfoDisplay();
     updateFpsDisplay();
+    updateTeamHoverDetection();
 
     if (_selectedTile.first >= 0 && _selectedTile.second >= 0)
         updateTileResourceDisplay(_selectedTile.first, _selectedTile.second);
@@ -184,13 +200,14 @@ void HUD::handleResize(int oldWidth, int oldHeight, int newWidth, int newHeight)
         pair.second->handleResize(oldWidth, oldHeight, newWidth, newHeight);
     }
 
-    if (_help) {
+    if (_help)
         _help->handleResize(oldWidth, oldHeight, newWidth, newHeight);
-    }
 
-    if (this->_settings) {
+    if (this->_settings)
         this->_settings->handleResize(oldWidth, oldHeight, newWidth, newHeight);
-    }
+
+    if (_teamDetailsContainer)
+        _teamDetailsContainer->handleResize(oldWidth, oldHeight, newWidth, newHeight);
 }
 
 void HUD::clearAllContainers()
@@ -249,6 +266,8 @@ void HUD::initDefaultLayout(float sideWidthPercent, float bottomHeightPercent)
                             bottomHeight,
                             bottomHeightPercent);
 
+    auto mapInfoContainer = createMapInfoContainer();
+
     initFpsDisplay();
 }
 
@@ -301,6 +320,11 @@ std::shared_ptr<Containers> HUD::getSecurityContainer() const
 std::shared_ptr<Containers> HUD::getServerMessagesContainer() const
 {
     return getContainer("server_messages_container");
+}
+
+std::shared_ptr<Containers> HUD::getMapInfoContainer() const
+{
+    return getContainer("map_info_container");
 }
 
 void HUD::initExitButton()
@@ -448,13 +472,14 @@ void HUD::initTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
             }
         );
 
+        Color32 teamColor = gameInfos->getTeamColor(teamName);
         sideContainer->addTextPercent(
             teamId + "_title",
             12.0f,
             yPos,
             "TEAM: " + teamName,
             3.5f,
-            {255, 255, 255, 255}
+            teamColor
         );
 
         yPos += 4.0f;
@@ -492,6 +517,9 @@ void HUD::updateTeamPlayersDisplay(std::shared_ptr<GameInfos> gameInfos)
             sideContainer->getElement(teamId + "_title"));
 
         if (titleElem) {
+            Color32 teamColor = gameInfos->getTeamColor(teamName);
+            titleElem->setColor(teamColor);
+
             float yPos = titleElem->getBounds().y - sideContainer->getBounds().y;
             yPos = yPos / sideContainer->getBounds().height * 100.0f;
             yPos += 4.0f;
@@ -944,6 +972,45 @@ std::shared_ptr<Containers> HUD::createServerMessagesContainer(
     return serverMessagesContainer;
 }
 
+std::shared_ptr<Containers> HUD::createMapInfoContainer()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return nullptr;
+
+    FloatRect bottomBounds = bottomContainer->getBounds();
+    float buttonX = bottomBounds.x + (bottomBounds.width * 0.945f);
+    float buttonY = bottomBounds.y + (bottomBounds.height * 0.025f);
+
+    float containerWidth = 350.0f;
+    float containerHeight = 250.0f;
+    float containerX = buttonX - containerWidth + (bottomBounds.width * 0.05f) + 10.0f;
+    float containerY = buttonY - containerHeight - 5.0f;
+
+    auto mapInfoContainer = addContainer(
+        "map_info_container",
+        containerX, containerY,
+        containerWidth, containerHeight,
+        {40, 40, 40, 240}
+    );
+
+    if (mapInfoContainer) {
+        mapInfoContainer->addTextPercent(
+            "map_info_title", 5.0f, 2.5f, "Map Information", 12.0f,
+            {255, 255, 255, 255}
+        );
+
+        mapInfoContainer->addTextPercent(
+            "map_info_content", 5.0f, 15.5f, "Loading map data...", 6.5f,
+            {200, 200, 200, 255}
+        );
+
+        mapInfoContainer->setVisible(false);
+    }
+
+    return mapInfoContainer;
+}
+
 std::pair<float, float> HUD::calculateContentMetrics(
     std::shared_ptr<Containers> container,
     const std::unordered_map<std::string, float> &initialYPositions)
@@ -1236,16 +1303,20 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
         switch (cameraMode)
         {
         case zappy::gui::CameraMode::FREE:
-            return "Right joystick = Change camera direction\n"
-                     "Left joystick = Move camera x and z\n"
+            return "Right joystick =\n"
+                     "Change camera direction\n"
+                     "Left joystick = Move camera x z\n"
                      "RT | LT = Move camera y\n"
                      "Select = Toggle HUD\n";
         case zappy::gui::CameraMode::PLAYER:
-            return "UP | DOWN = Next / Previous player\n"
-                     "Right joystick = Change camera direction\n"
+            return "UP | DOWN =\n"
+                     "Next / Previous player\n"
+                     "Right joystick =\n"
+                     "Change camera direction\n"
                      "Select = Toggle HUD\n";
         case zappy::gui::CameraMode::TARGETED:
-            return "Right joystick = Rotate camera around map origin\n"
+            return "Right joystick =\n"
+                     "Rotate camera around center\n"
                      "RT | LT = Zoom / Unzoom\n"
                      "Select = Toggle HUD\n";
         default:
@@ -1256,20 +1327,76 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
     {
     case zappy::gui::CameraMode::FREE:
         return "Z | Q | S | D = Move camera\n"
-                 "UP | DOWN | RIGHT | LEFT = Change camera direction\n"
+                 "UP | DOWN | RIGHT | LEFT =\n"
+                 "Change camera direction\n"
                  "H = Toggle HUD\n";
     case zappy::gui::CameraMode::PLAYER:
-        return "UP | DOWN = Next / Previous player\n"
-                 "RIGHT | LEFT = Change camera direction\n"
+        return "UP | DOWN =\n"
+                 "Next / Previous player\n"
+                 "RIGHT | LEFT =\n"
+                 "Change camera direction\n"
                  "H = Toggle HUD\n";
     case zappy::gui::CameraMode::TARGETED:
-        return "UP | DOWN | RIGHT | LEFT = Rotate camera around map origin\n"
+        return "UP | DOWN | RIGHT | LEFT =\n"
+                 "Rotate camera around center\n"
                  "SCROLL = Zoom / Unzoom\n"
                  "H = Toggle HUD\n";
     default:
         return "Unknown";
     }
     return "Unknown";
+}
+
+std::string HUD::_mapGlobalInfo(std::shared_ptr<GameInfos> gameInfos)
+{
+    auto mapSize = gameInfos->getMapSize();
+    std::string info = "";
+
+    info += "Map Size: " + std::to_string(mapSize.first) + " x " +
+        std::to_string(mapSize.second) + "\n";
+
+    if (this->_performanceMode || (mapSize.first >= 50 && mapSize.second >= 50)) {
+        info += "Food: X   Egg: X\n";
+        info += "Linemate: X\nDeraumere: X\n";
+        info += "Sibur: X\nMendiane: X\n";
+        info += "Phiras: X\nThystame: X\n";
+        info += "Total ressources: X\n";
+    } else {
+        int totalEgg = gameInfos->getTotalEggs();
+        int totalFood = gameInfos->getTotalFood();
+        int totalLinemate = gameInfos->getTotalLinemate();
+        int totalDeraumere = gameInfos->getTotalDeraumere();
+        int totalSibur = gameInfos->getTotalSibur();
+        int totalMendiane = gameInfos->getTotalMendiane();
+        int totalPhiras = gameInfos->getTotalPhiras();
+        int totalThystame = gameInfos->getTotalThystame();
+
+        info += "Food: " + std::to_string(totalFood) + "   Egg: " +
+            std::to_string(totalEgg) + "\n";
+        info += "Linemate: " + std::to_string(totalLinemate) + "\nDeraumere: " +
+            std::to_string(totalDeraumere) + "\n";
+        info += "Sibur: " + std::to_string(totalSibur) + "\nMendiane: " +
+            std::to_string(totalMendiane) + "\n";
+        info += "Phiras: " + std::to_string(totalPhiras) + "\nThystame: " +
+            std::to_string(totalThystame) + "\n";
+        info += "Total ressources: " + std::to_string(totalFood + totalLinemate +
+            totalDeraumere + totalSibur + totalMendiane + totalPhiras + totalThystame) + "\n";
+    }
+
+    const auto& players = gameInfos->getPlayers();
+    const auto& teams = gameInfos->getTeamNames();
+
+    info += "Total teams: " + std::to_string(teams.size()) + "\n";
+    info += "Total players: " + std::to_string(players.size()) + "\n";
+
+    int max_level = 1;
+    for (const auto& player : players) {
+        if (player.level > max_level)
+            max_level = player.level;
+    }
+    info += "Player Level Max: " + std::to_string(max_level) + "\n";
+
+    return info;
 }
 
 void HUD::updateHelpInformationHUD(zappy::gui::CameraMode cameraMode)
@@ -1294,6 +1421,64 @@ void HUD::updateHelpInformationHUD(zappy::gui::CameraMode cameraMode)
     if (keyHelp && keyHelp->getText() != camHelpKey) {
         keyHelp->setText(camHelpKey);
         return;
+    }
+}
+
+void HUD::initMapInfoDisplay()
+{
+    auto mapInfoContainer = getMapInfoContainer();
+    if (!mapInfoContainer)
+        return;
+
+    mapInfoContainer->setVisible(false);
+}
+
+void HUD::initMapInfoButton()
+{
+    auto bottomContainer = getBottomContainer();
+    if (!bottomContainer)
+        return;
+
+    bottomContainer->addButtonPercent(
+        "map_info_button", 94.5f, 2.5f, 5.0f, 15.0f,
+        "Map Info",
+        []() {
+        },
+        {70, 130, 180, 220}, {100, 160, 210, 255}, {100, 160, 210, 255}, {255, 255, 255, 255}
+    );
+}
+
+void HUD::updateMapInfoDisplay()
+{
+    auto bottomContainer = getBottomContainer();
+    auto mapInfoContainer = getMapInfoContainer();
+    if (!bottomContainer || !mapInfoContainer || !_gameInfos)
+        return;
+
+    auto mapInfoButton = std::dynamic_pointer_cast<Button>(
+        bottomContainer->getElement("map_info_button"));
+
+    bool isButtonHovered = false;
+    if (mapInfoButton) {
+        Vector2f mousePos = _display->getMousePosition();
+        isButtonHovered = mapInfoButton->contains(mousePos.x, mousePos.y);
+    }
+
+    auto mapInfoTextElem = std::dynamic_pointer_cast<Text>(
+        mapInfoContainer->getElement("map_info_content"));
+
+    if (!mapInfoTextElem) {
+        return;
+    }
+
+    if (isButtonHovered) {
+        auto mapInfoText = this->_mapGlobalInfo(_gameInfos);
+        if (mapInfoTextElem->getText() != mapInfoText) {
+            mapInfoTextElem->setText(mapInfoText);
+        }
+        mapInfoContainer->setVisible(true);
+    } else {
+        mapInfoContainer->setVisible(false);
     }
 }
 
@@ -1561,7 +1746,7 @@ void HUD::displayWinMessage(const std::string& teamName)
 {
     _showVictoryMessage = true;
     _winningTeam = teamName;
-    _victoryColor = {0, 127, 255, 255};
+    _victoryColor = _gameInfos->getTeamColor(teamName);
 }
 
 void HUD::onGameEvent(GameEventType eventType, const std::string& teamName)
@@ -1570,7 +1755,7 @@ void HUD::onGameEvent(GameEventType eventType, const std::string& teamName)
         case GameEventType::TEAM_WIN:
             _showVictoryMessage = true;
             _winningTeam = teamName;
-            _victoryColor = {0, 127, 255, 255};
+            _victoryColor = _gameInfos->getTeamColor(teamName);
             break;
         default:
             break;
@@ -1682,8 +1867,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_food_increment_btn",
-        32.5f, 15.0f,
-        2.f, 8.f,
+        34.9f, 15.0f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1693,8 +1878,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_food_decrement_btn",
-        35.f, 15.0f,
-        2.f, 8.f,
+        36.0f, 15.0f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1704,8 +1889,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_linemate_increment_btn",
-        25.f, 27.5f,
-        2.f, 8.f,
+        27.4f, 27.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1715,8 +1900,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_linemate_decrement_btn",
-        27.5f, 27.5f,
-        2.f, 8.f,
+        28.5f, 27.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1726,8 +1911,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_deraumere_increment_btn",
-        25.f, 40.5f,
-        2.f, 8.f,
+        27.4f, 40.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1737,8 +1922,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_deraumere_decrement_btn",
-        27.5f, 40.5f,
-        2.f, 8.f,
+        28.5f, 40.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1748,8 +1933,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_sibur_increment_btn",
-        25.f, 53.5f,
-        2.f, 8.f,
+        27.4f, 53.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1759,8 +1944,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_sibur_decrement_btn",
-        27.5f, 53.5f,
-        2.f, 8.f,
+        28.5f, 53.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1770,8 +1955,8 @@ void HUD::initTileResourceDisplay()
 
         bottomContainer->addButtonPercent(
         "tile_mendiane_increment_btn",
-        40.f, 27.5f,
-        2.f, 8.f,
+        42.4f, 27.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1781,8 +1966,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_mendiane_decrement_btn",
-        42.5f, 27.5f,
-        2.f, 8.f,
+        43.5f, 27.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1792,8 +1977,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_phiras_increment_btn",
-        40.f, 40.5f,
-        2.f, 8.f,
+        42.4f, 40.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1803,8 +1988,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_phiras_decrement_btn",
-        42.5f, 40.5f,
-        2.f, 8.f,
+        43.5f, 40.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1814,8 +1999,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_thystame_increment_btn",
-        40.f, 53.5f,
-        2.f, 8.f,
+        42.4f, 53.5f,
+        1.0f, 6.5f,
         "+",
         [this]() {
             this->_gameInfos->incrementTileInventoryItem(this->_selectedTile.first,
@@ -1825,8 +2010,8 @@ void HUD::initTileResourceDisplay()
 
     bottomContainer->addButtonPercent(
         "tile_thystame_decrement_btn",
-        42.5f, 53.5f,
-        2.f, 8.f,
+        43.5f, 53.5f,
+        1.0f, 6.5f,
         "-",
         [this]() {
             this->_gameInfos->decrementTileInventoryItem(this->_selectedTile.first,
@@ -1954,14 +2139,14 @@ void HUD::initFpsDisplay()
 
     bottomContainer->addTextPercent(
         "fps_display",
-        96.0f, 32.5f,
+        95.25f, 32.5f,
         "FPS: 60", 6.0f,
         {255, 255, 255, 255}
     );
 
     bottomContainer->addTextPercent(
         "cycle_display",
-        96.0f, 37.5f,
+        95.25f, 37.5f,
         "Cycle: 00h", 6.0f,
         {255, 255, 255, 255}
     );
@@ -1988,4 +2173,293 @@ void HUD::updateFpsDisplay()
 
         cycleElement->setText("Cycle: " + std::to_string(hours) + "h");
     }
+}
+
+void HUD::updateTeamHoverDetection()
+{
+    static std::chrono::steady_clock::time_point lastCheckTime;
+    static std::string lastHoveredTeam;
+    static bool shouldDisplay = false;
+
+    auto now = std::chrono::steady_clock::now();
+    std::chrono::duration<float> elapsed = now - lastCheckTime;
+
+    if (elapsed.count() < 0.1f) {
+        if (shouldDisplay && !lastHoveredTeam.empty())
+            showTeamDetailsContainer(lastHoveredTeam);
+        else
+            hideTeamDetailsContainer();
+        return;
+    }
+    lastCheckTime = now;
+
+    if (!_gameInfos || !_display)
+        return;
+
+    Vector2f mousePos = _display->getMousePosition();
+    auto sideContainer = getSideContainer();
+    if (!sideContainer)
+        return;
+
+    std::string currentHoveredTeam = "";
+    const std::vector<std::string> teams = _gameInfos->getTeamNames();
+
+    for (int i = static_cast<int>(teams.size()) - 1; i >= 0; i--) {
+        std::string teamId = "team_display_" + std::to_string(i);
+        const std::string& teamName = teams[i];
+
+        auto titleElement = sideContainer->getElement(teamId + "_title");
+        if (titleElement && titleElement->contains(mousePos.x, mousePos.y)) {
+            currentHoveredTeam = teamName;
+            break;
+        }
+
+        auto checkboxElement = sideContainer->getElement(teamId + "_checkbox");
+        if (checkboxElement && checkboxElement->contains(mousePos.x, mousePos.y)) {
+            currentHoveredTeam = teamName;
+            break;
+        }
+    }
+
+    if (currentHoveredTeam != _hoveredTeam) {
+        _hoveredTeam = currentHoveredTeam;
+        lastHoveredTeam = _hoveredTeam;
+        shouldDisplay = !_hoveredTeam.empty();
+        if (shouldDisplay)
+            showTeamDetailsContainer(_hoveredTeam);
+        else
+            hideTeamDetailsContainer();
+    } else if (!_hoveredTeam.empty()) {
+        lastHoveredTeam = _hoveredTeam;
+        shouldDisplay = true;
+        showTeamDetailsContainer(_hoveredTeam);
+    } else {
+        shouldDisplay = false;
+        hideTeamDetailsContainer();
+    }
+}
+
+void HUD::createTeamDetailsContainer()
+{
+    if (_teamDetailsContainer)
+        return;
+
+    Vector2i screenDimensions = _display->getScreenSize();
+    float screenWidth = static_cast<float>(screenDimensions.x);
+    float screenHeight = static_cast<float>(screenDimensions.y);
+
+    float sideWidthPercent = 15.0f;
+    float bottomHeightPercent = 20.0f;
+    float sideWidth = (screenWidth * sideWidthPercent) / 100.0f;
+    float squareSize = sideWidth;
+
+    float containerWidth = screenWidth * 0.15f;
+    float containerHeight = screenHeight - squareSize -
+        (screenHeight * bottomHeightPercent / 100.0f);
+    float containerX = sideWidth;
+    float containerY = squareSize;
+
+    _teamDetailsContainer = std::make_shared<Containers>(
+        _display,
+        _audio,
+        containerX,
+        containerY,
+        containerWidth,
+        containerHeight,
+        Color32{40, 40, 40, 220}
+    );
+
+    _teamDetailsContainer->setRelativePosition(
+        sideWidthPercent,
+        sideWidthPercent,
+        sideWidthPercent,
+        100.0f - sideWidthPercent - bottomHeightPercent
+    );
+
+    _teamDetailsContainer->setVisible(false);
+}
+
+void HUD::showTeamDetailsContainer(const std::string& teamName)
+{
+    if (!_teamDetailsContainer)
+        createTeamDetailsContainer();
+
+    _teamDetailsContainer->clearElements();
+
+    _teamDetailsContainer->addTextPercent(
+        "details_title",
+        5.0f,
+        5.0f,
+        "Team Details:",
+        4.0f,
+        {255, 255, 255, 255}
+    );
+
+    Color32 teamColor = _gameInfos->getTeamColor(teamName);
+    _teamDetailsContainer->addTextPercent(
+        "team_name",
+        5.0f,
+        10.0f,
+        teamName,
+        4.0f,
+        teamColor
+    );
+
+    const auto& players = _gameInfos->getPlayers();
+    std::vector<zappy::structs::Player> teamPlayers;
+    std::vector<int> levelCount(9, 0);
+    int totalPlayers = 0;
+    int totalLevels = 0;
+
+    zappy::structs::Inventory teamResources;
+    int alivePlayersCount = 0;
+
+    for (const auto& player : players) {
+        if (player.teamName == teamName) {
+            teamPlayers.push_back(player);
+            totalPlayers++;
+            alivePlayersCount++;
+            totalLevels += player.level;
+            if (player.level >= 1 && player.level <= 8)
+                levelCount[player.level]++;
+
+            teamResources.food += player.inventory.food;
+            teamResources.linemate += player.inventory.linemate;
+            teamResources.deraumere += player.inventory.deraumere;
+            teamResources.sibur += player.inventory.sibur;
+            teamResources.mendiane += player.inventory.mendiane;
+            teamResources.phiras += player.inventory.phiras;
+            teamResources.thystame += player.inventory.thystame;
+        }
+    }
+
+    const auto& eggs = _gameInfos->getEggs();
+    int teamEggs = 0;
+    for (const auto& egg : eggs) {
+        if (egg.teamName == teamName)
+            teamEggs++;
+    }
+
+    const auto& incantations = _gameInfos->getIncantations();
+    int teamIncantations = 0;
+    for (const auto& incantation : incantations) {
+        for (const auto& player : teamPlayers) {
+            if (player.x == incantation.x && player.y == incantation.y) {
+                teamIncantations++;
+                break;
+            }
+        }
+    }
+
+    float yPos = 18.0f;
+
+    _teamDetailsContainer->addTextPercent(
+        "total_players", 5.0f, yPos,
+        "Total Players: " + std::to_string(totalPlayers),
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 4.0f;
+
+    float averageLevel = totalPlayers > 0 ?
+        static_cast<float>(totalLevels) / totalPlayers : 0.0f;
+    _teamDetailsContainer->addTextPercent(
+        "average_level", 5.0f, yPos,
+        "Average Level: " + (totalPlayers > 0 ?
+            std::to_string(averageLevel).substr(0, 4) : "0.0"),
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 4.0f;
+
+    _teamDetailsContainer->addTextPercent(
+        "level_distribution_title", 5.0f, yPos,
+        "Level Distribution:",
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 3.0f;
+
+    for (int level = 1; level <= 8; level++) {
+        int r = std::min(255, 150 + level * 10);
+        int g = std::min(255, 150 + level * 5);
+        int b = std::max(0, 255 - level * 15);
+        Color32 levelColor = levelCount[level] > 0 ?
+            Color32{static_cast<unsigned char>(r), static_cast<unsigned char>(g),
+                static_cast<unsigned char>(b), 255} :
+            Color32{100, 100, 100, 255};
+
+        _teamDetailsContainer->addTextPercent(
+            "level_" + std::to_string(level), 10.0f, yPos,
+            "Level " + std::to_string(level) + ": " + std::to_string(levelCount[level])
+                + " player" + (levelCount[level] > 1 ? "s" : ""),
+            2.5f, levelColor
+        );
+        yPos += 3.0f;
+    }
+    yPos += 1.0f;
+
+    _teamDetailsContainer->addTextPercent(
+        "max_level_status", 5.0f, yPos,
+        levelCount[8] > 0 ?
+            "MAX LEVEL REACHED!\n(" + std::to_string(levelCount[8]) + " at level 8)" :
+            "No players at max\nlevel yet",
+        3.0f, levelCount[8] > 0 ? Color32{255, 215, 0, 255} : Color32{220, 220, 220, 255}
+    );
+    yPos += 7.5f;
+
+    _teamDetailsContainer->addTextPercent(
+        "resources_title", 5.0f, yPos,
+        "Team Resources:",
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 3.0f;
+
+    std::vector<std::pair<std::string, int>> resources = {
+        {"Food", teamResources.food},
+        {"Linemate", teamResources.linemate},
+        {"Deraumere", teamResources.deraumere},
+        {"Sibur", teamResources.sibur},
+        {"Mendiane", teamResources.mendiane},
+        {"Phiras", teamResources.phiras},
+        {"Thystame", teamResources.thystame}
+    };
+
+    for (const auto& res : resources) {
+        Color32 resColor = res.second > 0 ? Color32{150, 255, 150, 255} :
+            Color32{150, 150, 150, 255};
+        _teamDetailsContainer->addTextPercent(
+            "resource_" + res.first, 10.0f, yPos,
+            res.first + ": " + std::to_string(res.second),
+            2.2f, resColor
+        );
+        yPos += 2.5f;
+    }
+    yPos += 2.0f;
+
+    _teamDetailsContainer->addTextPercent(
+        "eggs_status", 5.0f, yPos,
+        "Eggs Status:",
+        3.0f, {220, 220, 220, 255}
+    );
+    yPos += 3.0f;
+
+    _teamDetailsContainer->addTextPercent(
+        "total_eggs", 10.0f, yPos,
+        "Total Eggs: " + std::to_string(teamEggs),
+        2.5f, teamEggs > 0 ? Color32{255, 200, 100, 255} : Color32{150, 150, 150, 255}
+    );
+    yPos += 4.5f;
+
+    _teamDetailsContainer->addTextPercent(
+        "incantations_status", 5.0f, yPos,
+        "Active Incantations: " + std::to_string(teamIncantations),
+        3.0f, Color32{220, 220, 220, 255}
+    );
+    yPos += 4.0f;
+
+    _teamDetailsContainer->setVisible(true);
+}
+
+void HUD::hideTeamDetailsContainer()
+{
+    if (_teamDetailsContainer)
+        _teamDetailsContainer->setVisible(false);
 }

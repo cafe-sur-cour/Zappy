@@ -123,6 +123,20 @@ int validate_and_get_players(player_t *player, zappy_t *zappy,
     return nb_players;
 }
 
+static void send_elevation_uder_way_to_all(zappy_t *zappy, int *player_list,
+    int nb_players)
+{
+    char *message = "Elevation underway\n";
+    player_t *player = NULL;
+
+    for (int i = 0; i < nb_players; i++) {
+        player = get_player_by_id(zappy->game, player_list[i]);
+        if (player && player->network) {
+            write_message(player->network->fd, message);
+        }
+    }
+}
+
 /* This functuion start the incantation returns -2 = "Elevation underway" */
 int handle_incantation(player_t *player, char *command, zappy_t *zappy)
 {
@@ -137,5 +151,6 @@ int handle_incantation(player_t *player, char *command, zappy_t *zappy)
     (void)command;
     mark_players_incanting(player_list, nb_players, zappy);
     valid_message("Elevation underway");
+    send_elevation_uder_way_to_all(zappy, player_list, nb_players);
     return -2;
 }

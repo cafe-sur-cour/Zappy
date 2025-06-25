@@ -29,6 +29,7 @@ class HUD : public IObserver {
         HUD(std::shared_ptr<IDisplay> display, std::shared_ptr<GameInfos> gameInfos,
             std::shared_ptr<IAudio> audio,
             std::shared_ptr<CameraManager>,
+            bool performanceMode,
             std::function<void()> resetCameraFunc = nullptr);
 
         ~HUD();
@@ -64,6 +65,8 @@ class HUD : public IObserver {
         std::shared_ptr<Containers> getSecurityContainer() const;
 
         std::shared_ptr<Containers> getServerMessagesContainer() const;
+
+        std::shared_ptr<Containers> getMapInfoContainer() const;
 
         void initExitButton();
 
@@ -106,6 +109,12 @@ class HUD : public IObserver {
 
         void updateFpsDisplay();
 
+        void initMapInfoDisplay();
+
+        void initMapInfoButton();
+
+        void updateMapInfoDisplay();
+
         zappy::structs::Player getPlayerById(int playerId) const;
 
         bool isPlayerInIncantation(int playerId) const;
@@ -125,6 +134,8 @@ class HUD : public IObserver {
         std::string _camModeToText(zappy::gui::CameraMode, bool isGamePadAvailable);
 
         std::string _camKeyHelp(zappy::gui::CameraMode, bool isGamePadAvailable);
+
+        std::string _mapGlobalInfo(std::shared_ptr<GameInfos> gameInfos);
 
         std::shared_ptr<Containers> createSquareContainer(float squareSize,
             float sideWidthPercent);
@@ -160,6 +171,8 @@ class HUD : public IObserver {
             float bottomHeight,
             float bottomHeightPercent);
 
+        std::shared_ptr<Containers> createMapInfoContainer();
+
         void updateElementPositions(
             std::shared_ptr<Containers> container,
             const std::unordered_map<std::string, float>& initialYPositions,
@@ -182,11 +195,17 @@ class HUD : public IObserver {
 
         void addIncrementDecrementButtons(std::shared_ptr<Containers> container, int playerId);
 
+        void updateTeamHoverDetection();
+        void createTeamDetailsContainer();
+        void showTeamDetailsContainer(const std::string& teamName);
+        void hideTeamDetailsContainer();
+
         std::unordered_map<std::string, std::shared_ptr<Containers>> _containers;
         std::shared_ptr<IDisplay> _display;
         std::shared_ptr<GameInfos> _gameInfos;
         std::shared_ptr<IAudio> _audio;
         std::shared_ptr<CameraManager> _camera;
+        bool _performanceMode;
         std::shared_ptr<Help> _help;
         std::shared_ptr<Settings> _settings;
         std::function<void()> _resetCameraFunc;
@@ -194,4 +213,8 @@ class HUD : public IObserver {
         std::string _winningTeam;
         Color32 _victoryColor;
         std::pair<int, int> _selectedTile;
+
+        std::string _hoveredTeam;
+        std::shared_ptr<Containers> _teamDetailsContainer;
+        bool _mapInfoButtonHovered;
 };

@@ -81,7 +81,7 @@ void Checkbox::update()
         return;
 
     Vector2f mousePoint = this->_display->getMousePosition();
-    _isHovered = contains(mousePoint.x, mousePoint.y);
+    _isHovered = containsCheckbox(mousePoint.x, mousePoint.y);
 
     bool wasPressed = _isPressed;
     _isPressed = _isHovered && this->_display->isMouseButtonDown(
@@ -130,4 +130,19 @@ void Checkbox::setSize(float width, float height)
 {
     AUIElement::setSize(width, height);
     _checkboxSize = std::min(width, height);
+}
+
+bool Checkbox::containsCheckbox(float x, float y) const
+{
+    float checkboxX = _bounds.x;
+    float checkboxY = _bounds.y + (_bounds.height - _checkboxSize) / 2.0f;
+
+    FloatRect checkboxRect = {
+        checkboxX,
+        checkboxY,
+        _checkboxSize,
+        _checkboxSize
+    };
+
+    return this->_display->checkCollisionPointRec({x, y}, checkboxRect);
 }
