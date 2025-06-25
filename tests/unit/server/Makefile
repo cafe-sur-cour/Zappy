@@ -72,6 +72,7 @@ SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/signal.c								\
 				../../../server/src/game/client.c							\
 				../../../server/src/game/game.c								\
+				../../../server/src/game/init_map.c							\
 				../../../server/src/game/graphic_client.c					\
 				../../../server/src/game/handle_crystal.c 					\
 				../../../server/src/game/handle_food.c						\
