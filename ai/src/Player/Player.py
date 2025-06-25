@@ -195,7 +195,7 @@ class Player:
         if level >= MAX_LEVEL:
             return True
 
-        offset = FOOD_VALUE * 1
+        offset = FOOD_VALUE
 
         return nbFood * FOOD_VALUE > self.howManyTimeUnitsForIncantation(level) + offset
 
@@ -206,10 +206,10 @@ class Player:
         stonesToDrop = sum(LVL_UPGRADES[level]["stones"].values())
         droppingCost = stonesToDrop * 7
 
-        maxLength = (max(self.x, self.y) / 2) * 4
+        maxLength = (max(self.x, self.y) / 2) * 50
         movementCost = 7 * maxLength
 
-        offset = FOOD_VALUE * 10
+        offset = FOOD_VALUE * 15
 
         totalCost = droppingCost + movementCost + offset
 
