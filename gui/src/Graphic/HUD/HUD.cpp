@@ -992,13 +992,13 @@ std::shared_ptr<Containers> HUD::createMapInfoContainer()
 
     if (mapInfoContainer) {
         mapInfoContainer->addTextPercent(
-            "map_info_title", 5.0f, 5.0f, "Map Information", 12.0f,
+            "map_info_title", 5.0f, 2.5f, "Map Information", 12.0f,
             {255, 255, 255, 255}
         );
 
         mapInfoContainer->addTextPercent(
-            "map_info_content", 5.0f, 20.0f, "Loading map data...", 4.5f,
-            {220, 220, 220, 255}
+            "map_info_content", 5.0f, 15.5f, "Loading map data...", 6.5f,
+            {200, 200, 200, 255}
         );
 
         mapInfoContainer->setVisible(false);
@@ -1346,46 +1346,52 @@ std::string HUD::_camKeyHelp(zappy::gui::CameraMode cameraMode, bool isGamePadAv
 std::string HUD::_mapGlobalInfo(std::shared_ptr<GameInfos> gameInfos)
 {
     auto mapSize = gameInfos->getMapSize();
-    if (this->_performanceMode || (mapSize.first >= 50 && mapSize.second >= 50))
-        return "Performance mode enabled";
-
     std::string info = "";
-    info += "Map size: " + std::to_string(mapSize.first) + "x" +
-                       std::to_string(mapSize.second) + "\n";
 
-    int totalEgg = gameInfos->getTotalEggs();
-    int totalFood = gameInfos->getTotalFood();
-    int totalLinemate = gameInfos->getTotalLinemate();
-    int totalDeraumere = gameInfos->getTotalDeraumere();
-    int totalSibur = gameInfos->getTotalSibur();
-    int totalMendiane = gameInfos->getTotalMendiane();
-    int totalPhiras = gameInfos->getTotalPhiras();
-    int totalThystame = gameInfos->getTotalThystame();
+    info += "Map Size: " + std::to_string(mapSize.first) + " x " +
+        std::to_string(mapSize.second) + "\n";
 
-    info += "Food: " + std::to_string(totalFood) + " Egg: " + std::to_string(totalEgg)+ "\n";
-    info += "Linemate: " + std::to_string(totalLinemate);
-    info += " Deraumere: " + std::to_string(totalDeraumere) + "\n";
-    info += "Sibur: " + std::to_string(totalSibur);
-    info += " Mendiane: " + std::to_string(totalMendiane) + "\n";
-    info += "Phiras: " + std::to_string(totalPhiras);
-    info += " Thystame: " + std::to_string(totalThystame) + "\n";
-    info += "Total resources: "
-         + std::to_string(totalFood + totalLinemate + totalDeraumere
-                          + totalSibur + totalMendiane
-                          + totalPhiras + totalThystame) + "\n";
+    if (this->_performanceMode || (mapSize.first >= 50 && mapSize.second >= 50)) {
+        info += "Food: X   Egg: X\n";
+        info += "Linemate: X\nDeraumere: X\n";
+        info += "Sibur: X\nMendiane: X\n";
+        info += "Phiras: X\nThystame: X\n";
+        info += "Total ressources: X\n";
+    } else {
+        int totalEgg = gameInfos->getTotalEggs();
+        int totalFood = gameInfos->getTotalFood();
+        int totalLinemate = gameInfos->getTotalLinemate();
+        int totalDeraumere = gameInfos->getTotalDeraumere();
+        int totalSibur = gameInfos->getTotalSibur();
+        int totalMendiane = gameInfos->getTotalMendiane();
+        int totalPhiras = gameInfos->getTotalPhiras();
+        int totalThystame = gameInfos->getTotalThystame();
+
+        info += "Food: " + std::to_string(totalFood) + "   Egg: " +
+            std::to_string(totalEgg) + "\n";
+        info += "Linemate: " + std::to_string(totalLinemate) + "\nDeraumere: " +
+            std::to_string(totalDeraumere) + "\n";
+        info += "Sibur: " + std::to_string(totalSibur) + "\nMendiane: " +
+            std::to_string(totalMendiane) + "\n";
+        info += "Phiras: " + std::to_string(totalPhiras) + "\nThystame: " +
+            std::to_string(totalThystame) + "\n";
+        info += "Total ressources: " + std::to_string(totalFood + totalLinemate +
+            totalDeraumere + totalSibur + totalMendiane + totalPhiras + totalThystame) + "\n";
+    }
+
     const auto& players = gameInfos->getPlayers();
     const auto& teams = gameInfos->getTeamNames();
 
-    info += "Total players / teams: " + std::to_string(players.size()) + "/ "
-         + std::to_string(teams.size()) + "\n";
+    info += "Total teams: " + std::to_string(teams.size()) + "\n";
+    info += "Total players: " + std::to_string(players.size()) + "\n";
 
     int max_level = 1;
-
     for (const auto& player : players) {
         if (player.level > max_level)
             max_level = player.level;
     }
-    info += "Player level max: " + std::to_string(max_level) + "\n";
+    info += "Player Level Max: " + std::to_string(max_level) + "\n";
+
     return info;
 }
 
