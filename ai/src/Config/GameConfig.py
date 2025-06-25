@@ -5,6 +5,12 @@
 ## GameConfig
 ##
 
+MAX_LEVEL = 8
+
+ELEVATION_COST = 300
+
+FOOD_VALUE = 126
+
 LVL_UPGRADES = {
     1: {
         "players": 1,
