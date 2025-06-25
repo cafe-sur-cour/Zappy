@@ -60,7 +60,8 @@ static void handle_player_death(zappy_t *zappy, player_t *player, team_t *team)
 {
     player_t *current = NULL;
 
-    write_message(player->network->fd, "dead\n");
+    write_in_buffer(player->network->writingBuffer, "dead\n");
+    write_message(player->network);
     remove_player_from_alive_teamate(zappy, player);
     send_player_death(zappy, player);
     if (team->players == player) {

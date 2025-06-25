@@ -145,7 +145,8 @@ int handle_look(player_t *player, char *command, zappy_t *zappy)
     char *message = look_up(player, zappy);
 
     (void)command;
-    if (write_message(player->network->fd, message) == -1) {
+    write_in_buffer(player->network->writingBuffer, message);
+    if (write_message(player->network) == -1) {
         free(message);
         return -1;
     }

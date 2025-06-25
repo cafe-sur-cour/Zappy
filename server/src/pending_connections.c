@@ -17,7 +17,7 @@ bool is_pending_graphic(zappy_t *zappy, int fd)
     graph_net_t *graphic = zappy->graph;
 
     while (graphic) {
-        if (graphic->fd == fd)
+        if (graphic->network->fd == fd)
             return false;
         graphic = graphic->next;
     }

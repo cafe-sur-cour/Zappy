@@ -19,7 +19,8 @@ static int send_ppo_message(graph_net_t *graphic, player_t *player)
 
     snprintf(buffer, size + 1, "ppo #%d %d %d %d\n",
         player->id, player->posX, player->posY, player->direction);
-    return write_message(graphic->fd, buffer);
+    write_in_buffer(graphic->network->writingBuffer, buffer);
+    return write_message(graphic->network);
 }
 
 int ppo(zappy_t *zappy, graph_net_t *graphic, char *message)

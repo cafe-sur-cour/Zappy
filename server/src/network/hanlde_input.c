@@ -6,6 +6,7 @@
 */
 
 #include "buffer.h"
+#include "network.h"
 
 #include <unistd.h>
 #include <poll.h>
@@ -122,20 +123,34 @@ static char *check_existing_message(buffer_t *cb)
     return NULL;
 }
 
-char *get_message(int fd)
+char *get_message(network_t *network)
+{
+    buffer_t *cb_ptr = network->readingBuffer;
+    char c = 0;
+    char *existing_message = NULL;
+
+    if (network->fd < 0)
+        return NULL;
+    existing_message = check_existing_message(network->readingBuffer);
+    if (existing_message)
+        return existing_message;
+    cb_ptr = get_message_from_buffer(network->fd, cb_ptr, c);
+    if (cb_ptr == NULL)
+        return NULL;
+    return check_existing_message(network->readingBuffer);
+}
+
+char *get_fd_message(int fd)
 {
     static buffer_t cb = {.head = 0, .tail = 0, .full = 0};
     buffer_t *cb_ptr = &cb;
     char c = 0;
-    char *existing_message = NULL;
 
     if (fd < 0)
         return NULL;
-    existing_message = check_existing_message(&cb);
-    if (existing_message)
-        return existing_message;
+    cb.tail = cb.head;
     cb_ptr = get_message_from_buffer(fd, cb_ptr, c);
     if (cb_ptr == NULL)
         return NULL;
-    return check_existing_message(&cb);
+    return end_message(cb_ptr);
 }

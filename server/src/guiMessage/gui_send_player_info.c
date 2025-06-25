@@ -20,10 +20,11 @@ int send_player_connect_to_specific_gui(graph_net_t *fd, player_t *p)
     char *message = malloc(sizeof(char) * xLenght);
 
     if (!message)
-        return -1;
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLenght, "pnw #%d %d %d %d %d %s\n", p->id, p->posX,
         p->posY, p->direction, p->level, p->team);
-    if (write_message(fd->fd, message) == -1) {
+    write_in_buffer(fd->network->writingBuffer, message);
+    if (write_message(fd->network) == -1) {
         return -1;
     }
     free(message);
@@ -40,15 +41,15 @@ int send_player_connect(zappy_t *zappy, player_t *p)
     graph_net_t *current = zappy->graph;
 
     if (!message)
-        return -1;
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLenght, "pnw #%d %d %d %d %d %s\n", p->id, p->posX,
         p->posY, p->direction, p->level, p->team);
     if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", message);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1)
             return -1;
-        }
         current = current->next;
     }
     free(message);
@@ -64,16 +65,15 @@ int send_player_pos(zappy_t *zappy, player_t *p)
     graph_net_t *current = zappy->graph;
 
     if (message == NULL)
-        return -1;
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLength, "ppo #%d %d %d %d\n", p->id, p->posX, p->posY,
         p->direction);
     if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", message);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
-            free(message);
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1)
             return -1;
-        }
         current = current->next;
     }
     free(message);
@@ -93,7 +93,8 @@ int send_player_level(zappy_t *zappy, player_t *player)
     if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", message);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1) {
             free(message);
             return -1;
         }

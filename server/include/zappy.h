@@ -34,7 +34,7 @@ typedef struct params_s {
 
 /* Structure to handle the network side of the gui*/
 typedef struct graph_net_s {
-    int fd;
+    network_t *network;
     bool mapSent;
     struct graph_net_s *next;
 } graph_net_t;
@@ -45,12 +45,6 @@ typedef struct unified_poll_s {
     int count;
     int capacity;
 } unified_poll_t;
-
-/* Server part of the network */
-typedef struct server_s {
-    int sockfd;
-    struct pollfd pollserver;
-} server_t;
 
 typedef struct zappy_s {
     server_t *network;
@@ -81,6 +75,7 @@ typedef struct graphic_pf_s {
 int helper(void);
 void error_message(const char *message);
 void valid_message(char const *message);
+int return_error(char const *message);
 
 /* checkers.c */
 bool check_port(char const *flag, char const *value, params_t *params);

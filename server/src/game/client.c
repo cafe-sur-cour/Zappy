@@ -103,10 +103,10 @@ static player_t *malloc_player(void)
     player->network->writingBuffer = malloc(sizeof(buffer_t));
     if (!player->network->readingBuffer || !player->network->writingBuffer) {
         error_message("Failed to allocate memory for player buffer.");
-        free(player->network);
-        free(player);
         return NULL;
     }
+    memset(player->network->readingBuffer, 0, sizeof(buffer_t));
+    memset(player->network->writingBuffer, 0, sizeof(buffer_t));
     return player;
 }
 

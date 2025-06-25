@@ -5,7 +5,7 @@
 ** game
 */
 
-#include "buffer.h"
+#include "network.h"
 #include <time.h>
 #include <pthread.h>
 
@@ -62,12 +62,6 @@ typedef struct egg_s {
     struct egg_s *next;
 } egg_t;
 
-/* Struct that "handles" the network element */
-typedef struct network_s {
-    int fd;
-    buffer_t *readingBuffer;
-    buffer_t *writingBuffer;
-} network_t;
 
 /* Struct defining the inventory of tiles and players */
 typedef struct inventory_s {

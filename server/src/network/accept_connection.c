@@ -9,9 +9,11 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
-int accept_connection(int server_fd)
+#include "network.h"
+
+int accept_connection(server_t *server)
 {
-    int new_socket = accept(server_fd, NULL, NULL);
+    int new_socket = accept(server->sockfd, NULL, NULL);
 
     if (new_socket < 0) {
         perror("Accept failed");

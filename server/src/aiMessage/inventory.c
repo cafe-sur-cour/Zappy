@@ -8,6 +8,7 @@
 
 #include "zappy.h"
 #include "network.h"
+#include "buffer.h"
 #include "game.h"
 
 #include <stdlib.h>
@@ -51,7 +52,8 @@ int inventory_message(player_t *player)
         player->inventory->nbDeraumere, player->inventory->nbSibur,
         player->inventory->nbMendiane, player->inventory->nbPhiras,
         player->inventory->nbThystame);
-    if (write_message(player->network->fd, message) == -1)
+    write_in_buffer(player->network->writingBuffer, message);
+    if (write_message(player->network) == -1)
         return -1;
     return print_inventory_server(player, n);
 }

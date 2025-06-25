@@ -26,7 +26,8 @@ void free_action_request(action_request_t *action)
 static void write_end_incantation(player_t *player, zappy_t *zappy)
 {
     if (handle_end_incantation(player, zappy) != 0) {
-        write_message(player->network->fd, "ko\n");
+        write_in_buffer(player->network->writingBuffer, "ko\n");
+        write_message(player->network);
     }
 }
 

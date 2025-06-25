@@ -25,7 +25,8 @@ int send_bct_message(graph_net_t *graphic, int x, int y,
         x, y, inventory->nbFood, inventory->nbLinemate, inventory->nbDeraumere,
         inventory->nbSibur, inventory->nbMendiane, inventory->nbPhiras,
         inventory->nbThystame);
-    return write_message(graphic->fd, buffer);
+    write_in_buffer(graphic->network->writingBuffer, buffer);
+    return write_message(graphic->network);
 }
 
 int bct(zappy_t *zappy, graph_net_t *graphic, char *message)
