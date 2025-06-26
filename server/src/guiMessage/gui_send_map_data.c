@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 int write_map_message(int xLength, zappy_t *zappy,
     inventory_t **tiles, int *pos)
@@ -82,7 +83,7 @@ int send_entrie_map(zappy_t *zappy)
     return 0;
 }
 
-static void free_elems(char *message, char *x, char *y)
+static int free_elems(char *message, char *x, char *y, int ret)
 {
     if (message)
         free(message);
@@ -90,13 +91,14 @@ static void free_elems(char *message, char *x, char *y)
         free(x);
     if (y)
         free(y);
+    return ret;
 }
 
 /* Send  the msz message to the gui */
 int send_map_size(zappy_t *server)
 {
     int xLenthth = int_str_len(server->game->map->width) +
-        int_str_len(server->game->map->height) + 7;
+        int_str_len(server->game->map->height) + 9;
     char *message = malloc(sizeof(char) * xLenthth);
     char *x = my_itoa(server->game->map->width);
     char *y = my_itoa(server->game->map->height);
@@ -104,15 +106,14 @@ int send_map_size(zappy_t *server)
 
     if (message == NULL || x == NULL || y == NULL)
         return return_error("Failed to allocate memory for string message.");
+    memset(message, 0, xLenthth);
     snprintf(message, xLenthth, "msz %s %s\n", x, y);
     while (current != NULL) {
         write_in_buffer(current->network->writingBuffer, message);
         if (write_message(current->network) == -1) {
-            free_elems(message, x, y);
-            return -1;
+            return free_elems(message, x, y, -1);
         }
         current = current->next;
     }
-    free_elems(message, x, y);
-    return 0;
+    return free_elems(message, x, y, 0);
 }

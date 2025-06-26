@@ -49,6 +49,8 @@ static int complete_connection_rest(zappy_t *zappy, int fd,
         return -1;
     }
     valid_message("New AI client connected.");
+    if (buffer)
+        free(buffer);
     return 0;
 }
 
@@ -86,9 +88,11 @@ int accept_client_team_name(zappy_t *zappy, int new_sockfd)
         return -1;
     }
     if (complete_connection(zappy, new_sockfd, message) == -1) {
+        free(message);
         close(new_sockfd);
         return -1;
     }
+    free(message);
     return 0;
 }
 

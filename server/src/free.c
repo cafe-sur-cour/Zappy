@@ -25,40 +25,22 @@ void *free_params(params_t *params)
     return NULL;
 }
 
-static void free_players(player_t *player)
+static void free_action_queue_pl(action_queue_t *queue)
 {
-    if (!player)
+    action_request_t *req = NULL;
+    action_request_t *next = NULL;
+
+    if (!queue)
         return;
-    if (player->inventory)
-        free(player->inventory);
-    if (player->network) {
-        if (player->network->readingBuffer)
-            free(player->network->readingBuffer);
-        if (player->network->writingBuffer)
-            free(player->network->writingBuffer);
-        free(player->network);
+    req = queue->head;
+    while (req) {
+        next = req->next;
+        if (req->command)
+            free(req->command);
+        free(req);
+        req = next;
     }
-    free(player);
-    return;
-}
-
-static void free_teams(team_t *teams)
-{
-    team_t *current = teams;
-    team_t *next;
-
-    while (current) {
-        next = current->next;
-        if (current->name) {
-            free(current->name);
-        }
-        if (current->players) {
-            free_players(current->players);
-        }
-        if (current)
-            free(current);
-        current = next;
-    }
+    free(queue);
 }
 
 static void free_game(game_t *game)
@@ -76,6 +58,14 @@ static void free_graph(graph_net_t *graph)
 {
     if (!graph)
         return;
+    if (graph->network == NULL)
+        return;
+    if (graph->network->readingBuffer == NULL
+        || graph->network->writingBuffer == NULL)
+        return;
+    free(graph->network->readingBuffer);
+    free(graph->network->writingBuffer);
+    free(graph->network);
     free(graph);
 }
 
@@ -100,8 +90,18 @@ void free_map(map_t *map)
             free(map->tiles[i]);
         }
     }
+    free(map->tiles);
     free_eggs(map->currentEggs);
     free(map);
+}
+
+static void free_unified_poll_pl(unified_poll_t *poll_struct)
+{
+    if (!poll_struct)
+        return;
+    if (poll_struct->fds)
+        free(poll_struct->fds);
+    free(poll_struct);
 }
 
 void *free_zappy(zappy_t *zappy)
@@ -118,6 +118,7 @@ void *free_zappy(zappy_t *zappy)
         free_graph(zappy->graph);
     if (zappy->network)
         free(zappy->network);
+    free_unified_poll_pl(zappy->unified_poll);
     free(zappy);
     return NULL;
 }

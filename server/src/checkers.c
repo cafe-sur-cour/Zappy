@@ -95,8 +95,8 @@ bool check_client(char const *flag, char const *value, params_t *params)
     if (is_only_digits(value) == 0)
         return false;
     clients_nb = atoi(value);
-    if (strlen(value) > 2 || clients_nb <= 0 || clients_nb > 8) {
-        error_message("Number of clients must be betwwen 1 and 8.");
+    if (strlen(value) > 2 || clients_nb <= 0 || clients_nb > 25) {
+        error_message("Number of clients must be betwwen 1 and 25.");
         return false;
     }
     params->nb_client = clients_nb;

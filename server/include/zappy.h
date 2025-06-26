@@ -142,6 +142,12 @@ void *free_params(params_t *params);
 void *free_player(player_t *player);
 void free_map(map_t *map);
 
+/* free_server.c */
+void free_networkplayer(player_t *player);
+void free_players(player_t *player);
+void free_teams(team_t *teams);
+
+
 /* Function to send info to the gui */
 int send_map_size(zappy_t *server);
 int send_entrie_map(zappy_t *server);
