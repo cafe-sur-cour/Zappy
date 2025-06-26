@@ -33,19 +33,19 @@ int left_message(player_t *player)
     direction_t direction = player->direction;
 
     if (direction == NORTH) {
-        player->direction = EAST;
-        return 0;
-    }
-    if (direction == EAST) {
-        player->direction = SOUTH;
-        return 0;
-    }
-    if (direction == SOUTH) {
         player->direction = WEST;
         return 0;
     }
-    if (direction == WEST) {
+    if (direction == EAST) {
         player->direction = NORTH;
+        return 0;
+    }
+    if (direction == SOUTH) {
+        player->direction = EAST;
+        return 0;
+    }
+    if (direction == WEST) {
+        player->direction = SOUTH;
         return 0;
     }
     return -1;
