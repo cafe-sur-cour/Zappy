@@ -462,7 +462,7 @@ void Map::drawPerformanceRock(int x, int y, const zappy::structs::Tile &tile)
                 static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
             };
 
-            this->_display->drawSphere(position, sphereRadius, CWHITE);
+            this->_display->drawSphere(position, sphereRadius, CBLUE);
         }
     }
 }
