@@ -42,6 +42,7 @@ class Client {
         ~Client();
 
         void _createGUI();
+        void stop();
 };
 
 #endif /* !CLIENT_HPP_ */

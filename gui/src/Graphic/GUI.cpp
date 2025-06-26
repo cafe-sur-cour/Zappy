@@ -190,6 +190,11 @@ GUI::~GUI()
     this->_display->closeWindow();
 }
 
+void GUI::stop()
+{
+    this->_isRunning = false;
+}
+
 void GUI::run()
 {
     if (!_isRunning) {

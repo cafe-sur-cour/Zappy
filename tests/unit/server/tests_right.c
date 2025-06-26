@@ -84,7 +84,7 @@ Test(right, right_message_north_to_west, .init = redirect_all_std)
     int result = right_message(player);
     
     cr_assert_eq(result, 0);
-    cr_assert_eq(player->direction, WEST);
+    cr_assert_eq(player->direction, EAST);
     
     cleanup_test_data(NULL, player);
 }
@@ -96,7 +96,7 @@ Test(right, right_message_west_to_south, .init = redirect_all_std)
     int result = right_message(player);
     
     cr_assert_eq(result, 0);
-    cr_assert_eq(player->direction, SOUTH);
+    cr_assert_eq(player->direction, NORTH);
     
     cleanup_test_data(NULL, player);
 }
@@ -108,7 +108,7 @@ Test(right, right_message_south_to_east, .init = redirect_all_std)
     int result = right_message(player);
     
     cr_assert_eq(result, 0);
-    cr_assert_eq(player->direction, EAST);
+    cr_assert_eq(player->direction, WEST);
     
     cleanup_test_data(NULL, player);
 }
@@ -120,7 +120,7 @@ Test(right, right_message_east_to_north, .init = redirect_all_std)
     int result = right_message(player);
     
     cr_assert_eq(result, 0);
-    cr_assert_eq(player->direction, NORTH);
+    cr_assert_eq(player->direction, SOUTH);
     
     cleanup_test_data(NULL, player);
 }
@@ -155,13 +155,13 @@ Test(right, right_message_full_rotation, .init = redirect_all_std)
     
     // Complete a full rotation: NORTH -> WEST -> SOUTH -> EAST -> NORTH
     cr_assert_eq(right_message(player), 0);
-    cr_assert_eq(player->direction, WEST);
+    cr_assert_eq(player->direction, EAST);
     
     cr_assert_eq(right_message(player), 0);
     cr_assert_eq(player->direction, SOUTH);
     
     cr_assert_eq(right_message(player), 0);
-    cr_assert_eq(player->direction, EAST);
+    cr_assert_eq(player->direction, WEST);
     
     cr_assert_eq(right_message(player), 0);
     cr_assert_eq(player->direction, NORTH);
@@ -195,7 +195,7 @@ Test(right, right_message_else_branch_coverage, .init = redirect_all_std)
     int result = right_message(player);
     
     cr_assert_eq(result, 0);
-    cr_assert_eq(player->direction, NORTH);
+    cr_assert_eq(player->direction, SOUTH);
     
     cleanup_test_data(NULL, player);
 }
@@ -250,7 +250,7 @@ Test(right, right_message_direction_consistency, .init = redirect_all_std)
     result = right_message(player);
     
     cr_assert_eq(result, 0);
-    cr_assert_eq(player->direction, WEST);
+    cr_assert_eq(player->direction, EAST);
     cr_assert_neq(player->direction, original_direction);
     
     cleanup_test_data(NULL, player);

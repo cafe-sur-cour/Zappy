@@ -31,6 +31,7 @@ class GUI {
         ~GUI();
 
         void run();
+        void stop();
         void refresh();
         void handleVictory(const std::string &teamName);
 
