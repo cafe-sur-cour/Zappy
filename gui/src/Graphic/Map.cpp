@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <vector>
+#include <map>
 #include <string>
 #include <cmath>
 #include <iostream>
@@ -425,56 +426,43 @@ void Map::drawRock(int x, int y, const zappy::structs::Tile &tile)
 
 void Map::drawPerformanceRock(int x, int y, const zappy::structs::Tile &tile)
 {
-    static const std::vector<std::string> rockNames = {
-        "linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame"
-    };
-
-    std::vector<std::pair<std::string, int>> rockTypes;
-    rockTypes.reserve(rockNames.size());
-    rockTypes.emplace_back(rockNames[0], tile.linemate);
-    rockTypes.emplace_back(rockNames[1], tile.deraumere);
-    rockTypes.emplace_back(rockNames[2], tile.sibur);
-    rockTypes.emplace_back(rockNames[3], tile.mendiane);
-    rockTypes.emplace_back(rockNames[4], tile.phiras);
-    rockTypes.emplace_back(rockNames[5], tile.thystame);
     int visibleRocks = 0;
-    for (const auto& rockType : rockTypes) {
-        if (_gameInfos->isObjectVisible(rockType.first)) {
-            visibleRocks += rockType.second;
-        }
-    }
+    if(_gameInfos->isObjectVisible("linemate"))
+        visibleRocks += tile.linemate;
+    if(_gameInfos->isObjectVisible("deraumere"))
+        visibleRocks += tile.deraumere;
+    if(_gameInfos->isObjectVisible("sibur"))
+        visibleRocks += tile.sibur;
+    if(_gameInfos->isObjectVisible("mendiane"))
+        visibleRocks += tile.mendiane;
+    if(_gameInfos->isObjectVisible("phiras"))
+        visibleRocks += tile.phiras;
+    if(_gameInfos->isObjectVisible("thystame"))
+        visibleRocks += tile.thystame;
 
-    if (visibleRocks <= 0)
-        return;
-
-    static auto startTime = std::chrono::steady_clock::now();
-    auto currentTime = std::chrono::steady_clock::now();
-    float elapsedSeconds = std::chrono::duration<float>(currentTime - startTime).count();
+    std::map<std::string, int> rockTypes;
+    rockTypes["linemate"] = tile.linemate;
+    rockTypes["deraumere"] = tile.deraumere;
+    rockTypes["sibur"] = tile.sibur;
+    rockTypes["mendiane"] = tile.mendiane;
+    rockTypes["phiras"] = tile.phiras;
+    rockTypes["thystame"] = tile.thystame;
 
     int index = tile.food;
     float sphereRadius = 0.15f;
-    float baseX = static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER);
-    float baseZ = static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER);
 
-    float colorPhase = elapsedSeconds * 0.5f;
-    unsigned char r = static_cast<unsigned char>(127.5f + 127.5f * sin(colorPhase));
-    unsigned char g = static_cast<unsigned char>(127.5f + 127.5f * sin(colorPhase + 2.0f));
-    unsigned char b = static_cast<unsigned char>(127.5f + 127.5f * sin(colorPhase + 4.0f));
-    Color32 rockColor = {r, g, b, 255};
+    for (const auto& rock : rockTypes) {
+        if (!_gameInfos->isObjectVisible(rock.first) || rock.second <= 0)
+            continue;
 
-    for (const auto& rockType : rockTypes) {
-        const std::string& type = rockType.first;
-        int count = rockType.second;
+        for (int i = 0; i < rock.second; ++i) {
+            Vector3f position = {
+                static_cast<float>(x * zappy::gui::POSITION_MULTIPLIER),
+                getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
+                static_cast<float>(y * zappy::gui::POSITION_MULTIPLIER)
+            };
 
-        if (_gameInfos->isObjectVisible(type) && count > 0) {
-            for (int i = 0; i < count; ++i) {
-                Vector3f position = {
-                    baseX,
-                    getOffset(DisplayPriority::ROCK, x, y, static_cast<size_t>(index++)),
-                    baseZ
-                };
-                this->_display->drawSphere(position, sphereRadius, rockColor);
-            }
+            this->_display->drawSphere(position, sphereRadius, CBLUE);
         }
     }
 }

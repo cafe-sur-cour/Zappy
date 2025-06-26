@@ -46,6 +46,15 @@ Client::~Client()
 {
 }
 
+void Client::stop()
+{
+    if (_gui)
+        _gui->stop();
+
+    if (_communication)
+        _communication->disconnect();
+}
+
 bool Client::_checkIfCorrectModuleType(ModuleType_t type, const std::string &path)
 {
     auto dlLoader = DLLoader<std::shared_ptr<IDisplay>>();
