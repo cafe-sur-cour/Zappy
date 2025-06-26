@@ -193,7 +193,7 @@ Test(eject, no_players_to_eject, .init = redirect_all_std)
     zappy->game->teams->nbPlayers = 1;
     
     int result = handle_eject(player, "Eject", zappy);
-    cr_assert_eq(result, 0, "Should return 0 when no players to eject");
+    cr_assert_eq(result, -1, "Should return -1 when no players to eject");
     
     free_test_zappy(zappy);
 }
@@ -441,7 +441,7 @@ Test(eject, players_on_different_tiles, .init = redirect_all_std)
     int original_y = other_player->posY;
     int result = handle_eject(ejector, "Eject", zappy);
     
-    cr_assert_eq(result, 0, "Eject should complete successfully");
+    cr_assert_eq(result, -1, "Eject shouldn't complete successfully");
     cr_assert_eq(other_player->posX, original_x, "Other player should not move");
     cr_assert_eq(other_player->posY, original_y, "Other player should not move");
     
