@@ -87,6 +87,7 @@ int distribute_resources(zappy_t *z)
             free(pos);
         }
     }
+    free(needed_count);
     free(shuffled_tiles);
     return 0;
 }

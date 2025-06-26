@@ -33,17 +33,38 @@ const graphic_pf_t GRAPHIC_COMMAND[] = {
     {NULL, NULL}
 };
 
+static void *free_net_reading(graph_net_t *new_node)
+{
+    free(new_node->network);
+    free(new_node);
+    return NULL;
+}
+
+static void *free_net_writting(graph_net_t *new_node)
+{
+    free(new_node->network->readingBuffer);
+    free(new_node->network);
+    free(new_node);
+    return NULL;
+}
+
 graph_net_t *add_graph_node(graph_net_t **head, int fd)
 {
     graph_net_t *new_node = malloc(sizeof(graph_net_t));
 
-    new_node->network = malloc(sizeof(network_t));
-    new_node->network->readingBuffer = create_buffer();
-    new_node->network->writingBuffer = create_buffer();
-    if (!new_node || !new_node->network ||
-        !new_node->network->readingBuffer ||
-        !new_node->network->writingBuffer)
+    if (!new_node)
         return NULL;
+    new_node->network = malloc(sizeof(network_t));
+    if (!new_node->network) {
+        free(new_node);
+        return NULL;
+    }
+    new_node->network->readingBuffer = create_buffer();
+    if (!new_node->network->readingBuffer)
+        return free_net_reading(new_node);
+    new_node->network->writingBuffer = create_buffer();
+    if (!new_node->network->writingBuffer)
+        return free_net_writting(new_node);
     new_node->network->fd = fd;
     new_node->mapSent = false;
     new_node->next = *head;

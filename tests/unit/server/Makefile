@@ -61,6 +61,7 @@ SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/algo.c									\
 				../../../server/src/checkers.c								\
 				../../../server/src/free.c									\
+				../../../server/src/free_player.c							\
 				../../../server/src/messages.c								\
 				../../../server/src/params_checkers.c 						\
 				../../../server/src/params.c								\

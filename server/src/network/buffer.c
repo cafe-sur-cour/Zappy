@@ -62,6 +62,7 @@ buffer_t *create_buffer(void)
     buffer->head = 0;
     buffer->tail = 0;
     buffer->full = 0;
+    memset(buffer->data, 0, sizeof(buffer->data));
     return buffer;
 }
 

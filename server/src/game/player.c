@@ -18,23 +18,20 @@ static void update_player_food(player_t *player, zappy_t *zappy)
 {
     time_t current_time = time(NULL);
     double time_elapsed = difftime(current_time, player->last_food_check);
-    int time_units_passed = (int)(time_elapsed * zappy->params->freq);
+    float time_to_wait = 126 / (double)zappy->params->freq;
 
-    if (time_units_passed > 0) {
-        player->food_timer -= time_units_passed;
-        player->last_food_check = current_time;
-        while (player->food_timer <= 0 && player->inventory->nbFood > 0) {
+    if (time_elapsed >= time_to_wait) {
+        if (player->inventory->nbFood > 0) {
             player->inventory->nbFood--;
-            player->food_timer += 126;
-            send_player_inventory(zappy, player);
         }
+        player->last_food_check = current_time;
     }
 }
 
 /* This function checks if a player is dead from starvation */
 static bool is_player_dead(player_t *player)
 {
-    return (player->food_timer <= 0 && player->inventory->nbFood <= 0);
+    return (player->inventory->nbFood <= 0);
 }
 
 void remove_player_from_alive_teamate(zappy_t *zappy, player_t *player)

@@ -92,6 +92,7 @@ int add_fd_to_poll(unified_poll_t *poll_struct, int fd, short events);
 int remove_fd_from_poll(unified_poll_t *poll_struct, int fd);
 void rebuild_poll_fds(zappy_t *zappy);
 void poll_all_clients(zappy_t *zappy);
+void free_action_queue_pl(action_queue_t *queue);
 
 /* build_fds.c */
 void rebuild_poll_fds(zappy_t *zappy);
@@ -141,6 +142,12 @@ void *free_zappy(zappy_t *server);
 void *free_params(params_t *params);
 void *free_player(player_t *player);
 void free_map(map_t *map);
+
+/* free_server.c */
+void free_networkplayer(player_t *player);
+void free_players(player_t *player);
+void free_teams(team_t *teams);
+
 
 /* Function to send info to the gui */
 int send_map_size(zappy_t *server);
