@@ -11,7 +11,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #include <string.h>
+#include <sys/time.h>
 
 /* This sends the end message "ok" or "ko" and sets the cooldown of player */
 void execute_action(player_t *player, action_request_t *action, zappy_t *zappy)
@@ -20,17 +22,22 @@ void execute_action(player_t *player, action_request_t *action, zappy_t *zappy)
     int result = 0;
 
     if (!cmd_info) {
-        write_message(player->network->fd, "ko\n");
+        write_in_buffer(player->network->writingBuffer, "ko\n");
+        write_message(player->network);
         return;
     }
-    player->remaining_cooldown = action->time_limit;
-    if (cmd_info->base_time >= 42)
+    player->time_action = action->time_limit;
+    gettimeofday(&player->last_action_time, NULL);
+    if (cmd_info->base_time >= 0)
         player->is_busy = true;
     result = cmd_info->handler(player, action->command, zappy);
-    if (result == 0)
-        write_message(player->network->fd, "ok\n");
-    else if (result == -1)
-        write_message(player->network->fd, "ko\n");
+    if (result == 0) {
+        write_in_buffer(player->network->writingBuffer, "ok\n");
+        write_message(player->network);
+    } else if (result == -1) {
+        write_in_buffer(player->network->writingBuffer, "ko\n");
+        write_message(player->network);
+    }
 }
 
 /* This functions queue the actions and "lock" it tosafely acces memory */

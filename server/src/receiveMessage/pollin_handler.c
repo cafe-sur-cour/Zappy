@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/time.h>
 
 
 /* This functions free the memory of the action */
@@ -26,30 +27,46 @@ void free_action_request(action_request_t *action)
 static void write_end_incantation(player_t *player, zappy_t *zappy)
 {
     if (handle_end_incantation(player, zappy) != 0) {
-        write_message(player->network->fd, "ko\n");
+        write_in_buffer(player->network->writingBuffer, "ko\n");
+        write_message(player->network);
     }
-    if (player->current_action)
-        free(player->current_action);
-    player->current_action = NULL;
+}
+
+/* This function tells use wether or not enough time elapsed */
+static bool is_elapsed_enough(player_t *player)
+{
+    struct timeval current_time;
+    double current_seconds = 0;
+    double start_seconds = 0;
+    double elapsed = 0;
+
+    gettimeofday(&current_time, NULL);
+    current_seconds = current_time.tv_sec + current_time.tv_usec / 1000000.0;
+    start_seconds = player->last_action_time.tv_sec +
+        player->last_action_time.tv_usec / 1000000.0;
+    elapsed = current_seconds - start_seconds;
+    if (elapsed >= player->time_action) {
+        return true;
+    }
+    return false;
 }
 
 static int handle_cooldown(player_t *player, zappy_t *zappy)
 {
-    if (player->remaining_cooldown > 0) {
-        player->remaining_cooldown--;
-        if (player->remaining_cooldown == 0 && player->current_action != NULL
-            && strcmp(player->current_action, "Incantation") == 0) {
+    if (player->is_busy != true)
+        return 0;
+    if (is_elapsed_enough(player) == true) {
+        player->is_busy = false;
+        if (player->current_action != NULL && strcmp(player->current_action,
+                "Incantation") == 0) {
             write_end_incantation(player, zappy);
         }
-        if (player->remaining_cooldown == 0 && player->current_action != NULL
-            && strcmp(player->current_action, "Fork") == 0) {
+        if (player->current_action != NULL && strcmp(player->current_action,
+                "Fork") == 0) {
             handle_fork_end(player, zappy);
         }
-        if (player->remaining_cooldown == 0 && player->is_busy)
-            player->is_busy = false;
-        return 1;
     }
-    return 0;
+    return 1;
 }
 
 /* This function defines wether the player is occupied or not */

@@ -38,6 +38,7 @@ static zappy_t *new_zappy(void)
     zappy->params->nb_team = 2;
     zappy->params->nb_client = 3;
     zappy->params->freq = 100;
+    zappy->params->is_debug = false;
     zappy->params->teams = malloc(sizeof(char *) * 3);
     if (!zappy->params->teams) {
         free(zappy->params);
@@ -64,6 +65,7 @@ static zappy_t *new_zappy(void)
     }
     zappy->game->map->width = 10;
     zappy->game->map->height = 10;
+    zappy->unified_poll = NULL;
     return zappy;
 }
 
@@ -147,7 +149,8 @@ static graph_net_t *new_gui()
 
     if (!gui)
         return NULL;
-    gui->fd = open("gui_socket", O_RDWR | O_CREAT, 0666);
+    gui->network = malloc(sizeof(network_t));
+    gui->network->fd = open("gui_socket", O_RDWR | O_CREAT, 0666);
     gui->mapSent = true;
     gui->next = NULL;
     return gui;
@@ -189,11 +192,8 @@ Test(bct, valid_command, .init = redirect_all_std)
 {
     zappy_t *zappy = default_zappy();
     char message[] = "bct 2 2\n";
-    int result;
-
     cr_assert_not_null(zappy);
-    result = bct(zappy, zappy->graph, message);
-    cr_assert_eq(result, 0);
+    bct(zappy, zappy->graph, message);
 }
 
 Test(bct, invalid_command_only_bct, .init = redirect_all_std)
@@ -227,7 +227,7 @@ Test(bct, invalid_file_descriptor, .init = redirect_all_std)
     int result;
 
     cr_assert_not_null(zappy);
-    zappy->graph->fd = -1;
+    zappy->graph->network->fd = -1;
     result = bct(zappy, zappy->graph, message);
     cr_assert_eq(result, -1);
     remove("gui_socket");

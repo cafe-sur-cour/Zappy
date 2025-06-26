@@ -26,7 +26,8 @@ static int send_sst_message(graph_net_t *graphic, int time)
     char buffer[size];
 
     snprintf(buffer, size, "sst %d\n", time);
-    return write_message(graphic->fd, buffer);
+    write_in_buffer(graphic->network->writingBuffer, buffer);
+    return write_message(graphic->network);
 }
 
 int sst(zappy_t *zappy, graph_net_t *graphic, char *message)

@@ -23,8 +23,12 @@ static void send_end_incantation_to_all(zappy_t *zappy, int *player_list,
     for (int i = 0; i < nb_players; i++) {
         current_player = get_player_by_id(zappy->game, player_list[i]);
         if (current_player && current_player->network) {
-            write_message(current_player->network->fd, msg);
+            write_in_buffer(current_player->network->writingBuffer, msg);
+            write_message(current_player->network);
         }
+        if (current_player->current_action)
+            free(current_player->current_action);
+        current_player->current_action = NULL;
     }
 }
 

@@ -34,7 +34,7 @@ int send_player_inventory(zappy_t *zappy, player_t *p)
     graph_net_t *current = zappy->graph;
 
     if (message == NULL)
-        return -1;
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLenght, "pin #%d %d %d %d %d %d %d %d %d %d\n", p->id,
         p->posX, p->posY, p->inventory->nbFood, p->inventory->nbLinemate,
         p->inventory->nbDeraumere, p->inventory->nbSibur, p->inventory->
@@ -42,9 +42,9 @@ int send_player_inventory(zappy_t *zappy, player_t *p)
     if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", message);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1)
             return -1;
-        }
         current = current->next;
     }
     free(message);
@@ -58,15 +58,14 @@ int send_player_expelled(zappy_t *zappy, player_t *player)
     char *message = malloc(sizeof(char) * xLenght);
     graph_net_t *current = zappy->graph;
 
-    if (message == NULL) {
-        error_message("Failed to allocate memory for player expulsion.");
-        return -1;
-    }
+    if (message == NULL)
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLenght, "pex #%d\n", player->id);
     if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", message);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1) {
             free(message);
             return -1;
         }

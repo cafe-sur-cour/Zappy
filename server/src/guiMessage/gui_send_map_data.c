@@ -18,15 +18,15 @@ int write_map_message(int xLength, zappy_t *zappy,
     graph_net_t *current = zappy->graph;
 
     if (message == NULL)
-        return -1;
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLength, "bct %d %d %d %d %d %d %d %d %d\n",
-        pos[0], pos[1],
-        tiles[pos[0]][pos[1]].nbFood, tiles[pos[0]][pos[1]].nbLinemate,
-        tiles[pos[0]][pos[1]].nbDeraumere, tiles[pos[0]][pos[1]].nbSibur,
-        tiles[pos[0]][pos[1]].nbMendiane, tiles[pos[0]][pos[1]].nbPhiras,
-        tiles[pos[0]][pos[1]].nbThystame);
+        pos[0], pos[1], tiles[pos[0]][pos[1]].nbFood,
+        tiles[pos[0]][pos[1]].nbLinemate, tiles[pos[0]][pos[1]].nbDeraumere,
+        tiles[pos[0]][pos[1]].nbSibur, tiles[pos[0]][pos[1]].nbMendiane,
+        tiles[pos[0]][pos[1]].nbPhiras, tiles[pos[0]][pos[1]].nbThystame);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1) {
             free(message);
             return -1;
         }
@@ -44,7 +44,7 @@ int send_map_tile(inventory_t **tiles, zappy_t *server,
     int *pos = malloc(sizeof(int) * 2);
 
     if (pos == NULL)
-        return -1;
+        return return_error("Failed to allocate memory for string message.");
     xLength = int_str_len(posX) +
         int_str_len(posY) +
         int_str_len(tiles[posX][posY].nbFood) + int_str_len(tiles[posX][posY]
@@ -103,10 +103,11 @@ int send_map_size(zappy_t *server)
     graph_net_t *current = server->graph;
 
     if (message == NULL || x == NULL || y == NULL)
-        return -1;
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLenthth, "msz %s %s\n", x, y);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1) {
             free_elems(message, x, y);
             return -1;
         }

@@ -16,8 +16,8 @@ static void poll_graphics_clients(zappy_t *zappy)
     graph_net_t *graphic = zappy->graph;
 
     while (graphic) {
-        if (graphic->fd >= 0) {
-            add_fd_to_poll(zappy->unified_poll, graphic->fd, POLLIN);
+        if (graphic->network->fd >= 0) {
+            add_fd_to_poll(zappy->unified_poll, graphic->network->fd, POLLIN);
         }
         graphic = graphic->next;
     }

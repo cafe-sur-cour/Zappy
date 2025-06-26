@@ -28,7 +28,8 @@ static int send_message_to_graphics(char *message, zappy_t *zappy)
     graph_net_t *current = zappy->graph;
 
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1) {
             free(message);
             return -1;
         }
@@ -49,7 +50,7 @@ int send_start_incantation(zappy_t *zappy, player_t *player, int *player_list,
     int offset = 0;
 
     if (message == NULL || nb_player < 1)
-        return -1;
+        return return_error("Failed to allocate memory for string message.");
     offset = snprintf(message, xlenght, "pic %d %d %d",
         player->posX, player->posY, player->level);
     for (int i = 0; i < nb_player; i++)

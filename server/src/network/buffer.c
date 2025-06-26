@@ -7,6 +7,9 @@
 
 #include "buffer.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* This functions allows you to wrap arround in the buffer */
 int advance(int idx)
@@ -46,4 +49,33 @@ int cb_getline(buffer_t *cb, char *line, int max_len)
         }
     }
     return 0;
+}
+
+buffer_t *create_buffer(void)
+{
+    buffer_t *buffer = malloc(sizeof(buffer_t));
+
+    if (!buffer) {
+        printf("Failed to allocate memory for buffer.\n");
+        return NULL;
+    }
+    buffer->head = 0;
+    buffer->tail = 0;
+    buffer->full = 0;
+    return buffer;
+}
+
+int write_in_buffer(buffer_t *cb, const char *str)
+{
+    int count = 0;
+
+    if (!cb || !str)
+        return 0;
+    while (*str) {
+        cb_write(cb, *str);
+        str++;
+        count++;
+    }
+    print_buffer_state(cb, "WRITING");
+    return count;
 }

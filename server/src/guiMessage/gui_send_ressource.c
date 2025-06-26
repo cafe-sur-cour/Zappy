@@ -19,15 +19,14 @@ int send_ressource_droped(zappy_t *zappy, player_t *player,
     char *message = malloc(sizeof(char) * xLength);
     graph_net_t *current = zappy->graph;
 
-    if (message == NULL) {
-        error_message("Failed to allocate memory for resource drop message.");
-        return -1;
-    }
+    if (message == NULL)
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLength, "pdr #%d %d\n", player->id, ressourceType);
     if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", message);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1) {
             free(message);
             return -1;
         }
@@ -45,15 +44,14 @@ int send_ressource_collected(zappy_t *zappy, player_t *player,
     char *message = malloc(sizeof(char) * xLength);
     graph_net_t *current = zappy->graph;
 
-    if (message == NULL) {
-        error_message("Failed to allocate memory for resource collected.");
-        return -1;
-    }
+    if (message == NULL)
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLength, "pgt #%d %d\n", player->id, ressourceType);
     if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", message);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1) {
             free(message);
             return -1;
         }

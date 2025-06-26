@@ -5,9 +5,10 @@
 ** game
 */
 
-#include "buffer.h"
+#include "network.h"
 #include <time.h>
 #include <pthread.h>
+#include <sys/time.h>
 
 #ifndef GAME_H_
     #define GAME_H_
@@ -62,11 +63,6 @@ typedef struct egg_s {
     struct egg_s *next;
 } egg_t;
 
-/* Struct that "handles" the network element */
-typedef struct network_s {
-    int fd;
-    buffer_t *buffer;
-} network_t;
 
 /* Struct defining the inventory of tiles and players */
 typedef struct inventory_s {
@@ -99,9 +95,10 @@ typedef struct player_s {
     char *team;
     /* New aditions for the smart pollin */
     action_queue_t *pending_actions;
-    time_t last_action_time;
+    struct timeval last_action_time;
     bool is_busy;
-    int remaining_cooldown;
+    time_t remaining_cooldown;
+    float time_action;
     char *current_action;
     /* Food timer for health system */
     int food_timer;  /* Time units until next food consumption */
