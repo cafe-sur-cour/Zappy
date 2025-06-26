@@ -17,7 +17,8 @@ static int send_plv_message(graph_net_t *graphic, player_t *player)
     char buffer[size];
 
     snprintf(buffer, size, "plv #%d %d\n", player->id, player->level);
-    return write_message(graphic->fd, buffer);
+    write_in_buffer(graphic->network->writingBuffer, buffer);
+    return write_message(graphic->network);
 }
 
 int pld(zappy_t *zappy, graph_net_t *graphic, char *message)

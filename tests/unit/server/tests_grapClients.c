@@ -19,33 +19,6 @@ static void redirect_all_std(void)
     cr_redirect_stderr();
 }
 
-// Helper function to create a simple zappy structure for testing
-static zappy_t *create_test_zappy(void)
-{
-    zappy_t *zappy = malloc(sizeof(zappy_t));
-    if (!zappy) return NULL;
-    
-    zappy->graph = NULL;
-    zappy->game = NULL;
-    zappy->network = NULL;
-    zappy->params = NULL;
-    return zappy;
-}
-
-// Helper function to free test zappy
-static void free_test_zappy(zappy_t *zappy)
-{
-    if (zappy) {
-        // Free any remaining graph nodes
-        graph_net_t *current = zappy->graph;
-        while (current) {
-            graph_net_t *next = current->next;
-            free(current);
-            current = next;
-        }
-        free(zappy);
-    }
-}
 
 // Test suite for add_graph_node function
 Test(graphic_client, add_graph_node_normal_case, .init = redirect_all_std)
@@ -54,9 +27,10 @@ Test(graphic_client, add_graph_node_normal_case, .init = redirect_all_std)
     int test_fd = 42;
     
     graph_net_t *result = add_graph_node(&head, test_fd);
-    
+
+
     cr_assert_not_null(result, "add_graph_node should return valid node");
-    cr_assert_eq(result->fd, test_fd, "Node should have correct fd");
+    cr_assert_eq(result->network->fd, test_fd, "Node should have correct fd");
     cr_assert_eq(result->mapSent, false, "mapSent should be initialized to false");
     cr_assert_eq(head, result, "Head should point to new node");
     cr_assert_null(result->next, "New node's next should be NULL for first node");
@@ -94,7 +68,7 @@ Test(graphic_client, remove_graph_node_existing_node, .init = redirect_all_std)
     
     cr_assert_null(removed, "remove_graph_node returns NULL (implementation detail)");
     // Verify the list structure is maintained
-    cr_assert_eq(head->fd, 3, "Head should still be node3");
+    cr_assert_eq(head->network->fd, 3, "Head should still be node3");
     
     free(node1);
     free(node2);
@@ -150,7 +124,7 @@ Test(graphic_client, add_and_remove_integration, .init = redirect_all_std)
     add_graph_node(&head, 3);
     
     cr_assert_not_null(head, "Head should not be NULL after additions");
-    cr_assert_eq(head->fd, 3, "Head should be the last added node");
+    cr_assert_eq(head->network->fd, 3, "Head should be the last added node");
     
     // Remove a node
     remove_graph_node(&head, 2);
@@ -174,7 +148,7 @@ Test(graphic_client, graph_node_initialization, .init = redirect_all_std)
     graph_net_t *node = add_graph_node(&head, test_fd);
     
     cr_assert_not_null(node, "Node should be created");
-    cr_assert_eq(node->fd, test_fd, "FD should be set correctly");
+    cr_assert_eq(node->network->fd, test_fd, "FD should be set correctly");
     cr_assert_eq(node->mapSent, false, "mapSent should be false initially");
     cr_assert_eq(node->next, NULL, "next should be NULL for single node");
     

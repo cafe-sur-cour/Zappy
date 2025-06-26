@@ -44,7 +44,8 @@ static void kill_player(zappy_t *zappy, player_t *player)
     player_t *current = NULL;
     team_t *team = get_team_by_name(zappy->game, player->team);
 
-    write_message(player->network->fd, "dead\n");
+    write_in_buffer(player->network->writingBuffer, "dead\n");
+    write_message(player->network);
     remove_player_from_teamate(zappy, player);
     send_player_death(zappy, player);
     if (team->players == player) {

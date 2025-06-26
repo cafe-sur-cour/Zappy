@@ -23,7 +23,8 @@ int msz(zappy_t *zappy, graph_net_t *graphic, char *message)
         return -1;
     }
     snprintf(buffer, size, "msz %d %d\n", x, y);
-    if (write_message(graphic->fd, buffer) == -1)
+    write_in_buffer(graphic->network->writingBuffer, buffer);
+    if (write_message(graphic->network) == -1)
         return -1;
     return 0;
 }

@@ -18,15 +18,14 @@ int send_player_death(zappy_t *zappy, player_t *player)
     char *message = malloc(sizeof(char) * xLength);
     graph_net_t *current = zappy->graph;
 
-    if (message == NULL) {
-        error_message("Failed to allocate memory for player death message.");
-        return -1;
-    }
+    if (message == NULL)
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLength, "pdi #%d\n", player->id);
     if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", message);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1) {
             free(message);
             return -1;
         }

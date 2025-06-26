@@ -41,7 +41,8 @@ static int move_player(player_t *player, zappy_t *zappy, direction_t direction)
         player->posX--;
     apply_torus_world(player, zappy);
     snprintf(buffer, size + 1, "eject: %d\n", (int)direction);
-    if (write_message(player->network->fd, buffer) == -1)
+    write_in_buffer(player->network->writingBuffer, buffer);
+    if (write_message(player->network) == -1)
         return -1;
     return 0;
 }

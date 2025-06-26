@@ -4,7 +4,7 @@
             "name": "Server: Valid arguments",
             "description": "Testing with correct values in each fields",
             "input": {
-                "program": ["./zappy_server", "-p", "4242", "-x", "100", "-y", "100", "-n", "team1", "team2", "-c", "6", "-f", "10"],
+                "program": ["./zappy_server", "-p", "6262", "-x", "100", "-y", "100", "-n", "team1", "team2", "-c", "6", "-f", "10"],
                 "succeed_after": 1
             },
             "expected_output": "ANYTHING",

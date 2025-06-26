@@ -7,9 +7,22 @@
 
 #include <unistd.h>
 
-void close_fd(int fd)
+#include "network.h"
+
+void close_server(server_t *server)
 {
-    if (fd < 0)
+    if (!server)
         return;
-    close(fd);
+    if (server->sockfd < 0)
+        return;
+    close(server->sockfd);
+}
+
+void close_client(network_t *network)
+{
+    if (!network)
+        return;
+    if (network->fd < 0)
+        return;
+    close(network->fd);
 }

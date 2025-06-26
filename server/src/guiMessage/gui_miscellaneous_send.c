@@ -19,17 +19,16 @@ int send_end_game(zappy_t *zappy, const char *teamName)
     char *message = malloc(sizeof(char) * xLength);
     graph_net_t *graph = zappy->graph;
 
-    if (message == NULL) {
-        error_message("Failed to allocate memory for end game message.");
-        return -1;
-    }
+    if (message == NULL)
+        return return_error("Failed to allocate memory for end game message.");
     snprintf(message, xLength, "seg %s\n", teamName);
     if (zappy->params->is_debug)
         printf("Sending end game message: %s", message);
     while (graph != NULL) {
-        if (write_message(graph->fd, message) == -1) {
+        write_in_buffer(graph->network->writingBuffer, message);
+        if (write_message(graph->network) == -1) {
             free(message);
-            return -1;
+            return return_error("Failed to write end game message.");
         }
         graph = graph->next;
     }
@@ -44,17 +43,16 @@ int send_str_message(zappy_t *zappy, const char *message)
     char *formatted_message = malloc(sizeof(char) * xLength);
     graph_net_t *current = zappy->graph;
 
-    if (formatted_message == NULL) {
-        error_message("Failed to allocate memory for string message.");
-        return -1;
-    }
+    if (formatted_message == NULL)
+        return return_error("Failed to allocate memory for string message.");
     snprintf(formatted_message, xLength, "smg %s\n", message);
     if (zappy->params->is_debug)
         printf("Sending string message: %s", formatted_message);
     while (current != NULL) {
-        if (write_message(current->fd, formatted_message) == -1) {
+        write_in_buffer(current->network->writingBuffer, formatted_message);
+        if (write_message(current->network) == -1) {
             free(formatted_message);
-            return -1;
+            return return_error("Failed to write end game message.");
         }
         current = current->next;
     }
@@ -71,8 +69,9 @@ int send_unknown_command(zappy_t *zappy)
     if (zappy->params->is_debug)
         printf("Sending unknown command message: %s", message);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1)
-            return -1;
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1)
+            return return_error("Failed to write end game message.");
         current = current->next;
     }
     return 0;
@@ -87,8 +86,9 @@ int send_command_parameter(zappy_t *zappy)
     if (zappy->params->is_debug)
         printf("Sending command parameter message: %s", message);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
-            return -1;
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1) {
+            return return_error("Failed to write end game message.");
         }
         current = current->next;
     }

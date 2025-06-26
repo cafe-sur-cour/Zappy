@@ -37,7 +37,6 @@ TESTS 	    =   tests_accept.c						\
 				tests_mct.c							\
 				tests_messaggeReception.c			\
 				tests_msz.c							\
-				tests_network.c						\
 				tests_params.c						\
 				tests_pin.c							\
 				tests_plv.c							\
@@ -52,8 +51,11 @@ TESTS 	    =   tests_accept.c						\
 				tests_eject.c						\
 				tests_map_init.c					\
 				tests_kil.c							\
-				tests_message_handlers.c
-#  tests_broadcast.c					\
+				tests_network.c						\
+				tests_broadcast.c					\
+				tests_message_handlers.c			\
+				tests_pollfds.c
+
 
 SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/algo.c									\
@@ -70,6 +72,7 @@ SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/signal.c								\
 				../../../server/src/game/client.c							\
 				../../../server/src/game/game.c								\
+				../../../server/src/game/init_map.c							\
 				../../../server/src/game/graphic_client.c					\
 				../../../server/src/game/handle_crystal.c 					\
 				../../../server/src/game/handle_food.c						\
@@ -86,7 +89,6 @@ SRC 		=	../../../server/src/accept.c								\
 				../../../server/src/network/create_server.c					\
 				../../../server/src/network/hanlde_input.c					\
 				../../../server/src/network/print_error.c					\
-				../../../server/src/network/queue.c							\
 				../../../server/src/network/send_message.c					\
 				../../../server/src/guiMessage/gui_miscellaneous_send.c		\
 				../../../server/src/guiMessage/gui_send_boradcast.c			\

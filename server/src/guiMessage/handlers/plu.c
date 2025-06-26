@@ -17,7 +17,8 @@ static int send_plv_message(graph_net_t *graphic, player_t *player)
     char buffer[size];
 
     snprintf(buffer, size, "plv #%d %d\n", player->id, player->level);
-    return write_message(graphic->fd, buffer);
+    write_in_buffer(graphic->network->writingBuffer, buffer);
+    return write_message(graphic->network);
 }
 
 static void increase_player_from_button(player_t *player, zappy_t *zappy)
@@ -31,7 +32,8 @@ static void increase_player_from_button(player_t *player, zappy_t *zappy)
         send_player_level(zappy, player);
     }
     snprintf(msg, 19, "Current level: %d\n", player->level);
-    write_message(player->network->fd, msg);
+    write_in_buffer(player->network->writingBuffer, msg);
+    write_message(player->network);
 }
 
 /* Send okay to the player */

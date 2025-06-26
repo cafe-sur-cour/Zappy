@@ -22,15 +22,15 @@ int send_egg(zappy_t *zappy, egg_t *egg)
     graph_net_t *currentGraph = zappy->graph;
 
     if (message == NULL)
-        return -1;
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLength, "enw #%d #%d %d %d\n", current->id,
         current->idLayer, current->posX, current->posY);
     if (zappy->params->is_debug == true)
         printf("Sending egg: %s", message);
     while (currentGraph != NULL) {
-        if (write_message(currentGraph->fd, message) == -1) {
+        write_in_buffer(currentGraph->network->writingBuffer, message);
+        if (write_message(currentGraph->network) == -1)
             return -1;
-        }
         currentGraph = currentGraph->next;
     }
     free(message);
@@ -57,15 +57,14 @@ int send_player_laying_egg(zappy_t *zappy, player_t *player)
     char *message = malloc(sizeof(char) * xLenght);
     graph_net_t *current = zappy->graph;
 
-    if (message == NULL) {
-        error_message("Failed to allocate memory for player laying egg.");
-        return -1;
-    }
+    if (message == NULL)
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLenght, "pfk #%d\n", player->id);
     if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", message);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1) {
             free(message);
             return -1;
         }

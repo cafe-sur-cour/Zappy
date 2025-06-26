@@ -13,18 +13,18 @@
 #include "network.h"
 
 /* Use the length name to create the buffer */
-static int create_buffer(const char *team_name, zappy_t *server)
+static int create_buffer_length(const char *team_name, zappy_t *server)
 {
     int xLength = strlen(team_name) + 6;
     char *message = malloc(sizeof(char) * (xLength));
     graph_net_t *current = server->graph;
 
-    if (message == NULL) {
-        return -1;
-    }
+    if (message == NULL)
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLength, "tna %s\n", team_name);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1)
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1)
             return -1;
         current = current->next;
     }
@@ -38,7 +38,7 @@ int send_team_name(zappy_t *server)
     for (int i = 0; i < server->params->nb_team; i++) {
         if (server->params->teams[i] == NULL)
             continue;
-        if (create_buffer(server->params->teams[i], server) == -1)
+        if (create_buffer_length(server->params->teams[i], server) == -1)
             return -1;
     }
     return 0;

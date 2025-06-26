@@ -18,15 +18,14 @@ int send_egg_death(zappy_t *zappy, egg_t *egg)
     char *message = malloc(sizeof(char) * xlenght);
     graph_net_t *current = zappy->graph;
 
-    if (message == NULL) {
-        error_message("Failed to allocate memory for egg death message.");
-        return -1;
-    }
+    if (message == NULL)
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xlenght, "edi #%d\n", egg->id);
     if (zappy->params->is_debug)
         printf("Sending egg death: %s", message);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1) {
             free(message);
             return -1;
         }

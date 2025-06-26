@@ -10,6 +10,7 @@
 #include <netinet/in.h>
 #include <stdio.h>
 
+#include "network.h"
 
 int set_socket(void)
 {
@@ -28,26 +29,26 @@ int set_socket(void)
     return sockfd;
 }
 
-int bind_socket(int fd, int port)
+int bind_socket(server_t *server)
 {
-    struct sockaddr_in address;
+    struct sockaddr_in adr;
 
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(port);
-    if (bind(fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
+    adr.sin_family = AF_INET;
+    adr.sin_addr.s_addr = INADDR_ANY;
+    adr.sin_port = htons(server->port);
+    if (bind(server->sockfd, (struct sockaddr *)&adr, sizeof(adr)) < 0) {
         perror("Bind failed");
-        close(fd);
+        close(server->sockfd);
         return -1;
     }
     return 0;
 }
 
-int listen_socket(int fd, int backlog)
+int listen_socket(server_t *server)
 {
-    if (listen(fd, backlog) < 0) {
+    if (listen(server->sockfd, server->backlog) < 0) {
         perror("Listen failed");
-        close(fd);
+        close(server->sockfd);
         return -1;
     }
     return 0;

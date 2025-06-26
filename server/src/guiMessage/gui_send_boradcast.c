@@ -20,17 +20,16 @@ int send_broadcast_to_player(zappy_t *zappy, player_t *player,
     char *formatted_message = malloc(sizeof(char) * xLength);
     graph_net_t *current = zappy->graph;
 
-    if (formatted_message == NULL) {
-        error_message("Failed to allocate memory for broadcast message.");
-        return -1;
-    }
+    if (formatted_message == NULL)
+        return return_error("Failed to allocate memory for message.");
     snprintf(formatted_message, xLength, "pbc #%d %s\n", player->id, message);
     if (zappy->params->is_debug == true)
         printf("Sending to GUI: %s", formatted_message);
     while (current != NULL) {
-        if (write_message(current->fd, formatted_message) == -1) {
+        write_in_buffer(current->network->writingBuffer, formatted_message);
+        if (write_message(current->network) == -1) {
             free(formatted_message);
-            return -1;
+            return return_error("Failed to write end game message.");
         }
         current = current->next;
     }

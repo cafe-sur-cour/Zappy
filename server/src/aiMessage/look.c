@@ -105,8 +105,10 @@ static char *process_tile(char *message, player_t *player, zappy_t *zappy,
     return message;
 }
 
-static char *finalize_message(char *message)
+static char *finalize_message(char *message, int *tiles)
 {
+    if (tiles != NULL)
+        free(tiles);
     if (message == NULL)
         return NULL;
     if (strlen(message) > 1 && message[strlen(message) - 1] == ',') {
@@ -139,7 +141,7 @@ char *look_up(player_t *player, zappy_t *zappy)
             return NULL;
         }
     }
-    return finalize_message(message);
+    return finalize_message(message, tiles);
 }
 
 /* This is the function that handle the mov in the array of function */
@@ -152,7 +154,8 @@ int handle_look(player_t *player, char *command, zappy_t *zappy)
         error_message("Failed to create look message.");
         return -1;
     }
-    if (write_message(player->network->fd, message) == -1) {
+    write_in_buffer(player->network->writingBuffer, message);
+    if (write_message(player->network) == -1) {
         free(message);
         return -1;
     }
