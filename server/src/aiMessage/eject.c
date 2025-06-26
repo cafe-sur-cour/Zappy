@@ -113,7 +113,8 @@ static int loop_thru_eggs(player_t *ejectman, zappy_t *zappy)
         if (ejectman->posX == save->posX && ejectman->posY == save->posY) {
             destroy_egg(save, ejectman);
             send_egg_death(zappy, save);
-            kil_egg_node(&save, save->id);
+            zappy->game->map->currentEggs = kil_egg_node(
+                &zappy->game->map->currentEggs, save->id);
             result++;
         }
         save = save->next;
