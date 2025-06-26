@@ -41,7 +41,8 @@ class App:
             self.logger.info(f"Received signal {signum}, shutting down AI team {self.name}...")
             self._cleanup_children()
             self.running = False
-            self.mainPlayer.communication.stopLoop()
+            if self.mainPlayer is not None:
+                self.mainPlayer.communication.stopLoop()
 
     def _wait_for_children(self):
         if not self.is_main_process:
