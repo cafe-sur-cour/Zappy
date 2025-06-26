@@ -105,7 +105,8 @@ static player_t *create_test_player(int id, int x, int y, direction_t dir, int f
         return NULL;
     }
     player->network->fd = fd;
-    player->network->buffer = NULL;
+    player->network->writingBuffer = malloc(sizeof(buffer_t));
+    player->network->readingBuffer = malloc(sizeof(buffer_t));
     
     player->inventory = malloc(sizeof(inventory_t));
     if (!player->inventory) {

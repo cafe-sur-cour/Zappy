@@ -99,13 +99,14 @@ static player_t *malloc_player(void)
         free(player);
         return NULL;
     }
-    player->network->buffer = malloc(sizeof(buffer_t));
-    if (!player->network->buffer) {
+    player->network->readingBuffer = malloc(sizeof(buffer_t));
+    player->network->writingBuffer = malloc(sizeof(buffer_t));
+    if (!player->network->readingBuffer || !player->network->writingBuffer) {
         error_message("Failed to allocate memory for player buffer.");
-        free(player->network);
-        free(player);
         return NULL;
     }
+    memset(player->network->readingBuffer, 0, sizeof(buffer_t));
+    memset(player->network->writingBuffer, 0, sizeof(buffer_t));
     return player;
 }
 
@@ -141,7 +142,8 @@ static player_t *init_player(int fd, zappy_t *zappy)
     player->direction = (direction_t)(rand() % 4 + 1);
     player->inventory = init_inventory();
     player->pending_actions = init_action_queue();
-    player->last_action_time = 0;
+    gettimeofday(&player->last_action_time, NULL);
+    player->time_action = 0;
     player->is_busy = false;
     player->current_action = NULL;
     player->remaining_cooldown = 0;

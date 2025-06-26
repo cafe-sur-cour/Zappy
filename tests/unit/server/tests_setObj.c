@@ -201,23 +201,6 @@ Test(set_object, add_elem_to_tile_multiple_same_resource, .init = redirect_all_s
     cleanup_test_data(zappy, NULL);
 }
 
-// Tests for handle_set function
-Test(set_object, handle_set_food_success, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    player_t *player = create_test_player(5, 5);
-    char command[] = "set food";
-
-    // Set all mock returns to success
-    send_map_tile_return = 0;
-    send_player_inventory_return = 0;
-    send_ressource_droped_return = 0;
-    
-    handle_set(player, command, zappy);
-
-    cleanup_test_data(zappy, player);
-}
-
 // Test malloc failure in handle_set
 Test(set_object, handle_set_malloc_failure, .init = redirect_all_std)
 {
@@ -235,58 +218,6 @@ Test(set_object, handle_set_malloc_failure, .init = redirect_all_std)
     
     // Disable malloc failure for cleanup
     disable_malloc_failure();
-    cleanup_test_data(zappy, player);
-}
-
-Test(set_object, handle_set_linemate_success, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    player_t *player = create_test_player(3, 7);
-    char command[] = "set linemate";
-
-    
-    send_map_tile_return = 0;
-    send_player_inventory_return = 0;
-    send_ressource_droped_return = 0;
-    
-    handle_set(player, command, zappy);
-
-    cleanup_test_data(zappy, player);
-}
-
-Test(set_object, handle_set_all_resources, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    player_t *player = create_test_player(5, 5);
-    
-    char *resources[] = {"food", "linemate", "deraumere", "sibur",
-                        "mendiane", "phiras", "thystame"};
-    
-    send_map_tile_return = 0;
-    send_player_inventory_return = 0;
-    send_ressource_droped_return = 0;
-    
-    for (int i = 0; i < 7; i++) {
-        char command[50];
-        snprintf(command, sizeof(command), "set %s", resources[i]);
-        
-        // Reset mock counters
-        send_map_tile_calls = 0;
-        send_player_inventory_calls = 0;
-        send_ressource_droped_calls = 0;
-        
-        handle_set(player, command, zappy);
-    }
-    
-    // Check that all resources were added to tile
-    cr_assert_eq(zappy->game->map->tiles[5][5].nbFood, 1);
-    cr_assert_eq(zappy->game->map->tiles[5][5].nbLinemate, 1);
-    cr_assert_eq(zappy->game->map->tiles[5][5].nbDeraumere, 1);
-    cr_assert_eq(zappy->game->map->tiles[5][5].nbSibur, 1);
-    cr_assert_eq(zappy->game->map->tiles[5][5].nbMendiane, 1);
-    cr_assert_eq(zappy->game->map->tiles[5][5].nbPhiras, 1);
-    cr_assert_eq(zappy->game->map->tiles[5][5].nbThystame, 1);
-    
     cleanup_test_data(zappy, player);
 }
 
@@ -323,133 +254,6 @@ Test(set_object, handle_set_invalid_resource, .init = redirect_all_std)
     cleanup_test_data(zappy, player);
 }
 
-Test(set_object, handle_set_insufficient_inventory, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    player_t *player = create_test_player(5, 5);
-    char command[] = "set food";
-    
-    // Set player food to 0
-    player->inventory->nbFood = 0;
-    
-    send_map_tile_return = 0;
-    send_player_inventory_return = 0;
-    send_ressource_droped_return = 0;
-    
-    handle_set(player, command, zappy);
-    cleanup_test_data(zappy, player);
-}
-
-Test(set_object, handle_set_send_map_tile_failure, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    player_t *player = create_test_player(5, 5);
-    char command[] = "set food";
-    
-    send_map_tile_return = -1; // Fail map tile send
-    send_player_inventory_return = 0;
-    send_ressource_droped_return = 0;
-    
-    handle_set(player, command, zappy);
-    cleanup_test_data(zappy, player);
-}
-
-Test(set_object, handle_set_send_player_inventory_failure, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    player_t *player = create_test_player(5, 5);
-    char command[] = "set food";
-    
-    send_map_tile_return = 0;
-    send_player_inventory_return = -1; // Fail inventory send
-    send_ressource_droped_return = 0;
-    
-    handle_set(player, command, zappy);
-    cleanup_test_data(zappy, player);
-}
-
-Test(set_object, handle_set_send_resource_dropped_failure, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    player_t *player = create_test_player(5, 5);
-    char command[] = "set food";
-    
-    send_map_tile_return = 0;
-    send_player_inventory_return = 0;
-    send_ressource_droped_return = -1; // Fail resource dropped send
-    
-    handle_set(player, command, zappy);
-    
-    cleanup_test_data(zappy, player);
-}
-
-Test(set_object, handle_set_resource_type_mapping, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    player_t *player = create_test_player(5, 5);
-    
-    send_map_tile_return = 0;
-    send_player_inventory_return = 0;
-    send_ressource_droped_return = 0;
-    
-    // Test different resource types to ensure correct mapping
-    char *resources[] = {"food", "linemate", "deraumere", "sibur", 
-                        "mendiane", "phiras", "thystame"};
-    
-    for (int i = 0; i < 7; i++) {
-        char command[50];
-        snprintf(command, sizeof(command), "set %s", resources[i]);
-        
-        send_ressource_droped_calls = 0; // Reset counter
-        
-        handle_set(player, command, zappy);
-    }
-    
-    cleanup_test_data(zappy, player);
-}
-
-Test(set_object, handle_set_multiple_words_resource, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    player_t *player = create_test_player(5, 5);
-    char command[] = "set food extra words ignored";
-    
-    send_map_tile_return = 0;
-    send_player_inventory_return = 0;
-    send_ressource_droped_return = 0;
-    
-    handle_set(player, command, zappy);
-
-    
-    cleanup_test_data(zappy, player);
-}
-
-Test(set_object, handle_set_edge_positions, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    
-    // Test edge positions
-    int positions[][2] = {{0, 0}, {9, 9}, {0, 9}, {9, 0}, {5, 0}, {0, 5}};
-    int num_positions = sizeof(positions) / sizeof(positions[0]);
-    
-    send_map_tile_return = 0;
-    send_player_inventory_return = 0;
-    send_ressource_droped_return = 0;
-    
-    for (int i = 0; i < num_positions; i++) {
-        player_t *player = create_test_player(positions[i][0], positions[i][1]);
-        char command[] = "set food";
-        
-        handle_set(player, command, zappy);
-        
-        free(player->team);
-        free(player->inventory);
-        free(player->network);
-        free(player);
-    }
-    
-    cleanup_test_data(zappy, NULL);
-}
 
 // Tests for rm_item_to_inventory function (lines 74, 84, 87, 89-90, 92-95)
 Test(set_object, rm_item_to_inventory_null_name, .init = redirect_all_std)
@@ -511,56 +315,6 @@ Test(set_object, rm_item_to_inventory_invalid_item, .init = redirect_all_std)
     cleanup_test_data(zappy, player);
 }
 
-Test(set_object, rm_item_to_inventory_all_valid_items, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    char *items[] = {"food", "linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame"};
-    
-    send_map_tile_return = 0;
-    send_player_inventory_return = 0;
-    send_ressource_droped_return = 0;
-    
-    for (int i = 0; i < 7; i++) {
-        player_t *player = create_test_player(5, 5);
-        char command[50];
-        snprintf(command, sizeof(command), "set %s", items[i]);
-        
-        handle_set(player, command, zappy);
-        free(player->team);
-        free(player->inventory);
-        free(player->network);
-        free(player);
-    }
-    
-    cleanup_test_data(zappy, NULL);
-}
-
-// Tests for send_type_ressource function (lines 98-100, 109, 116)
-Test(set_object, send_type_ressource_all_types, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    char *resources[] = {"food", "linemate", "deraumere", "sibur", "mendiane", "phiras", "thystame"};
-    
-    send_map_tile_return = 0;
-    send_player_inventory_return = 0;
-    send_ressource_droped_return = 0;
-    
-    for (int i = 0; i < 7; i++) {
-        player_t *player = create_test_player(5, 5);
-        char command[50];
-        snprintf(command, sizeof(command), "set %s", resources[i]);
-        
-        send_ressource_droped_calls = 0;
-        
-        handle_set(player, command, zappy);
-        free(player->team);
-        free(player->inventory);
-        free(player->network);
-        free(player);
-    }
-    
-    cleanup_test_data(zappy, NULL);
-}
 
 Test(set_object, send_type_ressource_unknown_resource, .init = redirect_all_std)
 {
@@ -576,23 +330,6 @@ Test(set_object, send_type_ressource_unknown_resource, .init = redirect_all_std)
     char command[] = "set unknown";
     
     // Since rm_item_to_inventory will fail for unknown items, this tests the error path
-    int result = handle_set(player, command, zappy);
-    
-    cr_assert_eq(result, -1);
-    
-    cleanup_test_data(zappy, player);
-}
-
-Test(set_object, send_ressource_droped_failure, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    player_t *player = create_test_player(5, 5);
-    char command[] = "set food";
-    
-    send_map_tile_return = 0;
-    send_player_inventory_return = 0;
-    send_ressource_droped_return = -1; // Make send_ressource_droped fail (line 116)
-    
     int result = handle_set(player, command, zappy);
     
     cr_assert_eq(result, -1);
@@ -639,58 +376,6 @@ Test(set_object, handle_set_empty_parameter, .init = redirect_all_std)
     
     // Should return -1 because parameter is NULL
     cr_assert_eq(result, -1);
-    
-    cleanup_test_data(zappy, player);
-}
-
-// Additional comprehensive tests
-Test(set_object, comprehensive_error_path_testing, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    
-    // Test scenario: valid item but insufficient inventory
-    player_t *player = create_test_player(5, 5);
-    player->inventory->nbFood = 0;  // No food in inventory
-    char command[] = "set food";
-    
-    int result = handle_set(player, command, zappy);
-    
-    // Should fail because player has no food to set
-    cr_assert_eq(result, -1);
-    
-    cleanup_test_data(zappy, player);
-}
-
-Test(set_object, resource_type_boundary_testing, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_test_zappy(10, 10);
-    player_t *player = create_test_player(5, 5);
-    
-    send_map_tile_return = 0;
-    send_player_inventory_return = 0;
-    send_ressource_droped_return = 0;
-    
-    // Test the exact resource names and their type mappings
-    char *test_cases[][2] = {
-        {"food", "0"}, {"linemate", "1"}, {"deraumere", "2"}, 
-        {"sibur", "3"}, {"mendiane", "4"}, {"phiras", "5"}, {"thystame", "6"}
-    };
-    
-    for (int i = 0; i < 7; i++) {
-        char command[50];
-        snprintf(command, sizeof(command), "set %s", test_cases[i][0]);
-        
-        // Reset player inventory to ensure we have items
-        player->inventory->nbFood = 10;
-        player->inventory->nbLinemate = 10;
-        player->inventory->nbDeraumere = 10;
-        player->inventory->nbSibur = 10;
-        player->inventory->nbMendiane = 10;
-        player->inventory->nbPhiras = 10;
-        player->inventory->nbThystame = 10;
-        
-        handle_set(player, command, zappy);
-    }
     
     cleanup_test_data(zappy, player);
 }

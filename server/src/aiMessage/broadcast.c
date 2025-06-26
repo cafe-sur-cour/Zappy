@@ -95,8 +95,8 @@ int broadcast_text(player_t *source, player_t *dest, char *text,
         return -1;
     snprintf(message, dir[2] + 1, "message %d, %s\n", dir[1], text);
     message[dir[2]] = '\0';
-    if (write_message(dest->network->fd, message) == -1) {
-        free(message);
+    write_in_buffer(dest->network->writingBuffer, message);
+    if (write_message(dest->network) == -1) {
         return -1;
     }
     print_broadcast_server(source, dest, dir[1]);
@@ -155,7 +155,8 @@ int handle_broadcast(player_t *player, char *command, zappy_t *zappy)
 
     if (loop_thru_teams(player, zappy, text) == -1)
         return -1;
-    if (write_message(player->network->fd, "ok\n") == -1)
+    write_in_buffer(player->network->writingBuffer, "ok\n");
+    if (write_message(player->network) == -1)
         return -1;
     if (send_broadcast_to_player(zappy, player, text) == -1)
         return -1;

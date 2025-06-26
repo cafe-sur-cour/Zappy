@@ -32,8 +32,10 @@ static void free_players(player_t *player)
     if (player->inventory)
         free(player->inventory);
     if (player->network) {
-        if (player->network->buffer)
-            free(player->network->buffer);
+        if (player->network->readingBuffer)
+            free(player->network->readingBuffer);
+        if (player->network->writingBuffer)
+            free(player->network->writingBuffer);
         free(player->network);
     }
     free(player);

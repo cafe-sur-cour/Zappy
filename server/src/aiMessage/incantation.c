@@ -132,7 +132,8 @@ static void send_elevation_uder_way_to_all(zappy_t *zappy, int *player_list,
     for (int i = 0; i < nb_players; i++) {
         player = get_player_by_id(zappy->game, player_list[i]);
         if (player && player->network) {
-            write_message(player->network->fd, message);
+            write_in_buffer(player->network->writingBuffer, message);
+            write_message(player->network);
         }
     }
 }

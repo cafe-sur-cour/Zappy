@@ -36,7 +36,23 @@ void error_message(char const *message)
     printf("\033[0;31m%s\033[0m\t\033[1;31m%s\033[0m\n", time_str, message);
 }
 
+int return_error(char const *message)
+{
+    error_message(message);
+    return -1;
+}
+
 void valid_message(char const *message)
+{
+    time_t now = time(NULL);
+    struct tm *tm_info = localtime(&now);
+    char time_str[26];
+
+    strftime(time_str, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+    printf("\033[0;32m%s\033[0m\t\033[1;29m%s\033[0m\n", time_str, message);
+}
+
+void other_message(char const *message)
 {
     time_t now = time(NULL);
     struct tm *tm_info = localtime(&now);

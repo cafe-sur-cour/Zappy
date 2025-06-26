@@ -36,7 +36,8 @@ static zappy_t *create_mock_zappy(void)
     zappy->params->teams[0] = strdup("team1");
     zappy->params->teams[1] = strdup("team2");
     
-    zappy->graph->fd = -1;
+    zappy->graph->network = malloc(sizeof(network_t));
+    zappy->graph->network->fd = -1;
     zappy->game->map->currentEggs = NULL;
     
     return zappy;
@@ -82,7 +83,7 @@ Test(process_new_client, graphic_client_success, .init = redirect_all_std)
     bool result = process_new_client("GRAPHIC", fd, zappy);
     
     cr_assert_eq(result, true);
-    cr_assert_eq(zappy->graph->fd, fd);
+    cr_assert_eq(zappy->graph->network->fd, fd);
     
     free_mock_zappy(zappy);
 }
@@ -90,7 +91,7 @@ Test(process_new_client, graphic_client_success, .init = redirect_all_std)
 Test(process_new_client, graphic_client_already_connected, .init = redirect_all_std)
 {
     zappy_t *zappy = create_mock_zappy();
-    zappy->graph->fd = 10; // Already connected
+    zappy->graph->network->fd = 10; // Already connected
     int fd = 42;
     
     cr_redirect_stderr();
@@ -154,7 +155,7 @@ Test(add_client_to_team, successful_addition_to_team, .init = redirect_all_std)
     if (team->players) {
         free(team->players->team);
         free(team->players->inventory);
-        free(team->players->network->buffer);
+        free(team->players->network->writingBuffer);
         free(team->players->network);
         free(team->players);
     }
@@ -220,7 +221,7 @@ Test(add_client_to_team, player_with_available_egg, .init = redirect_all_std)
     if (team->players) {
         free(team->players->team);
         free(team->players->inventory);
-        free(team->players->network->buffer);
+        free(team->players->network->readingBuffer);
         free(team->players->network);
         free(team->players);
     }
@@ -253,7 +254,7 @@ Test(add_client_to_team, player_with_hatched_egg, .init = redirect_all_std)
     if (team->players) {
         free(team->players->team);
         free(team->players->inventory);
-        free(team->players->network->buffer);
+        free(team->players->network->readingBuffer);
         free(team->players->network);
         free(team->players);
     }
@@ -288,7 +289,7 @@ Test(add_client_to_team, player_inventory_initialized, .init = redirect_all_std)
     if (team->players) {
         free(team->players->team);
         free(team->players->inventory);
-        free(team->players->network->buffer);
+        free(team->players->network->readingBuffer);
         free(team->players->network);
         free(team->players);
     }
@@ -330,7 +331,7 @@ Test(add_client_to_team, multiple_eggs_first_available, .init = redirect_all_std
     if (team->players) {
         free(team->players->team);
         free(team->players->inventory);
-        free(team->players->network->buffer);
+        free(team->players->network->readingBuffer);
         free(team->players->network);
         free(team->players);
     }
@@ -371,7 +372,7 @@ Test(add_client_to_team, multiple_eggs_all_hatched, .init = redirect_all_std)
     if (team->players) {
         free(team->players->team);
         free(team->players->inventory);
-        free(team->players->network->buffer);
+        free(team->players->network->readingBuffer);
         free(team->players->network);
         free(team->players);
     }

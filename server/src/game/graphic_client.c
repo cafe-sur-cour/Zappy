@@ -37,9 +37,14 @@ graph_net_t *add_graph_node(graph_net_t **head, int fd)
 {
     graph_net_t *new_node = malloc(sizeof(graph_net_t));
 
-    if (!new_node)
+    new_node->network = malloc(sizeof(network_t));
+    new_node->network->readingBuffer = create_buffer();
+    new_node->network->writingBuffer = create_buffer();
+    if (!new_node || !new_node->network ||
+        !new_node->network->readingBuffer ||
+        !new_node->network->writingBuffer)
         return NULL;
-    new_node->fd = fd;
+    new_node->network->fd = fd;
     new_node->mapSent = false;
     new_node->next = *head;
     *head = new_node;
@@ -49,7 +54,7 @@ graph_net_t *add_graph_node(graph_net_t **head, int fd)
 static graph_net_t *find_node(graph_net_t *current, graph_net_t *prev,
     graph_net_t **head, int fd)
 {
-    if (current->fd == fd) {
+    if (current->network->fd == fd) {
         if (prev)
             prev->next = current->next;
         else

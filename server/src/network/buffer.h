@@ -24,5 +24,8 @@ typedef struct buffer_s {
 int advance(int idx);
 void cb_write(buffer_t *cb, char c);
 int cb_getline(buffer_t *cb, char *line, int max_len);
+buffer_t *create_buffer(void);
+int write_in_buffer(buffer_t *cb, const char *str);
+void print_buffer_state(buffer_t *cb, const char *label);
 
 #endif /* !BUFFER_H_ */

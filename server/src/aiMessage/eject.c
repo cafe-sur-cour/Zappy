@@ -41,7 +41,8 @@ static int move_player(player_t *player, zappy_t *zappy, direction_t direction)
         player->posX--;
     apply_torus_world(player, zappy);
     snprintf(buffer, size + 1, "eject: %d\n", (int)direction);
-    if (write_message(player->network->fd, buffer) == -1)
+    write_in_buffer(player->network->writingBuffer, buffer);
+    if (write_message(player->network) == -1)
         return -1;
     return 0;
 }
@@ -94,21 +95,16 @@ static int loop_thru_teams(player_t *ejectman, zappy_t *zappy)
 
 int handle_eject(player_t *player, char *command, zappy_t *zappy)
 {
-    int n = 0;
     int result = 0;
 
     if (strcmp(command, "Eject") != 0) {
         error_message("Invalid command for eject handling.");
         return -1;
     }
-    n = loop_thru_teams(player, zappy);
-    if (n == -1) {
-        if (write_message(player->network->fd, "ko\n") == -1)
-            return -1;
-        return 0;
-    }
-    if (result == 0) {
-        if (write_message(player->network->fd, "ko\n") == -1)
+    result = loop_thru_teams(player, zappy);
+    if (result == -1) {
+        write_in_buffer(player->network->writingBuffer, "ko\n");
+        if (write_message(player->network) == -1)
             return -1;
         return 0;
     }

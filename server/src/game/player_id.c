@@ -44,6 +44,8 @@ player_t *get_player_by_id(game_t *game, int player_id)
 /* This sub-function check the current id agains the other */
 static int loop_thru_current_players(player_t *current_player, int highest_id)
 {
+    if (current_player == NULL)
+        return highest_id;
     while (current_player != NULL) {
         if (current_player->id > highest_id)
             highest_id = current_player->id;
@@ -56,12 +58,16 @@ static int loop_thru_current_players(player_t *current_player, int highest_id)
 int get_next_free_id(zappy_t *server)
 {
     int highest_id = 0;
-    team_t *current_team = server->game->teams;
+    team_t *current_team;
     player_t *current_player = NULL;
 
+    if (!server || !server->game || !server->game->teams)
+        return 1;
+    current_team = server->game->teams;
     while (current_team != NULL) {
         current_player = current_team->players;
-        highest_id = loop_thru_current_players(current_player, highest_id);
+        if (current_player != NULL)
+            highest_id = loop_thru_current_players(current_player, highest_id);
         current_team = current_team->next;
     }
     return highest_id + 1;

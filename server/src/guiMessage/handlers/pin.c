@@ -28,7 +28,8 @@ int send_pin_message(graph_net_t *graphic, player_t *player)
         player->inventory->nbLinemate, player->inventory->nbDeraumere,
         player->inventory->nbSibur, player->inventory->nbMendiane,
         player->inventory->nbPhiras, player->inventory->nbThystame);
-    return write_message(graphic->fd, buffer);
+    write_in_buffer(graphic->network->writingBuffer, buffer);
+    return write_message(graphic->network);
 }
 
 int pin(zappy_t *zappy, graph_net_t *graphic, char *message)

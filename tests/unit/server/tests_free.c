@@ -88,7 +88,6 @@ Test(free_functions, free_player_basic, .init = redirect_all_std)
     player->inventory = malloc(sizeof(inventory_t));
     player->network = malloc(sizeof(network_t));
     player->network->fd = -1;
-    player->network->buffer = NULL;
     player->next = NULL;
     
     void *result = free_player(player);

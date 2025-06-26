@@ -134,7 +134,8 @@ static graph_net_t *new_gui()
 
     if (!gui)
         return NULL;
-    gui->fd = open("gui_socket", O_RDWR | O_CREAT, 0666);
+    gui->network = malloc(sizeof(network_t));
+    gui->network->fd = open("gui_socket", O_RDWR | O_CREAT, 0666);
     gui->mapSent = true;
     gui->next = NULL;
     return gui;

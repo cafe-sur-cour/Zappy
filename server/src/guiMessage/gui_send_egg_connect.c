@@ -19,15 +19,14 @@ int send_egg_connect(zappy_t *zappy, egg_t *currentEgg)
     char *message = malloc(sizeof(char) * xLength);
     graph_net_t *current = zappy->graph;
 
-    if (message == NULL) {
-        error_message("Memory allocation failed in send_egg_connect");
-        return -1;
-    }
+    if (message == NULL)
+        return return_error("Failed to allocate memory for string message.");
     snprintf(message, xLength, "ebo #%d\n", currentEgg->id);
     if (zappy->params->is_debug == true)
         printf("DEBUG: Sending egg connection message: %s", message);
     while (current != NULL) {
-        if (write_message(current->fd, message) == -1) {
+        write_in_buffer(current->network->writingBuffer, message);
+        if (write_message(current->network) == -1) {
             free(message);
             return -1;
         }

@@ -12,15 +12,15 @@
 #include "network.h"
 #include "zappy.h"
 
-static server_t *init_network_fd(server_t *network, int port)
+static server_t *init_network_fd(server_t *network)
 {
-    if (bind_socket(network->sockfd, port) == -1) {
-        close(network->sockfd);
+    if (bind_socket(network) == -1) {
+        close_server(network);
         free(network);
         return NULL;
     }
-    if (listen_socket(network->sockfd, 10) == -1) {
-        close(network->sockfd);
+    if (listen_socket(network) == -1) {
+        close_server(network);
         free(network);
         return NULL;
     }
@@ -40,7 +40,9 @@ static server_t *init_network(int port)
         free(network);
         return NULL;
     }
-    network = init_network_fd(network, port);
+    network->port = port;
+    network->backlog = 10;
+    network = init_network_fd(network);
     if (network == NULL)
         return NULL;
     network->pollserver.fd = network->sockfd;
