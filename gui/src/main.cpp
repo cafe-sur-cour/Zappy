@@ -5,9 +5,9 @@
 ** main
 */
 
+#include <signal.h>
 #include <iostream>
 #include <string>
-#include <signal.h>
 #include <memory>
 
 #include "Utils/Constants.hpp"
