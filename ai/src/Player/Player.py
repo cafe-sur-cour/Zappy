@@ -195,7 +195,7 @@ class Player:
         if level >= MAX_LEVEL:
             return True
 
-        offset = FOOD_VALUE // 4  # Reduce offset to 1/4 of original
+        offset = FOOD_VALUE
 
         return nbFood * FOOD_VALUE > self.howManyTimeUnitsForIncantation(level) + offset
 
@@ -209,7 +209,7 @@ class Player:
         maxLength = (max(self.x, self.y) / 2) * 50
         movementCost = 7 * maxLength
 
-        offset = FOOD_VALUE * 5  # Reduced from 15 to 5
+        offset = FOOD_VALUE * 15
 
         totalCost = droppingCost + movementCost + offset
 
@@ -309,7 +309,7 @@ class Player:
                 self.communication.sendForward()
                 self.roombaState["lastCommand"] = "forward"
                 self.roombaState["forwardCount"] += 1
-                self.communication.sendTakeObject("food")
+                self.roombaState["phase"] = "lookAround"
                 self.roombaState["lastPhase"] = "forward"
 
             else:
@@ -317,7 +317,6 @@ class Player:
                 self.communication.sendRight()
                 self.roombaState["lastCommand"] = "right"
                 self.roombaState["phase"] = "turn"
-                self.communication.sendTakeObject("food")
                 self.roombaState["lastPhase"] = "forward"
 
         elif phase == "turn":
