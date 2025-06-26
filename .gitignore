@@ -22,3 +22,4 @@ server/tests/ctest*.c
 *__pycache_*
 yarn.lock
 node_modules
+player_socket
