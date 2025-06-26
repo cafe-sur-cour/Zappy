@@ -44,7 +44,7 @@ The AI achieves victory through coordinated multi-phase strategy:
 - **Map Awareness**: Adapts exploration to map size and boundaries
 - **Enemy Detection**: Recognizes and responds to competing teams
 - **Resource Denial**: Strategic collection to limit enemy progress
-- **Failure Recovery**: Robust fallback strategies maintain team momentumeam coordination and messaging
+- **Failure Recovery**: Robust fallback strategies maintain team momentum coordination and messaging
 ├── 🔐 Hash System          - Secure team communication with replay protection
 ├── 🖥️  CLI Parser          - Robust command line argument handling
 ├── 📊 Logger System        - Comprehensive logging and debugging
