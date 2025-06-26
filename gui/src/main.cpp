@@ -19,7 +19,8 @@ std::unique_ptr<Client> g_client = nullptr;
 void signalHandler(int signal)
 {
     if (signal == SIGINT) {
-        std::cout << "\n" << colors::T_YELLOW << "Received Ctrl+C, shutting down gracefully..."
+        std::cout << "\n" << colors::T_YELLOW
+                  << "Received Ctrl+C, shutting down gracefully..."
                   << colors::RESET << std::endl;
 
         if (g_client) {
