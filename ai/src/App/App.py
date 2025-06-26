@@ -30,6 +30,7 @@ class App:
         self.running = True
         self.is_main_process = True
         self.logger = Logger()
+        self.mainPlayer: Player = None
 
         if self.is_main_process:
             signal.signal(signal.SIGINT, self._signal_handler)
@@ -37,8 +38,11 @@ class App:
 
     def _signal_handler(self, signum, frame):
         if self.is_main_process:
-            self.logger.info(f"Shutting down AI team {self.name}...")
+            self.logger.info(f"Received signal {signum}, shutting down AI team {self.name}...")
+            self._cleanup_children()
             self.running = False
+            if self.mainPlayer is not None:
+                self.mainPlayer.communication.stopLoop()
 
     def _wait_for_children(self):
         if not self.is_main_process:
@@ -109,43 +113,27 @@ class App:
             return -1
         if pid == 0:
             self.is_main_process = False
-            signal.signal(signal.SIGINT, self._child_signal_handler)
-            signal.signal(signal.SIGTERM, self._child_signal_handler)
-
             try:
                 p = Player(self.name, self.ip, self.port)
                 p.is_child_process = True
-                _, x, y = p.communication.connectToServer()
-                p.setMapSize(x, y)
-                p.startComThread()
-                p.loop()
-            except (CommunicationException, SocketException):
-                exit(FAILURE)
-            except KeyboardInterrupt:
-                exit(SUCCESS)
+                result = p.start()
+                exit(result)
             except Exception:
                 exit(FAILURE)
-            exit(SUCCESS)
         return pid
-
-    def _child_signal_handler(self, signum, frame):
-        sys.stdout.flush()
-        sys.stderr.flush()
-        os._exit(SUCCESS)
 
     def run(self):
         self.logger.success(f"Starting Zappy AI for team: {self.name}...")
-        player = Player(self.name, self.ip, self.port)
-        slots, x, y = 0, 0, 0
+        self.mainPlayer = Player(self.name, self.ip, self.port)
+        slots = 0
 
         try:
-            slots, x, y = player.communication.connectToServer()
+            slots, x, y = self.mainPlayer.communication.connectToServer()
+            self.mainPlayer.setMapSize(x, y)
+            self.mainPlayer.setNbSlots(slots + 1)
         except (CommunicationException, SocketException) as e:
             self.logger.error(f"Failed to connect to server: {e}")
             return FAILURE
-
-        player.setMapSize(x, y)
-        player.setNbSlots(slots + 1)
 
         for _ in range(slots):
             if not self.running:
@@ -155,24 +143,27 @@ class App:
                 self.childs.append(child_pid)
 
         try:
-            player.startComThread()
+            self.mainPlayer.startComThread()
             while self.running:
                 try:
-                    player.loop()
+                    self.mainPlayer.loop()
                     break
                 except KeyboardInterrupt:
                     break
         except (CommunicationException, SocketException):
             self.logger.error(f"Server connection lost for team {self.name}")
-            self._cleanup_children()
+            if self.running:
+                self._cleanup_children()
             return FAILURE
         except KeyboardInterrupt:
             self.logger.info(f"Interrupted - shutting down team {self.name}")
-            self._cleanup_children()
+            if self.running:
+                self._cleanup_children()
             return SUCCESS
         except Exception as e:
             self.logger.error(f"Unexpected error in main player: {e}")
-            self._cleanup_children()
+            if self.running:
+                self._cleanup_children()
             return FAILURE
         finally:
             if self.is_main_process:
