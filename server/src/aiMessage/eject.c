@@ -47,12 +47,24 @@ static int move_player(player_t *player, zappy_t *zappy, direction_t direction)
     return 0;
 }
 
+static int destroy_egg(egg_t *egg, player_t *ejectman)
+{
+    int size = 30 + int_str_len(egg->id) + int_str_len(ejectman->id);
+    char buffer[size];
+
+    snprintf(buffer, size + 1, "Egg %d was destroyed by player %d\n",
+        egg->id, ejectman->id);
+    valid_message(buffer);
+    return 0;
+}
+
 static int eject_players(player_t *player, player_t *ejectman, zappy_t *zappy)
 {
     if (player->id != ejectman->id && player->posX == ejectman->posX &&
         player->posY == ejectman->posY) {
         if (move_player(player, zappy, ejectman->direction) == -1)
             return -1;
+        send_player_pos(zappy, player);
         return 1;
     }
     return 0;
@@ -93,20 +105,38 @@ static int loop_thru_teams(player_t *ejectman, zappy_t *zappy)
     return result;
 }
 
+static int loop_thru_eggs(player_t *ejectman, zappy_t *zappy)
+{
+    int result = 0;
+    egg_t *save = zappy->game->map->currentEggs;
+
+    while (save) {
+        if (ejectman->posX == save->posX && ejectman->posY == save->posY) {
+            destroy_egg(save, ejectman);
+            send_egg_death(zappy, save);
+            zappy->game->map->currentEggs = kil_egg_node(
+                &zappy->game->map->currentEggs, save->id);
+            result++;
+        }
+        save = save->next;
+    }
+    return result;
+}
+
 int handle_eject(player_t *player, char *command, zappy_t *zappy)
 {
+    int n = 0;
     int result = 0;
 
     if (strcmp(command, "Eject") != 0) {
         error_message("Invalid command for eject handling.");
         return -1;
     }
-    result = loop_thru_teams(player, zappy);
-    if (result == -1) {
-        write_in_buffer(player->network->writingBuffer, "ko\n");
-        if (write_message(player->network) == -1)
-            return -1;
-        return 0;
-    }
+    n = loop_thru_teams(player, zappy);
+    if (n == -1)
+        return -1;
+    result = loop_thru_eggs(player, zappy) + n;
+    if (result == 0)
+        return -1;
     return 0;
 }
