@@ -92,6 +92,7 @@ int add_fd_to_poll(unified_poll_t *poll_struct, int fd, short events);
 int remove_fd_from_poll(unified_poll_t *poll_struct, int fd);
 void rebuild_poll_fds(zappy_t *zappy);
 void poll_all_clients(zappy_t *zappy);
+void free_action_queue_pl(action_queue_t *queue);
 
 /* build_fds.c */
 void rebuild_poll_fds(zappy_t *zappy);

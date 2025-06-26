@@ -25,7 +25,7 @@ void *free_params(params_t *params)
     return NULL;
 }
 
-static void free_action_queue_pl(action_queue_t *queue)
+void free_action_queue_pl(action_queue_t *queue)
 {
     action_request_t *req = NULL;
     action_request_t *next = NULL;
