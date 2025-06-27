@@ -112,7 +112,7 @@ private:
                 struct sockaddr_in clientAddr;
                 socklen_t clientAddrLen = sizeof(clientAddr);
                 int clientSocket = accept(_serverSocket, (struct sockaddr*)&clientAddr, &clientAddrLen);
-                
+
                 if (clientSocket >= 0) {
                     _clientSockets.push_back(clientSocket);
                 }
@@ -133,7 +133,7 @@ protected:
         // Set up a mock server for testing
         mockServer = std::make_unique<MockServer>(TEST_PORT);
         ASSERT_TRUE(mockServer->start());
-        
+
         // Give the server time to start
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
@@ -159,10 +159,10 @@ const int CommunicationTest::TEST_PORT;
 // Test successful connection
 TEST_F(CommunicationTest, SuccessfulConnection) {
     zappy::structs::Config config = createValidConfig();
-    
+
     // This should connect successfully to our mock server
     EXPECT_NO_THROW({
-        Communication comm(config);
+        Communication comm(config.port, config.hostname);
         EXPECT_TRUE(comm.isConnected());
     });
 }
@@ -171,20 +171,20 @@ TEST_F(CommunicationTest, SuccessfulConnection) {
 TEST_F(CommunicationTest, ConnectionToNonExistentServer) {
     zappy::structs::Config config = createValidConfig();
     config.port = 12345; // A port where no server is running
-    
+
     // This should throw an exception since the connection will fail
     EXPECT_NO_THROW({
-        Communication comm(config);
+        Communication comm(config.port, config.hostname);
     });
 }
 
 // Test sending message
 TEST_F(CommunicationTest, SendMessage) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
-    
+    Communication comm(config.port, config.hostname);
+
     EXPECT_TRUE(comm.isConnected());
-    
+
     // Should not throw when sending a message
     EXPECT_NO_THROW({
         comm.sendMessage("Hello, Server!");
@@ -194,10 +194,10 @@ TEST_F(CommunicationTest, SendMessage) {
 // Test disconnection
 TEST_F(CommunicationTest, Disconnection) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
-    
+    Communication comm(config.port, config.hostname);
+
     EXPECT_TRUE(comm.isConnected());
-    
+
     // Disconnect and check status
     comm.disconnect();
     EXPECT_FALSE(comm.isConnected());
@@ -206,22 +206,22 @@ TEST_F(CommunicationTest, Disconnection) {
 // Test receiving messages
 TEST_F(CommunicationTest, ReceiveMessages) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
-    
+    Communication comm(config.port, config.hostname);
+
     EXPECT_TRUE(comm.isConnected());
-    
+
     // Wait for connection establishment
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    
+
     // Should be connected to our mock server now
     ASSERT_TRUE(mockServer->hasClients());
-    
+
     // Send message from mock server to client
     ASSERT_TRUE(mockServer->sendToAllClients("Test message"));
-    
+
     // Give some time for the message to be processed
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    
+
     // Check if we received the message
     EXPECT_TRUE(comm.hasMessages());
     std::string message = comm.popMessage();
@@ -231,24 +231,24 @@ TEST_F(CommunicationTest, ReceiveMessages) {
 // Test message queuing
 TEST_F(CommunicationTest, MessageQueueing) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
-    
+    Communication comm(config.port, config.hostname);
+
     EXPECT_TRUE(comm.isConnected());
-    
+
     // Wait for connection establishment
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    
+
     // Should be connected to our mock server now
     ASSERT_TRUE(mockServer->hasClients());
-    
+
     // Send multiple messages from mock server to client
     ASSERT_TRUE(mockServer->sendToAllClients("Message 1"));
     ASSERT_TRUE(mockServer->sendToAllClients("Message 2"));
     ASSERT_TRUE(mockServer->sendToAllClients("Message 3"));
-    
+
     // Give some time for messages to be processed
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    
+
     // Check if we received the messages in correct order
     EXPECT_TRUE(comm.hasMessages());
     EXPECT_EQ(comm.popMessage(), "Message 1");
@@ -262,10 +262,10 @@ TEST_F(CommunicationTest, MessageQueueing) {
 // Test empty message queue
 TEST_F(CommunicationTest, EmptyMessageQueue) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
-    
+    Communication comm(config.port, config.hostname);
+
     EXPECT_TRUE(comm.isConnected());
-    
+
     // Nothing has been sent, so queue should be empty
     EXPECT_FALSE(comm.hasMessages());
     EXPECT_EQ(comm.popMessage(), "");
@@ -274,12 +274,12 @@ TEST_F(CommunicationTest, EmptyMessageQueue) {
 // Test sending message when not connected
 TEST_F(CommunicationTest, SendMessageWhenNotConnected) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
-    
+    Communication comm(config.port, config.hostname);
+
     // Disconnect first
     comm.disconnect();
     EXPECT_FALSE(comm.isConnected());
-    
+
     // Should throw when trying to send a message
     EXPECT_THROW({
         comm.sendMessage("This should fail");
@@ -289,22 +289,22 @@ TEST_F(CommunicationTest, SendMessageWhenNotConnected) {
 // Test multiple rapid disconnections
 TEST_F(CommunicationTest, MultipleRapidDisconnections) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
-    
+    Communication comm(config.port, config.hostname);
+
     // Multiple disconnects should not crash or throw
     EXPECT_NO_THROW({
         comm.disconnect();
         comm.disconnect();
         comm.disconnect();
     });
-    
+
     EXPECT_FALSE(comm.isConnected());
 }
 
 // Test processWrite functionality through message sending behavior
 TEST_F(CommunicationTest, ProcessWriteBehavior) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
+    Communication comm(config.port, config.hostname);
 
     EXPECT_TRUE(comm.isConnected());
 
@@ -324,7 +324,7 @@ TEST_F(CommunicationTest, ProcessWriteBehavior) {
 // Test processWrite with large message buffer
 TEST_F(CommunicationTest, ProcessWriteLargeBuffer) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
+    Communication comm(config.port, config.hostname);
 
     EXPECT_TRUE(comm.isConnected());
 
@@ -343,7 +343,7 @@ TEST_F(CommunicationTest, ProcessWriteLargeBuffer) {
 // Test processWrite with rapid message sending
 TEST_F(CommunicationTest, ProcessWriteRapidSending) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
+    Communication comm(config.port, config.hostname);
 
     EXPECT_TRUE(comm.isConnected());
 
@@ -363,7 +363,7 @@ TEST_F(CommunicationTest, ProcessWriteRapidSending) {
 // Test processWrite buffer management with empty buffer
 TEST_F(CommunicationTest, ProcessWriteEmptyBuffer) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
+    Communication comm(config.port, config.hostname);
 
     EXPECT_TRUE(comm.isConnected());
 
@@ -378,7 +378,7 @@ TEST_F(CommunicationTest, ProcessWriteEmptyBuffer) {
 // Test processWrite partial write scenarios
 TEST_F(CommunicationTest, ProcessWritePartialWrites) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
+    Communication comm(config.port, config.hostname);
 
     EXPECT_TRUE(comm.isConnected());
 
@@ -399,7 +399,7 @@ TEST_F(CommunicationTest, ProcessWritePartialWrites) {
 // Test processWrite with message delimiter handling
 TEST_F(CommunicationTest, ProcessWriteDelimiterHandling) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
+    Communication comm(config.port, config.hostname);
 
     EXPECT_TRUE(comm.isConnected());
 
@@ -421,7 +421,7 @@ TEST_F(CommunicationTest, ProcessWriteDelimiterHandling) {
 // Test processWrite after disconnection
 TEST_F(CommunicationTest, ProcessWriteAfterDisconnection) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
+    Communication comm(config.port, config.hostname);
 
     EXPECT_TRUE(comm.isConnected());
 
@@ -441,7 +441,7 @@ TEST_F(CommunicationTest, ProcessWriteAfterDisconnection) {
 // Test processWrite buffer persistence across multiple calls
 TEST_F(CommunicationTest, ProcessWriteBufferPersistence) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
+    Communication comm(config.port, config.hostname);
 
     EXPECT_TRUE(comm.isConnected());
 
@@ -464,7 +464,7 @@ TEST_F(CommunicationTest, ProcessWriteBufferPersistence) {
 // Test processWrite with connection stress
 TEST_F(CommunicationTest, ProcessWriteConnectionStress) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
+    Communication comm(config.port, config.hostname);
 
     EXPECT_TRUE(comm.isConnected());
 
@@ -486,7 +486,7 @@ TEST_F(CommunicationTest, ProcessWriteConnectionStress) {
 // Test processWrite with mixed message sizes
 TEST_F(CommunicationTest, ProcessWriteMixedMessageSizes) {
     zappy::structs::Config config = createValidConfig();
-    Communication comm(config);
+    Communication comm(config.port, config.hostname);
 
     EXPECT_TRUE(comm.isConnected());
 
