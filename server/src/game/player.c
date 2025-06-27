@@ -101,16 +101,26 @@ static void check_winning_condition(zappy_t *zappy, team_t *current)
     }
 }
 
+static int count_eggs_for_team(team_t *team, egg_t *eggs)
+{
+    int count = 0;
+
+    for (egg_t *egg = eggs; egg != NULL; egg = egg->next) {
+        if (egg && team && egg->teamName && team->name &&
+            strcmp(egg->teamName, team->name) == 0) {
+            count++;
+        }
+    }
+    return count;
+}
+
 static int get_id(zappy_t *zappy)
 {
     int id = 0;
 
     for (team_t *team = zappy->game->teams; team != NULL;
         team = team->next) {
-        for (egg_t *egg = zappy->game->map->currentEggs; egg != NULL; egg = egg->next) {
-            if (egg && team && team->name && egg->teamName && strcmp(egg->teamName, team->name) == 0)
-                id += 1;
-        }
+        id += count_eggs_for_team(team, zappy->game->map->currentEggs);
     }
     return id;
 }
@@ -169,17 +179,5 @@ static void remove_player_from_team(team_t *team, player_t *player, int fd,
         send_player_death(zappy, player);
         free_player(player);
         return;
-    }
-}
-
-void remove_player_by_fd(zappy_t *zappy, int fd)
-{
-    team_t *team = zappy->game->teams;
-    player_t *player = NULL;
-
-    while (team) {
-        player = team->players;
-        remove_player_from_team(team, player, fd, zappy);
-        team = team->next;
     }
 }
