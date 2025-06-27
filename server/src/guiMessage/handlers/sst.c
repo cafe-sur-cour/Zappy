@@ -34,7 +34,6 @@ int sst(zappy_t *zappy, graph_net_t *graphic, char *message)
 {
     int new_freq = 0;
 
-    printf("Received %s\n", message);
     if (strlen(message) < 5) {
         error_message("Invalid sst message format.");
         return -1;
