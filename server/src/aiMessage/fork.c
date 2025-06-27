@@ -25,7 +25,7 @@ static int get_nb_eggs(zappy_t *zappy)
     return count;
 }
 
-static void push_back_egg(zappy_t *zappy, egg_t *new)
+void push_back_egg(zappy_t *zappy, egg_t *new)
 {
     egg_t *save = zappy->game->map->currentEggs;
 

@@ -206,5 +206,6 @@ team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server)
     }
     result = server->game->teams;
     server->game->teams = save;
+    result->nbPlayerAlive++;
     return result;
 }
