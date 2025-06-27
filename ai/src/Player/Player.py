@@ -451,7 +451,7 @@ class Player:
             self.commandsToSend.append(
                 (
                     lambda: self.broadcaster.broadcastMessage(f"dropStones {self.id}"),
-                    f"broadcast dropStones {self.id}"
+                    f"broadcast dropStones"
                 )
             )
             self.incantationState["lastCommand"] = "broadcast dropStones"
@@ -485,7 +485,7 @@ class Player:
                 self.commandsToSend.append(
                     (
                         lambda: self.broadcaster.broadcastMessage(f"sendInventory {self.id}"),
-                        f"broadcast sendInventory {self.id}"
+                        f"broadcast sendInventory"
                     )
                 )
                 self.incantationState["lastCommand"] = "broadcast sendInventory"
@@ -565,7 +565,7 @@ class Player:
             self.commandsToSend.append(
                 (
                     lambda: self.broadcaster.broadcastMessage(f"whereAreYou {self.id}"),
-                    f"broadcast whereAreYou {self.id}"
+                    f"broadcast whereAreYou"
                 )
             )
             self.goToIncantationState["lastCommand"] = "broadcast whereAreYou"
@@ -579,7 +579,7 @@ class Player:
             self.commandsToSend.append(
                 (
                     lambda: self.broadcaster.broadcastMessage(f"whereAreYou {self.id}"),
-                    f"broadcast whereAreYou {self.id}"
+                    f"broadcast whereAreYou"
                 )
             )
             self.goToIncantationState["needToWait"] = True
