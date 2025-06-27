@@ -159,7 +159,7 @@ void check_player_status(zappy_t *zappy)
     }
 }
 
-static void remove_player_from_team(team_t *team, player_t *player, int fd,
+void remove_player_from_team(team_t *team, player_t *player, int fd,
     zappy_t *zappy)
 {
     player_t *prev = NULL;

@@ -121,6 +121,8 @@ bool process_new_client(const char *team_name, int fd, zappy_t *server);
 team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server);
 void check_player_status(zappy_t *zappy);
 void remove_player_by_fd(zappy_t *zappy, int fd);
+void remove_player_from_team(team_t *team, player_t *player, int fd,
+    zappy_t *zappy);
 
 /* init_map.c */
 int init_game(zappy_t *server);
