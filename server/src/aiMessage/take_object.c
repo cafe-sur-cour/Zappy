@@ -13,20 +13,20 @@
 #include <stdio.h>
 #include <string.h>
 
-// static void print_tile(zappy_t *zappy, int x, int y)
-// {
-//     inventory_t *tile = NULL;
+static void print_tile(zappy_t *zappy, int x, int y)
+{
+    inventory_t *tile = NULL;
 
-//     if (y < 0 || y >= zappy->game->map->height ||
-//         x < 0 || x >= zappy->game->map->width) {
-//         printf("Error: Coordinates (%d,%d) out of bounds\n", x, y);
-//         return;
-//     }
-//     tile = &zappy->game->map->tiles[x][y];
-//     printf("Tile (%d,%d): F:%d L:%d D:%d S:%d M:%d P:%d T:%d\n",
-//         x, y, tile->nbFood, tile->nbLinemate, tile->nbDeraumere,
-//         tile->nbSibur, tile->nbMendiane, tile->nbPhiras, tile->nbThystame);
-// }
+    if (y < 0 || y >= zappy->game->map->height ||
+        x < 0 || x >= zappy->game->map->width) {
+        printf("Error: Coordinates (%d,%d) out of bounds\n", x, y);
+        return;
+    }
+    tile = &zappy->game->map->tiles[x][y];
+    printf("Tile (%d,%d): F:%d L:%d D:%d S:%d M:%d P:%d T:%d\n",
+        x, y, tile->nbFood, tile->nbLinemate, tile->nbDeraumere,
+        tile->nbSibur, tile->nbMendiane, tile->nbPhiras, tile->nbThystame);
+}
 
 static int remove_from_current_tile(zappy_t *zappy, int x, int y, char *name)
 {
@@ -42,7 +42,8 @@ static int remove_from_current_tile(zappy_t *zappy, int x, int y, char *name)
             return 0;
         }
     }
-    printf("Error: Resource '%s' not found on tile (%d, %d)\n", name, x, y);
+    printf("Error: Resource '%s' not found on ", name);
+    print_tile(zappy, x, y);
     return -1;
 }
 

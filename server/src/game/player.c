@@ -64,7 +64,6 @@ static void handle_player_death(zappy_t *zappy, player_t *player, team_t *team)
             current->next = player->next;
         }
     }
-    team->nbPlayerAlive--;
     free_player(player);
 }
 
@@ -113,22 +112,46 @@ static int get_id(zappy_t *zappy, team_t *team)
     return id;
 }
 
+static player_t *init_temp_player(void)
+{
+    player_t *temp = malloc(sizeof(player_t));
+
+    if (!temp)
+        return NULL;
+    temp->id = -1;
+    temp->network = NULL;
+    temp->level = 1;
+    temp->posX = 0;
+    temp->posY = 0;
+    temp->direction = NORTH;
+    temp->inventory = NULL;
+    temp->is_busy = false;
+    temp->remaining_cooldown = 0;
+    temp->time_action = 0.0;
+    temp->current_action = NULL;
+    temp->food_timer = 126;
+    return temp;
+}
+
 /* This functions verify the necessity of creating an egg or not */
 void verify_need_for_egg(team_t *team, zappy_t *zappy)
 {
     int id = 0;
+    player_t *temp = init_temp_player();
     egg_t *new = NULL;
     int pos[2] = {rand() % zappy->game->map->width,
         rand() % zappy->game->map->height};
 
     if (team->nbPlayerAlive + team->nbEggs < team->nbPlayers) {
+        printf("Team %s - data %i + %i < %i Egg added \n", team->name, team->nbPlayerAlive, team->nbEggs, team->nbPlayers);
         id = get_id(zappy, team);
         new = add_egg_node(id, pos, team->name, -1);
         push_back_egg(zappy, new);
-        send_player_laying_egg(zappy, team->players);
+        send_player_laying_egg(zappy, temp);
         send_egg(zappy, new);
         team->nbEggs += 1;
     }
+    free(temp);
 }
 
 /* Loop thru the player to check health and connection updates */
