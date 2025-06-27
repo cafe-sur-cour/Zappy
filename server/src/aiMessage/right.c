@@ -47,9 +47,8 @@ int right_message(player_t *player)
     if (direction == EAST) {
         player->direction = SOUTH;
         return 0;
-    } else
-        return -1;
-    return 0;
+    }
+    return -1;
 }
 
 int handle_right(player_t *player, char *command, zappy_t *zappy)
