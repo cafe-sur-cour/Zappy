@@ -97,7 +97,6 @@ class Player:
         self.goToIncantationState: dict = {
             "status": False,
             "steps": [],
-            "lastCommand": None,
             "direction": 0,
             "arrived": False,
             "movementStarted": False,
@@ -555,7 +554,6 @@ class Player:
                             )
                         )
             self.goToIncantationState["droppingStones"] = False
-            self.goToIncantationState["lastCommand"] = "drop stones"
             self.commandsToSend.append(
                 (lambda: self.communication.sendInventory(), "inventory")
             )
@@ -566,17 +564,10 @@ class Player:
             self.goToIncantationState["movementStarted"]
         ):
             self.goToIncantationState["arrived"] = True
-            self.commandsToSend.append(
-                (
-                    lambda: self.broadcaster.broadcastMessage(f"whereAreYou {self.id}"),
-                    f"broadcast whereAreYou"
-                )
-            )
-            self.goToIncantationState["lastCommand"] = "broadcast whereAreYou"
             return
 
         if self.goToIncantationState["needToWait"]:
-            sleep(0.5)
+            sleep(0.1)
             return
 
         if len(self.goToIncantationState["steps"]) == 0:
@@ -587,7 +578,6 @@ class Player:
                 )
             )
             self.goToIncantationState["needToWait"] = True
-            self.goToIncantationState["lastCommand"] = "broadcast whereAreYou"
             return
 
         self.goToIncantationState["movementStarted"] = True
@@ -599,7 +589,6 @@ class Player:
                 "step"
             )
         )
-        self.goToIncantationState["lastCommand"] = "step"
 
     def handleResponseInventory(self) -> None:
         newInventory = self.communication.getInventory()
@@ -800,12 +789,7 @@ class Player:
                     r()
                 return
 
-        lastCommand = self.roombaState["lastCommand"]
-        if self.incantationState["status"]:
-            lastCommand = self.incantationState["lastCommand"]
-        elif self.goToIncantationState["status"]:
-            lastCommand = self.goToIncantationState["lastCommand"]
-        self.logger.error(f"Unknown response to '{lastCommand}': {response.strip()}")
+        self.logger.error(f"Unknown response to '{self.lastCommandSent}': {response.strip()}")
 
     def getStepsFromDirection(self) -> list[Callable[[], None]]:
         stepsMap = {
@@ -937,13 +921,6 @@ class Player:
             self.goToIncantationState["steps"] = self.getStepsFromDirection()
             self.goToIncantationState["movementStarted"] = False
             self.goToIncantationState["droppingStones"] = False
-
-            self.commandsToSend.append(
-                (
-                    lambda: self.broadcaster.broadcastMessage(f"whereAreYou {self.id}"),
-                    f"broadcast whereAreYou {self.id}"
-                )
-            )
 
     def handleMessageDropStones(self, direction: int, rest: str) -> None:
         id = rest.strip()
