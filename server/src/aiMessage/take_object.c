@@ -27,7 +27,6 @@ static int remove_from_current_tile(zappy_t *zappy, int x, int y, char *name)
             return 0;
         }
     }
-    printf("Error: Resource '%s' not found on (%d;%d)\n", name, x, y);
     return -1;
 }
 
