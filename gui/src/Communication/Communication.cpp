@@ -14,7 +14,7 @@
 
 #include "Communication.hpp"
 
-Communication::Communication(zappy::structs::Config config)
+Communication::Communication(zappy::structs::Config config, const std::string &delimiter)
     : _config(config),
       _running(false),
       _connected(false),
@@ -22,6 +22,8 @@ Communication::Communication(zappy::structs::Config config)
       _sendBuffer(""),
       _socket(-1)
 {
+    _delimiter = delimiter.empty() ? "\n" : delimiter;
+
     try {
         setupConnection();
         startCommunicationThread();
@@ -167,8 +169,10 @@ void Communication::communicationLoop()
                 std::string &message = _outgoingMessages.front();
                 _sendBuffer += message;
 
-                if (!message.empty() && message.back() != MESSAGE_DELIMITER)
-                    _sendBuffer += MESSAGE_DELIMITER;
+                if (!message.empty() && !_delimiter.empty() &&
+                    (message.size() < _delimiter.size() ||
+                    message.substr(message.size() - _delimiter.size()) != _delimiter))
+                    _sendBuffer += _delimiter;
 
                 _outgoingMessages.pop();
             }
@@ -266,9 +270,9 @@ void Communication::parseReceivedData()
 {
     size_t pos;
 
-    while ((pos = _receiveBuffer.find(MESSAGE_DELIMITER)) != std::string::npos) {
+    while ((pos = _receiveBuffer.find(_delimiter)) != std::string::npos) {
         std::string message = _receiveBuffer.substr(0, pos);
-        _receiveBuffer.erase(0, pos + 1);
+        _receiveBuffer.erase(0, pos + _delimiter.length());
 
         std::lock_guard<std::mutex> lock(_mutex);
 
