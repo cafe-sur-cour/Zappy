@@ -24,7 +24,7 @@ Client::Client(int ac, const char *const *av)
               << ", Hostname: " << _config.hostname
               << colors::RESET << std::endl;
 
-    _communication = std::make_shared<Communication>(_config);
+    _communication = std::make_shared<Communication>(_config.port, _config.hostname);
     _gameInfos = std::make_shared<GameInfos>(_communication);
     _msgHandler = std::make_unique<MsgHandler>(_gameInfos, _communication);
 
