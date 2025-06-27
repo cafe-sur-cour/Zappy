@@ -162,8 +162,21 @@ class Communication:
         poller_object = select.poll()
         poller_object.register(self.socket.get_fd(), select.POLLOUT)
         fd_vs_event = poller_object.poll(200)
-        if fd_vs_event:
+        fd, event = fd_vs_event[0]
+        if event & select.POLLOUT:
             self.socket.send(msg)
+        elif event & select.POLLHUP:
+            self.logger.error("Server disconnected (POLLHUP)")
+            self.playerDead = True
+            raise CommunicationInvalidResponseException(
+                "Server disconnected while trying to send data"
+            )
+        elif event & select.POLLERR:
+            self.logger.error("Communication error (POLLERR)")
+            self.playerDead = True
+            raise CommunicationInvalidResponseException(
+                "Error in communication with server while sending data"
+            )
         else:
             raise CommunicationInvalidResponseException(
                 "Socket not ready for sending data"
