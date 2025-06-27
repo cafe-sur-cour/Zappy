@@ -28,12 +28,6 @@ static void update_player_food(player_t *player, zappy_t *zappy)
     }
 }
 
-/* This function checks if a player is dead from starvation */
-static bool is_player_dead(player_t *player)
-{
-    return (player->inventory->nbFood <= 0);
-}
-
 void remove_player_from_alive_teamate(zappy_t *zappy, player_t *player)
 {
     team_t *current_team = zappy->game->teams;
@@ -83,7 +77,7 @@ static void check_player_health_status(zappy_t *zappy,
         next_player = player->next;
         verify_player_id(zappy, player);
         update_player_food(player, zappy);
-        if (is_player_dead(player))
+        if (player->inventory->nbFood <= 0)
             handle_player_death(zappy, player, current);
         player = next_player;
     }
@@ -106,6 +100,37 @@ static void check_winning_condition(zappy_t *zappy, team_t *current)
     }
 }
 
+static int get_id(zappy_t *zappy, team_t *team)
+{
+    int id = 0;
+
+    for (egg_t *egg = zappy->game->map->currentEggs; egg !=
+        NULL; egg = egg->next) {
+        if (strcmp(egg->teamName, team->name) == 0) {
+            id++;
+        }
+    }
+    return id;
+}
+
+/* This functions verify the necessity of creating an egg or not */
+void verify_need_for_egg(team_t *team, zappy_t *zappy)
+{
+    int id = 0;
+    egg_t *new = NULL;
+    int pos[2] = {rand() % zappy->game->map->width,
+        rand() % zappy->game->map->height};
+
+    if (team->nbPlayerAlive + team->nbEggs < team->nbPlayers) {
+        id = get_id(zappy, team);
+        new = add_egg_node(id, pos, team->name, -1);
+        push_back_egg(zappy, new);
+        send_player_laying_egg(zappy, team->players);
+        send_egg(zappy, new);
+        team->nbEggs += 1;
+    }
+}
+
 /* Loop thru the player to check health and connection updates */
 void check_player_status(zappy_t *zappy)
 {
@@ -116,6 +141,7 @@ void check_player_status(zappy_t *zappy)
         current = current->next) {
         check_player_health_status(zappy, current, next_player);
         check_winning_condition(zappy, current);
+        verify_need_for_egg(current, zappy);
     }
 }
 

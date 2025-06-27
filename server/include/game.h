@@ -122,6 +122,7 @@ typedef struct team_s {
     char *name;
     int nbPlayers;
     int nbPlayerAlive;
+    int nbEggs;
     player_t *players;
     struct team_s *next;
 } team_t;

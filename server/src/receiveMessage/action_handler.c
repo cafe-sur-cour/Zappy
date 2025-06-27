@@ -69,20 +69,13 @@ action_queue_t *init_action_queue(void)
 /* This function adds the requested action in the queue */
 void insert_action_by_priority(action_queue_t *queue, action_request_t *action)
 {
-    action_request_t *current = queue->head;
-    action_request_t *prev = NULL;
-
-    while (current && current->priority <= action->priority) {
-        prev = current;
-        current = current->next;
-    }
-    action->next = current;
-    if (prev) {
-        prev->next = action;
-    } else {
+    action->next = NULL;
+    if (!queue->head) {
         queue->head = action;
-    }
-    if (!current) {
+        queue->tail = action;
+    } else {
+        queue->tail->next = action;
         queue->tail = action;
     }
+    queue->count++;
 }
