@@ -233,7 +233,7 @@ int handle_eject(player_t *player, char *command, zappy_t *zappy);
 /* fork */
 int handle_fork(player_t *player, char *command, zappy_t *zappy);
 int handle_fork_end(player_t *player, zappy_t *zappy);
-
+void push_back_egg(zappy_t *zappy, egg_t *new);
 int print_look_server(player_t *player);
 
 /* Incantation handler */

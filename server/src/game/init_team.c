@@ -24,6 +24,7 @@ int init_teams(zappy_t *server)
         current->name = strdup(server->params->teams[i]);
         current->nbPlayers = 0;
         current->nbPlayerAlive = 0;
+        current->nbEggs = 0;
         current->players = NULL;
         current->next = server->game->teams;
         server->game->teams = current;

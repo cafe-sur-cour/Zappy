@@ -6,7 +6,6 @@
 ##
 
 import os
-import sys
 import signal
 import time
 from src.Config.Constants import (
