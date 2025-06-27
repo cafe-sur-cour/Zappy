@@ -284,7 +284,11 @@ class Player:
                                 f"take food"
                             )
                         )
-                if not self.teamHasEnoughStones:
+                if (
+                    not self.teamHasEnoughStones and
+                    "food" in self.inventory.keys() and
+                    self.enoughFoodForGoToIncantation(self.level, self.inventory["food"])
+                ):
                     for item, quantity in self.look[0].items():
                         if item in ["player", "egg", "food"]:
                             continue
