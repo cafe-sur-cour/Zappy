@@ -155,7 +155,6 @@ int handle_broadcast(player_t *player, char *command, zappy_t *zappy)
 
     if (loop_thru_teams(player, zappy, text) == -1)
         return -1;
-    write_in_buffer(player->network->writingBuffer, "ok\n");
     if (write_message(player->network) == -1)
         return -1;
     if (send_broadcast_to_player(zappy, player, text) == -1)
