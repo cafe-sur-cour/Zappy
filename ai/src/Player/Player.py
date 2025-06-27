@@ -282,7 +282,10 @@ class Player:
                         continue
                     for _ in range(quantity):
                         self.commandsToSend.append(
-                            (lambda: self.communication.sendTakeObject(item), f"take {item}")
+                            (
+                                lambda obj=item: self.communication.sendTakeObject(obj),
+                                f"take {item}"
+                            )
                         )
             self.roombaState["lastCommand"] = "take"
             self.roombaState["phase"] = "forward"
@@ -452,7 +455,7 @@ class Player:
                     if self.inventory.get(stone, 0) > 0:
                         self.commandsToSend.append(
                             (
-                                lambda: self.communication.sendSetObject(stone),
+                                lambda obj=stone: self.communication.sendSetObject(obj),
                                 f"set {stone}"
                             )
                         )
@@ -534,7 +537,10 @@ class Player:
                 for _ in range(quantity):
                     if self.inventory.get(stone, 0) > 0:
                         self.commandsToSend.append(
-                            (lambda: self.communication.sendSetObject(stone), f"set {stone}")
+                            (
+                                lambda obj=stone: self.communication.sendSetObject(obj),
+                                f"set {stone}"
+                            )
                         )
             self.goToIncantationState["droppingStones"] = False
             self.goToIncantationState["lastCommand"] = "drop stones"
