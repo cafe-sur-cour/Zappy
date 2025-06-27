@@ -7,6 +7,7 @@
 
 import select
 import threading
+import time
 
 from .Socket import Socket
 from src.Exceptions.Exceptions import (
@@ -59,8 +60,11 @@ class Communication:
                     with self.mutex:
                         if len(self.requestQueue) > 0:
                             request = self.requestQueue.pop(0)
-                            self.pendingQueue.append(request)
-                            self.socket.send(request)
+                            try:
+                                self.send(request)
+                                self.pendingQueue.append(request)
+                            except CommunicationInvalidResponseException:
+                                self.requestQueue.insert(0, request)
                 self.receive()
             except SocketException:
                 with self.mutex:
@@ -158,6 +162,30 @@ class Communication:
             raise
         except Exception:
             return ""
+
+    def send(self, msg: str) -> None:
+        poller_object = select.poll()
+        poller_object.register(self.socket.get_fd(), select.POLLOUT)
+        fd_vs_event = poller_object.poll(200)
+        fd, event = fd_vs_event[0]
+        if event & select.POLLOUT:
+            self.socket.send(msg)
+        elif event & select.POLLHUP:
+            self.logger.error("Server disconnected (POLLHUP)")
+            self.playerDead = True
+            raise CommunicationInvalidResponseException(
+                "Server disconnected while trying to send data"
+            )
+        elif event & select.POLLERR:
+            self.logger.error("Communication error (POLLERR)")
+            self.playerDead = True
+            raise CommunicationInvalidResponseException(
+                "Error in communication with server while sending data"
+            )
+        else:
+            raise CommunicationInvalidResponseException(
+                "Socket not ready for sending data"
+            )
 
     def receive(self) -> None:
         try:
@@ -261,7 +289,14 @@ class Communication:
                 f"Invalid response from server handshake: {response}"
             )
 
-        self.socket.send(f"{self.name}\n")
+        while (True):
+            try:
+                self.send(f"{self.name}\n")
+                break
+            except CommunicationInvalidResponseException as e:
+                self.logger.error(f"Failed to send name: {e}")
+                time.sleep(0.5)
+                continue
         response = self.receiveData()
 
         if response == "ko":
