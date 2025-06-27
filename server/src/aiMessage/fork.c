@@ -47,6 +47,7 @@ static int team_allows_connection(player_t *player, zappy_t *zappy)
 
     while (current_team) {
         if (strcmp(current_team->name, team_name) == 0) {
+            current_team->nbEggs++;
             break;
         }
         current_team = current_team->next;

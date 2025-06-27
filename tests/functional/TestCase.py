@@ -86,8 +86,8 @@ class TestCase:
                     except subprocess.TimeoutExpired:
                         os.killpg(os.getpgid(process.pid), signal.SIGKILL)
 
-        raw_output = process.stdout.read().decode('utf-8')
-        raw_output += process.stderr.read().decode('utf-8')
+        raw_output = process.stdout.read().decode('utf-8', errors='replace')
+        raw_output += process.stderr.read().decode('utf-8', errors='replace')
 
         self.raw_output = raw_output
         self.real_output = strip_ansi_codes(raw_output).replace("\n", "")

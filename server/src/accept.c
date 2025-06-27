@@ -34,7 +34,7 @@ static char *check_team_name(zappy_t *zappy, int new_sockfd)
 static int complete_connection_rest(zappy_t *zappy, int fd,
     char *buffer, team_t *team)
 {
-    snprintf(buffer, 12, "%d\n", zappy->params->nb_client - team->nbPlayers);
+    snprintf(buffer, 12, "%d\n", (zappy->params->nb_client + team->nbEggs) - team->nbPlayers);
     if (write_fd(fd, buffer) == -1) {
         free(buffer);
         return -1;

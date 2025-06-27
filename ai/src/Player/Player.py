@@ -274,6 +274,7 @@ class Player:
 
         elif phase == "vacuum":
             self.look = self.communication.getLook() or self.look
+            print(f"Roomba looking around: {self.look}")
             if self.look and len(self.look) > 0:
                 for item, quantity in self.look[0].items():
                     if item == "player" or item == "egg":
@@ -281,11 +282,9 @@ class Player:
                     if self.teamHasEnoughStones and item != "food":
                         continue
                     for _ in range(quantity):
+                        print(f"Taking {item}")
                         self.commandsToSend.append(
-                            (
-                                lambda obj=item: self.communication.sendTakeObject(obj),
-                                f"take {item}"
-                            )
+                            (lambda: self.communication.sendTakeObject(str(item)), f"take {item}")
                         )
             self.roombaState["lastCommand"] = "take"
             self.roombaState["phase"] = "forward"
@@ -1044,6 +1043,7 @@ class Player:
             return
         command, name = self.commandsToSend.pop(0)
         self.lastCommandSent = name
+        print(f"Sending command: {name}")
         command()
 
     def loop(self) -> None:
