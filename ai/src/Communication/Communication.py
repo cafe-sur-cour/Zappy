@@ -57,14 +57,14 @@ class Communication:
         while not self.playerDead:
             try:
                 if self.lenRequestQueue() > 0 and self.lenPendingQueue() < 10:
-                        with self.mutex:
-                            if len(self.requestQueue) > 0:
-                                request = self.requestQueue.pop(0)
-                                try:
-                                    self.send(request)
-                                    self.pendingQueue.append(request)
-                                except CommunicationInvalidResponseException:
-                                    self.requestQueue.insert(0, request)
+                    with self.mutex:
+                        if len(self.requestQueue) > 0:
+                            request = self.requestQueue.pop(0)
+                            try:
+                                self.send(request)
+                                self.pendingQueue.append(request)
+                            except CommunicationInvalidResponseException:
+                                self.requestQueue.insert(0, request)
                 self.receive()
             except SocketException:
                 with self.mutex:
@@ -158,7 +158,7 @@ class Communication:
         except Exception:
             return ""
 
-    def send(self, msg : str) -> None:
+    def send(self, msg: str) -> None:
         poller_object = select.poll()
         poller_object.register(self.socket.get_fd(), select.POLLOUT)
         fd_vs_event = poller_object.poll(200)
@@ -168,7 +168,6 @@ class Communication:
             raise CommunicationInvalidResponseException(
                 "Socket not ready for sending data"
             )
-
 
     def receive(self) -> None:
         try:
