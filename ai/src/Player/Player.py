@@ -27,7 +27,9 @@ from src.Config.GameConfig import (
     TOTAL_NEEDED_STONES,
     MAX_LEVEL,
     ELEVATION_COST,
-    FOOD_VALUE
+    FOOD_VALUE,
+    MOVE_COST,
+    DROP_COST
 )
 from src.Logger.Logger import Logger
 
@@ -181,7 +183,7 @@ class Player:
 
     def getNeededStonesByPriority(self) -> list[(str, int)]:
         neededStones = []
-        if self.level == 8:
+        if self.level >= MAX_LEVEL:
             return neededStones
         stones: dict[str, int] = LVL_UPGRADES[self.level]["stones"]
         for stone, quantity in stones.items():
@@ -230,12 +232,12 @@ class Player:
             return True
 
         stonesToDrop = sum(LVL_UPGRADES[level]["stones"].values())
-        droppingCost = stonesToDrop * 7
+        droppingCost = stonesToDrop * DROP_COST
 
-        maxLength = (max(self.x, self.y) / 2) * 50
-        movementCost = 7 * maxLength
+        maxLength = (max(self.x, self.y) / 2) * 7
+        movementCost = MOVE_COST * maxLength
 
-        offset = FOOD_VALUE * 15
+        offset = FOOD_VALUE * 5
 
         totalCost = droppingCost + movementCost + offset
 
@@ -273,20 +275,26 @@ class Player:
             self.roombaState["lastPhase"] = "lookAround"
 
         elif phase == "vacuum":
-            self.look = self.communication.getLook() or self.look
             if self.look and len(self.look) > 0:
-                for item, quantity in self.look[0].items():
-                    if item == "player" or item == "egg":
-                        continue
-                    if self.teamHasEnoughStones and item != "food":
-                        continue
-                    for _ in range(quantity):
+                if "food" in self.look[0].keys():
+                    for _ in range(self.look[0]["food"]):
                         self.commandsToSend.append(
                             (
-                                lambda obj=item: self.communication.sendTakeObject(obj),
-                                f"take {item}"
+                                lambda: self.communication.sendTakeObject("food"),
+                                f"take food"
                             )
                         )
+                if not self.teamHasEnoughStones:
+                    for item, quantity in self.look[0].items():
+                        if item in ["player", "egg", "food"]:
+                            continue
+                        for _ in range(quantity):
+                            self.commandsToSend.append(
+                                (
+                                    lambda obj=item: self.communication.sendTakeObject(obj),
+                                    f"take {item}"
+                                )
+                            )
             self.roombaState["lastCommand"] = "take"
             self.roombaState["phase"] = "forward"
             self.roombaState["lastPhase"] = "vacuum"
@@ -630,7 +638,7 @@ class Player:
             self.commandsToSend.append(
                 (
                     lambda: self.broadcaster.broadcastMessage(inventoryToSend),
-                    f"broadcast {inventoryToSend}"
+                    f"broadcast inventory"
                 )
             )
             self.needToBroadcastInventory = False
@@ -683,7 +691,7 @@ class Player:
                 self.level = new_level
                 self.inIncantation = False
 
-                if self.level >= 8:
+                if self.level >= MAX_LEVEL:
                     self.logger.success("Player reached maximum level!")
                     self.incantationState["status"] = False
                     self.incantationState["phase"] = "sendComeIncant"
