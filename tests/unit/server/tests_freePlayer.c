@@ -177,10 +177,10 @@ Test(free_zappy, frees_zappy_struct, .init=redirect_all_std)
     zappy->game = calloc(1, sizeof(game_t));
     zappy->graph = calloc(1, sizeof(graph_net_t));
     zappy->graph->network = calloc(1, sizeof(network_t));
-    zappy->graph->network->readingBuffer = calloc(1, 1);
-    zappy->graph->network->writingBuffer = calloc(1, 1);
+    zappy->graph->network->readingBuffer = create_buffer();
+    zappy->graph->network->writingBuffer = create_buffer();
     zappy->unified_poll = calloc(1, sizeof(unified_poll_t));
-    zappy->unified_poll->fds = calloc(1, 1);
+    zappy->unified_poll->fds = malloc(10 * sizeof(struct pollfd));
 
     free_zappy(zappy);
 

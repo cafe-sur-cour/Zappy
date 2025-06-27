@@ -104,7 +104,6 @@ Test(player, verify_need_for_egg_creates_egg, .init=redirect_all_std)
 Test(player, remove_player_by_fd_removes_player, .init=redirect_all_std)
 {
     zappy_t *zappy = create_minimal_zappy_for_player();
-    player_t *player = zappy->game->teams->players;
     remove_player_by_fd(zappy, 42);
     // Player should be freed, but we can't check pointer, just no crash
     free(zappy->game->teams->name);
