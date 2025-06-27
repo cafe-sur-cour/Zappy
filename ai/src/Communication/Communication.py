@@ -99,21 +99,21 @@ class Communication:
 
         try:
             look = []
-            items = response[1:-1].split(",")
-            if not items or len(items) == 0:
+            tiles = response[1:-1].split(",")
+            if not tiles or len(tiles) == 0:
                 return None
-            for item in items:
+            for tile in tiles:
                 look.append({})
-                if not item:
+                if not tile:
                     continue
-                tile = item.strip().split(" ")
-                tile = [d.strip() for d in tile if d and d.strip()]
-                for data in tile:
-                    if not data:
+                items = tile.strip().split(" ")
+                items = [d.strip() for d in items if d and d.strip()]
+                for item in items:
+                    if not item:
                         continue
-                    if data not in look[-1]:
-                        look[-1][data] = 0
-                    look[-1][data] += 1
+                    if item not in look[-1]:
+                        look[-1][item] = 0
+                    look[-1][item] += 1
             return look
         except (IndexError, KeyError, ValueError) as e:
             self.logger.error(f"Error parsing look response '{response}': {e}")
@@ -141,10 +141,15 @@ class Communication:
 
     def receiveData(self) -> str:
         try:
+            shouldRec = False
             with self.mutex:
                 if '\n' not in self.responseBuffer:
-                    r = self.socket.receive()
+                    shouldRec = True
+            if shouldRec:
+                r = self.socket.receive()
+                with self.mutex:
                     self.responseBuffer += r
+            with self.mutex:
                 firstNewlineIndex = self.responseBuffer.index('\n')
                 data = self.responseBuffer[:firstNewlineIndex + 1]
                 self.responseBuffer = self.responseBuffer[firstNewlineIndex + 1:]

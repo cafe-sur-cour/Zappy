@@ -51,9 +51,7 @@ static int team_allows_connection(player_t *player, zappy_t *zappy)
         }
         current_team = current_team->next;
     }
-    if (current_team->nbPlayerAlive < zappy->params->nb_client)
-        return 0;
-    return -1;
+    return 0;
 }
 
 /* This function defines the current runing action as incantation */
