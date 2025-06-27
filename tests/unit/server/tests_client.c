@@ -28,6 +28,7 @@ static zappy_t *create_mock_zappy(void)
     zappy->graph = malloc(sizeof(graph_net_t));
     zappy->game = malloc(sizeof(game_t));
     zappy->game->map = malloc(sizeof(map_t));
+    zappy->game->map->currentEggs = malloc(sizeof(egg_t));
     zappy->game->teams = NULL;
     
     zappy->params->nb_team = 2;
@@ -381,21 +382,4 @@ Test(add_client_to_team, multiple_eggs_all_hatched, .init = redirect_all_std)
     free(egg1);
     free(egg2);
     free_mock_zappy(zappy);
-}
-
-Test(add_client_to_team, player_with_no_eggs, .init = redirect_all_std)
-{
-    zappy_t *zappy = create_mock_zappy();
-    team_t *team = create_mock_team("team1", 1);
-    zappy->game->teams = team;
-    player_t *player = malloc(sizeof(player_t));
-    player->id = -1; // Uninitialized ID
-    player->network = malloc(sizeof(network_t));
-    player->network->fd = 42;
-    player->inventory = malloc(sizeof(inventory_t));
-    player->team = strdup("team1");
-    player->next = NULL;
-    team->players = player;
-
-    check_player_status(zappy);
 }

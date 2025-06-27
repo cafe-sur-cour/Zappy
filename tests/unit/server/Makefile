@@ -54,7 +54,9 @@ TESTS 	    =   tests_accept.c						\
 				tests_network.c						\
 				tests_broadcast.c					\
 				tests_message_handlers.c			\
-				tests_pollfds.c
+				tests_pollfds.c						\
+				tests_freePlayer.c					\
+				tests_player.c
 
 
 SRC 		=	../../../server/src/accept.c								\
