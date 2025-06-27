@@ -98,7 +98,6 @@ class Communication:
         return inventory
 
     def tryGetLook(self, response: str) -> list[dict[str, int]] | None:
-        print("Response:", response)
         if not response.startswith("[") or not response.endswith("]"):
             return None
 
@@ -362,7 +361,6 @@ class Communication:
         self.sendCommand("Eject\n")
 
     def sendTakeObject(self, object_name: str):
-        print("Sending Take ", object_name)
         self.sendCommand(f"Take {object_name}\n")
 
     def sendSetObject(self, object_name: str):
