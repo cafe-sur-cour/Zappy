@@ -7,6 +7,7 @@
 
 import select
 import threading
+import time
 
 from .Socket import Socket
 from src.Exceptions.Exceptions import (
@@ -271,7 +272,14 @@ class Communication:
                 f"Invalid response from server handshake: {response}"
             )
 
-        self.send(f"{self.name}\n")
+        while (True):
+            try:
+                self.send(f"{self.name}\n")
+                break
+            except CommunicationInvalidResponseException as e:
+                self.logger.error(f"Failed to send name: {e}")
+                time.sleep(0.5)
+                continue
         response = self.receiveData()
 
         if response == "ko":
