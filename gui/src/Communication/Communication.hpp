@@ -29,7 +29,8 @@
 
 class Communication : public ICommunication {
     public:
-        explicit Communication(zappy::structs::Config config);
+        explicit Communication(zappy::structs::Config config,
+            const std::string &delimiter = "\n");
         ~Communication();
 
         void sendMessage(const std::string &message) override;
@@ -68,7 +69,7 @@ class Communication : public ICommunication {
         int _socket;
         struct pollfd _pollfd;
         static const int BUFFER_SIZE = 4096;
-        static const char MESSAGE_DELIMITER = '\n';
+        std::string _delimiter;
 };
 
 #endif /* !COMMUNICATION_HPP_ */

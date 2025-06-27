@@ -69,6 +69,11 @@ static void get_graphic_buffer(int fd, graph_net_t *current,
     if (buffer) {
         poll_graphic_commands(zappy, current, buffer);
         free(buffer);
+    } else {
+        valid_message("Graphic client disconnected");
+        remove_graph_node(&zappy->graph, fd);
+        close(fd);
+        return;
     }
 }
 
