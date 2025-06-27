@@ -25,8 +25,6 @@ Communication::Communication(int port, const std::string &hostname,
       _sendBuffer(""),
       _socket(-1)
 {
-    // _delimiter = delimiter.empty() ? "\n" : delimiter;
-
     try {
         setupConnection();
         startCommunicationThread();
