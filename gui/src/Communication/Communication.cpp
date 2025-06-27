@@ -14,15 +14,18 @@
 
 #include "Communication.hpp"
 
-Communication::Communication(zappy::structs::Config config, const std::string &delimiter)
-    : _config(config),
+Communication::Communication(int port, const std::string &hostname,
+                             const std::string &delimiter)
+    : _port(port),
+      _hostname(hostname),
+      _delimiter(delimiter.empty() ? "\n" : delimiter),
       _running(false),
       _connected(false),
       _receiveBuffer(""),
       _sendBuffer(""),
       _socket(-1)
 {
-    _delimiter = delimiter.empty() ? "\n" : delimiter;
+    // _delimiter = delimiter.empty() ? "\n" : delimiter;
 
     try {
         setupConnection();
@@ -97,7 +100,7 @@ void Communication::setupConnection()
 
     _connected = true;
     std::cout << colors::T_GREEN << "Successfully connected to "
-              << _config.hostname << ":" << _config.port
+              << _hostname << ":" << _port
               << colors::RESET << std::endl;
 }
 
@@ -117,9 +120,9 @@ void Communication::connectToServer()
     struct sockaddr_in serverAddr;
     memset(&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(_config.port);
+    serverAddr.sin_port = htons(_port);
 
-    if (inet_pton(AF_INET, _config.hostname.c_str(), &serverAddr.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, _hostname.c_str(), &serverAddr.sin_addr) <= 0) {
         std::string errorMsg = "Invalid address: ";
         errorMsg += strerror(errno);
         close(_socket);

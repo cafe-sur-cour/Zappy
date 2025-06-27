@@ -29,8 +29,8 @@
 
 class Communication : public ICommunication {
     public:
-        explicit Communication(zappy::structs::Config config,
-            const std::string &delimiter = "\n");
+        explicit Communication(int port, const std::string &hostname,
+                const std::string &delimiter = "\n");
         ~Communication();
 
         void sendMessage(const std::string &message) override;
@@ -53,7 +53,9 @@ class Communication : public ICommunication {
 
         void parseReceivedData();
 
-        zappy::structs::Config _config;
+        int _port;
+        std::string _hostname;
+        std::string _delimiter;
         std::thread _thread;
         std::mutex _mutex;
         std::condition_variable _cv;
@@ -69,7 +71,6 @@ class Communication : public ICommunication {
         int _socket;
         struct pollfd _pollfd;
         static const int BUFFER_SIZE = 4096;
-        std::string _delimiter;
 };
 
 #endif /* !COMMUNICATION_HPP_ */
