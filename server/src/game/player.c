@@ -23,6 +23,7 @@ static void update_player_food(player_t *player, zappy_t *zappy)
     if (time_elapsed >= time_to_wait) {
         if (player->inventory->nbFood > 0) {
             player->inventory->nbFood--;
+            send_player_inventory(zappy, player);
         }
         player->last_food_check = current_time;
     }
@@ -64,6 +65,7 @@ static void handle_player_death(zappy_t *zappy, player_t *player, team_t *team)
             current->next = player->next;
         }
     }
+    close_client(player->network);
     free_player(player);
 }
 
@@ -105,9 +107,9 @@ static int get_id(zappy_t *zappy)
 
     for (team_t *team = zappy->game->teams; team != NULL;
         team = team->next) {
-        for (egg_t *egg = zappy->game->map->currentEggs; egg !=
-            NULL; egg = egg->next) {
-            id += (strcmp(egg->teamName, team->name) == 0) ? 1 : 0;
+        for (egg_t *egg = zappy->game->map->currentEggs; egg != NULL; egg = egg->next) {
+            if (egg && team && team->name && egg->teamName && strcmp(egg->teamName, team->name) == 0)
+                id += 1;
         }
     }
     return id;
@@ -124,7 +126,7 @@ void verify_need_for_egg(team_t *team, zappy_t *zappy)
     if (team->nbPlayerAlive + team->nbEggs >= team->nbPlayers) {
         return;
     }
-    while (team->nbPlayerAlive + team->nbEggs <= team->nbPlayers) {
+    while (team->nbPlayerAlive + team->nbEggs < team->nbPlayers) {
         id = get_id(zappy);
         new = add_egg_node(id, pos, team->name, -1);
         push_back_egg(zappy, new);

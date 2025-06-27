@@ -68,6 +68,7 @@ static void mark_current_action(player_t *player)
 /* This function handles the initiall data of an egg being laid */
 int handle_fork(player_t *player, char *command, zappy_t *zappy)
 {
+    printf("Fork command\n");
     int id = get_nb_eggs(zappy);
     int pos[2] = {player->posX, player->posY};
     egg_t *new = NULL;
