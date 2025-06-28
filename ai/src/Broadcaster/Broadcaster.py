@@ -17,8 +17,7 @@ class Broadcaster:
     def revealMessage(self, message: str) -> str:
         try:
             message = self.hasher.unHashMessage(message.strip())
-        except Exception as e:
-            print(f"Error unhashing message: {e}")
+        except Exception:
             message = ""
 
         if not message:

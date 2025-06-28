@@ -1004,7 +1004,7 @@ class Player:
             self.goToIncantationState["droppingStones"] = False
         self.roombaState["phase"] = "forward"
 
-    def handleMessages(self, direction: int, message: str) -> None:
+    def handleMessages(self, direction: int, originalMessage: str) -> None:
         switcher = {
             "teamslots ": self.handleMessageTeamslots,
             "sendInventory ": self.handleMessageSendInventory,
@@ -1017,16 +1017,22 @@ class Player:
             "goRoombas": self.handleMessageGoRoombas,
         }
 
+        unHashedMessage = self.broadcaster.revealMessage(originalMessage)
+
         for key in switcher.keys():
-            if message.startswith(key):
-                rest = message[len(key):].strip()
+            if unHashedMessage.startswith(key):
+                rest = unHashedMessage[len(key):].strip()
                 if rest:
                     switcher[key](direction, rest)
                 else:
                     switcher[key](direction)
                 return
 
-        self.logger.error(f"Unknown message: {message.strip()}")
+        self.commandsToSend.append(
+            (
+                lambda: self.broadcaster.broadcastMessage(originalMessage)
+            )
+        )
 
     def sendCommands(self) -> None:
         if len(self.commandsToSend) == 0:
@@ -1043,9 +1049,7 @@ class Player:
                 if self.communication.hasMessages():
                     data = self.communication.getLastMessage()
                     direction = data[0]
-                    message = self.broadcaster.revealMessage(data[1])
-                    if message.strip():
-                        self.handleMessages(direction, message)
+                    self.handleMessages(direction, data[1])
 
                 if self.communication.hasResponses():
                     response = self.communication.getLastResponse()
