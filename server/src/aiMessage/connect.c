@@ -30,7 +30,9 @@ static int send_nbr_slots(player_t *player, int nb_available_slots)
     snprintf(buffer, sizeof(buffer), "%d\n", nb_available_slots);
     buffer[str_len_slots + 1] = '\0';
     write_in_buffer(player->network->writingBuffer, buffer);
-    return write_message(player->network);
+    if (write_message(player->network) == -1)
+        return -1;
+    return 1;
 }
 
 int handle_connect_nbr(player_t *player, char *command, zappy_t *zappy)
