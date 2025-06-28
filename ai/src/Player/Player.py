@@ -1004,7 +1004,7 @@ class Player:
             self.goToIncantationState["droppingStones"] = False
         self.roombaState["phase"] = "forward"
 
-    def handleMessages(self, direction: int, originalMessage: str) -> None:
+    def handleMessage(self, direction: int, originalMessage: str) -> None:
         switcher = {
             "teamslots ": self.handleMessageTeamslots,
             "sendInventory ": self.handleMessageSendInventory,
@@ -1049,7 +1049,7 @@ class Player:
                 if self.communication.hasMessages():
                     data = self.communication.getLastMessage()
                     direction = data[0]
-                    self.handleMessages(direction, data[1])
+                    self.handleMessage(direction, data[1])
 
                 if self.communication.hasResponses():
                     response = self.communication.getLastResponse()
