@@ -158,5 +158,5 @@ int handle_look(player_t *player, char *command, zappy_t *zappy)
         return -1;
     }
     free(message);
-    return 0;
+    return 1;
 }

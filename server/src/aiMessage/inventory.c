@@ -76,5 +76,5 @@ int handle_inventory(player_t *player, char *command, zappy_t *zappy)
         return -1;
     if (send_player_inventory(zappy, player) == -1)
         return -1;
-    return 0;
+    return 1;
 }
