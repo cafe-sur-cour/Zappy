@@ -7,7 +7,7 @@
 
 import os
 import signal
-import time
+from time import sleep
 from src.Config.Constants import (
     FAILURE,
     SUCCESS,
@@ -78,7 +78,7 @@ class App:
             except Exception:
                 pass
 
-        time.sleep(0.5)
+        sleep(0.5)
 
         force_killed = []
         for pid in self.childs:
@@ -114,7 +114,6 @@ class App:
             self.is_main_process = False
             try:
                 p = Player(self.name, self.ip, self.port)
-                p.is_child_process = True
                 result = p.start()
                 exit(result)
             except Exception:

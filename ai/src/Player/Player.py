@@ -29,7 +29,9 @@ from src.Config.GameConfig import (
     ELEVATION_COST,
     FOOD_VALUE,
     MOVE_COST,
-    DROP_COST
+    DROP_COST,
+    MIN_NB_PLAYERS,
+    FORK_COST,
 )
 from src.Logger.Logger import Logger
 
@@ -49,7 +51,6 @@ class Player:
         self.teamName: str = name
         self.ip: str = ip
         self.port: int = port
-        self.is_child_process = False
 
         self.level: int = 1
         self.broadcaster: Broadcaster = Broadcaster(self.communication, name)
@@ -135,12 +136,53 @@ class Player:
             f"Going to incantation: {self.goToIncantationState['status']}"
         )
 
+    def _cleanup_children(self):
+        if len(self.childs) > 0:
+            self.logger.info(f"Terminating {len(self.childs)} AI child processes...")
+
+        for pid in self.childs:
+            try:
+                os.kill(pid, signal.SIGTERM)
+            except (ProcessLookupError, ChildProcessError):
+                pass
+            except Exception:
+                pass
+
+        sleep(0.5)
+
+        force_killed = []
+        for pid in self.childs:
+            try:
+                os.kill(pid, 0)
+                os.kill(pid, signal.SIGKILL)
+                force_killed.append(pid)
+            except (ProcessLookupError, ChildProcessError):
+                pass
+            except Exception:
+                pass
+
+        for pid in self.childs:
+            try:
+                os.waitpid(pid, 0)
+            except (ProcessLookupError, ChildProcessError):
+                pass
+            except Exception:
+                pass
+
+        num_children = len(self.childs)
+        self.childs.clear()
+        if force_killed:
+            self.logger.info(f"Force killed {len(force_killed)} AI child processes")
+        if num_children > 0:
+            self.logger.success(f"All AI processes terminated.")
+
     def _child_signal_handler(self, signum, frame):
         try:
             if hasattr(self, 'communication') and self.communication:
                 self.communication.stopLoop()
         except Exception:
             pass
+        self._cleanup_children()
         sys.stdout.flush()
         sys.stderr.flush()
         os._exit(SUCCESS)
@@ -158,15 +200,11 @@ class Player:
 
     def start(self):
         try:
-            if self.is_child_process:
-                signal.signal(signal.SIGINT, self._child_signal_handler)
-                signal.signal(signal.SIGTERM, self._child_signal_handler)
+            signal.signal(signal.SIGINT, self._child_signal_handler)
+            signal.signal(signal.SIGTERM, self._child_signal_handler)
 
-            slots, x, y = self.communication.connectToServer()
+            _, x, y = self.communication.connectToServer()
             self.setMapSize(x, y)
-
-            if not self.is_child_process:
-                self.setNbSlots(slots + 1)
 
             self.startComThread()
 
@@ -572,6 +610,20 @@ class Player:
             )
         )
 
+    def createNewPlayer(self) -> None:
+        pid: int = os.fork()
+        if pid < 0:
+            return
+        elif pid == 0:
+            try:
+                p = Player(self.teamName, self.ip, self.port)
+                result = p.start()
+                exit(result)
+            except Exception:
+                exit(FAILURE)
+        else:
+            self.childs.append(pid)
+
     def handleResponseInventory(self) -> None:
         newInventory = self.communication.getInventory()
 
@@ -647,6 +699,15 @@ class Player:
             self.inIncantation = False
 
     def handleResponseOK(self) -> None:
+        if self.lastCommandSent == "Fork":
+            self.createNewPlayer()
+            self.nbTeamSlots += 1
+            self.commandsToSend.append(
+                (
+                    lambda: self.broadcaster.broadcastMessage(f"teamslots {self.nbTeamSlots}"),
+                    "broadcast teamslots"
+                )
+            )
         if (
             not self.incantationState["status"] and
             not self.goToIncantationState["status"] and
@@ -700,7 +761,18 @@ class Player:
     def handleResponseConnectNbr(self, response: str) -> None:
         try:
             connectNbr = int(response)
+            for _ in range(connectNbr):
+                self.createNewPlayer()
             self.nbConnectedPlayers = self.nbTeamSlots - connectNbr
+            if self.nbConnectedPlayers < MIN_NB_PLAYERS:
+                for _ in range(MIN_NB_PLAYERS - self.nbConnectedPlayers):
+                    if self.inventory["food"] * FOOD_VALUE > FORK_COST:
+                        self.commandsToSend.append(
+                            (
+                                lambda: self.communication.sendFork(),
+                                "Fork"
+                            )
+                        )
         except ValueError:
             self.logger.error(f"Invalid connect nbr: {response.strip()}")
 
