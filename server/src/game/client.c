@@ -160,16 +160,16 @@ static int check_team_capacity(zappy_t *server, const char *team_name,
     player_t *new_player)
 {
     while (server->game->teams) {
-        printf("%i vs %i\n", server->game->teams->nbPlayers, server->params->nb_client + server->game->teams->nbEggs);
         if (strcmp(server->game->teams->name, team_name) == 0 &&
-            server->game->teams->nbPlayers < server->params->nb_client + server->game->teams->nbEggs) {
+            server->game->teams->nbPlayers < server->params->nb_client +
+                server->game->teams->nbEggs) {
             new_player->next = server->game->teams->players;
             server->game->teams->players = new_player;
             server->game->teams->nbPlayers++;
             server->game->teams->nbPlayerAlive++;
             new_player->id = -1;
-            printf("Value return, %d\n", (server->params->nb_client + server->game->teams->nbEggs) - server->game->teams->nbPlayers);
-            return (server->params->nb_client + server->game->teams->nbEggs) - server->game->teams->nbPlayers;
+            return (server->params->nb_client + server->game->teams->nbEggs)
+                - server->game->teams->nbPlayers;
         }
         server->game->teams = server->game->teams->next;
     }
