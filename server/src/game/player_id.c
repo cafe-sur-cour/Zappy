@@ -81,3 +81,15 @@ void verify_player_id(zappy_t *zappy, player_t *player)
         send_player_connect(zappy, player);
     }
 }
+
+void remove_player_by_fd(zappy_t *zappy, int fd)
+{
+    team_t *team = zappy->game->teams;
+    player_t *player = NULL;
+
+    while (team) {
+        player = team->players;
+        remove_player_from_team(team, player, fd, zappy);
+        team = team->next;
+    }
+}

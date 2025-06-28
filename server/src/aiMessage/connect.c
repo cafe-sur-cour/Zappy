@@ -42,6 +42,6 @@ int handle_connect_nbr(player_t *player, char *command, zappy_t *zappy)
     player_team = find_team_by_name(zappy, player->team);
     if (player_team == NULL)
         return -1;
-    nb_available_slots = zappy->params->nb_client - player_team->nbPlayers;
+    nb_available_slots = zappy->params->nb_client - player_team->nbPlayerAlive;
     return send_nbr_slots(player, nb_available_slots);
 }

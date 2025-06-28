@@ -22,6 +22,11 @@ static void get_message_client(int fd, player_t *player, zappy_t *zappy)
     if (message) {
         queue_action(player, message, zappy);
         free(message);
+    } else {
+        valid_message("Player disconnected");
+        remove_player_by_fd(zappy, fd);
+        close(fd);
+        return;
     }
 }
 

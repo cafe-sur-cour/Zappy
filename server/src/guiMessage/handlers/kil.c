@@ -59,7 +59,7 @@ static void kill_player(zappy_t *zappy, player_t *player)
             current->next = player->next;
         }
     }
-    team->nbPlayerAlive--;
+    close_client(player->network);
     free_player(player);
 }
 
