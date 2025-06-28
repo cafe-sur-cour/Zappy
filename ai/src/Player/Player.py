@@ -85,6 +85,7 @@ class Player:
             "lastPhase": None,
             "commandSentTime": 0,
             "highestPidSeen": 0,
+            "turnCount": 0,
         }
 
         self.incantationState: dict = {
@@ -299,7 +300,7 @@ class Player:
                                 )
                             )
             self.roombaState["lastCommand"] = "take"
-            self.roombaState["phase"] = "forward"
+            self.roombaState["phase"] = "move"
             self.roombaState["lastPhase"] = "vacuum"
 
         elif phase == "updateInventory":
@@ -307,7 +308,7 @@ class Player:
                 (lambda: self.communication.sendInventory(), "inventory")
             )
             self.roombaState["lastCommand"] = "inventory"
-            self.roombaState["phase"] = "forward"
+            self.roombaState["phase"] = "move"
             self.roombaState["lastPhase"] = "updateInventory"
 
         elif phase == "checkOnTeammates":
@@ -352,7 +353,7 @@ class Player:
                                 )
                             )
                             self.roombaState["lastCommand"] = "broadcast leadIncantation"
-                    self.roombaState["phase"] = "forward"
+                    self.roombaState["phase"] = "move"
                 else:
                     self.commandsToSend.append(
                         (lambda: self.communication.sendGetConnectNbr(), "Connect_nbr")
@@ -365,7 +366,9 @@ class Player:
                 )
                 self.roombaState["lastCommand"] = "Connect_nbr"
 
-        elif phase == "forward":
+        elif phase == "move":
+            self.roombaState["lastPhase"] = "move"
+
             if self.roombaState["forwardCount"] < self.roombaState["targetForward"]:
                 self.commandsToSend.append(
                     (lambda: self.communication.sendForward(), "forward")
@@ -373,39 +376,18 @@ class Player:
                 self.roombaState["lastCommand"] = "forward"
                 self.roombaState["forwardCount"] += 1
                 self.roombaState["phase"] = "lookAround"
-                self.roombaState["lastPhase"] = "forward"
 
             else:
+                self.roombaState["turnCount"] = (self.roombaState["turnCount"] + 1) % 4
+                if self.roombaState["turnCount"] == 0:
+                    self.roombaState["targetForward"] += 1
+                if self.roombaState["turnCount"] == 3:
+                    self.roombaState["targetForward"] -= 1
                 self.roombaState["forwardCount"] = 0
                 self.commandsToSend.append(
                     (lambda: self.communication.sendRight(), "right")
                 )
                 self.roombaState["lastCommand"] = "right"
-                self.roombaState["phase"] = "turn"
-                self.roombaState["lastPhase"] = "forward"
-
-        elif phase == "turn":
-            if self.roombaState["lastCommand"] == "right":
-                self.commandsToSend.append(
-                    (lambda: self.communication.sendForward(), "forward")
-                )
-                self.roombaState["lastCommand"] = "forward"
-
-            elif self.roombaState["lastCommand"] == "forward":
-                self.commandsToSend.append(
-                    (lambda: self.communication.sendLeft(), "left")
-                )
-                self.roombaState["lastCommand"] = "left"
-                self.roombaState["phase"] = "lookAround"
-                self.roombaState["lastPhase"] = "turn"
-
-            else:
-                self.logger.error(
-                    f"Unexpected lastCommand '{self.roombaState['lastCommand']}'"
-                    f" in turn phase, resetting to lookAround"
-                )
-                self.roombaState["phase"] = "lookAround"
-                self.roombaState["lastPhase"] = "turn"
 
         else:
             self.logger.error(f"Unknown roomba phase '{phase}', resetting to lookAround")
@@ -415,7 +397,7 @@ class Player:
     def incantationAction(self) -> None:
         if self.level >= MAX_LEVEL:
             self.incantationState["status"] = False
-            self.roombaState["phase"] = "forward"
+            self.roombaState["phase"] = "move"
             return
 
         phase = self.incantationState["phase"]
@@ -510,7 +492,7 @@ class Player:
                         self.incantationState["phase"] = "sendComeIncant"
                         self.incantationState["lastCommand"] = None
                         self.incantationState["playerResponses"] = []
-                        self.roombaState["phase"] = "forward"
+                        self.roombaState["phase"] = "move"
 
                     else:
                         self.incantationState["phase"] = "startIncantation"
@@ -540,7 +522,7 @@ class Player:
     def goToIncantationAction(self) -> None:
         if self.level >= MAX_LEVEL:
             self.goToIncantationState["status"] = False
-            self.roombaState["phase"] = "forward"
+            self.roombaState["phase"] = "move"
             return
 
         if self.goToIncantationState["droppingStones"]:
@@ -643,7 +625,7 @@ class Player:
         self.logger.error(f"Command '{self.lastCommandSent}' failed")
 
         if self.roombaState["phase"] == "checkOnTeammates":
-            self.roombaState["phase"] = "forward"
+            self.roombaState["phase"] = "move"
 
         if self.incantationState["status"] and self.inIncantation:
             self.logger.error("Incantation failed, going roomba mode")
@@ -651,7 +633,7 @@ class Player:
             self.incantationState["phase"] = "sendComeIncant"
             self.incantationState["lastCommand"] = None
             self.incantationState["playerResponses"] = []
-            self.roombaState["phase"] = "forward"
+            self.roombaState["phase"] = "move"
             self.inIncantation = False
 
         if self.goToIncantationState["status"] and self.inIncantation:
@@ -661,7 +643,7 @@ class Player:
             self.goToIncantationState["movementStarted"] = False
             self.goToIncantationState["steps"] = []
             self.goToIncantationState["droppingStones"] = False
-            self.roombaState["phase"] = "forward"
+            self.roombaState["phase"] = "move"
             self.inIncantation = False
 
     def handleResponseOK(self) -> None:
@@ -1002,7 +984,7 @@ class Player:
             self.goToIncantationState["movementStarted"] = False
             self.goToIncantationState["steps"] = []
             self.goToIncantationState["droppingStones"] = False
-        self.roombaState["phase"] = "forward"
+        self.roombaState["phase"] = "move"
 
     def handleMessage(self, direction: int, originalMessage: str) -> None:
         switcher = {
