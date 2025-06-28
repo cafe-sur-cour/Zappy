@@ -27,5 +27,6 @@ int cb_getline(buffer_t *cb, char *line, int max_len);
 buffer_t *create_buffer(void);
 int write_in_buffer(buffer_t *cb, const char *str);
 void print_buffer_state(buffer_t *cb, const char *label);
+void empty_buffer(buffer_t *cb);
 
 #endif /* !BUFFER_H_ */
