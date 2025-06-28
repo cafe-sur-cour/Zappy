@@ -381,7 +381,7 @@ class Player:
                 self.roombaState["turnCount"] = (self.roombaState["turnCount"] + 1) % 4
                 if self.roombaState["turnCount"] == 0:
                     self.roombaState["targetForward"] += 1
-                if self.roombaState["turnCount"] == 3:
+                if self.roombaState["turnCount"] == 2:
                     self.roombaState["targetForward"] -= 1
                 self.roombaState["forwardCount"] = 0
                 self.commandsToSend.append(
