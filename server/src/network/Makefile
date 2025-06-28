@@ -12,7 +12,8 @@ SRC		=	accept_connection.c	\
 			send_message.c		\
 			buffer.c			\
 			print_error.c		\
-			print_buffer.c
+			print_buffer.c		\
+			empty_buffer.c
 
 OBJ 	= 	$(SRC:.c=.o)
 

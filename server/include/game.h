@@ -17,6 +17,7 @@ typedef struct action_request_s action_request_t;
 typedef struct action_queue_s action_queue_t;
 typedef struct player_s player_t;
 
+
 /* Definition of the directions */
 typedef enum direction_e {
     NORTH = 1,
@@ -24,6 +25,12 @@ typedef enum direction_e {
     SOUTH = 3,
     WEST = 4
 } direction_t;
+
+/* This function defines the direction for the broadcast */
+typedef struct direction_orientation_s {
+    direction_t dir;
+    int angle[8];
+} direction_orientation_t;
 
 /* definintion od the different element on the map */
 typedef enum crystal_e {

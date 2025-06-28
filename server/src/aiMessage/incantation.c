@@ -144,12 +144,12 @@ int handle_incantation(player_t *player, char *command, zappy_t *zappy)
     int *player_list = NULL;
     int nb_players = validate_and_get_players(player, zappy, &player_list);
 
-    send_start_incantation(zappy, player, player_list, nb_players);
     if (nb_players == -1) {
         send_end_incantation(zappy, player, "ko");
         return -1;
     }
     (void)command;
+    send_start_incantation(zappy, player, player_list, nb_players);
     mark_players_incanting(player_list, nb_players, zappy);
     valid_message("Elevation underway");
     send_elevation_uder_way_to_all(zappy, player_list, nb_players);
