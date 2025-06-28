@@ -15,17 +15,17 @@
 #include <poll.h>
 #include <unistd.h>
 
-static void get_message_client(int fd, player_t *player, zappy_t *zappy)
+static void get_message_client(player_t *player, zappy_t *zappy)
 {
-    char *message = get_fd_message(fd);
+    char *message = get_message(player->network);
 
     if (message) {
         queue_action(player, message, zappy);
         free(message);
     } else {
         valid_message("Player disconnected");
-        remove_player_by_fd(zappy, fd);
-        close(fd);
+        close_client(player->network);
+        remove_player_by_fd(zappy, player->network->fd);
         return;
     }
 }
@@ -45,7 +45,7 @@ static int handle_ai_client_message(zappy_t *zappy, int fd, player_t *player,
             return 0;
         }
         if (revents & POLLIN) {
-            get_message_client(fd, player, zappy);
+            get_message_client(player, zappy);
         }
         return 0;
         player = player->next;
@@ -66,18 +66,18 @@ static void handle_player_fd(zappy_t *zappy, int fd, short revents)
     }
 }
 
-static void get_graphic_buffer(int fd, graph_net_t *current,
+static void get_graphic_buffer(graph_net_t *current,
     zappy_t *zappy)
 {
-    char *buffer = get_fd_message(fd);
+    char *buffer = get_message(current->network);
 
     if (buffer) {
         poll_graphic_commands(zappy, current, buffer);
         free(buffer);
     } else {
         valid_message("Graphic client disconnected");
-        remove_graph_node(&zappy->graph, fd);
-        close(fd);
+        close_client(current->network);
+        remove_graph_node(&zappy->graph, current->network->fd);
         return;
     }
 }
@@ -98,7 +98,7 @@ static void handle_graphic_fd(zappy_t *zappy, int fd, short revents)
             return;
         }
         if (revents & POLLIN) {
-            get_graphic_buffer(fd, current, zappy);
+            get_graphic_buffer(current, zappy);
         }
         return;
         current = current->next;

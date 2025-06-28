@@ -38,7 +38,7 @@ static char *append_to_message(char *message, const char *text)
     size_t old_len = strlen(message);
     size_t text_len = strlen(text);
 
-    message = realloc(message, old_len + text_len + 1);
+    message = realloc(message, old_len + text_len + 3);
     strcat(message, text);
     return message;
 }
@@ -148,6 +148,7 @@ int handle_look(player_t *player, char *command, zappy_t *zappy)
     (void)command;
     if (message == NULL)
         return -1;
+    empty_buffer(player->network->writingBuffer);
     write_in_buffer(player->network->writingBuffer, message);
     if (write_message(player->network) == -1) {
         free(message);

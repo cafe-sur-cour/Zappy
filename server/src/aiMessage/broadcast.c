@@ -14,8 +14,15 @@
 #include <math.h>
 #include <string.h>
 
+static const direction_orientation_t orr[] = {
+    {NORTH, {1, 2, 3, 4, 5, 6, 7, 8}},
+    {EAST, {3, 4, 5, 6, 7, 8, 1, 2}},
+    {SOUTH, {5, 6, 7, 8, 1, 2, 3, 4}},
+    {WEST, {7, 8, 1, 2, 3, 4, 5, 6}}
+};
+
 static void print_broadcast_server(player_t *source, player_t *dest,
-    int orientation)
+    int orientation, char *message)
 {
     int l = int_str_len(source->id) + int_str_len(dest->id) +
         int_str_len(dest->posX) + int_str_len(dest->posY) + 1 + 57;
@@ -29,19 +36,30 @@ static void print_broadcast_server(player_t *source, player_t *dest,
         source->id, dest->id, dest->posX, dest->posY, orientation);
     valid_message(d);
     free(d);
+    if (message)
+        free(message);
 }
 
 static int adjust_for_orientation(int direction_number,
     direction_t orientation)
 {
-    int offset = 0;
-    int adjusted = 0;
+    int dir_val = -1;
 
     if (direction_number == 0)
         return 0;
-    offset = (orientation - 1) * 2;
-    adjusted = ((direction_number - 1 - offset + 8) % 8) + 1;
-    return adjusted;
+    if (orientation == NORTH)
+        return direction_number;
+    for (int i = 0; i < 4; i++) {
+        if (orr[i].dir == orientation) {
+            dir_val = i;
+            break;
+        }
+    }
+    for (int i = 0; i < 8; i++) {
+        if (orr[dir_val].dir == orientation && direction_number == i + 1)
+            return orr[dir_val].angle[i];
+    }
+    return 1;
 }
 
 static void wrap_coordinates(int *dx, int *dy, int map_width, int map_height)
@@ -56,38 +74,50 @@ static void wrap_coordinates(int *dx, int *dy, int map_width, int map_height)
         *dy += map_height;
 }
 
+static double get_base_angle(int dx, int dy)
+{
+    double angle = 0;
+
+    angle = atan2(-dy, dx) * (180.0 / M_PI);
+    if (angle < 0)
+        angle += 360;
+    return angle;
+}
+
 static int get_orientation(int dx, int dy)
 {
-    if (dx == 0 && dy == 0)
-        return 0;
-    if (dx == 0 && dy < 0)
-        return 1;
-    if (dx > 0 && dy < 0)
-        return 2;
-    if (dx > 0 && dy == 0)
+    double angle = get_base_angle(dx, dy);
+
+    if (angle >= 337.5 || angle < 22.5)
         return 3;
-    if (dx > 0 && dy > 0)
+    if (angle >= 22.5 && angle < 67.5)
         return 4;
-    if (dx == 0 && dy > 0)
+    if (angle >= 67.5 && angle < 112.5)
         return 5;
-    if (dx < 0 && dy > 0)
+    if (angle >= 112.5 && angle < 157.5)
         return 6;
-    if (dx < 0 && dy == 0)
+    if (angle >= 157.5 && angle < 202.5)
         return 7;
-    if (dx < 0 && dy < 0)
+    if (angle >= 202.5 && angle < 247.5)
         return 8;
+    if (angle >= 247.5 && angle < 292.5)
+        return 1;
+    if (angle >= 292.5 && angle < 337.5)
+        return 2;
     return 0;
 }
 
 int broadcast_text(player_t *source, player_t *dest, char *text,
     zappy_t *zappy)
 {
-    int d[2] = {source->posX - dest->posX, source->posY - dest->posY};
+    int d[2] = {dest->posX - source->posX, dest->posY - source->posY};
     int dir[3] = {0};
     char *message = NULL;
 
     wrap_coordinates(&d[0], &d[1], zappy->params->x, zappy->params->y);
     dir[0] = get_orientation(d[0], d[1]);
+    if (d[0] == 0 && d[1] == 0)
+        return 0;
     dir[1] = adjust_for_orientation(dir[0], dest->direction);
     dir[2] = strlen(text) + int_str_len(dir[1]) + 11;
     message = malloc(sizeof(char) * (dir[2] + 1));
@@ -96,11 +126,9 @@ int broadcast_text(player_t *source, player_t *dest, char *text,
     snprintf(message, dir[2] + 1, "message %d, %s\n", dir[1], text);
     message[dir[2]] = '\0';
     write_in_buffer(dest->network->writingBuffer, message);
-    if (write_message(dest->network) == -1) {
+    if (write_message(dest->network) == -1)
         return -1;
-    }
-    print_broadcast_server(source, dest, dir[1]);
-    free(message);
+    print_broadcast_server(source, dest, dir[1], message);
     return 0;
 }
 
