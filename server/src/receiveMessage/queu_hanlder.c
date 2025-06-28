@@ -46,7 +46,7 @@ void queue_action(player_t *player, char *command, zappy_t *zappy)
     action_request_t *action = NULL;
 
     (void)zappy;
-    if (!player->pending_actions)
+    if (!player->pending_actions || player->pending_actions->count >= 10)
         return;
     action = create_action_request(command, player, zappy->params->freq);
     if (!action)
@@ -59,7 +59,6 @@ void queue_action(player_t *player, char *command, zappy_t *zappy)
             player->pending_actions->tail = action;
     } else
         insert_action_by_priority(player->pending_actions, action);
-    player->pending_actions->count++;
 }
 
 /* This function free's the queue */
