@@ -99,12 +99,9 @@ class App:
             except Exception:
                 pass
 
-        num_children = len(self.childs)
         self.childs.clear()
         if force_killed:
             self.logger.info(f"Force killed {len(force_killed)} AI child processes")
-        if num_children > 0:
-            self.logger.success(f"All AI processes terminated.")
 
     def create_new_player(self) -> int:
         pid: int = os.fork()

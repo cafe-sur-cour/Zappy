@@ -169,12 +169,9 @@ class Player:
             except Exception:
                 pass
 
-        num_children = len(self.childs)
         self.childs.clear()
         if force_killed:
             self.logger.info(f"Force killed {len(force_killed)} AI child processes")
-        if num_children > 0:
-            self.logger.success(f"All AI processes terminated.")
 
     def _child_signal_handler(self, signum, frame):
         try:
@@ -275,7 +272,7 @@ class Player:
         maxLength = (max(self.x, self.y) / 2) * 7
         movementCost = MOVE_COST * maxLength
 
-        offset = FOOD_VALUE * 5
+        offset = FOOD_VALUE * 15
 
         totalCost = droppingCost + movementCost + offset
 
@@ -761,8 +758,9 @@ class Player:
     def handleResponseConnectNbr(self, response: str) -> None:
         try:
             connectNbr = int(response)
-            for _ in range(connectNbr):
-                self.createNewPlayer()
+            if self.nbTeamSlots - connectNbr < MIN_NB_PLAYERS:
+                for _ in range(MIN_NB_PLAYERS - (self.nbTeamSlots - connectNbr)):
+                    self.createNewPlayer()
             self.nbConnectedPlayers = self.nbTeamSlots - connectNbr
             if self.nbConnectedPlayers < MIN_NB_PLAYERS:
                 for _ in range(MIN_NB_PLAYERS - self.nbConnectedPlayers):
