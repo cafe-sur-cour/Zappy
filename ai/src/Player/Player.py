@@ -1208,9 +1208,9 @@ class Player:
 
         for key in switcher.keys():
             if unHashedMessage.startswith(key):
-                parsedMessage, msgId, _ = self.broadcaster.parseReceivedMessage(unHashedMessage)
+                parsedMessage, id, _ = self.broadcaster.parseReceivedMessage(unHashedMessage)
 
-                if msgId == self.id:
+                if id == self.id:
                     return
 
                 rest = parsedMessage[len(key):].strip()
