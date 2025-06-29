@@ -133,10 +133,10 @@ void verify_need_for_egg(team_t *team, zappy_t *zappy)
     int pos[2] = {rand() % zappy->game->map->width - 1,
         rand() % zappy->game->map->height - 1};
 
-    if (team->nbPlayerAlive + team->nbEggs >= team->nbPlayers) {
+    if (team->nbPlayerAlive + team->nbEggs >= zappy->params->nb_client) {
         return;
     }
-    while (team->nbPlayerAlive + team->nbEggs < team->nbPlayers) {
+    while (team->nbPlayerAlive + team->nbEggs < zappy->params->nb_client) {
         id = get_id(zappy);
         new = add_egg_node(id, pos, team->name, -1);
         push_back_egg(zappy, new);
