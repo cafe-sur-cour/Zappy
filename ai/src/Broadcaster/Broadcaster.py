@@ -29,7 +29,7 @@ class Broadcaster:
     def broadcastMessage(self, message: str) -> None:
         if not message:
             return
-
+        print(f"Broadcasting message: {message}")
         message = message.strip()
         if not message:
             return
@@ -43,5 +43,4 @@ class Broadcaster:
 
         if not hashedMessage:
             return
-        print(f"Broadcasting message: {message}")
         self.com.sendBroadcast(hashedMessage)

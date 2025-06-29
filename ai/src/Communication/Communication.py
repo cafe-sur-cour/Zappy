@@ -94,7 +94,6 @@ class Communication:
                 inventory[name] = int(quantity)
             except ValueError:
                 return None
-
         return inventory
 
     def tryGetLook(self, response: str) -> list[dict[str, int]] | None:
