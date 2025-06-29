@@ -86,7 +86,7 @@ static inventory_t *init_inventory(void)
 }
 
 /* This function initialize the current player structure */
-static player_t *malloc_player(void)
+static player_t *malloc_player(const char *team)
 {
     player_t *player = malloc(sizeof(player_t));
 
@@ -99,14 +99,13 @@ static player_t *malloc_player(void)
         free(player);
         return NULL;
     }
-    player->network->readingBuffer = malloc(sizeof(buffer_t));
-    player->network->writingBuffer = malloc(sizeof(buffer_t));
+    player->network->readingBuffer = create_buffer('\n');
+    player->network->writingBuffer = create_buffer('\n');
     if (!player->network->readingBuffer || !player->network->writingBuffer) {
         error_message("Failed to allocate memory for player buffer.");
         return NULL;
     }
-    memset(player->network->readingBuffer, 0, sizeof(buffer_t));
-    memset(player->network->writingBuffer, 0, sizeof(buffer_t));
+    player->team = strdup((char *)team);
     return player;
 }
 
@@ -119,6 +118,11 @@ static player_t *set_player_pos(player_t *player, zappy_t *zappy)
         return player;
     current_egg = zappy->game->map->currentEggs;
     while (current_egg != NULL){
+        if (current_egg->teamName != NULL &&
+            strcmp(current_egg->teamName, player->team) != 0) {
+            current_egg = current_egg->next;
+            continue;
+        }
         if (current_egg->isHatched == false) {
             player->posX = current_egg->posX;
             player->posY = current_egg->posY;
@@ -131,9 +135,9 @@ static player_t *set_player_pos(player_t *player, zappy_t *zappy)
 }
 
 /* This function initialize the current player structure */
-static player_t *init_player(int fd, zappy_t *zappy)
+static player_t *init_player(int fd, zappy_t *zappy, const char *team)
 {
-    player_t *player = malloc_player();
+    player_t *player = malloc_player(team);
 
     if (!player)
         return NULL;
@@ -184,18 +188,12 @@ static team_t *add_client_team_rest(zappy_t *server, team_t *save,
         free_player(new_player);
         return NULL;
     }
-    new_player->team = strdup(team_name);
-    if (!new_player->team) {
-        error_message("Failed to allocate memory for player team name.");
-        free_player(new_player);
-        return NULL;
-    }
     return server->game->teams;
 }
 
 team_t *add_client_to_team(const char *team_name, int fd, zappy_t *server)
 {
-    player_t *new_player = init_player(fd, server);
+    player_t *new_player = init_player(fd, server, team_name);
     team_t *save = server->game->teams;
     team_t *result = NULL;
 

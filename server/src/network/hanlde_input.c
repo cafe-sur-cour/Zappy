@@ -36,7 +36,7 @@ static buffer_t *get_message_from_buffer(int fd, buffer_t *cb,
         if (read(fd, &c, 1) <= 0)
             return NULL;
         cb_write(cb, c);
-        if (c == '\n')
+        if (c == cb->delim)
             break;
     }
     return cb;
@@ -87,7 +87,7 @@ static char *extract_message_from_buffer(buffer_t *cb, int start, int current)
         pos = (pos + 1) % BUFFER_SIZE;
         i++;
     }
-    if (message[i - 1] == '\n')
+    if (message[i - 1] == cb->delim)
         message[i - 1] = '\0';
     return message;
 }
@@ -114,7 +114,7 @@ static char *check_existing_message(buffer_t *cb)
     int current = start;
 
     while (current != cb->head || cb->full) {
-        if (cb->data[current] == '\n')
+        if (cb->data[current] == cb->delim)
             return process_newline_found(cb, start, current);
         current = (current + 1) % BUFFER_SIZE;
         if (current == cb->head && !cb->full)
@@ -142,7 +142,7 @@ char *get_message(network_t *network)
 
 char *get_fd_message(int fd)
 {
-    static buffer_t cb = {.head = 0, .tail = 0, .full = 0};
+    static buffer_t cb = {.head = 0, .tail = 0, .full = 0, .delim = '\n'};
     buffer_t *cb_ptr = &cb;
     char c = 0;
 
