@@ -51,8 +51,8 @@ static zappy_t *create_minimal_zappy_for_player(void)
     zappy->game->teams->players->network = calloc(1, sizeof(network_t));
     zappy->game->teams->players->network->fd = 42;
     // Add writingBuffer for player->network, required by handle_player_death
-    zappy->game->teams->players->network->writingBuffer = create_buffer();
-    zappy->game->teams->players->network->readingBuffer = create_buffer();
+    zappy->game->teams->players->network->writingBuffer = create_buffer('\n);
+    zappy->game->teams->players->network->readingBuffer = create_buffer('\n);
     zappy->game->teams->players->last_food_check = time(NULL) - 200;
     // Add stub for player->next
     zappy->game->teams->players->next = NULL;
