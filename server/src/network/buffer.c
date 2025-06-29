@@ -41,7 +41,7 @@ int cb_getline(buffer_t *cb, char *line, int max_len)
         line[i] = c;
         i++;
         idx = advance(idx);
-        if (c == '\n' || i == max_len - 1) {
+        if (c == cb->delim || i == max_len - 1) {
             line[i] = '\0';
             cb->tail = idx;
             cb->full = 0;
@@ -51,7 +51,7 @@ int cb_getline(buffer_t *cb, char *line, int max_len)
     return 0;
 }
 
-buffer_t *create_buffer(void)
+buffer_t *create_buffer(char delim)
 {
     buffer_t *buffer = malloc(sizeof(buffer_t));
 
@@ -62,6 +62,7 @@ buffer_t *create_buffer(void)
     buffer->head = 0;
     buffer->tail = 0;
     buffer->full = 0;
+    buffer->delim = delim;
     memset(buffer->data, 0, sizeof(buffer->data));
     return buffer;
 }

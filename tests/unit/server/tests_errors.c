@@ -40,7 +40,7 @@ Test(errors, write_message_valid_fd, .init = redirect_all_std)
     player->network = malloc(sizeof(network_t));
     player->network->fd = 1; // Valid file descriptor for testing
     player->network->writingBuffer = malloc(sizeof(buffer_t));
-    player->network->writingBuffer = create_buffer();
+    player->network->writingBuffer = create_buffer('\n');
 
     write_in_buffer(player->network->writingBuffer, "Test message");
     int result = write_message(player->network);
@@ -54,7 +54,7 @@ Test(errors, write_message_invalid_fd, .init = redirect_all_std)
     player->network = malloc(sizeof(network_t));
     player->network->fd = 1; // Valid file descriptor for testing
     player->network->writingBuffer = malloc(sizeof(buffer_t));
-    player->network->writingBuffer = create_buffer();
+    player->network->writingBuffer = create_buffer('\n');
 
     write_in_buffer(player->network->writingBuffer, "Test message");
     int result = write_message(player->network);
