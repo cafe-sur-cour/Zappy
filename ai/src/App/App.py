@@ -27,16 +27,16 @@ class App:
         self.ip = config["machine"]
         self.childs: list[int] = []
         self.running = True
-        self.is_main_process = True
+        self.mainProcessPID = os.getpid()
         self.logger = Logger()
         self.mainPlayer: Player = None
 
-        if self.is_main_process:
+        if os.getpid() == self.mainProcessPID:
             signal.signal(signal.SIGINT, self._signal_handler)
             signal.signal(signal.SIGTERM, self._signal_handler)
 
     def _signal_handler(self, signum, frame):
-        if self.is_main_process:
+        if os.getpid() == self.mainProcessPID:
             self.logger.info(f"Received signal {signum}, shutting down AI team {self.name}...")
             self._cleanup_children()
             self.running = False
@@ -44,7 +44,7 @@ class App:
                 self.mainPlayer.communication.stopLoop()
 
     def _wait_for_children(self):
-        if not self.is_main_process:
+        if os.getpid() != self.mainProcessPID:
             return
 
         if len(self.childs) > 0:
@@ -61,7 +61,7 @@ class App:
         self.childs.clear()
 
     def _cleanup_children(self):
-        if not self.is_main_process:
+        if os.getpid() != self.mainProcessPID:
             return
 
         if len(self.childs) > 0:
@@ -105,7 +105,6 @@ class App:
         if pid < 0:
             return -1
         if pid == 0:
-            self.is_main_process = False
             try:
                 p = Player(self.name, self.ip, self.port)
                 result = p.start()
@@ -158,7 +157,7 @@ class App:
                 self._cleanup_children()
             return FAILURE
         finally:
-            if self.is_main_process:
+            if os.getpid() == self.mainProcessPID:
                 self._wait_for_children()
                 self.logger.info(f"AI team {self.name} finished")
 

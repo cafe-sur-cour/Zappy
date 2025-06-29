@@ -208,7 +208,7 @@ Test(get_message, invalid_fd, .init = redirect_all_std)
 {
     network_t network;
     network.fd = -1;
-    network.readingBuffer = create_buffer();
+    network.readingBuffer = create_buffer('\n');
     
     char *result = get_message(&network);
     
@@ -222,7 +222,7 @@ Test(get_message, existing_message_in_buffer, .init = redirect_all_std)
 {
     network_t network;
     network.fd = 0;
-    network.readingBuffer = create_buffer();
+    network.readingBuffer = create_buffer('\n');
     
     // Pre-populate buffer with a complete message
     const char *test_msg = "Existing message\n";
@@ -245,7 +245,7 @@ Test(get_message, partial_message_in_buffer, .init = redirect_all_std, .fini = c
     
     network_t network;
     network.fd = test_server_fd;
-    network.readingBuffer = create_buffer();
+    network.readingBuffer = create_buffer('\n');
     
     // Pre-populate buffer with partial message (no newline)
     const char *partial_msg = "Partial";
@@ -270,7 +270,7 @@ Test(get_message, buffer_wrap_around, .init = redirect_all_std)
 {
     network_t network;
     network.fd = 0;
-    network.readingBuffer = create_buffer();
+    network.readingBuffer = create_buffer('\n');
     
     // Fill buffer to near capacity to test wrap-around
     for (int i = 0; i < BUFFER_SIZE - 10; i++) {
@@ -302,7 +302,7 @@ Test(get_message, empty_buffer_closed_fd, .init = redirect_all_std, .fini = clea
     
     network_t network;
     network.fd = test_server_fd;
-    network.readingBuffer = create_buffer();
+    network.readingBuffer = create_buffer('\n');
     
     // Close the writing end
     close(test_client_fd);
@@ -321,7 +321,7 @@ Test(get_message, long_message, .init = redirect_all_std, .fini = cleanup_socket
     
     network_t network;
     network.fd = test_server_fd;
-    network.readingBuffer = create_buffer();
+    network.readingBuffer = create_buffer('\n');
     
     // Create a long message (but within buffer limits)
     char long_msg[500];
@@ -349,7 +349,7 @@ Test(get_message, multiple_newlines, .init = redirect_all_std, .fini = cleanup_s
     
     network_t network;
     network.fd = test_server_fd;
-    network.readingBuffer = create_buffer();
+    network.readingBuffer = create_buffer('\n');
     
     // Write message with multiple newlines
     const char *multi_nl = "First\nSecond\n";

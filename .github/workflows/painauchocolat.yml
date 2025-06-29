@@ -33,7 +33,7 @@ jobs:
       - name: CLICK HERE TO SEE "DOOF DOOF"
         run: |
           echo "::notice title=DOOFENSCHMIRTZ::CLICK HERE"
-          echo "         /\_/\"
+          echo "         /\\_/\\"
           echo "         (o.o)"
           echo "          >^<"
 
