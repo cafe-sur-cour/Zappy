@@ -49,8 +49,8 @@ bool check_width(char const *flag, char const *value, params_t *params)
     if (is_only_digits(value) == 0)
         return false;
     width = atoi(value);
-    if (strlen(value) > 5 || width <= 0 || width > 2500) {
-        error_message("Width must be a positive integer between 1 and 2500.");
+    if (strlen(value) > 5 || width <= 0 || width > 1000) {
+        error_message("Width must be a positive integer between 1 and 1000.");
         return false;
     }
     params->x = width;
@@ -72,8 +72,8 @@ bool check_height(char const *flag, char const *value, params_t *params)
     if (is_only_digits(value) == 0)
         return false;
     height = atoi(value);
-    if (strlen(value) > 5 || height <= 0 || height > 2500) {
-        error_message("Height must be a positive integer between 1 and 2500.");
+    if (strlen(value) > 5 || height <= 0 || height > 1000) {
+        error_message("Height must be a positive integer between 1 and 1000.");
         return false;
     }
     params->y = height;
