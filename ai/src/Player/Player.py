@@ -230,7 +230,7 @@ class Player:
 
     def isSacrificeAction(self):
         phase = self.isSacrificeState["phase"]
-        
+
         if phase == "getInventory":
             self.commandsToSend.append(
                 (
@@ -268,7 +268,9 @@ class Player:
             for i in range(nbSacrifice):
                 self.commandsToSend.append(
                     (
-                        lambda x=i: self.broadcaster.broadcastMessage(f"setAllFood {self.childs[-(1 + x)]}"),
+                        lambda x=i: self.broadcaster.broadcastMessage(
+                            f"setAllFood {self.childs[-(1 + x)]}"
+                        ),
                         "broadcast setAllFood"
                     )
                 )
@@ -459,7 +461,9 @@ class Player:
                     if not hasattr(self, '_teammate_wait_start'):
                         self._teammate_wait_start = time.time()
                     elif time.time() - self._teammate_wait_start > 5.0:
-                        self.logger.error("Timeout waiting for teammates, continuing with roomba")
+                        self.logger.error(
+                            "Timeout waiting for teammates, continuing with roomba"
+                        )
                         self.roombaState["phase"] = "move"
                         delattr(self, '_teammate_wait_start')
 
@@ -549,7 +553,9 @@ class Player:
                 if not hasattr(self, '_incantation_whereareYou_start'):
                     self._incantation_whereareYou_start = time.time()
                 elif time.time() - self._incantation_whereareYou_start > 10.0:
-                    self.logger.error("Timeout waiting for teammates in incantation, resetting")
+                    self.logger.error(
+                        "Timeout waiting for teammates in incantation, resetting"
+                    )
                     self.incantationState["status"] = False
                     self.incantationState["phase"] = "sendComeIncant"
                     self.incantationState["lastCommand"] = None
@@ -702,7 +708,9 @@ class Player:
                 )
                 self.goToIncantationState["needToWait"] = True
             else:
-                self.logger.error("No steps available and already arrived, resetting goToIncantation state")
+                self.logger.error(
+                    "No steps available and already arrived, resetting goToIncantation state"
+                )
                 self.goToIncantationState["status"] = False
                 self.roombaState["phase"] = "move"
             return
@@ -815,7 +823,9 @@ class Player:
             if not self.sacrificeState["status"]:
                 self.commandsToSend.append(
                     (
-                        lambda: self.broadcaster.broadcastMessage(f"teamslots {self.nbTeamSlots}"),
+                        lambda: self.broadcaster.broadcastMessage(
+                            f"teamslots {self.nbTeamSlots}"
+                        ),
                         "broadcast teamslots"
                     )
                 )
@@ -1198,9 +1208,9 @@ class Player:
 
         for key in switcher.keys():
             if unHashedMessage.startswith(key):
-                parsedMessage, messageId, _ = self.broadcaster.parseReceivedMessage(unHashedMessage)
+                parsedMessage, msgId, _ = self.broadcaster.parseReceivedMessage(unHashedMessage)
 
-                if messageId == self.id:
+                if msgId == self.id:
                     return
 
                 rest = parsedMessage[len(key):].strip()
