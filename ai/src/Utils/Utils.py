@@ -5,9 +5,17 @@
 ## Utils
 ##
 
+from typing import Any
+
 def isNumber(str: str):
     try:
         int(str)
         return True
     except:
         return False
+
+class State:
+    def __init__(self, status: bool, **attributes):
+        self.status = status
+        for name, value in attributes.items():
+            self.__setattr__(name, value)
