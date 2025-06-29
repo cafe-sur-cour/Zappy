@@ -86,7 +86,7 @@ static inventory_t *init_inventory(void)
 }
 
 /* This function initialize the current player structure */
-static player_t *malloc_player(void)
+static player_t *malloc_player(const char *team)
 {
     player_t *player = malloc(sizeof(player_t));
 
@@ -105,6 +105,7 @@ static player_t *malloc_player(void)
         error_message("Failed to allocate memory for player buffer.");
         return NULL;
     }
+    player->team = strdup((char *)team);
     return player;
 }
 
@@ -136,7 +137,7 @@ static player_t *set_player_pos(player_t *player, zappy_t *zappy)
 /* This function initialize the current player structure */
 static player_t *init_player(int fd, zappy_t *zappy, const char *team)
 {
-    player_t *player = malloc_player();
+    player_t *player = malloc_player(team);
 
     if (!player)
         return NULL;
@@ -152,7 +153,6 @@ static player_t *init_player(int fd, zappy_t *zappy, const char *team)
     player->remaining_cooldown = 0;
     player->food_timer = 126;
     player->last_food_check = time(NULL);
-    player->team = strdup((char *)team);
     if (!player->inventory)
         return free_player(player);
     player = set_player_pos(player, zappy);
