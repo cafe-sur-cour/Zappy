@@ -1082,7 +1082,8 @@ class Player:
 
         self.commandsToSend.append(
             (
-                lambda: self.broadcaster.broadcastMessage(originalMessage)
+                lambda: self.broadcaster.broadcastMessage(originalMessage),
+                "broadcast other team message"
             )
         )
 
