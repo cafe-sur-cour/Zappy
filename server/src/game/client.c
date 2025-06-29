@@ -86,7 +86,7 @@ static inventory_t *init_inventory(void)
 }
 
 /* This function initialize the current player structure */
-static player_t *malloc_player(void)
+static player_t *malloc_player(const char *team)
 {
     player_t *player = malloc(sizeof(player_t));
 
@@ -107,6 +107,7 @@ static player_t *malloc_player(void)
     }
     memset(player->network->readingBuffer, 0, sizeof(buffer_t));
     memset(player->network->writingBuffer, 0, sizeof(buffer_t));
+    player->team = (char *)team;
     return player;
 }
 
@@ -138,7 +139,7 @@ static player_t *set_player_pos(player_t *player, zappy_t *zappy)
 /* This function initialize the current player structure */
 static player_t *init_player(int fd, zappy_t *zappy, const char *team)
 {
-    player_t *player = malloc_player();
+    player_t *player = malloc_player(team);
 
     if (!player)
         return NULL;
@@ -154,7 +155,6 @@ static player_t *init_player(int fd, zappy_t *zappy, const char *team)
     player->remaining_cooldown = 0;
     player->food_timer = 126;
     player->last_food_check = time(NULL);
-    player->team = (char *)team;
     if (!player->inventory)
         return free_player(player);
     player = set_player_pos(player, zappy);

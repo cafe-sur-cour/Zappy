@@ -100,7 +100,8 @@ int handle_fork_end(player_t *player, zappy_t *zappy)
         }
         current_egg = current_egg->next;
     }
-    send_egg(zappy, current_egg);
+    if (current_egg != NULL)
+        send_egg(zappy, current_egg);
     if (player->current_action)
         free(player->current_action);
     player->current_action = NULL;
