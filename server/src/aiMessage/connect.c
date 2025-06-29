@@ -46,7 +46,7 @@ int handle_connect_nbr(player_t *player, char *command, zappy_t *zappy)
         printf("Error: Team '%s' not found.\n", player->team);
         return -1;
     }
-    nb_available_slots = zappy->params->nb_client - player_team->nbPlayerAlive +
-        player_team->nbEggs;
+    nb_available_slots = zappy->params->nb_client - player_team->nbPlayerAlive
+        + player_team->nbEggs;
     return send_nbr_slots(player, nb_available_slots);
 }
