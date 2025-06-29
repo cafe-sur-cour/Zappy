@@ -291,6 +291,10 @@ class Player:
         return neededStones
 
     def doesTeamHaveEnoughStones(self) -> bool:
+        if self.level >= MAX_LEVEL:
+            self.teamHasEnoughStones = True
+            return True
+
         totalStones = {
             "linemate": self.inventory["linemate"],
             "deraumere": self.inventory["deraumere"],
@@ -753,10 +757,7 @@ class Player:
                 ):
                     continue
                 if (
-                    item == "food" and
-                    self.teamHasEnoughStones
-                ) or (
-                    item == "thystame" and
+                    item in ["food", "thystame"] and
                     self.enoughFoodForGoToIncantation(self.level, newInventory["food"])
                 ):
                     self.roombaState.phase = "checkOnTeammates"
