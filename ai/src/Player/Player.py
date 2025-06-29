@@ -35,6 +35,7 @@ from src.Config.GameConfig import (
     FORK_COST,
 )
 from src.Logger.Logger import Logger
+from src.Utils.Utils import isNumber
 
 
 class Player:
@@ -882,6 +883,8 @@ class Player:
     def handleResponseConnectNbr(self, response: str) -> None:
         try:
             connectNbr = int(response)
+            if connectNbr < 0:
+                connectNbr = 0
             if self.nbTeamSlots - connectNbr < MIN_NB_PLAYERS:
                 for _ in range(MIN_NB_PLAYERS - (self.nbTeamSlots - connectNbr)):
                     self.createNewPlayer()
@@ -944,7 +947,7 @@ class Player:
                 lambda a: a[len("Current level: "):].strip()
             ),
             (
-                str.isdigit,
+                isNumber,
                 None,
                 self.handleResponseConnectNbr,
                 lambda a: a.strip()
