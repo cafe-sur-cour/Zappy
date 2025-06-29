@@ -112,6 +112,16 @@ class Player:
         self.commandsToSend: list[tuple[Callable, str]] = []
         self.lastCommandSent: str = None
 
+        self.sacrificeState: dict = {
+            "status": False,
+            "phase": "fork",
+            "go": True,
+        }
+        self.isSacrificeState: dict = {
+            "status": False,
+            "phase": "getInventory",
+        }
+
     def __del__(self):
         try:
             if hasattr(self, 'communication') and self.communication:
@@ -217,6 +227,54 @@ class Player:
             return SUCCESS
         except Exception:
             return FAILURE
+
+    def isSacrificeAction(self):
+        phase = self.isSacrificeState["phase"]
+        
+        if phase == "getInventory":
+            self.commandsToSend.append(
+                (
+                    lambda: self.communication.sendInventory(),
+                    "inventory"
+                )
+            )
+            self.isSacrificeState["phase"] = "dropFood"
+
+        elif phase == "dropFood":
+            for _ in range(self.inventory.get("food", 0)):
+                self.commandsToSend.append(
+                    (
+                        lambda: self.communication.sendSetObject("food"),
+                        "set food"
+                    )
+                )
+            self.isSacrificeState["phase"] = "die"
+
+        else:
+            time.sleep(0.1)
+
+    def sacrificeAction(self):
+        phase = self.sacrificeState["phase"]
+        nbSacrifice = 3
+
+        if phase == "fork":
+            for _ in range(nbSacrifice):
+                self.commandsToSend.append(
+                    (lambda: self.communication.sendFork(), "Fork")
+                )
+            self.sacrificeState["phase"] = "sendSetAllFood"
+
+        elif phase == "sendSetAllFood":
+            for i in range(nbSacrifice):
+                self.commandsToSend.append(
+                    (
+                        lambda x=i: self.broadcaster.broadcastMessage(f"setAllFood {self.childs[-(1 + x)]}"),
+                        "broadcast setAllFood"
+                    )
+                )
+            self.sacrificeState["phase"] = "fork"
+            self.sacrificeState["status"] = False
+            self.sacrificeState["go"] = False
 
     def getNeededStonesByPriority(self) -> list[(str, int)]:
         neededStones = []
@@ -696,6 +754,9 @@ class Player:
                     self.roombaState["phase"] = "checkOnTeammates"
                     break
 
+        if newInventory.get("food", 0) <= 10 and self.inventory.get("food", 0) > 10:
+            self.sacrificeState["go"] = True
+
         self.inventory = newInventory or self.inventory
 
         if self.needToBroadcastInventory:
@@ -751,12 +812,13 @@ class Player:
         if self.lastCommandSent == "Fork":
             self.createNewPlayer()
             self.nbTeamSlots += 1
-            self.commandsToSend.append(
-                (
-                    lambda: self.broadcaster.broadcastMessage(f"teamslots {self.nbTeamSlots}"),
-                    "broadcast teamslots"
+            if not self.sacrificeState["status"]:
+                self.commandsToSend.append(
+                    (
+                        lambda: self.broadcaster.broadcastMessage(f"teamslots {self.nbTeamSlots}"),
+                        "broadcast teamslots"
+                    )
                 )
-            )
         if (
             not self.incantationState["status"] and
             not self.goToIncantationState["status"] and
@@ -1084,8 +1146,8 @@ class Player:
             self.goToIncantationState["needToWait"] = False
 
     def handleMessageLeadIncantation(self, direction: int, rest: str) -> None:
-        target_id = rest.strip()
-        if target_id != self.id:
+        targetId = rest.strip()
+        if targetId != self.id:
             return
 
         if (
@@ -1108,6 +1170,13 @@ class Player:
             self.goToIncantationState["droppingStones"] = False
         self.roombaState["phase"] = "move"
 
+    def handleMessageSetAllFood(self, direction: int, rest: str) -> None:
+        targetPid = rest.strip()
+        if targetPid != str(self.pid):
+            return
+
+        self.isSacrificeState["status"] = True
+
     def handleMessage(self, direction: int, originalMessage: str) -> None:
         switcher = {
             "teamslots ": self.handleMessageTeamslots,
@@ -1119,6 +1188,7 @@ class Player:
             "dropStones ": self.handleMessageDropStones,
             "leadIncantation ": self.handleMessageLeadIncantation,
             "goRoombas": self.handleMessageGoRoombas,
+            "setAllFood ": self.handleMessageSetAllFood,
         }
 
         if self.broadcaster.alreadyReceivedMessage(originalMessage):
@@ -1189,6 +1259,9 @@ class Player:
                         sleep(0.1)
                         continue
 
+                if self.isSacrificeState["status"]:
+                    self.isSacrificeAction()
+
                 if (
                     self.nbTeamSlots != -1 and
                     not self.inIncantation and
@@ -1201,7 +1274,11 @@ class Player:
                         self.sendCommands()
                         last_action_time = current_time
                     else:
-                        if self.incantationState["status"]:
+                        if self.inventory.get("food", 0) <= 10:
+                            self.sacrificeState["status"] = True
+                        if self.sacrificeState["status"] and self.sacrificeState["go"]:
+                            self.sacrificeAction()
+                        elif self.incantationState["status"]:
                             self.incantationAction()
                         elif self.goToIncantationState["status"]:
                             self.goToIncantationAction()
