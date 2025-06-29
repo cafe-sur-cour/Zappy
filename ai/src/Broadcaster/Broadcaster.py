@@ -50,6 +50,8 @@ class Broadcaster:
             return
 
         self.messages.append(hashedMessage)
+        if len(self.messages) > 100:
+            self.messages.pop(0)
         self.com.sendBroadcast(hashedMessage)
 
     def setPlayerId(self, playerId: str) -> None:
@@ -75,5 +77,7 @@ class Broadcaster:
     def alreadyReceivedMessage(self, message: str) -> bool:
         if message not in self.messages:
             self.messages.append(message)
+            if len(self.messages) > 100:
+                self.messages.pop(0)
             return False
         return True
