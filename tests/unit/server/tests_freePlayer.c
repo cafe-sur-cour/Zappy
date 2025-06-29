@@ -36,8 +36,8 @@ Test(free_networkplayer, frees_network_fields, .init=redirect_all_std)
 {
     player_t *player = calloc(1, sizeof(player_t));
     player->network = calloc(1, sizeof(network_t));
-    player->network->readingBuffer = create_buffer('\n);
-    player->network->writingBuffer = create_buffer('\n);
+    player->network->readingBuffer = create_buffer('\n');
+    player->network->writingBuffer = create_buffer('\n');
 
     free_networkplayer(player);
 
@@ -50,8 +50,8 @@ Test(free_players, frees_single_player, .init=redirect_all_std)
     player_t *player = calloc(1, sizeof(player_t));
     player->inventory = calloc(1, sizeof(inventory_t));
     player->network = calloc(1, sizeof(network_t));
-    player->network->readingBuffer = create_buffer('\n);
-    player->network->writingBuffer = create_buffer('\n);
+    player->network->readingBuffer = create_buffer('\n');
+    player->network->writingBuffer = create_buffer('\n');
     player->pending_actions = NULL;
     player->team = strdup("team");
     player->current_action = strdup("action");
@@ -177,8 +177,8 @@ Test(free_zappy, frees_zappy_struct, .init=redirect_all_std)
     zappy->game = calloc(1, sizeof(game_t));
     zappy->graph = calloc(1, sizeof(graph_net_t));
     zappy->graph->network = calloc(1, sizeof(network_t));
-    zappy->graph->network->readingBuffer = create_buffer('\n);
-    zappy->graph->network->writingBuffer = create_buffer('\n);
+    zappy->graph->network->readingBuffer = create_buffer('\n');
+    zappy->graph->network->writingBuffer = create_buffer('\n');
     zappy->unified_poll = calloc(1, sizeof(unified_poll_t));
     zappy->unified_poll->fds = malloc(10 * sizeof(struct pollfd));
 

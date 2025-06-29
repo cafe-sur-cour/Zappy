@@ -82,8 +82,8 @@ static player_t *create_test_player(int id, int x, int y, int level, const char 
     player->direction = NORTH;
     player->team = strdup(team);
     player->network->fd = 42;
-    player->network->readingBuffer = test_create_buffer('\n);
-    player->network->writingBuffer = test_create_buffer('\n);
+    player->network->readingBuffer = test_create_buffer('\n');
+    player->network->writingBuffer = test_create_buffer('\n');
     player->is_busy = false;
     player->remaining_cooldown = 0;
     player->current_action = NULL;
