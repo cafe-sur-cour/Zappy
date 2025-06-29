@@ -109,7 +109,6 @@ static player_t *malloc_player(const char *team)
     return player;
 }
 
-
 /* This loops thrue the eggs list to atribute a pos to the player */
 static player_t *set_player_pos(player_t *player, zappy_t *zappy)
 {

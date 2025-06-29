@@ -78,6 +78,6 @@ int write_in_buffer(buffer_t *cb, const char *str)
         str++;
         count++;
     }
-   // print_buffer_state(cb, "WRITING");
+    print_buffer_state(cb, "WRITING");
     return count;
 }

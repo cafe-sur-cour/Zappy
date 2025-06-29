@@ -35,7 +35,7 @@ int write_message(network_t *network)
     buffer_len = strlen(network->writingBuffer->data);
     if (buffer_len == 0)
         return 0;
-   // print_buffer_state(network->readingBuffer, "READING");
+    print_buffer_state(network->readingBuffer, "READING");
     write_value = write(network->fd, network->writingBuffer->data, buffer_len);
     if (write_value == -1) {
         error_print("Failed to write network->writingBuffer->data to client.");
