@@ -8,8 +8,13 @@
 MAX_LEVEL = 8
 
 ELEVATION_COST = 300
+FORK_COST = 42
+MOVE_COST = 7
+DROP_COST = 7
 
 FOOD_VALUE = 126
+
+MIN_NB_PLAYERS = 6
 
 LVL_UPGRADES = {
     1: {
@@ -98,4 +103,14 @@ TOTAL_NEEDED_STONES = {
     "mendiane": 5,
     "phiras": 6,
     "thystame": 1
+}
+
+BASE_INVENTORY = {
+    "food": 10,
+    "linemate": 0,
+    "deraumere": 0,
+    "sibur": 0,
+    "mendiane": 0,
+    "phiras": 0,
+    "thystame": 0
 }
