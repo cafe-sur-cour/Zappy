@@ -59,10 +59,10 @@ graph_net_t *add_graph_node(graph_net_t **head, int fd)
         free(new_node);
         return NULL;
     }
-    new_node->network->readingBuffer = create_buffer();
+    new_node->network->readingBuffer = create_buffer('\n');
     if (!new_node->network->readingBuffer)
         return free_net_reading(new_node);
-    new_node->network->writingBuffer = create_buffer();
+    new_node->network->writingBuffer = create_buffer('\n');
     if (!new_node->network->writingBuffer)
         return free_net_writting(new_node);
     new_node->network->fd = fd;

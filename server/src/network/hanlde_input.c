@@ -36,7 +36,7 @@ static buffer_t *get_message_from_buffer(int fd, buffer_t *cb,
         if (read(fd, &c, 1) <= 0)
             return NULL;
         cb_write(cb, c);
-        if (c == '\n')
+        if (c == cb->delim)
             break;
     }
     return cb;
