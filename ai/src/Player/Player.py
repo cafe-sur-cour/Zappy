@@ -28,7 +28,8 @@ from src.Config.GameConfig import (
     MAX_LEVEL,
     TOTAL_NEEDED_STONES,
     ELEVATION_COST,
-    FOOD_VALUE
+    FOOD_VALUE,
+    MIN_FOOD_FOR_INCANTATION
 )
 from src.Logger.Logger import Logger
 
@@ -216,36 +217,19 @@ class Player:
             if totalStones[key] < TOTAL_NEEDED_STONES[key]:
                 self.teamHasEnoughStones = False
                 return False
+        self.logger.debug(f"Inventory {inventory} is sufficient for level {self.level}")
         self.teamHasEnoughStones = True
         return True
-    #     totalStones = {
-    #         "linemate": self.inventory["linemate"],
-    #         "deraumere": self.inventory["deraumere"],
-    #         "sibur": self.inventory["sibur"],
-    #         "mendiane": self.inventory["mendiane"],
-    #         "phiras": self.inventory["phiras"],
-    #         "thystame": self.inventory["thystame"]
-    #     }
-    #     for inventory in self.teamMatesStatus:
-    #         print("Current inventory: %s", inventory)
-    #         if inventory["linemate"] < LVL_UPGRADES[self.level]["stones"]["linemate"]:
-    #             print(f"Not enough linemate: {inventory['linemate']} < {LVL_UPGRADES[self.level]['stones']['linemate']}")
-    #             return False
-    #         if inventory["deraumere"] < LVL_UPGRADES[self.level]["stones"]["deraumere"]:
-    #             print(f"Not enough deraumere: {inventory['deraumere']} < {LVL_UPGRADES[self.level]['stones']['deraumere']}")
-    #             return False
-    #         if inventory["sibur"] < LVL_UPGRADES[self.level]["stones"]["sibur"]:
-    #             print(f"Not enough sibur: {inventory['sibur']} < {LVL_UPGRADES[self.level]['stones']['sibur']}")
-    #             return False
-    #         if inventory["mendiane"] < LVL_UPGRADES[self.level]["stones"]["mendiane"]:
-    #             print(f"Not enough mendiane: {inventory['mendiane']} < {LVL_UPGRADES[self.level]['stones']['mendiane']}")
-    #             return False
-    #         if inventory["phiras"] < LVL_UPGRADES[self.level]["stones"]["phiras"]:
-    #             return False
-    #         if inventory["thystame"] < LVL_UPGRADES[self.level]["stones"]["thystame"]:
-    #             return False
-    #     self.logger.debug(f"Inventory {inventory} is sufficient for level {self.level}")
-    #     return True
+
+    def hasEnoughStonesLocally(self) -> bool:
+        """Check if current player has enough stones for their level"""
+        if self.level >= MAX_LEVEL:
+            return True
+        required_stones = LVL_UPGRADES[self.level]["stones"]
+        for stone, required_quantity in required_stones.items():
+            if self.inventory.get(stone, 0) < required_quantity:
+                return False
+        return True
 
     def howManyTimeUnitsForIncantation(self, level: int) -> int:
         return ELEVATION_COST
@@ -254,6 +238,10 @@ class Player:
         if level >= MAX_LEVEL:
             return True
 
+        # Ensure minimum food requirement is met
+        if nbFood < MIN_FOOD_FOR_INCANTATION:
+            return False
+
         offset = FOOD_VALUE
 
         return nbFood * FOOD_VALUE > self.howManyTimeUnitsForIncantation(level) + offset
@@ -261,6 +249,11 @@ class Player:
     def enoughFoodForGoToIncantation(self, level: int, nbFood: int) -> bool:
         if level >= MAX_LEVEL:
             return True
+
+        # Ensure minimum food requirement is met
+        self.logger.error(f"Checking food for go to incantation: level {level}, nbFood {nbFood}")
+        if nbFood < 20:
+            return False
 
         stonesToDrop = sum(LVL_UPGRADES[level]["stones"].values())
         droppingCost = stonesToDrop * 7
@@ -271,24 +264,38 @@ class Player:
         offset = FOOD_VALUE * 2
 
         totalCost = droppingCost + movementCost + offset
-
+        self.logger.error(f"nbfood {nbFood} * {FOOD_VALUE} > {totalCost} + {self.howManyTimeUnitsForIncantation(level)}")
         return nbFood * FOOD_VALUE > (totalCost + self.howManyTimeUnitsForIncantation(level))
 
     def teamHasEnoughFoodForGoToIncantation(self) -> bool:
+        # Check self first with minimum food requirement
+        if self.inventory["food"] < 20:
+            return False
+            
         if not self.enoughFoodForGoToIncantation(self.level, self.inventory["food"]):
             return False
 
         for teamMate in self.teamMatesStatus:
+            # Check minimum food requirement for each teammate
+            if teamMate["food"] < 20:
+                return False
             if not self.enoughFoodForGoToIncantation(teamMate["level"], teamMate["food"]):
                 return False
         self.logger.debug("Team has enough food for go to incantation")
         return True
 
     def teamHasEnoughFoodForIncantation(self) -> bool:
+        # Check self first with minimum food requirement
+        if self.inventory["food"] < 20:
+            return False
+            
         if not self.enoughFoodForIncantation(self.level, self.inventory["food"]):
             return False
 
         for teamMate in self.teamMatesStatus:
+            # Check minimum food requirement for each teammate
+            if teamMate["food"] < 20:
+                return False
             if not self.enoughFoodForIncantation(teamMate["level"], teamMate["food"]):
                 return False
 
@@ -351,19 +358,28 @@ class Player:
 
         elif phase == "checkOnTeammates":
             if self.roombaState["lastCommand"] == "Connect_nbr":
-                self.commandsToSend.append(
-                    (
-                        lambda: self.broadcaster.broadcastMessage(f"sendInventory {self.id}"),
-                        "broadcast sendInventory"
+                # Only broadcast inventory request if we have enough stones locally and enough food
+                if (self.hasEnoughStonesLocally() and 
+                    self.inventory["food"] >= MIN_FOOD_FOR_INCANTATION and
+                    self.enoughFoodForGoToIncantation(self.level, self.inventory["food"])):
+                    self.commandsToSend.append(
+                        (
+                            lambda: self.broadcaster.broadcastMessage(f"sendInventory {self.id}"),
+                            "broadcast sendInventory"
+                        )
                     )
-                )
-                self.roombaState["lastCommand"] = "broadcast sendInventory"
+                    self.roombaState["lastCommand"] = "broadcast sendInventory"
+                else:
+                    # Not ready for incantation, go back to collecting
+                    self.roombaState["phase"] = "forward"
+                    self.roombaState["lastPhase"] = "checkOnTeammates"
 
             elif self.roombaState["lastCommand"] == "broadcast sendInventory":
                 expectedTeamMates = self.nbConnectedPlayers - 1
                 receivedTeamMatesStatus = len(self.teamMatesStatus)
-
+                print(f"Received team mates in send inv status: {receivedTeamMatesStatus} / {expectedTeamMates}")
                 if receivedTeamMatesStatus >= expectedTeamMates:
+                    self.logger.error("Enough incenter response")
                     if (
                         self.doesTeamHaveEnoughStones() and
                         self.teamHasEnoughFoodForGoToIncantation()
@@ -382,8 +398,12 @@ class Player:
                                     highest_pid_id = teammate_id
 
                         if highest_pid == self.pid:
+                            self.logger.info(f"I am the leader (PID: {self.pid}), starting incantation")
                             self.incantationState["status"] = True
+                            self.incantationState["phase"] = "sendComeIncant"
+                            return  # Exit roomba action to start incantation
                         else:
+                            self.logger.info(f"Leader is {highest_pid_id} (PID: {highest_pid}), broadcasting leadIncantation")
                             self.commandsToSend.append(
                                 (
                                     lambda: self.broadcaster.broadcastMessage(
@@ -394,6 +414,7 @@ class Player:
                             )
                             self.roombaState["lastCommand"] = "broadcast leadIncantation"
                     self.roombaState["phase"] = "forward"
+                    self.roombaState["lastPhase"] = "checkOnTeammates"
                 else:
                     self.commandsToSend.append(
                         (lambda: self.communication.sendGetConnectNbr(), "Connect_nbr")
@@ -585,6 +606,7 @@ class Player:
                 expectedTeamMates = self.nbConnectedPlayers - 1
                 receivedTeamMatesStatus = len(self.teamMatesStatus)
 
+                print(f"Received team mates status: {receivedTeamMatesStatus} / {expectedTeamMates}")
                 if receivedTeamMatesStatus >= expectedTeamMates:
                     if not self.teamHasEnoughFoodForIncantation():
                         self.logger.error("Not enough food for incantation, resetting state")
@@ -671,25 +693,47 @@ class Player:
             self.goToIncantationState["movementStarted"]
         ):
             self.goToIncantationState["arrived"] = True
-            self.commandsToSend.append(
-                (
-                    lambda: self.broadcaster.broadcastMessage(f"whereAreYou {self.id}"),
-                    f"broadcast whereAreYou {self.id}"
+            # Use look instead of broadcasting whereAreYou
+            if self.goToIncantationState["lastCommand"] != "look":
+                self.commandsToSend.append(
+                    (lambda: self.communication.sendLook(), "look")
                 )
-            )
-            self.goToIncantationState["lastCommand"] = "broadcast whereAreYou"
+                self.goToIncantationState["lastCommand"] = "look"
+            else:
+                # Check if we have a look response
+                self.look = self.communication.getLook() or self.look
+                if self.look and len(self.look) > 0:
+                    # Count players in the first tile (current position)
+                    playersOnCurrentTile = self.look[0].get("player", 0)
+                    self.logger.debug(f"GoToIncant - Nb players on current tile: {playersOnCurrentTile} / {self.nbConnectedPlayers}")
+                    if playersOnCurrentTile >= self.nbConnectedPlayers:
+                        self.logger.debug("All players are on the same tile, proceeding with stone dropping")
+                        self.goToIncantationState["droppingStones"] = True
+                    else:
+                        # Wait a bit and look again
+                        self.goToIncantationState["lastCommand"] = None
             return
 
-
         if len(self.goToIncantationState["steps"]) == 0:
-            self.commandsToSend.append(
-                (
-                    lambda: self.broadcaster.broadcastMessage(f"whereAreYou {self.id}"),
-                    f"broadcast whereAreYou {self.id}"
+            # Use look instead of broadcasting whereAreYou when no steps remaining
+            if self.goToIncantationState["lastCommand"] != "look":
+                self.commandsToSend.append(
+                    (lambda: self.communication.sendLook(), "look")
                 )
-            )
-            self.goToIncantationState["needToWait"] = True
-            self.goToIncantationState["lastCommand"] = "broadcast whereAreYou"
+                self.goToIncantationState["lastCommand"] = "look"
+            else:
+                # Check if we have a look response
+                self.look = self.communication.getLook() or self.look
+                if self.look and len(self.look) > 0:
+                    # Count players in the first tile (current position)
+                    playersOnCurrentTile = self.look[0].get("player", 0)
+                    self.logger.debug(f"GoToIncant (no steps) - Nb players on current tile: {playersOnCurrentTile} / {self.nbConnectedPlayers}")
+                    if playersOnCurrentTile >= self.nbConnectedPlayers:
+                        self.logger.debug("All players are on the same tile, proceeding with stone dropping")
+                        self.goToIncantationState["droppingStones"] = True
+                    else:
+                        # Wait a bit and look again
+                        self.goToIncantationState["lastCommand"] = None
             return
 
         self.goToIncantationState["movementStarted"] = True
@@ -716,11 +760,10 @@ class Player:
                     self.nbTeamSlots == -1
                 ):
                     continue
+                # Only trigger checkOnTeammates if we have enough stones locally and food to justify the exchange
                 if (
-                    item == "food" and
-                    self.teamHasEnoughStones
-                ) or (
-                    item != "food" and
+                    self.hasEnoughStonesLocally() and
+                    self.inventory["food"] >= MIN_FOOD_FOR_INCANTATION and
                     self.enoughFoodForGoToIncantation(self.level, newInventory["food"])
                 ):
                     self.roombaState["phase"] = "checkOnTeammates"
@@ -769,7 +812,7 @@ class Player:
                 )
             )
             self.incantationState["status"] = False
-            self.incantationState["phase"] = "sendComeIncant"
+            self.incantationState["phase"] = "vacuum"
             self.incantationState["lastCommand"] = None
             self.incantationState["playerResponses"] = []
             self.teamMatesStatus = []  # Clear to force fresh check
@@ -780,7 +823,7 @@ class Player:
         elif self.incantationState["status"] and self.inIncantation:
             self.logger.error("Incantation failed, going roomba mode")
             self.incantationState["status"] = False
-            self.incantationState["phase"] = "sendComeIncant"
+            self.incantationState["phase"] = "vacuum"
             self.incantationState["lastCommand"] = None
             self.incantationState["playerResponses"] = []
             self.teamMatesStatus = []  # Clear to force fresh check
@@ -1017,15 +1060,19 @@ class Player:
     def handleMessageSendInventory(self, direction: int, rest: str) -> None:
         id = rest.strip()
         if id != self.id:
-            self.teamMatesStatus = [mate for mate in self.teamMatesStatus if mate["id"] != id]
-            self.senderID = id
-            self.needToBroadcastInventory = True
-            self.commandsToSend.append(
-                (
-                    lambda: self.communication.sendInventory(),
-                    "inventory"
+            # Only respond if we have enough stones locally and food to justify the exchange
+            if (self.hasEnoughStonesLocally() and 
+                self.inventory["food"] >= MIN_FOOD_FOR_INCANTATION and
+                self.enoughFoodForGoToIncantation(self.level, self.inventory["food"])):
+                self.teamMatesStatus = [mate for mate in self.teamMatesStatus if mate["id"] != id]
+                self.senderID = id
+                self.needToBroadcastInventory = True
+                self.commandsToSend.append(
+                    (
+                        lambda: self.communication.sendInventory(),
+                        "inventory"
+                    )
                 )
-            )
 
     def handleMessageInventory(self, direction: int, rest: str) -> None:
         self.logger.debug(f"Raw inventory message: '{rest}'")

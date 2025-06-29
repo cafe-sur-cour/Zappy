@@ -11,6 +11,9 @@ ELEVATION_COST = 300
 
 FOOD_VALUE = 126
 
+# Minimum food required before starting incantation
+MIN_FOOD_FOR_INCANTATION = 25
+
 LVL_UPGRADES = {
     1: {
         "players": 1,
