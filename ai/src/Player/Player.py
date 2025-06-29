@@ -232,10 +232,10 @@ class Player:
         stonesToDrop = sum(LVL_UPGRADES[level]["stones"].values())
         droppingCost = stonesToDrop * 7
 
-        maxLength = (max(self.x, self.y) / 2) * 50
+        maxLength = (max(self.x, self.y) / 2) * 20
         movementCost = 7 * maxLength
 
-        offset = FOOD_VALUE * 15
+        offset = FOOD_VALUE * 2
 
         totalCost = droppingCost + movementCost + offset
 
@@ -430,14 +430,24 @@ class Player:
             self.incantationState["playerResponses"] = []
 
         elif phase == "waitForWhereAreYou":
-            arrivedPlayers = len([
-                response for response in self.incantationState["playerResponses"]
-                if response.get("direction") == 0
-            ])
-
-            if arrivedPlayers >= self.nbConnectedPlayers - 1:
-                self.incantationState["phase"] = "dropStones"
-                self.incantationState["lastCommand"] = None
+            if self.incantationState["lastCommand"] != "look":
+                self.commandsToSend.append(
+                    (lambda: self.communication.sendLook(), "look")
+                )
+                self.incantationState["lastCommand"] = "look"
+            else:
+                # Check if we have a look response
+                self.look = self.communication.getLook() or self.look
+                if self.look and len(self.look) > 0:
+                    # Count players in the first tile (current position)
+                    playersOnCurrentTile = self.look[0].get("player", 0)
+                    self.logger.debug(f"Nb players on current tile: {playersOnCurrentTile} / {self.nbConnectedPlayers}")
+                    if playersOnCurrentTile >= self.nbConnectedPlayers:
+                        self.incantationState["phase"] = "dropStones"
+                        self.incantationState["lastCommand"] = None
+                    else:
+                        # Wait a bit and look again
+                        self.incantationState["lastCommand"] = None
 
         elif phase == "dropStones":
             self.commandsToSend.append(
@@ -639,7 +649,7 @@ class Player:
         self.look = self.communication.getLook() or self.look
 
     def handleResponseKO(self) -> None:
-        self.logger.error(f"Command '{self.lastCommandSent}' failed")
+        # self.logger.error(f"Command '{self.lastCommandSent}' failed")
 
         if self.roombaState["phase"] == "checkOnTeammates":
             self.roombaState["phase"] = "forward"
@@ -793,7 +803,7 @@ class Player:
             lastCommand = self.incantationState["lastCommand"]
         elif self.goToIncantationState["status"]:
             lastCommand = self.goToIncantationState["lastCommand"]
-        self.logger.error(f"Unknown response to '{lastCommand}': {response.strip()}")
+        # self.logger.error(f"Unknown response to '{lastCommand}': {response.strip()}")
 
     def getStepsFromDirection(self) -> list[Callable[[], None]]:
         stepsMap = {
@@ -1037,7 +1047,7 @@ class Player:
                     switcher[key](direction)
                 return
 
-        self.logger.error(f"Unknown message: {message.strip()}")
+        # self.logger.error(f"Unknown message: {message.strip()}")
 
     def sendCommands(self) -> None:
         if len(self.commandsToSend) == 0:

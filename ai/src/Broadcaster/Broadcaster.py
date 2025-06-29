@@ -43,5 +43,5 @@ class Broadcaster:
 
         if not hashedMessage:
             return
-
+        print(f"Broadcasting message: {message}")
         self.com.sendBroadcast(hashedMessage)
