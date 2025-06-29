@@ -68,6 +68,7 @@ static void mark_current_action(player_t *player)
 /* This function handles the initiall data of an egg being laid */
 int handle_fork(player_t *player, char *command, zappy_t *zappy)
 {
+    printf("Handling %s for player %d\n", command, player->id);
     int id = get_nb_eggs(zappy);
     int pos[2] = {player->posX, player->posY};
     egg_t *new = NULL;
@@ -89,10 +90,24 @@ int handle_fork(player_t *player, char *command, zappy_t *zappy)
     return 0;
 }
 
+
+static team_t *get_team_by_name(game_t *game, const char *team_name)
+{
+    team_t *current = game->teams;
+
+    while (current) {
+        if (strcmp(current->name, team_name) == 0)
+            return current;
+        current = current->next;
+    }
+    return NULL;
+}
 /* This function handles the end of an egg laying */
 int handle_fork_end(player_t *player, zappy_t *zappy)
 {
+    printf("Handling fork end for player %d\n", player->id);
     egg_t *current_egg = zappy->game->map->currentEggs;
+    team_t *current_team = get_team_by_name(zappy->game, player->team);
 
     while (current_egg != NULL) {
         if (current_egg->idLayer == player->id && !current_egg->isHatched) {
@@ -100,8 +115,14 @@ int handle_fork_end(player_t *player, zappy_t *zappy)
         }
         current_egg = current_egg->next;
     }
-    if (current_egg != NULL)
-        send_egg(zappy, current_egg);
+    printf("nb eggs before: %d\n", current_team->nbEggs);
+    current_team->nbEggs--;
+    printf("nb eggs after: %d\n", current_team->nbEggs);
+    if (current_egg == NULL) {
+        player->current_action = NULL;
+        return -1;
+    }
+    send_egg(zappy, current_egg);
     if (player->current_action)
         free(player->current_action);
     player->current_action = NULL;

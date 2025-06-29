@@ -21,6 +21,7 @@ void execute_action(player_t *player, action_request_t *action, zappy_t *zappy)
     const command_info_t *cmd_info = find_command_info(action->command);
     int result = 0;
 
+    printf("Executing action: %s for player %i\n", action->command, player->id);
     if (!cmd_info) {
         write_in_buffer(player->network->writingBuffer, "ko\n");
         write_message(player->network);
