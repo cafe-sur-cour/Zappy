@@ -58,10 +58,7 @@ class App:
             except Exception:
                 pass
 
-        num_children = len(self.childs)
         self.childs.clear()
-        if num_children > 0:
-            self.logger.success(f"All AI processes finished.")
 
     def _cleanup_children(self):
         if not self.is_main_process:

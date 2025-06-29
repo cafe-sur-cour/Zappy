@@ -255,7 +255,7 @@ class Player:
 
     def sacrificeAction(self):
         phase = self.sacrificeState["phase"]
-        nbSacrifice = 3
+        nbSacrifice = 5
 
         if phase == "fork":
             for _ in range(nbSacrifice):
@@ -1259,11 +1259,7 @@ class Player:
                         sleep(0.1)
                         continue
 
-                if self.isSacrificeState["status"]:
-                    self.isSacrificeAction()
-
                 if (
-                    self.nbTeamSlots != -1 and
                     not self.inIncantation and
                     not self.communication.hasRequests() and
                     not self.communication.hasPendingCommands() and
@@ -1274,17 +1270,20 @@ class Player:
                         self.sendCommands()
                         last_action_time = current_time
                     else:
-                        if self.inventory.get("food", 0) <= 10:
-                            self.sacrificeState["status"] = True
-                        if self.sacrificeState["status"] and self.sacrificeState["go"]:
-                            self.sacrificeAction()
-                        elif self.incantationState["status"]:
-                            self.incantationAction()
-                        elif self.goToIncantationState["status"]:
-                            self.goToIncantationAction()
-                        else:
-                            self.roombaAction()
-                        last_action_time = current_time
+                        if self.isSacrificeState["status"]:
+                            self.isSacrificeAction()
+                        if self.nbTeamSlots != -1:
+                            if self.inventory.get("food", 0) <= 10:
+                                self.sacrificeState["status"] = True
+                            if self.sacrificeState["status"] and self.sacrificeState["go"]:
+                                self.sacrificeAction()
+                            elif self.incantationState["status"]:
+                                self.incantationAction()
+                            elif self.goToIncantationState["status"]:
+                                self.goToIncantationAction()
+                            else:
+                                self.roombaAction()
+                            last_action_time = current_time
 
                 if current_time - last_action_time > action_timeout:
                     self.logger.error("No action for too long, forcing roomba mode")
