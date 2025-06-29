@@ -74,6 +74,7 @@ class Player:
 
         self.pid: int = os.getpid()
         self.id: str = name + "-" + str(self.pid)
+        self.broadcaster.setPlayerId(self.id)
         self.senderID: str = None
         self.needToBroadcastInventory = False
 
@@ -275,7 +276,7 @@ class Player:
         maxLength = (max(self.x, self.y) / 2) * 7
         movementCost = MOVE_COST * maxLength
 
-        offset = FOOD_VALUE * 4
+        offset = FOOD_VALUE * 1
 
         totalCost = droppingCost + movementCost + offset
 
@@ -623,7 +624,7 @@ class Player:
         if self.goToIncantationState["needToWait"]:
             if not hasattr(self, '_incantation_wait_start'):
                 self._incantation_wait_start = time.time()
-            elif time.time() - self._incantation_wait_start > 3.0:
+            elif time.time() - self._incantation_wait_start > 10.0:
                 self.logger.error("Timeout waiting in goToIncantation, resetting")
                 self.goToIncantationState["needToWait"] = False
                 self.goToIncantationState["status"] = False
@@ -1120,11 +1121,19 @@ class Player:
             "goRoombas": self.handleMessageGoRoombas,
         }
 
+        if self.broadcaster.alreadyReceivedMessage(originalMessage):
+            return
+
         unHashedMessage = self.broadcaster.revealMessage(originalMessage)
 
         for key in switcher.keys():
             if unHashedMessage.startswith(key):
-                rest = unHashedMessage[len(key):].strip()
+                parsedMessage, messageId, _ = self.broadcaster.parseReceivedMessage(unHashedMessage)
+
+                if messageId == self.id:
+                    return
+
+                rest = parsedMessage[len(key):].strip()
                 if rest:
                     switcher[key](direction, rest)
                 else:
@@ -1133,7 +1142,7 @@ class Player:
 
         self.commandsToSend.append(
             (
-                lambda: self.broadcaster.broadcastMessage(originalMessage),
+                lambda: self.broadcaster.broadcastMessage(originalMessage, format=False),
                 "broadcast other team message"
             )
         )
