@@ -8,6 +8,7 @@
 import os
 import sys
 import signal
+import time
 from threading import Thread
 from typing import Callable
 from time import sleep
@@ -237,6 +238,7 @@ class Player:
             "phiras": self.inventory["phiras"],
             "thystame": self.inventory["thystame"]
         }
+
         for inventory in self.teamMatesStatus:
             totalStones["linemate"] += inventory["linemate"]
             totalStones["deraumere"] += inventory["deraumere"]
@@ -244,6 +246,7 @@ class Player:
             totalStones["mendiane"] += inventory["mendiane"]
             totalStones["phiras"] += inventory["phiras"]
             totalStones["thystame"] += inventory["thystame"]
+
         for key in TOTAL_NEEDED_STONES.keys():
             if totalStones[key] < TOTAL_NEEDED_STONES[key]:
                 self.teamHasEnoughStones = False
@@ -272,7 +275,7 @@ class Player:
         maxLength = (max(self.x, self.y) / 2) * 7
         movementCost = MOVE_COST * maxLength
 
-        offset = FOOD_VALUE * 15
+        offset = FOOD_VALUE * 4
 
         totalCost = droppingCost + movementCost + offset
 
@@ -348,6 +351,7 @@ class Player:
 
         elif phase == "checkOnTeammates":
             if self.roombaState["lastCommand"] == "Connect_nbr":
+                self.teamMatesStatus.clear()
                 self.commandsToSend.append(
                     (
                         lambda: self.broadcaster.broadcastMessage(f"sendInventory {self.id}"),
@@ -393,7 +397,12 @@ class Player:
                     self.commandsToSend.append(
                         (lambda: self.communication.sendGetConnectNbr(), "Connect_nbr")
                     )
-                    self.roombaState["lastCommand"] = "Connect_nbr"
+                    if not hasattr(self, '_teammate_wait_start'):
+                        self._teammate_wait_start = time.time()
+                    elif time.time() - self._teammate_wait_start > 5.0:
+                        self.logger.error("Timeout waiting for teammates, continuing with roomba")
+                        self.roombaState["phase"] = "move"
+                        delattr(self, '_teammate_wait_start')
 
             else:
                 self.commandsToSend.append(
@@ -418,16 +427,25 @@ class Player:
                     self.roombaState["targetForward"] -= 1
                 if self.roombaState["turnCount"] == 2:
                     self.roombaState["targetForward"] += 1
+
+                if self.roombaState["targetForward"] <= 0:
+                    self.roombaState["targetForward"] = max(self.x, self.y) // 4 + 1
+
                 self.roombaState["forwardCount"] = 0
                 self.commandsToSend.append(
                     (lambda: self.communication.sendRight(), "right")
                 )
                 self.roombaState["lastCommand"] = "right"
+                self.roombaState["phase"] = "lookAround"
 
         else:
             self.logger.error(f"Unknown roomba phase '{phase}', resetting to lookAround")
             self.roombaState["phase"] = "lookAround"
             self.roombaState["lastPhase"] = "unknown"
+            self.roombaState["lastCommand"] = None
+            self.roombaState["forwardCount"] = 0
+            if self.roombaState["targetForward"] <= 0:
+                self.roombaState["targetForward"] = max(self.x, self.y) // 4 + 1
 
     def incantationAction(self) -> None:
         if self.level >= MAX_LEVEL:
@@ -447,6 +465,7 @@ class Player:
             self.incantationState["lastCommand"] = "broadcast comeIncant"
             self.incantationState["lastPhase"] = "sendComeIncant"
             self.incantationState["phase"] = "sendConnectNbr"
+            self.incantationState["playerResponses"] = []
 
         elif phase == "sendConnectNbr":
             self.commandsToSend.append(
@@ -455,7 +474,6 @@ class Player:
             self.incantationState["lastCommand"] = "Connect_nbr"
             self.incantationState["lastPhase"] = "sendConnectNbr"
             self.incantationState["phase"] = "waitForWhereAreYou"
-            self.incantationState["playerResponses"] = []
 
         elif phase == "waitForWhereAreYou":
             arrivedPlayers = len([
@@ -466,6 +484,19 @@ class Player:
             if arrivedPlayers >= self.nbConnectedPlayers - 1:
                 self.incantationState["phase"] = "dropStones"
                 self.incantationState["lastCommand"] = None
+                if hasattr(self, '_incantation_whereareYou_start'):
+                    delattr(self, '_incantation_whereareYou_start')
+            else:
+                if not hasattr(self, '_incantation_whereareYou_start'):
+                    self._incantation_whereareYou_start = time.time()
+                elif time.time() - self._incantation_whereareYou_start > 10.0:
+                    self.logger.error("Timeout waiting for teammates in incantation, resetting")
+                    self.incantationState["status"] = False
+                    self.incantationState["phase"] = "sendComeIncant"
+                    self.incantationState["lastCommand"] = None
+                    self.incantationState["playerResponses"] = []
+                    self.roombaState["phase"] = "move"
+                    delattr(self, '_incantation_whereareYou_start')
 
         elif phase == "dropStones":
             self.commandsToSend.append(
@@ -502,6 +533,7 @@ class Player:
 
         elif phase == "inventoryCheck":
             if self.incantationState["lastCommand"] == "Connect_nbr":
+                self.teamMatesStatus.clear()
                 self.commandsToSend.append(
                     (
                         lambda: self.broadcaster.broadcastMessage(f"sendInventory {self.id}"),
@@ -536,7 +568,6 @@ class Player:
                     self.commandsToSend.append(
                         (lambda: self.communication.sendGetConnectNbr(), "Connect_nbr")
                     )
-                    self.incantationState["lastCommand"] = "Connect_nbr"
 
             else:
                 self.commandsToSend.append(
@@ -581,20 +612,40 @@ class Player:
             self.goToIncantationState["movementStarted"]
         ):
             self.goToIncantationState["arrived"] = True
-            return
-
-        if self.goToIncantationState["needToWait"]:
-            sleep(0.1)
-            return
-
-        if len(self.goToIncantationState["steps"]) == 0:
             self.commandsToSend.append(
                 (
                     lambda: self.broadcaster.broadcastMessage(f"whereAreYou {self.id}"),
                     f"broadcast whereAreYou"
                 )
             )
-            self.goToIncantationState["needToWait"] = True
+            return
+
+        if self.goToIncantationState["needToWait"]:
+            if not hasattr(self, '_incantation_wait_start'):
+                self._incantation_wait_start = time.time()
+            elif time.time() - self._incantation_wait_start > 3.0:
+                self.logger.error("Timeout waiting in goToIncantation, resetting")
+                self.goToIncantationState["needToWait"] = False
+                self.goToIncantationState["status"] = False
+                self.roombaState["phase"] = "move"
+                delattr(self, '_incantation_wait_start')
+                return
+            sleep(0.1)
+            return
+
+        if len(self.goToIncantationState["steps"]) == 0:
+            if not self.goToIncantationState["arrived"]:
+                self.commandsToSend.append(
+                    (
+                        lambda: self.broadcaster.broadcastMessage(f"whereAreYou {self.id}"),
+                        f"broadcast whereAreYou"
+                    )
+                )
+                self.goToIncantationState["needToWait"] = True
+            else:
+                self.logger.error("No steps available and already arrived, resetting goToIncantation state")
+                self.goToIncantationState["status"] = False
+                self.roombaState["phase"] = "move"
             return
 
         self.goToIncantationState["movementStarted"] = True
@@ -638,7 +689,7 @@ class Player:
                     item == "food" and
                     self.teamHasEnoughStones
                 ) or (
-                    item != "food" and
+                    item == "thystame" and
                     self.enoughFoodForGoToIncantation(self.level, newInventory["food"])
                 ):
                     self.roombaState["phase"] = "checkOnTeammates"
@@ -1098,11 +1149,18 @@ class Player:
         try:
             if self.nbTeamSlots != -1:
                 self.sentNbSlots = False
+
+            last_action_time = 0
+            action_timeout = 30.0
+
             while not self.communication.playerIsDead():
+                current_time = time.time()
+
                 if self.communication.hasMessages():
                     data = self.communication.getLastMessage()
                     direction = data[0]
                     self.handleMessage(direction, data[1])
+                    last_action_time = current_time
 
                 if self.communication.hasResponses():
                     response = self.communication.getLastResponse()
@@ -1111,6 +1169,7 @@ class Player:
                             self.logger.display("Player died")
                             break
                         self.handleCommandResponse(response)
+                        last_action_time = current_time
 
                 if not self.sentNbSlots:
                     if self.nbConnectedPlayers >= self.nbTeamSlots:
@@ -1131,6 +1190,7 @@ class Player:
                 ):
                     if len(self.commandsToSend) > 0:
                         self.sendCommands()
+                        last_action_time = current_time
                     else:
                         if self.incantationState["status"]:
                             self.incantationAction()
@@ -1138,6 +1198,15 @@ class Player:
                             self.goToIncantationAction()
                         else:
                             self.roombaAction()
+                        last_action_time = current_time
+
+                if current_time - last_action_time > action_timeout:
+                    self.logger.error("No action for too long, forcing roomba mode")
+                    self.incantationState["status"] = False
+                    self.goToIncantationState["status"] = False
+                    self.roombaState["phase"] = "lookAround"
+                    self.commandsToSend.clear()
+                    last_action_time = current_time
 
         except (CommunicationException, SocketException) as e:
             self.logger.error(f"Communication exception: {e}")
