@@ -556,9 +556,66 @@ class Player:
                         )
                     )
 
-            # Skip inventory checks and go directly to incantation since prerequisites were already verified
+            # Always move to next phase after dropping stones
             self.incantationState["lastCommand"] = "drop stones"
-            self.incantationState["phase"] = "startIncantation"
+            self.incantationState["phase"] = "updateInventory"
+
+
+        elif phase == "updateInventory":
+            self.commandsToSend.append(
+                (
+                    lambda: self.communication.sendInventory(),
+                    "inventory"
+                )
+            )
+            self.incantationState["phase"] = "inventoryCheck"
+            self.incantationState["lastCommand"] = "inventory"
+
+        elif phase == "inventoryCheck":
+            if self.incantationState["lastCommand"] == "Connect_nbr":
+                self.commandsToSend.append(
+                    (
+                        lambda: self.broadcaster.broadcastMessage(f"sendInventory {self.id}"),
+                        f"broadcast sendInventory {self.id}"
+                    )
+                )
+                self.incantationState["lastCommand"] = "broadcast sendInventory"
+
+            elif self.incantationState["lastCommand"] == "broadcast sendInventory":
+                expectedTeamMates = self.nbConnectedPlayers - 1
+                receivedTeamMatesStatus = len(self.teamMatesStatus)
+
+                if receivedTeamMatesStatus >= expectedTeamMates:
+                    if not self.teamHasEnoughFoodForIncantation():
+                        self.logger.error("Not enough food for incantation, resetting state")
+                        self.commandsToSend.append(
+                            (
+                                lambda: self.broadcaster.broadcastMessage("goRoombas"),
+                                "broadcast goRoombas"
+                            )
+                        )
+                        self.incantationState["status"] = False
+                        self.incantationState["phase"] = "sendComeIncant"
+                        self.incantationState["lastCommand"] = None
+                        self.incantationState["playerResponses"] = []
+                        self.roombaState["phase"] = "forward"
+
+                    else:
+                        self.incantationState["phase"] = "startIncantation"
+
+                else:
+                    print("in connect nbr phase, not enough team mates responses")
+                    self.commandsToSend.append(
+                        (lambda: self.communication.sendGetConnectNbr(), "Connect_nbr")
+                    )
+                    self.incantationState["lastCommand"] = "Connect_nbr"
+
+            else:
+                print("in connect nbr phase, waiting for responses")
+                self.commandsToSend.append(
+                    (lambda: self.communication.sendGetConnectNbr(), "Connect_nbr")
+                )
+                self.incantationState["lastCommand"] = "Connect_nbr"
 
         elif phase == "startIncantation":
             self.commandsToSend.append(
@@ -1190,63 +1247,6 @@ class Player:
             return
         command, name = self.commandsToSend.pop(0)
         self.lastCommandSent = name
-        command()
-
-    def loop(self) -> None:
-        try:
-            if self.nbTeamSlots != -1:
-                self.sentNbSlots = False
-            while not self.communication.playerIsDead():
-                if self.communication.hasMessages():
-                    data = self.communication.getLastMessage()
-                    direction = data[0]
-                    message = self.broadcaster.revealMessage(data[1])
-                    if message.strip():
-                        self.handleMessages(direction, message)
-
-                if self.communication.hasResponses():
-                    response = self.communication.getLastResponse()
-                    if response:
-                        if response.strip() == "dead":
-                            self.logger.display("Player died")
-                            break
-                        self.handleCommandResponse(response)
-
-                if not self.sentNbSlots:
-                    if self.nbConnectedPlayers >= self.nbTeamSlots:
-                        self.broadcaster.broadcastMessage(f"teamslots {self.nbTeamSlots}")
-                        self.sentNbSlots = True
-                    else:
-                        self.communication.sendGetConnectNbr()
-                        sleep(0.1)
-                        continue
-
-                if (
-                    self.nbTeamSlots != -1 and
-                    not self.inIncantation and
-                    not self.communication.hasRequests() and
-                    not self.communication.hasPendingCommands() and
-                    not self.communication.hasResponses() and
-                    not self.communication.hasMessages()
-                ):
-                    if len(self.commandsToSend) > 0:
-                        self.sendCommands()
-                    else:
-                        if self.incantationState["status"]:
-                            self.incantationAction()
-                        elif self.goToIncantationState["status"]:
-                            self.goToIncantationAction()
-                        else:
-                            self.roombaAction()
-
-        except (CommunicationException, SocketException) as e:
-            self.logger.error(f"Communication exception: {e}")
-        except KeyboardInterrupt as e:
-            self.logger.error(f"Keyboard Interrupt: {e}")
-        except Exception as e:
-            self.logger.error(f"Exception: {e}")
-        finally:
-            self.communication.stopLoop()
         command()
 
     def loop(self) -> None:
