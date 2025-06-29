@@ -7,12 +7,14 @@
 
 from typing import Any
 
+
 def isNumber(str: str):
     try:
         int(str)
         return True
-    except:
+    except Exception:
         return False
+
 
 class State:
     def __init__(self, status: bool, **attributes):
