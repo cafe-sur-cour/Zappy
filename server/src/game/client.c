@@ -107,6 +107,8 @@ static player_t *malloc_player(void)
     }
     memset(player->network->readingBuffer, 0, sizeof(buffer_t));
     memset(player->network->writingBuffer, 0, sizeof(buffer_t));
+    player->network->readingBuffer->delim = '\n';
+    player->network->writingBuffer->delim = '\n';
     return player;
 }
 

@@ -18,13 +18,14 @@ typedef struct buffer_s {
     int head;
     int tail;
     int full;
+    char delim;
 } buffer_t;
 
 /* buffer.c */
 int advance(int idx);
 void cb_write(buffer_t *cb, char c);
 int cb_getline(buffer_t *cb, char *line, int max_len);
-buffer_t *create_buffer(void);
+buffer_t *create_buffer(char delimiter);
 int write_in_buffer(buffer_t *cb, const char *str);
 void print_buffer_state(buffer_t *cb, const char *label);
 void empty_buffer(buffer_t *cb);

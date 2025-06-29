@@ -51,7 +51,7 @@ int cb_getline(buffer_t *cb, char *line, int max_len)
     return 0;
 }
 
-buffer_t *create_buffer(void)
+buffer_t *create_buffer(char delimiter)
 {
     buffer_t *buffer = malloc(sizeof(buffer_t));
 
@@ -62,6 +62,7 @@ buffer_t *create_buffer(void)
     buffer->head = 0;
     buffer->tail = 0;
     buffer->full = 0;
+    buffer->delim = delimiter;
     memset(buffer->data, 0, sizeof(buffer->data));
     return buffer;
 }
